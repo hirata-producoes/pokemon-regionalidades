@@ -99,7 +99,21 @@ ASSETS_DIR_NAME := $(BUILD_DIR)/assets
 RESOURCE_PACK := pokemon_go_world.pak
 RESOURCE_PACK_MANIFEST := resources/pc/manifest.json
 RESOURCE_PACK_BUILDER := tools/pokemon_go_world/pack_resources.py
-PC_RESOURCE_ASSETS := $(ASSETS_DIR_NAME)/graphics/title_screen/pokemon_logo.png.8bpp.smol
+PC_RESOURCE_ASSETS := \
+	$(ASSETS_DIR_NAME)/graphics/title_screen/pokemon_logo.png.8bpp.smol \
+	$(ASSETS_DIR_NAME)/graphics/title_screen/pokemon_logo.bin.smolTM \
+	$(ASSETS_DIR_NAME)/graphics/title_screen/rayquaza.png.4bpp.smol \
+	$(ASSETS_DIR_NAME)/graphics/title_screen/rayquaza.bin.smolTM \
+	$(ASSETS_DIR_NAME)/graphics/title_screen/clouds.png.4bpp.smol \
+	$(ASSETS_DIR_NAME)/graphics/title_screen/clouds.bin.smolTM \
+	$(ASSETS_DIR_NAME)/graphics/title_screen/emerald_version.png_mwidth_8__mheight_4.8bpp.smol \
+	$(ASSETS_DIR_NAME)/graphics/title_screen/emerald_version.png.gbapal \
+	$(ASSETS_DIR_NAME)/graphics/title_screen/press_start.png_mwidth_4__mheight_1__num_tiles_48__Wnum_tiles.4bpp.smol \
+	$(ASSETS_DIR_NAME)/graphics/title_screen/press_start.png.gbapal \
+	$(ASSETS_DIR_NAME)/graphics/title_screen/logo_shine.png.4bpp.smol
+PC_RESOURCE_SOURCE_FILES := \
+	graphics/title_screen/pokemon_logo.gbapal \
+	graphics/title_screen/rayquaza_and_clouds.gbapal
 
 ELF_NAME := $(ROM_NAME:.exe=.elf)
 MAP_NAME := $(ROM_NAME:.exe=.map)
@@ -582,7 +596,7 @@ $(ROM): $(OBJS) $(PC_RESOURCE_ASSETS)
 	$(file >$(OBJ_DIR)/objects.rsp,$(OBJS))
 	$(CC) $(CFLAGS) -Wl,--demangle -Wl,-Map,$(MAP) @$(OBJ_DIR)/objects.rsp -static-libgcc -L$(SDL_DIR)/lib $(PLATFORM_LIBS) -o $@
 
-$(RESOURCE_PACK): $(PC_RESOURCE_ASSETS) $(RESOURCE_PACK_MANIFEST) $(RESOURCE_PACK_BUILDER)
+$(RESOURCE_PACK): $(PC_RESOURCE_ASSETS) $(PC_RESOURCE_SOURCE_FILES) $(RESOURCE_PACK_MANIFEST) $(RESOURCE_PACK_BUILDER)
 	$(PYTHON) $(RESOURCE_PACK_BUILDER) build --manifest $(RESOURCE_PACK_MANIFEST) --output $@ --root .
 
 emerald: all

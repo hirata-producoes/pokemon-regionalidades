@@ -4,6 +4,53 @@
     {
       "name": "graphics/title_screen/pokemon_logo.8bpp.smol",
       "source": "build/assets/graphics/title_screen/pokemon_logo.png.8bpp.smol"
+    },
+    {
+      "name": "graphics/title_screen/pokemon_logo.smolTM",
+      "source": "build/assets/graphics/title_screen/pokemon_logo.bin.smolTM"
+    },
+    {
+      "name": "graphics/title_screen/background.gbapal",
+      "sources": [
+        "graphics/title_screen/pokemon_logo.gbapal",
+        "graphics/title_screen/rayquaza_and_clouds.gbapal"
+      ]
+    },
+    {
+      "name": "graphics/title_screen/rayquaza.4bpp.smol",
+      "source": "build/assets/graphics/title_screen/rayquaza.png.4bpp.smol"
+    },
+    {
+      "name": "graphics/title_screen/rayquaza.smolTM",
+      "source": "build/assets/graphics/title_screen/rayquaza.bin.smolTM"
+    },
+    {
+      "name": "graphics/title_screen/clouds.4bpp.smol",
+      "source": "build/assets/graphics/title_screen/clouds.png.4bpp.smol"
+    },
+    {
+      "name": "graphics/title_screen/clouds.smolTM",
+      "source": "build/assets/graphics/title_screen/clouds.bin.smolTM"
+    },
+    {
+      "name": "graphics/title_screen/emerald_version.8bpp.smol",
+      "source": "build/assets/graphics/title_screen/emerald_version.png_mwidth_8__mheight_4.8bpp.smol"
+    },
+    {
+      "name": "graphics/title_screen/emerald_version.gbapal",
+      "source": "build/assets/graphics/title_screen/emerald_version.png.gbapal"
+    },
+    {
+      "name": "graphics/title_screen/press_start.4bpp.smol",
+      "source": "build/assets/graphics/title_screen/press_start.png_mwidth_4__mheight_1__num_tiles_48__Wnum_tiles.4bpp.smol"
+    },
+    {
+      "name": "graphics/title_screen/press_start.gbapal",
+      "source": "build/assets/graphics/title_screen/press_start.png.gbapal"
+    },
+    {
+      "name": "graphics/title_screen/logo_shine.4bpp.smol",
+      "source": "build/assets/graphics/title_screen/logo_shine.png.4bpp.smol"
     }
   ]
 }
