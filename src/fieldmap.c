@@ -14,6 +14,7 @@
 #include "secret_base.h"
 #include "trainer_hill.h"
 #include "tv.h"
+#include "tileset_resources.h"
 #include "constants/rgb.h"
 #include "constants/layouts.h"
 #include "constants/metatile_behaviors.h"
@@ -482,12 +483,12 @@ static u32 GetAttributeByMetatileIdAndMapLayoutFrlg(u16 metatile, u8 attributeTy
     u32 attribute;
     if (metatile < GetNumMetatilesInPrimary(gMapHeader.mapLayout))
     {
-        const u32 *attributes = (const u32*)gMapHeader.mapLayout->primaryTileset->metatileAttributes;
+        const u32 *attributes = (const u32 *)ResolveTilesetAttributes(gMapHeader.mapLayout->primaryTileset->metatileAttributes);
         attribute = attributes[metatile];
     }
     else if (metatile < NUM_METATILES_TOTAL)
     {
-        const u32 *attributes = (const u32*) gMapHeader.mapLayout->secondaryTileset->metatileAttributes;
+        const u32 *attributes = (const u32 *)ResolveTilesetAttributes(gMapHeader.mapLayout->secondaryTileset->metatileAttributes);
         metatile -= GetNumMetatilesInPrimary(gMapHeader.mapLayout);
         attribute = attributes[metatile];
     }
@@ -508,12 +509,12 @@ u32 GetAttributeByMetatileIdAndMapLayout(u16 metatile, u8 attributeType, bool32 
 
     if (metatile < GetNumMetatilesInPrimary(gMapHeader.mapLayout))
     {
-        const u16 *attributes = (const u16*)gMapHeader.mapLayout->primaryTileset->metatileAttributes;
+        const u16 *attributes = ResolveTilesetAttributes(gMapHeader.mapLayout->primaryTileset->metatileAttributes);
         attribute = attributes[metatile];
     }
     else if (metatile < NUM_METATILES_TOTAL)
     {
-        const u16 *attributes = (const u16*)gMapHeader.mapLayout->secondaryTileset->metatileAttributes;
+        const u16 *attributes = ResolveTilesetAttributes(gMapHeader.mapLayout->secondaryTileset->metatileAttributes);
         metatile -= GetNumMetatilesInPrimary(gMapHeader.mapLayout);
         attribute = attributes[metatile];
     }
@@ -948,10 +949,13 @@ static void CopyTilesetToVram(struct Tileset const *tileset, u16 numTiles, u16 o
 {
     if (tileset)
     {
+        const u32 *tiles = ResolveTilesetTiles(tileset->tiles);
+        if (tiles == NULL)
+            return;
         if (!tileset->isCompressed)
-            LoadBgTiles(2, tileset->tiles, numTiles * 32, offset);
+            LoadBgTiles(2, tiles, numTiles * 32, offset);
         else
-            DecompressAndCopyTileDataToVram(2, tileset->tiles, numTiles * 32, offset, 0);
+            DecompressAndCopyTileDataToVram(2, tiles, numTiles * 32, offset, 0);
     }
 }
 
@@ -959,10 +963,13 @@ static void CopyTilesetToVramUsingHeap(struct Tileset const *tileset, u16 numTil
 {
     if (tileset)
     {
+        const u32 *tiles = ResolveTilesetTiles(tileset->tiles);
+        if (tiles == NULL)
+            return;
         if (!tileset->isCompressed)
-            LoadBgTiles(2, tileset->tiles, numTiles * 32, offset);
+            LoadBgTiles(2, tiles, numTiles * 32, offset);
         else
-            DecompressAndLoadBgGfxUsingHeap(2, tileset->tiles, numTiles * 32, offset, 0);
+            DecompressAndLoadBgGfxUsingHeap(2, tiles, numTiles * 32, offset, 0);
     }
 }
 
@@ -981,12 +988,15 @@ static void LoadTilesetPalette(struct Tileset const *tileset, u16 destOffset, u1
 {
     if (tileset)
     {
+        const u16 (*palettes)[16] = ResolveTilesetPalettes(tileset->palettes);
+        if (palettes == NULL)
+            return;
         if (tileset->isSecondary == FALSE)
         {
             if (skipFaded)
-                CpuFastCopy(tileset->palettes, &gPlttBufferUnfaded[destOffset], size); // always word-aligned
+                CpuFastCopy(palettes, &gPlttBufferUnfaded[destOffset], size); // always word-aligned
             else
-                LoadPaletteFast(tileset->palettes, destOffset, size);
+                LoadPaletteFast(palettes, destOffset, size);
             gPlttBufferFaded[destOffset] = gPlttBufferUnfaded[destOffset] = RGB_BLACK;
             ApplyGlobalTintToPaletteEntries(destOffset + 1, (size - 2) >> 1);
         }
@@ -995,13 +1005,13 @@ static void LoadTilesetPalette(struct Tileset const *tileset, u16 destOffset, u1
             // All 'gTilesetPalettes_' arrays should have ALIGNED(4) in them,
             // but we use SmartCopy here just in case they don't
             if (skipFaded)
-                CpuCopy16(tileset->palettes[numPalsInPrimary], &gPlttBufferUnfaded[destOffset], size);
+                CpuCopy16(palettes[numPalsInPrimary], &gPlttBufferUnfaded[destOffset], size);
             else
-                LoadPaletteFast(tileset->palettes[numPalsInPrimary], destOffset, size);
+                LoadPaletteFast(palettes[numPalsInPrimary], destOffset, size);
         }
         else
         {
-            LoadPalette((const u16 *)tileset->palettes, destOffset, size);
+            LoadPalette((const u16 *)palettes, destOffset, size);
             ApplyGlobalTintToPaletteEntries(destOffset, size >> 1);
         }
     }

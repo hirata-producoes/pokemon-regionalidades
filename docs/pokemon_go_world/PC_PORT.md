@@ -33,8 +33,9 @@ Este alvo compila diretamente o código decompilado do jogo para Windows/SDL2. E
 - Tela de resumo validada a partir do menu de equipe, incluindo sprite/paleta externos, dados, habilidade, descrição, memo e transição para renomear. Duas escritas de texto que alcançavam a borda do buffer receberam margens apenas no alvo PC; uma execução automatizada de 15 segundos terminou sem exceção.
 - A configuração ativa gera 1.067 cries externos (7,74 MiB). O mixer os carrega e mantém em cache somente quando cada espécie toca; as tabelas montadas permanecem imutáveis e o GBA conserva as amostras compiladas originais.
 - Batalha de regressão confirmou `Cry_Pikachu` e `Cry_Bulbasaur` vindos do pacote. Sem o pacote, ambos são omitidos com segurança e a batalha continua sem exceção.
-- O executável agora mede 24.171.265 bytes (aproximadamente 23,05 MiB), o pacote com 9.369 entradas mede 12.985.552 bytes (aproximadamente 12,38 MiB) e `data/sound_data.o` caiu para aproximadamente 0,96 MiB no PC.
-- Próximo marco: migrar tilesets e outras famílias grandes.
+- Os tilesets de mapa ativos também foram externalizados: 85 gráficos de tiles, 77 conjuntos de paletas, 72 tabelas de metatiles e 72 tabelas de atributos. O primeiro mapa carregou `General` e `InsideOfTruck` diretamente do pacote; sem pacote, dados zerados seguros evitam leituras inválidas.
+- O executável agora mede 23.459.351 bytes (aproximadamente 22,37 MiB), o pacote com 9.675 entradas mede 13.758.256 bytes (aproximadamente 13,12 MiB), `data/sound_data.o` permanece em aproximadamente 0,96 MiB e `src/tilesets.o` caiu para aproximadamente 0,06 MiB no PC.
+- Próximo marco: migrar animações de tileset, músicas/instrumentos e outras famílias grandes.
 
 ## Compatibilidades resolvidas para o primeiro mapa
 
@@ -75,7 +76,7 @@ O alvo interno também está disponível como `make pc` quando `make`, GCC i686,
 
 ## Sobre 32 bits e tamanho
 
-O executável continua sendo de 32 bits nesta fase porque scripts e tabelas do jogo armazenam ponteiros de 32 bits. Isso não impõe o limite de ROM de 32 MiB. Recursos já podem ser carregados sob demanda de um pacote externo com offsets de 64 bits; tela de título, imagens, paletas, ícones, pegadas e cries de Pokémon já foram migrados.
+O executável continua sendo de 32 bits nesta fase porque scripts e tabelas do jogo armazenam ponteiros de 32 bits. Isso não impõe o limite de ROM de 32 MiB. Recursos já podem ser carregados sob demanda de um pacote externo com offsets de 64 bits; tela de título, imagens, paletas, ícones, pegadas, cries de Pokémon e tilesets de mapas já foram migrados.
 
 ## Próximos marcos
 

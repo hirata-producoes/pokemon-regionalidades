@@ -72,6 +72,7 @@
 #include "tileset_anims.h"
 #include "time_events.h"
 #include "trainer_hill.h"
+#include "tileset_resources.h"
 #include "trainer_pokemon_sprites.h"
 #include "tv.h"
 #include "scanline_effect.h"
@@ -1792,8 +1793,12 @@ void UpdateAltBgPalettes(u16 palettes)
 {
     const struct Tileset *primary = gMapHeader.mapLayout->primaryTileset;
     const struct Tileset *secondary = gMapHeader.mapLayout->secondaryTileset;
+    const u16 (*primaryPalettes)[16] = ResolveTilesetPalettes(primary->palettes);
+    const u16 (*secondaryPalettes)[16] = ResolveTilesetPalettes(secondary->palettes);
     u32 i = 1;
     if (!MapHasNaturalLight(gMapHeader.mapType))
+        return;
+    if (primaryPalettes == NULL || secondaryPalettes == NULL)
         return;
     palettes &= ~((1 << GetNumPalsInPrimary(gMapHeader.mapLayout)) - 1) | primary->swapPalettes;
     palettes &= ((1 << GetNumPalsInPrimary(gMapHeader.mapLayout)) - 1) | (secondary->swapPalettes << GetNumPalsInPrimary(gMapHeader.mapLayout));
@@ -1806,9 +1811,9 @@ void UpdateAltBgPalettes(u16 palettes)
         if (palettes & 1)
         {
             if (i < GetNumPalsInPrimary(gMapHeader.mapLayout))
-                AvgPaletteWeighted(&((u16 *)primary->palettes)[i * 16], &((u16 *)primary->palettes)[((i + 9) % 16) * 16], gPlttBufferUnfaded + i * 16, gTimeBlend.altWeight);
+                AvgPaletteWeighted(&((u16 *)primaryPalettes)[i * 16], &((u16 *)primaryPalettes)[((i + 9) % 16) * 16], gPlttBufferUnfaded + i * 16, gTimeBlend.altWeight);
             else
-                AvgPaletteWeighted(&((u16 *)secondary->palettes)[i * 16], &((u16 *)secondary->palettes)[((i + 9) % 16) * 16], gPlttBufferUnfaded + i * 16, gTimeBlend.altWeight);
+                AvgPaletteWeighted(&((u16 *)secondaryPalettes)[i * 16], &((u16 *)secondaryPalettes)[((i + 9) % 16) * 16], gPlttBufferUnfaded + i * 16, gTimeBlend.altWeight);
         }
         i++;
         palettes >>= 1;

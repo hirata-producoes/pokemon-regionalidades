@@ -11,6 +11,7 @@
 #include "rotating_gate.h"
 #include "sprite.h"
 #include "text.h"
+#include "tileset_resources.h"
 
 //EWRAM_DATA bool8 gUnusedBikeCameraAheadPanback = FALSE;   //  Old EWRAM variable that was never set to anything other than false
 
@@ -232,11 +233,11 @@ static void DrawMetatileAt(const struct MapLayout *mapLayout, u16 offset, int x,
         metatileId = 0;
     if (metatileId < GetNumMetatilesInPrimary(mapLayout))
     {
-        metatiles = mapLayout->primaryTileset->metatiles;
+        metatiles = ResolveTilesetMetatiles(mapLayout->primaryTileset->metatiles);
     }
     else
     {
-        metatiles = mapLayout->secondaryTileset->metatiles;
+        metatiles = ResolveTilesetMetatiles(mapLayout->secondaryTileset->metatiles);
         metatileId -= GetNumMetatilesInPrimary(mapLayout);
     }
     DrawMetatile(MapGridGetMetatileLayerTypeAt(x, y), metatiles + metatileId * NUM_TILES_PER_METATILE, offset);
