@@ -15,9 +15,11 @@ Este alvo compila diretamente o código decompilado do jogo para Windows/SDL2. E
 - Primeiro mapa confirmado: o jogo conclui `CB2_NewGame`, entra em `CB2_Overworld` e renderiza o interior do caminhão inicial.
 - Teste automatizado permaneceu estável por mais de 100 segundos, incluindo a criação do personagem e a entrada no mapa.
 - Controles e renderização dinâmica confirmados: o personagem se movimenta no caminhão, atravessa a saída e chega a Littleroot com a primeira conversa da mãe renderizada.
-- O executável mede 36.155.607 bytes (aproximadamente 34,48 MiB), portanto o alvo PC já não está preso ao limite de ROM de 32 MiB.
+- Save nativo validado em duas execuções: o jogo grava `pokemon_go_world.sav` com 131.072 bytes e apresenta `CONTINUE` carregando o mapa salvo após reiniciar.
+- Backend SII RTC do PC validado contra a data e hora locais do Windows. O projeto continua respeitando `OW_USE_FAKE_RTC = TRUE`, portanto a jogabilidade usa o relógio persistido no save; se essa opção for desativada, o backend nativo segue o relógio do sistema e persiste seu deslocamento em `pokemon_go_world.cfg`.
+- O executável mede 36.158.587 bytes (aproximadamente 34,48 MiB), portanto o alvo PC já não está preso ao limite de ROM de 32 MiB.
 - Áudio MP2K, multiboot e recursos específicos do hardware GBA estão temporariamente isolados por stubs; multiboot não fará parte do alvo PC e o áudio será substituído pela implementação nativa.
-- Próximo marco: validar controles normais no mapa, renderização dinâmica, áudio, RTC e save.
+- Próximo marco: implementar e validar o áudio MP2K nativo.
 
 ## Compatibilidades resolvidas para o primeiro mapa
 
@@ -26,6 +28,8 @@ Este alvo compila diretamente o código decompilado do jogo para Windows/SDL2. E
 - Espelho de ROM usado pelo interpretador de scripts do GBA removido somente no alvo PC; o alvo GBA conserva a marcação original.
 - Fila de DMA processada no host durante carregamentos síncronos, reproduzindo o progresso que o VBlank assíncrono realiza no hardware.
 - Sondagem RFU desativada no PC e encerramentos de tela protegidos contra callbacks de um quadro já liberado.
+- GPIO do RTC do cartucho substituído, somente no alvo portátil, por um backend SDL2 baseado no relógio do sistema.
+- Persistência do flash conectada a um arquivo próprio do projeto, sem alterar o formato do save GBA.
 
 ## Como compilar
 
@@ -58,6 +62,7 @@ O executável continua sendo de 32 bits nesta fase porque scripts e tabelas do j
 1. ~~Compilar todos os objetos do Expansion.~~
 2. ~~Linkar o primeiro executável Pokémon GO World para PC.~~
 3. ~~Confirmar a tela inicial e chegar ao primeiro mapa.~~
-4. Validar controles, vídeo, áudio, RTC e save.
-5. Validar batalhas, animações e menus do Expansion.
-6. Introduzir o pacote externo de recursos.
+4. ~~Validar controles, vídeo, RTC e save.~~
+5. Implementar e validar o áudio MP2K nativo.
+6. Validar batalhas, animações e menus do Expansion.
+7. Introduzir o pacote externo de recursos.

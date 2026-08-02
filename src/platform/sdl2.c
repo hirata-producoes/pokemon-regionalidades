@@ -80,10 +80,11 @@ double curGameTime = 0;
 double fixedTimestep = 1.0 / 60.0; // 16.666667ms
 double timeScale = 1.0;
 struct SiiRtcInfo internalClock;
+static time_t sRtcOffsetSeconds;
 
 static FILE *sSaveFile = NULL;
-static char sSavePath[1024] = "pokeemerald.sav";
-static char sConfigPath[1024] = "pokeemerald.cfg";
+static char sSavePath[1024] = "pokemon_go_world.sav";
+static char sConfigPath[1024] = "pokemon_go_world.cfg";
 static u8 sBorderBackground;
 static bool sHasBorderBackgroundConfig;
 static u8 sBackgroundOrderVersion;
@@ -107,6 +108,7 @@ static void StoreSaveFile(void);
 static void CloseSaveFile(void);
 
 static void UpdateInternalClock(void);
+static void SetInternalClockFromRtc(const struct SiiRtcInfo *rtc, bool includeDate);
 
 #ifdef __ANDROID__
 static void HandleTouchEvent(const SDL_TouchFingerEvent *event);
@@ -165,8 +167,8 @@ int main(int argc, char **argv)
     char *prefPath = SDL_GetPrefPath("pokeemerald", "pokeemerald");
     if (prefPath != NULL)
     {
-        SDL_snprintf(sSavePath, sizeof(sSavePath), "%spokeemerald.sav", prefPath);
-        SDL_snprintf(sConfigPath, sizeof(sConfigPath), "%spokeemerald.cfg", prefPath);
+        SDL_snprintf(sSavePath, sizeof(sSavePath), "%spokemon_go_world.sav", prefPath);
+        SDL_snprintf(sConfigPath, sizeof(sConfigPath), "%spokemon_go_world.cfg", prefPath);
         SDL_free(prefPath);
     }
 #endif
@@ -321,13 +323,26 @@ int main(int argc, char **argv)
 #ifndef __ANDROID__
     VDraw(sdlTexture);
 #endif
-    mainLoopThread = SDL_CreateThread(DoMain, "AgbMain", NULL);
 
-    double accumulator = 0.0;
-
+    // Initialize the emulated cartridge RTC before the game thread can probe
+    // it. The project may choose its save-backed fake clock at compile time,
+    // but the native SII backend remains available and follows host time.
     memset(&internalClock, 0, sizeof(internalClock));
     internalClock.status = SIIRTCINFO_24HOUR;
     UpdateInternalClock();
+    if (Platform_GetEnvironmentFlag("POKEMON_GO_WORLD_TEST_RTC"))
+    {
+        struct SiiRtcInfo rtc;
+        SiiRtcUnprotect();
+        if (SiiRtcGetDateTime(&rtc))
+            DBGPRINTF("PC RTC test: SII backend read succeeded\n");
+        else
+            DBGPRINTF("PC RTC test: SII backend read failed\n");
+    }
+
+    mainLoopThread = SDL_CreateThread(DoMain, "AgbMain", NULL);
+
+    double accumulator = 0.0;
 
     while (isRunning)
     {
@@ -475,6 +490,7 @@ static void ReadConfigFile(void)
     FILE *configFile = fopen(sConfigPath, "r");
     char line[64];
     unsigned int value;
+    long long signedValue;
 
     if (configFile == NULL)
         return;
@@ -499,6 +515,8 @@ static void ReadConfigFile(void)
             sPlatformSettings[PLATFORM_SETTING_BORDER] = value != 0;
         else if (sscanf(line, "volume=%u", &value) == 1 && value <= 10)
             sPlatformSettings[PLATFORM_SETTING_VOLUME] = value;
+        else if (sscanf(line, "rtcOffsetSeconds=%lld", &signedValue) == 1)
+            sRtcOffsetSeconds = (time_t)signedValue;
     }
     fclose(configFile);
 }
@@ -517,6 +535,7 @@ static void StoreConfigFile(void)
     fprintf(configFile, "vsync=%u\n", sPlatformSettings[PLATFORM_SETTING_VSYNC]);
     fprintf(configFile, "border=%u\n", sPlatformSettings[PLATFORM_SETTING_BORDER]);
     fprintf(configFile, "volume=%u\n", sPlatformSettings[PLATFORM_SETTING_VOLUME]);
+    fprintf(configFile, "rtcOffsetSeconds=%lld\n", (long long)sRtcOffsetSeconds);
     fclose(configFile);
 }
 
@@ -548,6 +567,12 @@ static void StoreSaveFile()
 void Platform_StoreSaveFile(void)
 {
     StoreSaveFile();
+}
+
+bool32 Platform_GetEnvironmentFlag(const char *name)
+{
+    const char *value = SDL_getenv(name);
+    return value != NULL && value[0] != '\0' && value[0] != '0';
 }
 
 void Platform_ReadFlash(u16 sectorNum, u32 offset, u8 *dest, u32 size)
@@ -1185,7 +1210,7 @@ void VBlankIntrWait(void)
     SDL_SemWait(vBlankSemaphore);
 }
 
-u8 BinToBcd(u8 bin)
+static u8 BinToBcd(u8 bin)
 {
     int placeCounter = 1;
     u8 out = 0;
@@ -1197,6 +1222,11 @@ u8 BinToBcd(u8 bin)
     while ((bin /= 10) > 0);
 
     return out;
+}
+
+static u8 BcdToBin(u8 bcd)
+{
+    return ((bcd >> 4) * 10) + (bcd & 0xF);
 }
 
 void Platform_GetStatus(struct SiiRtcInfo *rtc)
@@ -1211,8 +1241,11 @@ void Platform_SetStatus(struct SiiRtcInfo *rtc)
 
 static void UpdateInternalClock(void)
 {
-    time_t rawTime = time(NULL);
+    time_t rawTime = time(NULL) + sRtcOffsetSeconds;
     struct tm *time = localtime(&rawTime);
+
+    if (time == NULL)
+        return;
 
     internalClock.year = BinToBcd(time->tm_year - 100);
     internalClock.month = BinToBcd(time->tm_mon + 1);
@@ -1221,6 +1254,37 @@ static void UpdateInternalClock(void)
     internalClock.hour = BinToBcd(time->tm_hour);
     internalClock.minute = BinToBcd(time->tm_min);
     internalClock.second = BinToBcd(time->tm_sec);
+}
+
+static void SetInternalClockFromRtc(const struct SiiRtcInfo *rtc, bool includeDate)
+{
+    time_t adjustedNow = time(NULL) + sRtcOffsetSeconds;
+    struct tm *current = localtime(&adjustedNow);
+    struct tm desired;
+    time_t desiredTime;
+
+    if (current == NULL)
+        return;
+
+    desired = *current;
+    if (includeDate)
+    {
+        desired.tm_year = 100 + BcdToBin(rtc->year);
+        desired.tm_mon = BcdToBin(rtc->month) - 1;
+        desired.tm_mday = BcdToBin(rtc->day);
+    }
+    desired.tm_hour = BcdToBin(rtc->hour);
+    desired.tm_min = BcdToBin(rtc->minute);
+    desired.tm_sec = BcdToBin(rtc->second);
+    desired.tm_isdst = -1;
+
+    desiredTime = mktime(&desired);
+    if (desiredTime == (time_t)-1)
+        return;
+
+    sRtcOffsetSeconds = desiredTime - time(NULL);
+    UpdateInternalClock();
+    StoreConfigFile();
 }
 
 void Platform_GetDateTime(struct SiiRtcInfo *rtc)
@@ -1234,22 +1298,17 @@ void Platform_GetDateTime(struct SiiRtcInfo *rtc)
     rtc->hour = internalClock.hour;
     rtc->minute = internalClock.minute;
     rtc->second = internalClock.second;
-    DBGPRINTF("GetDateTime: %d-%02d-%02d %02d:%02d:%02d\n", ConvertBcdToBinary(rtc->year),
-                                                         ConvertBcdToBinary(rtc->month),
-                                                         ConvertBcdToBinary(rtc->day),
-                                                         ConvertBcdToBinary(rtc->hour),
-                                                         ConvertBcdToBinary(rtc->minute),
-                                                         ConvertBcdToBinary(rtc->second));
+    DBGPRINTF("GetDateTime: %d-%02d-%02d %02d:%02d:%02d\n", BcdToBin(rtc->year),
+                                                         BcdToBin(rtc->month),
+                                                         BcdToBin(rtc->day),
+                                                         BcdToBin(rtc->hour),
+                                                         BcdToBin(rtc->minute),
+                                                         BcdToBin(rtc->second));
 }
 
 void Platform_SetDateTime(struct SiiRtcInfo *rtc)
 {
-    internalClock.month = rtc->month;
-    internalClock.day = rtc->day;
-    internalClock.dayOfWeek = rtc->dayOfWeek;
-    internalClock.hour = rtc->hour;
-    internalClock.minute = rtc->minute;
-    internalClock.second = rtc->second;
+    SetInternalClockFromRtc(rtc, true);
 }
 
 void Platform_GetTime(struct SiiRtcInfo *rtc)
@@ -1259,16 +1318,14 @@ void Platform_GetTime(struct SiiRtcInfo *rtc)
     rtc->hour = internalClock.hour;
     rtc->minute = internalClock.minute;
     rtc->second = internalClock.second;
-    DBGPRINTF("GetTime: %02d:%02d:%02d\n", ConvertBcdToBinary(rtc->hour),
-                                        ConvertBcdToBinary(rtc->minute),
-                                        ConvertBcdToBinary(rtc->second));
+    DBGPRINTF("GetTime: %02d:%02d:%02d\n", BcdToBin(rtc->hour),
+                                        BcdToBin(rtc->minute),
+                                        BcdToBin(rtc->second));
 }
 
 void Platform_SetTime(struct SiiRtcInfo *rtc)
 {
-    internalClock.hour = rtc->hour;
-    internalClock.minute = rtc->minute;
-    internalClock.second = rtc->second;
+    SetInternalClockFromRtc(rtc, false);
 }
 
 void Platform_SetAlarm(u8 *alarmData)

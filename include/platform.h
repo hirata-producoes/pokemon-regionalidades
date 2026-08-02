@@ -6,6 +6,7 @@
 
 void Platform_StoreSaveFile(void);
 void Platform_ReadFlash(u16 sectorNum, u32 offset, u8 *dest, u32 size);
+bool32 Platform_GetEnvironmentFlag(const char *name);
 void Platform_QueueAudio(float *audioBuffer, s32 samplesPerFrame);
 u16 Platform_GetKeyInput(void);
 u8 Platform_GetBorderBackgroundCount(void);
@@ -27,7 +28,6 @@ u8 Platform_GetSetting(enum PlatformSetting setting);
 void Platform_SetSetting(enum PlatformSetting setting, u8 value);
 void Platform_GetStatus(struct SiiRtcInfo *rtc);
 void Platform_SetStatus(struct SiiRtcInfo *rtc);
-static void UpdateInternalClock(void);
 void Platform_GetDateTime(struct SiiRtcInfo *rtc);
 void Platform_SetDateTime(struct SiiRtcInfo *rtc);
 void Platform_GetTime(struct SiiRtcInfo *rtc);
@@ -35,4 +35,3 @@ void Platform_SetTime(struct SiiRtcInfo *rtc);
 void Platform_SetAlarm(u8 *alarmData);
 
 #endif
-
