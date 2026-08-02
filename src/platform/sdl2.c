@@ -54,6 +54,7 @@ static LONG CALLBACK LogNativeException(EXCEPTION_POINTERS *exception)
 #include "gba/flash_internal.h"
 #include "platform/dma.h"
 #include "platform/framedraw.h"
+#include "resource_pack.h"
 
 extern void (*const gIntrTable[])(void);
 
@@ -154,6 +155,13 @@ int main(int argc, char **argv)
         return 1;
     }
     DBGPRINTF("PC port: SDL initialized\n");
+
+    {
+        const char *resourcePackPath = SDL_getenv("POKEMON_GO_WORLD_RESOURCE_PACK");
+        if (resourcePackPath == NULL || resourcePackPath[0] == '\0')
+            resourcePackPath = "pokemon_go_world.pak";
+        ResourcePack_Open(resourcePackPath);
+    }
 
 #ifdef __ANDROID__
     for (int i = 0; i < SDL_NumJoysticks() && androidController == NULL; i++)
@@ -438,6 +446,7 @@ int main(int argc, char **argv)
 
     //StoreSaveFile();
     CloseSaveFile();
+    ResourcePack_Close();
 
 #if defined(NATIVE_LINUX) || defined(_WIN32)
     for (int i = 0; i < sBorderBackgroundCount; i++)

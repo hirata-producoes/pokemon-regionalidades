@@ -1,0 +1,9 @@
+{
+  "format_version": 1,
+  "resources": [
+    {
+      "name": "graphics/title_screen/pokemon_logo.8bpp.smol",
+      "source": "build/assets/graphics/title_screen/pokemon_logo.png.8bpp.smol"
+    }
+  ]
+}
