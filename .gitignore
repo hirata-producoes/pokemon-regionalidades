@@ -1,4 +1,6 @@
 *.exe
+*.dll
+build_pc.log
 *.o
 *.i
 *.elf

@@ -34,7 +34,7 @@
 class CFile
 {
 public:
-    CFile(const char * filenameCStr, bool isStdin, const char * graphicsRootCStr);
+    CFile(const char * filenameCStr, bool isStdin, const char * graphicsRootCStr, bool portable);
     CFile(CFile&& other);
     CFile(const CFile&) = delete;
     ~CFile();
@@ -50,6 +50,7 @@ private:
         bool acceptLineMarker;
     } m_location;
     bool m_isStdin;
+    bool m_portable;
     std::string m_graphicsRoot;
     std::map<std::vector<unsigned char>, std::uint64_t> m_compoundStrings;
     std::string m_output;

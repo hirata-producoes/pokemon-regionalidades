@@ -24,6 +24,9 @@
 #include "main.h"
 #include "trainer_hill.h"
 #include "test_runner.h"
+#ifdef PORTABLE
+#include "platform.h"
+#endif
 #include "constants/rgb.h"
 
 static void VBlankIntr(void);
@@ -32,8 +35,10 @@ static void VCountIntr(void);
 static void SerialIntr(void);
 static void IntrDummy(void);
 
+#ifndef PORTABLE
 // Defined in the linker script so that the test build can override it.
 extern void gInitialMainCB2(void);
+#endif
 extern void CB2_FlashNotDetectedScreen(void);
 
 const enum GameVersion gGameVersion = GAME_VERSION;
@@ -100,7 +105,9 @@ void AgbMain(void)
     InitIntrHandlers();
     m4aSoundInit();
     EnableVCountIntrAtLine150();
+#ifndef PORTABLE
     InitRFU();
+#endif
     RtcInit();
     CheckForFlashMemory();
     InitMainCallbacks();
@@ -115,8 +122,10 @@ void AgbMain(void)
 
     gSoftResetDisabled = FALSE;
 
+#ifndef PORTABLE
     if (gFlashMemoryPresent != TRUE)
         SetMainCallback2(CB2_FlashNotDetectedScreen);
+#endif
 
     gLinkTransferringData = FALSE;
 
@@ -185,7 +194,11 @@ static void InitMainCallbacks(void)
     gTrainerHillVBlankCounter = NULL;
     gMain.vblankCounter2 = 0;
     gMain.callback1 = NULL;
+#ifdef PORTABLE
+    SetMainCallback2(CB2_InitCopyrightScreenAfterBootup);
+#else
     SetMainCallback2(gInitialMainCB2);
+#endif
     gSaveBlock2Ptr = &gSaveblock2.block;
     gPokemonStoragePtr = &gPokemonStorage.block;
 }
@@ -268,7 +281,11 @@ void InitKeys(void)
 
 static void ReadKeys(void)
 {
+#ifdef PORTABLE
+    u16 keyInput = Platform_GetKeyInput();
+#else
     u16 keyInput = REG_KEYINPUT ^ KEYS_MASK;
+#endif
     gMain.newKeysRaw = keyInput & ~gMain.heldKeysRaw;
     gMain.newKeys = gMain.newKeysRaw;
     gMain.newAndRepeatedKeys = gMain.newKeysRaw;

@@ -406,7 +406,11 @@ extern void FastUnsafeCopy32(void *, const void *, u32 size);
 //  Dark Egg magic
 static inline void CopyFuncToIwram(void *funcBuffer, const void *funcStartAddress, const void *funcEndAdress)
 {
+#ifdef PORTABLE
+    memcpy(funcBuffer, funcStartAddress, (const u8 *)funcEndAdress - (const u8 *)funcStartAddress);
+#else
     FastUnsafeCopy32(funcBuffer, funcStartAddress, funcEndAdress - funcStartAddress);
+#endif
 }
 
 // The reason for macros and unrolling the loops stems from the following:
@@ -1398,8 +1402,12 @@ ARM_FUNC static void SwitchToArmCallFastLZ77(const u32 *src, void *dest, void (*
 
 void FastLZ77UnCompWram(const u32 *src, void *dest)
 {
+#ifdef PORTABLE
+    LZ77UnCompWram(src, dest);
+#else
     u32 funcBuffer[200];
 
     CopyFuncToIwram(funcBuffer, LZ77UnCompWRAMOptimized, LZ77UnCompWRAMOptimized_end);
     SwitchToArmCallFastLZ77(src, dest, (void *) funcBuffer);
+#endif
 }
