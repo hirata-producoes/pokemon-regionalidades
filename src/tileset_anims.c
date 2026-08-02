@@ -6,6 +6,7 @@
 #include "task.h"
 #include "battle_transition.h"
 #include "fieldmap.h"
+#include "tileset_anim_resources.h"
 
 static EWRAM_DATA struct {
     const u16 *src;
@@ -73,6 +74,12 @@ static void QueueAnimTiles_MauvilleGym_ElectricGates(u16);
 static void QueueAnimTiles_SootopolisGym_Waterfalls(u16);
 static void QueueAnimTiles_EliteFour_GroundLights(u16);
 static void QueueAnimTiles_EliteFour_WallLights(u16);
+
+#if defined(PORTABLE) && !defined(PC_TILESET_ANIM_RESOURCE_SCAN)
+#define PC_EXTERNAL_TILESET_ANIM_FRAME(...) {0}
+#define INCGFX_U16 PC_EXTERNAL_TILESET_ANIM_FRAME
+#define INCBIN_U16 PC_EXTERNAL_TILESET_ANIM_FRAME
+#endif
 
 const u16 gTilesetAnims_General_Flower_Frame1[] = INCGFX_U16("data/tilesets/primary/general/anim/flower/1.png", ".4bpp");
 const u16 gTilesetAnims_General_Flower_Frame0[] = INCGFX_U16("data/tilesets/primary/general/anim/flower/0.png", ".4bpp");
@@ -554,7 +561,7 @@ static void AppendTilesetAnimToBuffer(const u16 *src, u16 *dest, u16 size)
 {
     if (sTilesetDMA3TransferBufferSize < 20)
     {
-        sTilesetDMA3TransferBuffer[sTilesetDMA3TransferBufferSize].src = src;
+        sTilesetDMA3TransferBuffer[sTilesetDMA3TransferBufferSize].src = ResolveTilesetAnimFrame(src, size);
         sTilesetDMA3TransferBuffer[sTilesetDMA3TransferBufferSize].dest = dest;
         sTilesetDMA3TransferBuffer[sTilesetDMA3TransferBufferSize].size = size;
         sTilesetDMA3TransferBufferSize ++;
@@ -1432,3 +1439,6 @@ void InitTilesetAnim_CeladonGym(void)
     sSecondaryTilesetAnimCallback = TilesetAnim_CeladonGym;
 }
 
+#if defined(PORTABLE) && !defined(PC_TILESET_ANIM_RESOURCE_SCAN)
+#include "../build/pc-generated/tileset_anim_resources.h"
+#endif
