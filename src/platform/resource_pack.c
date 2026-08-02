@@ -219,8 +219,9 @@ bool32 ResourcePack_Open(const char *path)
         if (i != 0)
         {
             struct ResourcePackEntry *previous = &sResourcePackEntries[i - 1];
-            if (previous->hash > entry->hash
-             || (previous->hash == entry->hash && strcmp(previous->name, entry->name) >= 0))
+            // Hash-only lookups require hashes to be unique. The pack builder
+            // enforces this too, but validate the invariant for arbitrary files.
+            if (previous->hash >= entry->hash)
                 goto invalid;
         }
     }
@@ -240,12 +241,10 @@ bool32 ResourcePack_IsOpen(void)
     return sResourcePackFile != NULL;
 }
 
-static struct ResourcePackEntry *FindEntry(const char *name)
+static struct ResourcePackEntry *FindFirstEntryByHash(u64 hash)
 {
-    u64 hash = HashName(name);
     u32 left = 0;
     u32 right = sResourcePackEntryCount;
-    u32 index;
 
     while (left < right)
     {
@@ -256,7 +255,21 @@ static struct ResourcePackEntry *FindEntry(const char *name)
             right = middle;
     }
 
-    for (index = left; index < sResourcePackEntryCount && sResourcePackEntries[index].hash == hash; index++)
+    if (left < sResourcePackEntryCount && sResourcePackEntries[left].hash == hash)
+        return &sResourcePackEntries[left];
+    return NULL;
+}
+
+static struct ResourcePackEntry *FindEntry(const char *name)
+{
+    u64 hash = HashName(name);
+    struct ResourcePackEntry *entry = FindFirstEntryByHash(hash);
+    u32 index;
+
+    if (entry == NULL)
+        return NULL;
+    index = (u32)(entry - sResourcePackEntries);
+    for (; index < sResourcePackEntryCount && sResourcePackEntries[index].hash == hash; index++)
     {
         struct ResourcePackEntry *entry = &sResourcePackEntries[index];
         if (strcmp(entry->name, name) == 0)
@@ -289,6 +302,25 @@ static void *LoadEntryData(struct ResourcePackEntry *entry)
     return data;
 }
 
+static const void *GetEntryData(struct ResourcePackEntry *entry, u64 *sizeOut)
+{
+    if (sizeOut != NULL)
+        *sizeOut = 0;
+    if (entry == NULL)
+        return NULL;
+    if (entry->data == NULL)
+    {
+        entry->data = LoadEntryData(entry);
+        if (entry->data == NULL)
+            return NULL;
+        DBGPRINTF("Resource pack: cached %s (%llu bytes)\n",
+                  entry->name, (unsigned long long)entry->size);
+    }
+    if (sizeOut != NULL)
+        *sizeOut = entry->size;
+    return entry->data;
+}
+
 const void *ResourcePack_Get(const char *name, const void *fallback, u64 fallbackSize, u64 *sizeOut)
 {
     struct ResourcePackEntry *entry = FindEntry(name);
@@ -298,24 +330,23 @@ const void *ResourcePack_Get(const char *name, const void *fallback, u64 fallbac
 
     if (entry != NULL)
     {
-        if (entry->data == NULL)
-        {
-            entry->data = LoadEntryData(entry);
-            if (entry->data == NULL)
-                goto missing;
-            DBGPRINTF("Resource pack: cached %s (%llu bytes)\n", name, (unsigned long long)entry->size);
-        }
-        if (sizeOut != NULL)
-            *sizeOut = entry->size;
-        return entry->data;
+        const void *data = GetEntryData(entry, sizeOut);
+        if (data != NULL)
+            return data;
     }
 
-missing:
     if (fallback != NULL)
         DBGPRINTF("Resource pack: %s missing or unreadable; using compiled fallback\n", name);
     else
         DBGPRINTF("Resource pack: %s missing or unreadable; continuing without this resource\n", name);
+    if (sizeOut != NULL)
+        *sizeOut = fallbackSize;
     return fallback;
+}
+
+const void *ResourcePack_GetByHash(u64 hash, u64 *sizeOut)
+{
+    return GetEntryData(FindFirstEntryByHash(hash), sizeOut);
 }
 
 void *ResourcePack_Load(const char *name, u64 *sizeOut)
@@ -335,6 +366,23 @@ void *ResourcePack_Load(const char *name, u64 *sizeOut)
         *sizeOut = entry->size;
     DBGPRINTF("Resource pack: loaded transient %s (%llu bytes)\n",
               name, (unsigned long long)entry->size);
+    return data;
+}
+
+void *ResourcePack_LoadByHash(u64 hash, u64 *sizeOut)
+{
+    struct ResourcePackEntry *entry = FindFirstEntryByHash(hash);
+    void *data;
+
+    if (sizeOut != NULL)
+        *sizeOut = 0;
+    data = LoadEntryData(entry);
+    if (data == NULL)
+        return NULL;
+    if (sizeOut != NULL)
+        *sizeOut = entry->size;
+    DBGPRINTF("Resource pack: loaded transient %s (%llu bytes)\n",
+              entry->name, (unsigned long long)entry->size);
     return data;
 }
 

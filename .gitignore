@@ -1,6 +1,8 @@
 *.exe
 *.dll
 build_pc.log
+/build_pc_*.log
+/build_gba_*.log
 *.o
 *.i
 *.elf

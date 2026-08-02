@@ -5333,6 +5333,15 @@ const u16 *GetMonSpritePalFromSpecies(enum Species species, bool32 isShiny, bool
     return GetMonSpritePalFromSpeciesIsEgg(species, isShiny, isFemale, FALSE);
 }
 
+static const u16 *ResolveMonSpritePalette(const u16 *palette)
+{
+#ifdef PORTABLE
+    return GetExternalPokemonPalette(palette);
+#else
+    return palette;
+#endif
+}
+
 const u16 *GetMonSpritePalFromSpeciesIsEgg(enum Species species, bool32 isShiny, bool32 isFemale, bool32 isEgg)
 {
     species = SanitizeSpeciesId(species);
@@ -5340,33 +5349,33 @@ const u16 *GetMonSpritePalFromSpeciesIsEgg(enum Species species, bool32 isShiny,
     if (isEgg)
     {
         if (gSpeciesInfo[species].eggId != EGG_ID_NONE)
-            return gEggDatas[gSpeciesInfo[species].eggId].eggPalette;
+            return ResolveMonSpritePalette(gEggDatas[gSpeciesInfo[species].eggId].eggPalette);
         else
-            return gSpeciesInfo[SPECIES_EGG].palette;
+            return ResolveMonSpritePalette(gSpeciesInfo[SPECIES_EGG].palette);
     }
     else if (isShiny)
     {
     #if P_GENDER_DIFFERENCES
         if (gSpeciesInfo[species].shinyPaletteFemale != NULL && isFemale)
-            return gSpeciesInfo[species].shinyPaletteFemale;
+            return ResolveMonSpritePalette(gSpeciesInfo[species].shinyPaletteFemale);
         else
     #endif
         if (gSpeciesInfo[species].shinyPalette != NULL)
-            return gSpeciesInfo[species].shinyPalette;
+            return ResolveMonSpritePalette(gSpeciesInfo[species].shinyPalette);
         else
-            return gSpeciesInfo[SPECIES_NONE].shinyPalette;
+            return ResolveMonSpritePalette(gSpeciesInfo[SPECIES_NONE].shinyPalette);
     }
     else
     {
     #if P_GENDER_DIFFERENCES
         if (gSpeciesInfo[species].paletteFemale != NULL && isFemale)
-            return gSpeciesInfo[species].paletteFemale;
+            return ResolveMonSpritePalette(gSpeciesInfo[species].paletteFemale);
         else
     #endif
         if (gSpeciesInfo[species].palette != NULL)
-            return gSpeciesInfo[species].palette;
+            return ResolveMonSpritePalette(gSpeciesInfo[species].palette);
         else
-            return gSpeciesInfo[SPECIES_NONE].palette;
+            return ResolveMonSpritePalette(gSpeciesInfo[SPECIES_NONE].palette);
     }
 }
 
