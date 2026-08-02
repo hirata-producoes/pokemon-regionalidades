@@ -5,13 +5,13 @@ O alvo PC gera `pokemon_go_world.pak` ao lado de `pokemon_go_world-pc.exe`. O pa
 ## Como adicionar um recurso
 
 1. Adicione uma entrada com nome único e `source` em `resources/pc/manifest.json`. Use `sources` para concatenar vários arquivos, na ordem informada, em uma única entrada.
-   Famílias geradas podem ser referenciadas por `resource_lists`; a lista de imagens, paletas, ícones e pegadas de Pokémon é criada em `build/pc-generated/pokemon_resources.json`, a de cries ativos em `build/pc-generated/cry_resources.json`, a dos tilesets ativos em `build/pc-generated/tileset_resources.json` e a dos frames animados em `build/pc-generated/tileset_anim_resources.json`.
+   Famílias geradas podem ser referenciadas por `resource_lists`; a lista de imagens, paletas, ícones e pegadas de Pokémon é criada em `build/pc-generated/pokemon_resources.json`, a de cries ativos em `build/pc-generated/cry_resources.json`, a dos tilesets ativos em `build/pc-generated/tileset_resources.json`, a dos frames animados em `build/pc-generated/tileset_anim_resources.json` e a das amostras musicais em `build/pc-generated/music_sample_resources.json`.
 2. Garanta que o alvo `pc` produza o arquivo de origem se ele for gerado por uma ferramenta do projeto.
 3. No código PC, obtenha o dado com `ResourcePack_Get` no momento em que ele for necessário. Tabelas geradas podem evitar nomes duplicados no executável usando `ResourcePack_GetByHash` ou `ResourcePack_LoadByHash`.
 4. Mantenha o código GBA sob o caminho original com `#ifndef PORTABLE`.
 5. Compile com `tools/pokemon_go_world/build_pc.ps1` e valide o recurso com o pacote presente e ausente.
 
-Os 12 recursos usados pela tela de título Emerald, 2.950 imagens, 2.889 paletas, 1.420 ícones, 1.031 pegadas, 1.067 cries de Pokémon, 306 recursos de tileset e 174 frames de animação de tileset foram removidos do executável PC. Os tilesets abrangem 85 gráficos de tiles, 77 conjuntos de paletas, 72 tabelas de metatiles e 72 tabelas de atributos. Os geradores inspecionam as configurações ativas com o pré-processador C, preservando formas habilitadas, diferenças de gênero e escolhas entre recursos modernos/GBA. Suas definições compiladas permanecem no alvo GBA.
+Os 12 recursos usados pela tela de título Emerald, 2.950 imagens, 2.889 paletas, 1.420 ícones, 1.031 pegadas, 1.067 cries de Pokémon, 306 recursos de tileset, 174 frames de animação de tileset e 106 amostras musicais foram removidos do executável PC. Os tilesets abrangem 85 gráficos de tiles, 77 conjuntos de paletas, 72 tabelas de metatiles e 72 tabelas de atributos; as amostras musicais atendem 156 identificadores, incluindo aliases de fonemas compartilhados. Os geradores inspecionam as configurações ativas com o pré-processador C, preservando formas habilitadas, diferenças de gênero e escolhas entre recursos modernos/GBA. Suas definições compiladas permanecem no alvo GBA.
 
 ## Formato versão 1
 
@@ -28,7 +28,7 @@ Todos os inteiros são little-endian. O cabeçalho tem 48 bytes:
 
 Cada entrada do índice tem 40 bytes: hash FNV-1a de 64 bits, offset e tamanho de dados de 64 bits, offset do nome de 64 bits, comprimento do nome de 32 bits e CRC32 de 32 bits.
 
-O construtor rejeita nomes duplicados e colisões FNV-1a; o carregador também exige hashes únicos e valida versão, tamanho total, intervalos, ordenação, nomes, hashes e CRC32. Apenas o índice e os nomes entram na memória ao abrir o pacote. Recursos reutilizados podem permanecer em cache com `ResourcePack_Get`/`ResourcePack_GetByHash`; recursos grandes ou numerosos podem usar `ResourcePack_Load`/`ResourcePack_LoadByHash` e ser liberados após o uso. Paletas, ícones, pegadas, cries, componentes de tileset e frames animados usam cache sob demanda; imagens comprimidas de Pokémon usam leitura transitória. O mixer mantém o ponteiro da amostra durante a reprodução, por isso cada cry carregado permanece em cache até o encerramento. Assim, um pacote de 100 ou 128 MiB não consome automaticamente a mesma quantidade de RAM.
+O construtor rejeita nomes duplicados e colisões FNV-1a; o carregador também exige hashes únicos e valida versão, tamanho total, intervalos, ordenação, nomes, hashes e CRC32. Apenas o índice e os nomes entram na memória ao abrir o pacote. Recursos reutilizados podem permanecer em cache com `ResourcePack_Get`/`ResourcePack_GetByHash`; recursos grandes ou numerosos podem usar `ResourcePack_Load`/`ResourcePack_LoadByHash` e ser liberados após o uso. Paletas, ícones, pegadas, cries, componentes de tileset, frames animados e amostras musicais usam cache sob demanda; imagens comprimidas de Pokémon usam leitura transitória. O mixer mantém ponteiros de cries e instrumentos durante a reprodução, por isso cada amostra usada permanece em cache até o encerramento. Assim, um pacote de 100 ou 128 MiB não consome automaticamente a mesma quantidade de RAM.
 
 ## Comandos úteis
 

@@ -4,7 +4,8 @@
     "build/pc-generated/pokemon_resources.json",
     "build/pc-generated/cry_resources.json",
     "build/pc-generated/tileset_resources.json",
-    "build/pc-generated/tileset_anim_resources.json"
+    "build/pc-generated/tileset_anim_resources.json",
+    "build/pc-generated/music_sample_resources.json"
   ],
   "resources": [
     {

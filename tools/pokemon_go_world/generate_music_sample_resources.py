@@ -1,0 +1,296 @@
+#!/usr/bin/env python3
+"""Generate PC placeholders and resource metadata for MP2K music samples."""
+
+from __future__ import annotations
+
+import argparse
+import json
+from pathlib import Path
+import re
+import subprocess
+
+
+LABEL = re.compile(r"^\s*(DirectSoundWaveData_[A-Za-z0-9_]+)::")
+INCBIN = re.compile(r'^\s*\.incbin\s+"([^"]+)"')
+IF = re.compile(r"^\s*\.if\s+(.+?)(?:\s+@.*)?$")
+ELSE = re.compile(r"^\s*\.else(?:\s+@.*)?$")
+ENDIF = re.compile(r"^\s*\.endif(?:\s+@.*)?$")
+
+WRAPPER = """
+#define TRUE 1
+#define FALSE 0
+#include "config/general.h"
+#include "sound/direct_sound_data.inc"
+"""
+
+
+def fnv1a64(value: str) -> int:
+    result = 0xCBF29CE484222325
+    for byte in value.encode("utf-8"):
+        result ^= byte
+        result = (result * 0x100000001B3) & 0xFFFFFFFFFFFFFFFF
+    return result
+
+
+def write_if_changed(path: Path, content: str) -> None:
+    path.parent.mkdir(parents=True, exist_ok=True)
+    if path.exists() and path.read_text(encoding="utf-8") == content:
+        path.touch()
+        return
+    path.write_text(content, encoding="utf-8", newline="\n")
+
+
+def preprocess(root: Path, cpp: Path) -> str:
+    command = [
+        str(cpp),
+        "-P",
+        "-x",
+        "assembler-with-cpp",
+        f"-I{root / 'include'}",
+        f"-I{root}",
+        "-DPORTABLE=1",
+        "-DTESTING=0",
+        "-",
+    ]
+    result = subprocess.run(
+        command,
+        cwd=root,
+        input=WRAPPER,
+        text=True,
+        encoding="utf-8",
+        stdout=subprocess.PIPE,
+        stderr=subprocess.PIPE,
+        check=False,
+    )
+    if result.returncode != 0:
+        raise RuntimeError(f"C preprocessor failed ({result.returncode}):\n{result.stderr}")
+    return result.stdout
+
+
+def evaluate_condition(expression: str) -> bool:
+    normalized = expression.strip()
+    match = re.fullmatch(r"(-?\d+)\s*(==|!=)\s*(-?\d+)", normalized)
+    if match:
+        left, operator, right = match.groups()
+        return (int(left) == int(right)) == (operator == "==")
+    if re.fullmatch(r"-?\d+", normalized):
+        return int(normalized) != 0
+    raise ValueError(f"unsupported assembler condition: {expression}")
+
+
+def active_lines(source_text: str) -> list[str]:
+    result: list[str] = []
+    stack: list[tuple[bool, bool]] = []
+    active = True
+
+    for line in source_text.splitlines():
+        if_match = IF.match(line)
+        if if_match:
+            condition = evaluate_condition(if_match.group(1))
+            stack.append((active, condition))
+            active = active and condition
+            continue
+        if ELSE.match(line):
+            if not stack:
+                raise ValueError("assembler .else without .if")
+            parent_active, condition = stack[-1]
+            stack[-1] = (parent_active, not condition)
+            active = parent_active and not condition
+            continue
+        if ENDIF.match(line):
+            if not stack:
+                raise ValueError("assembler .endif without .if")
+            parent_active, _ = stack.pop()
+            active = parent_active
+            continue
+        if active:
+            result.append(line)
+
+    if stack:
+        raise ValueError("unterminated assembler .if")
+    return result
+
+
+def extract_groups(root: Path, source_text: str) -> list[tuple[tuple[str, ...], str]]:
+    groups: list[tuple[tuple[str, ...], str]] = []
+    pending_labels: list[str] = []
+
+    for line in active_lines(source_text):
+        label_match = LABEL.match(line)
+        if label_match:
+            pending_labels.append(label_match.group(1))
+            continue
+        incbin_match = INCBIN.match(line)
+        if not incbin_match:
+            continue
+        source = incbin_match.group(1)
+        if not pending_labels:
+            continue
+        if not (root / source).is_file():
+            raise FileNotFoundError(f"music sample does not exist: {source}")
+        groups.append((tuple(pending_labels), source))
+        pending_labels.clear()
+
+    if pending_labels:
+        raise ValueError(f"music sample labels without data: {', '.join(pending_labels)}")
+    if not groups:
+        raise ValueError("no active music samples found")
+    return groups
+
+
+def resource_name(source: str) -> str:
+    prefix = "sound/direct_sound_samples/"
+    relative = source[len(prefix):] if source.startswith(prefix) else source
+    return f"music_samples/{relative}"
+
+
+def generate(
+    root: Path,
+    cpp: Path,
+    header: Path,
+    placeholders: Path,
+    resource_list: Path,
+    makefile: Path,
+) -> None:
+    groups = extract_groups(root, preprocess(root, cpp))
+    resources_by_source: dict[str, dict[str, str]] = {}
+    table_entries: list[tuple[str, str]] = []
+
+    for labels, source in groups:
+        name = resource_name(source)
+        resources_by_source.setdefault(source, {"name": name, "source": source})
+        for label in labels:
+            table_entries.append((label, name))
+
+    placeholder_lines = [
+        "@ Generated by tools/pokemon_go_world/generate_music_sample_resources.py.",
+        "@ Do not edit by hand.",
+        "",
+    ]
+    for labels, _ in groups:
+        placeholder_lines.append("\t.align 2")
+        for label in labels:
+            placeholder_lines.append(f"{label}::")
+        placeholder_lines.append("\t.space 16")
+        placeholder_lines.append("")
+
+    header_lines = [
+        "// Generated by tools/pokemon_go_world/generate_music_sample_resources.py.",
+        "// Do not edit by hand.",
+        "#ifndef GUARD_GENERATED_PC_MUSIC_SAMPLE_RESOURCES_H",
+        "#define GUARD_GENERATED_PC_MUSIC_SAMPLE_RESOURCES_H",
+        "",
+        "#include <stddef.h>",
+        "#include \"resource_pack.h\"",
+        "",
+    ]
+    for label, _ in table_entries:
+        header_lines.append(f"extern const u8 {label}[];")
+    header_lines.extend([
+        "",
+        "struct PcMusicSampleResource",
+        "{",
+        "    const struct WaveData *compiledData;",
+        "    u64 hash;",
+        "    struct WaveData *resolvedData;",
+        "    bool8 attempted;",
+        "    bool8 reportedInvalid;",
+        "};",
+        "",
+        "static struct PcMusicSampleResource sPcMusicSampleResources[] =",
+        "{",
+    ])
+    for label, name in table_entries:
+        header_lines.append(
+            f"    {{ (const struct WaveData *){label}, UINT64_C({fnv1a64(name)}) }},"
+        )
+    header_lines.extend([
+        "};",
+        "",
+        "static const struct WaveData sMissingMusicSample =",
+        "{",
+        "    .freq = 13379,",
+        "    .size = 1,",
+        "    .data = {0},",
+        "};",
+        "",
+        "struct WaveData *ResolveMusicSample(struct WaveData *compiledData)",
+        "{",
+        "    u32 i;",
+        "",
+        "    for (i = 0; i < ARRAY_COUNT(sPcMusicSampleResources); i++)",
+        "    {",
+        "        struct PcMusicSampleResource *resource = &sPcMusicSampleResources[i];",
+        "        u64 resourceSize = 0;",
+        "",
+        "        if (resource->compiledData != compiledData)",
+        "            continue;",
+        "        if (!resource->attempted)",
+        "        {",
+        "            struct WaveData *wave = (struct WaveData *)ResourcePack_GetByHash(resource->hash, &resourceSize);",
+        "            if (wave != NULL",
+        "             && resourceSize >= offsetof(struct WaveData, data)",
+        "             && wave->size <= resourceSize - offsetof(struct WaveData, data))",
+        "                resource->resolvedData = wave;",
+        "            resource->attempted = TRUE;",
+        "        }",
+        "        if (resource->resolvedData != NULL)",
+        "            return resource->resolvedData;",
+        "        if (!resource->reportedInvalid)",
+        "        {",
+        "            DBGPRINTF(\"Music sample: identifier %p is missing or invalid\\n\", compiledData);",
+        "            resource->reportedInvalid = TRUE;",
+        "        }",
+        "        return (struct WaveData *)&sMissingMusicSample;",
+        "    }",
+        "",
+        "    return compiledData;",
+        "}",
+        "",
+        "#endif // GUARD_GENERATED_PC_MUSIC_SAMPLE_RESOURCES_H",
+        "",
+    ])
+
+    resources = [resources_by_source[source] for source in sorted(resources_by_source)]
+    resource_document = {"format_version": 1, "resources": resources}
+    make_lines = [
+        "# Generated by tools/pokemon_go_world/generate_music_sample_resources.py.",
+        "PC_MUSIC_SAMPLE_RESOURCE_ASSETS := \\",
+    ]
+    sources = sorted(resources_by_source)
+    for index, source in enumerate(sources):
+        continuation = " \\" if index != len(sources) - 1 else ""
+        make_lines.append(f"\t{source}{continuation}")
+    make_lines.append("")
+
+    write_if_changed(header, "\n".join(header_lines))
+    write_if_changed(placeholders, "\n".join(placeholder_lines))
+    write_if_changed(resource_list, json.dumps(resource_document, indent=2) + "\n")
+    write_if_changed(makefile, "\n".join(make_lines))
+    print(
+        f"Generated {len(table_entries)} music sample identifiers for "
+        f"{len(resources)} external resources"
+    )
+
+
+def main() -> None:
+    parser = argparse.ArgumentParser()
+    parser.add_argument("--root", type=Path, required=True)
+    parser.add_argument("--cpp", type=Path, required=True)
+    parser.add_argument("--header", type=Path, required=True)
+    parser.add_argument("--placeholders", type=Path, required=True)
+    parser.add_argument("--resource-list", type=Path, required=True)
+    parser.add_argument("--makefile", type=Path, required=True)
+    args = parser.parse_args()
+    generate(
+        args.root.resolve(),
+        args.cpp.resolve(),
+        args.header.resolve(),
+        args.placeholders.resolve(),
+        args.resource_list.resolve(),
+        args.makefile.resolve(),
+    )
+
+
+if __name__ == "__main__":
+    main()
