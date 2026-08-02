@@ -1,4 +1,7 @@
 #include "global.h"
+#ifdef PORTABLE
+#include "platform.h"
+#endif
 #include "agb_flash.h"
 #include "gba/flash_internal.h"
 #include "fieldmap.h"
@@ -233,7 +236,11 @@ static u8 HandleWriteSectorNBytes(u8 sectorId, u8 *data, u16 size)
 
 static u8 TryWriteSector(u8 sector, u8 *data)
 {
+#ifdef PORTABLE
+    if (ProgramFlashSector_DUMMY(sector, data)) // is damaged?
+#else
     if (ProgramFlashSectorAndVerify(sector, data)) // is damaged?
+#endif
     {
         // Failed
         SetDamagedSectorBits(ENABLE, sector);
@@ -768,6 +775,9 @@ u8 HandleSavingData(u8 saveType)
         WriteSaveSectorOrSlot(FULL_SAVE_SLOT, gRamSaveSectorLocations);
         break;
     }
+#ifdef PORTABLE
+    Platform_StoreSaveFile();
+#endif
     gTrainerHillVBlankCounter = backupVar;
     return 0;
 }
@@ -783,6 +793,9 @@ u8 TrySavingData(u8 saveType)
     HandleSavingData(saveType);
     if (!gDamagedSaveSectors)
     {
+#ifdef PORTABLE
+        Platform_StoreSaveFile();
+#endif
         gSaveAttemptStatus = SAVE_STATUS_OK;
         return SAVE_STATUS_OK;
     }
@@ -982,7 +995,11 @@ u32 TryWriteSpecialSaveSector(u8 sector, u8 *src)
     savData = &gSaveDataBuffer.data[4]; // data[4] to skip past SPECIAL_SECTOR_SENTINEL
     for (; i <= size; i++)
         savData[i] = src[i];
+#ifdef PORTABLE
+    if (ProgramFlashSector_DUMMY(sector, savDataBuffer) != 0)
+#else
     if (ProgramFlashSectorAndVerify(sector, savDataBuffer) != 0)
+#endif
         return SAVE_STATUS_ERROR;
     return SAVE_STATUS_OK;
 }

@@ -8,7 +8,13 @@
 	.if \requests_effects == 0
 	.4byte \value
 	.else
+#ifdef PORTABLE
+	@ GBA tags effect-aware commands by adding ROM_SIZE and executing them
+	@ through the cartridge ROM mirror. A native process has no such mirror.
+	.4byte \value
+#else
 	.4byte \value + ROM_SIZE
+#endif
 	.endif
 	.else
 	enum \constant

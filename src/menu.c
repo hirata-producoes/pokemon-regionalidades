@@ -1523,6 +1523,13 @@ bool8 FreeTempTileDataBuffersIfPossible(void)
 {
     int i;
 
+#ifdef PORTABLE
+    // The GBA completes queued DMA requests from its asynchronous VBlank IRQ.
+    // SDL drives VBlank on frame requests, but some loaders wait for DMA in a
+    // tight loop before requesting the next frame. Drain the host-side queue
+    // here so those synchronous loaders make progress.
+    ProcessDma3Requests();
+#endif
     if (!IsDma3ManagerBusyWithBgCopy())
     {
         if (sTempTileDataBufferIdx)

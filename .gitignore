@@ -68,3 +68,6 @@ tools/aif2pcm/aif2pcm
 *.smolTM
 __pycache__
 .map_version
+build_pc_debug.log
+gdb_*.log
+pokeemerald.cfg

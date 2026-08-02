@@ -96,22 +96,30 @@ void EnableVCountIntrAtLine150(void);
 
 void AgbMain(void)
 {
+    DBGPRINTF("AgbMain: begin\n");
     *(vu16 *)BG_PLTT = RGB_WHITE; // Set the backdrop to white on startup
     InitGpuRegManager();
+    DBGPRINTF("AgbMain: GPU registers initialized\n");
     REG_WAITCNT = WAITCNT_PREFETCH_ENABLE
             | WAITCNT_WS0_S_1 | WAITCNT_WS0_N_3
             | WAITCNT_WS1_S_1 | WAITCNT_WS1_N_3;
     InitKeys();
     InitIntrHandlers();
+    DBGPRINTF("AgbMain: keys and interrupts initialized\n");
     m4aSoundInit();
+    DBGPRINTF("AgbMain: sound initialized\n");
     EnableVCountIntrAtLine150();
 #ifndef PORTABLE
     InitRFU();
 #endif
     RtcInit();
+    DBGPRINTF("AgbMain: RTC initialized\n");
     CheckForFlashMemory();
+    DBGPRINTF("AgbMain: flash initialized\n");
     InitMainCallbacks();
+    DBGPRINTF("AgbMain: callbacks initialized\n");
     InitMapMusic();
+    DBGPRINTF("AgbMain: map music initialized\n");
 #ifdef BUGFIX
     SeedRngWithRtc(); // see comment at SeedRngWithRtc definition below
 #endif
@@ -119,6 +127,7 @@ void AgbMain(void)
     ResetBgs();
     SetDefaultFontsPointer();
     InitHeap(gHeap, HEAP_SIZE);
+    DBGPRINTF("AgbMain: heap and display state initialized\n");
 
     gSoftResetDisabled = FALSE;
 
@@ -129,7 +138,7 @@ void AgbMain(void)
 
     gLinkTransferringData = FALSE;
 
-#ifndef NDEBUG
+#if !defined(NDEBUG) && !defined(PORTABLE)
 #if (LOG_HANDLER == LOG_HANDLER_MGBA_PRINT)
     (void) MgbaOpen();
 #elif (LOG_HANDLER == LOG_HANDLER_AGB_PRINT)
@@ -137,13 +146,18 @@ void AgbMain(void)
 #endif
 #endif
     gAgbMainLoop_sp = __builtin_frame_address(0);
+    DBGPRINTF("AgbMain: entering frame loop\n");
     AgbMainLoop();
 }
 
 void AgbMainLoop(void)
 {
+    bool32 firstFrame = TRUE;
+
     for (;;)
     {
+        if (firstFrame)
+            DBGPRINTF("AgbMainLoop: reading keys\n");
         ReadKeys();
 
         if (gSoftResetDisabled == FALSE
@@ -163,8 +177,13 @@ void AgbMainLoop(void)
         }
         else
         {
+            if (firstFrame)
+                DBGPRINTF("AgbMainLoop: calling callbacks\n");
             gLinkTransferringData = FALSE;
             UpdateLinkAndCallCallbacks();
+
+            if (firstFrame)
+                DBGPRINTF("AgbMainLoop: callbacks complete\n");
 
             if (Overworld_RecvKeysFromLinkIsRunning() == TRUE)
             {
@@ -177,7 +196,12 @@ void AgbMainLoop(void)
         }
 
         PlayTimeCounter_Update();
+        if (firstFrame)
+            DBGPRINTF("AgbMainLoop: updating map music\n");
         MapMusicMain();
+        if (firstFrame)
+            DBGPRINTF("AgbMainLoop: waiting for first VBlank\n");
+        firstFrame = FALSE;
         WaitForVBlank();
     }
 }
@@ -205,6 +229,14 @@ static void InitMainCallbacks(void)
 
 static void CallCallbacks(void)
 {
+#ifdef PORTABLE
+    static MainCallback previousCallback2;
+    if (gMain.callback2 != previousCallback2)
+    {
+        DBGPRINTF("Main callback changed: %p\n", gMain.callback2);
+        previousCallback2 = gMain.callback2;
+    }
+#endif
     if (gMain.callback1)
         gMain.callback1();
 

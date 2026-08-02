@@ -11,10 +11,20 @@ Este alvo compila diretamente o código decompilado do jogo para Windows/SDL2. E
 - Camada SDL2, renderer, BIOS, DMA e áudio CGB integrados na base Expansion.
 - Todo o código C, mapas, scripts, gráficos e músicas do projeto passam pela compilação nativa.
 - Primeiro executável Windows ligado com sucesso: `pokemon_go_world-pc.exe`.
-- Teste de fumaça concluído: o processo permaneceu estável durante 8 segundos.
+- Tela de copyright, introdução, título completo com `PRESS START` e fluxo de `NEW GAME` confirmados visualmente no Windows.
+- Primeiro mapa confirmado: o jogo conclui `CB2_NewGame`, entra em `CB2_Overworld` e renderiza o interior do caminhão inicial.
+- Teste automatizado permaneceu estável por mais de 100 segundos, incluindo a criação do personagem e a entrada no mapa.
 - O executável mede 36.155.607 bytes (aproximadamente 34,48 MiB), portanto o alvo PC já não está preso ao limite de ROM de 32 MiB.
 - Áudio MP2K, multiboot e recursos específicos do hardware GBA estão temporariamente isolados por stubs; multiboot não fará parte do alvo PC e o áudio será substituído pela implementação nativa.
-- Próximo marco: confirmar visualmente a sequência de abertura e chegar ao primeiro mapa.
+- Próximo marco: validar controles normais no mapa, renderização dinâmica, áudio, RTC e save.
+
+## Compatibilidades resolvidas para o primeiro mapa
+
+- Flash/save do cartucho substituído por armazenamento nativo em memória e arquivo.
+- Rotinas de descompressão que executavam código copiado para RAM adaptadas para execução direta, compatível com DEP/NX do Windows.
+- Espelho de ROM usado pelo interpretador de scripts do GBA removido somente no alvo PC; o alvo GBA conserva a marcação original.
+- Fila de DMA processada no host durante carregamentos síncronos, reproduzindo o progresso que o VBlank assíncrono realiza no hardware.
+- Sondagem RFU desativada no PC e encerramentos de tela protegidos contra callbacks de um quadro já liberado.
 
 ## Como compilar
 
@@ -36,7 +46,7 @@ O executável continua sendo de 32 bits nesta fase porque scripts e tabelas do j
 
 1. ~~Compilar todos os objetos do Expansion.~~
 2. ~~Linkar o primeiro executável Pokémon GO World para PC.~~
-3. Confirmar a tela inicial e chegar ao primeiro mapa.
+3. ~~Confirmar a tela inicial e chegar ao primeiro mapa.~~
 4. Validar controles, vídeo, áudio, RTC e save.
 5. Validar batalhas, animações e menus do Expansion.
 6. Introduzir o pacote externo de recursos.

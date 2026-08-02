@@ -9,6 +9,11 @@
 
 u32 IntrMain[1];
 
+bool8 HandleLinkConnection(void)
+{
+    return FALSE;
+}
+
 void RegisterRamReset(u32 resetFlags)
 {
 }
@@ -125,4 +130,3 @@ void ply_note(u32 noteCmd, struct MusicPlayerInfo *player, struct MusicPlayerTra
 void m4aSoundVSync(void)
 {
 }
-

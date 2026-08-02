@@ -2,6 +2,7 @@ param(
     [string]$ToolchainRoot,
     [string]$SdlRoot,
     [string]$PythonPath,
+    [switch]$Debug,
     [int]$Jobs = [Environment]::ProcessorCount
 )
 
@@ -53,6 +54,10 @@ $makeArgs = @(
     "SDL_DIR=$sdlMakePath",
     "PYTHON=$pythonMakePath"
 )
+
+if ($Debug) {
+    $makeArgs += 'DEBUG=1'
+}
 
 Push-Location $repoRoot
 try {

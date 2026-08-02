@@ -704,6 +704,12 @@ static bool8 MainState_Exit(void)
             SetMainCallback2(sNamingScreen->returnCallback);
         DestroyTask(FindTaskIdByFunc(Task_NamingScreen));
         FreeAllWindowBuffers();
+#ifdef PORTABLE
+        // CB2_NamingScreen still finishes the current host frame after the
+        // task changes callback. Prevent the remaining sprite/VBlank work
+        // from observing the freed naming-screen state on PC.
+        SetVBlankCallback(NULL);
+#endif
         FREE_AND_SET_NULL(sNamingScreen);
     }
     return FALSE;
@@ -2071,6 +2077,10 @@ static void PrintControls(void)
 static void CB2_NamingScreen(void)
 {
     RunTasks();
+#ifdef PORTABLE
+    if (sNamingScreen == NULL)
+        return;
+#endif
     AnimateSprites();
     BuildOamBuffer();
     UpdatePaletteFade();
