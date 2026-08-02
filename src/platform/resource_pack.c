@@ -240,15 +240,12 @@ bool32 ResourcePack_IsOpen(void)
     return sResourcePackFile != NULL;
 }
 
-const void *ResourcePack_Get(const char *name, const void *fallback, u64 fallbackSize, u64 *sizeOut)
+static struct ResourcePackEntry *FindEntry(const char *name)
 {
     u64 hash = HashName(name);
     u32 left = 0;
     u32 right = sResourcePackEntryCount;
     u32 index;
-
-    if (sizeOut != NULL)
-        *sizeOut = fallbackSize;
 
     while (left < right)
     {
@@ -262,35 +259,88 @@ const void *ResourcePack_Get(const char *name, const void *fallback, u64 fallbac
     for (index = left; index < sResourcePackEntryCount && sResourcePackEntries[index].hash == hash; index++)
     {
         struct ResourcePackEntry *entry = &sResourcePackEntries[index];
-        if (strcmp(entry->name, name) != 0)
-            continue;
+        if (strcmp(entry->name, name) == 0)
+            return entry;
+    }
+    return NULL;
+}
 
-        if (entry->data == NULL && entry->size != 0)
+static void *LoadEntryData(struct ResourcePackEntry *entry)
+{
+    void *data;
+
+    if (entry == NULL || entry->size > SIZE_MAX)
+        return NULL;
+    data = malloc(entry->size == 0 ? 1 : (size_t)entry->size);
+    if (data == NULL)
+        return NULL;
+    if (entry->size != 0
+     && (!SeekPack(entry->offset)
+      || fread(data, 1, (size_t)entry->size, sResourcePackFile) != (size_t)entry->size))
+    {
+        free(data);
+        return NULL;
+    }
+    if (CalculateCrc32(data, (size_t)entry->size) != entry->checksum)
+    {
+        free(data);
+        return NULL;
+    }
+    return data;
+}
+
+const void *ResourcePack_Get(const char *name, const void *fallback, u64 fallbackSize, u64 *sizeOut)
+{
+    struct ResourcePackEntry *entry = FindEntry(name);
+
+    if (sizeOut != NULL)
+        *sizeOut = fallbackSize;
+
+    if (entry != NULL)
+    {
+        if (entry->data == NULL)
         {
-            if (entry->size > SIZE_MAX)
-                break;
-            entry->data = malloc((size_t)entry->size);
-            if (entry->data == NULL
-             || !SeekPack(entry->offset)
-             || fread(entry->data, 1, (size_t)entry->size, sResourcePackFile) != (size_t)entry->size
-             || CalculateCrc32(entry->data, (size_t)entry->size) != entry->checksum)
-            {
-                free(entry->data);
-                entry->data = NULL;
-                break;
-            }
+            entry->data = LoadEntryData(entry);
+            if (entry->data == NULL)
+                goto missing;
             DBGPRINTF("Resource pack: cached %s (%llu bytes)\n", name, (unsigned long long)entry->size);
         }
         if (sizeOut != NULL)
             *sizeOut = entry->size;
-        return entry->size == 0 ? "" : entry->data;
+        return entry->data;
     }
 
+missing:
     if (fallback != NULL)
         DBGPRINTF("Resource pack: %s missing or unreadable; using compiled fallback\n", name);
     else
         DBGPRINTF("Resource pack: %s missing or unreadable; continuing without this resource\n", name);
     return fallback;
+}
+
+void *ResourcePack_Load(const char *name, u64 *sizeOut)
+{
+    struct ResourcePackEntry *entry = FindEntry(name);
+    void *data;
+
+    if (sizeOut != NULL)
+        *sizeOut = 0;
+    data = LoadEntryData(entry);
+    if (data == NULL)
+    {
+        DBGPRINTF("Resource pack: %s missing or unreadable\n", name);
+        return NULL;
+    }
+    if (sizeOut != NULL)
+        *sizeOut = entry->size;
+    DBGPRINTF("Resource pack: loaded transient %s (%llu bytes)\n",
+              name, (unsigned long long)entry->size);
+    return data;
+}
+
+void ResourcePack_Free(void *data)
+{
+    free(data);
 }
 
 #endif // PORTABLE

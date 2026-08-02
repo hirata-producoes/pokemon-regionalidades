@@ -37,6 +37,10 @@
 #include "data.h"
 #include "battle.h" // to get rid of later
 #include "constants/rgb.h"
+#ifdef PORTABLE
+#include "pokemon_resources.h"
+#include "resource_pack.h"
+#endif
 #include "party_menu.h"
 
 #define GFXTAG_EGG       12345
@@ -540,7 +544,18 @@ static void CB2_LoadEggHatch(void)
         enum Species species = GetMonData(&gParties[B_TRAINER_PLAYER][sEggHatchData->eggPartyId], MON_DATA_SPECIES);
         if (gSpeciesInfo[species].eggId != EGG_ID_NONE)
         {
-            u32 *tempSprite = malloc_and_decompress(gEggDatas[gSpeciesInfo[species].eggId].eggHatchGfx, NULL);
+            const void *eggHatchGfx = gEggDatas[gSpeciesInfo[species].eggId].eggHatchGfx;
+#ifdef PORTABLE
+            u64 externalSize = 0;
+            void *externalGfx = LoadExternalPokemonPic(eggHatchGfx, &externalSize);
+            eggHatchGfx = externalSize >= sizeof(u32) ? externalGfx : NULL;
+#endif
+            u32 *tempSprite = eggHatchGfx != NULL
+                            ? malloc_and_decompress(eggHatchGfx, NULL)
+                            : AllocZeroed(MON_PIC_SIZE);
+#ifdef PORTABLE
+            ResourcePack_Free(externalGfx);
+#endif
             struct SpriteSheet tempSheet;
             tempSheet.data = tempSprite;
             tempSheet.size = 2048;

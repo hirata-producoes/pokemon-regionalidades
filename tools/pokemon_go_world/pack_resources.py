@@ -46,9 +46,18 @@ def load_manifest(path: Path, root: Path) -> list[dict[str, object]]:
     if document.get("format_version") != VERSION:
         raise ValueError(f"manifest format_version must be {VERSION}")
 
+    documents = [document]
+    for resource_list_name in document.get("resource_lists", []):
+        resource_list_path = root / resource_list_name
+        resource_list = json.loads(resource_list_path.read_text(encoding="utf-8"))
+        if resource_list.get("format_version") != VERSION:
+            raise ValueError(f"resource list {resource_list_path} format_version must be {VERSION}")
+        documents.append(resource_list)
+
     resources: list[dict[str, object]] = []
     seen: set[str] = set()
-    for item in document.get("resources", []):
+    items = [item for current_document in documents for item in current_document.get("resources", [])]
+    for item in items:
         name = item["name"]
         if ("source" in item) == ("sources" in item):
             raise ValueError(f"resource {name!r} must define exactly one of source or sources")

@@ -23,10 +23,13 @@ Este alvo compila diretamente o código decompilado do jogo para Windows/SDL2. E
 - Batalha selvagem de diagnóstico validada com Bulbasaur nível 50 contra Pikachu nível 45: transição, sprites, cries, HUD, menus, turnos, HP, sono e animações de `Thunder` e `Discharge` funcionaram no alvo PC.
 - Pacote externo versionado integrado com índice e offsets de 64 bits, leitura sob demanda, cache por recurso, validação de limites, FNV-1a e CRC32. O formato e o fluxo de adição estão documentados em `docs/pokemon_go_world/RESOURCE_PACK.md`.
 - Os 12 recursos usados pela tela de título Emerald foram removidos de fato do executável PC e carregados de `pokemon_go_world.pak`: gráficos comprimidos, tilemaps e paletas do logo, Rayquaza, nuvens, versão, brilho e banners. Suas definições originais continuam no alvo GBA.
-- O executável mede 36.163.465 bytes (aproximadamente 34,49 MiB) e o pacote mede 12.368 bytes, portanto o alvo PC já não está preso ao limite de ROM de 32 MiB.
+- A configuração ativa gera automaticamente 2.950 recursos externos de imagens frontais, traseiras, diferenças de gênero, formas e ovos de Pokémon. `gSpeciesInfo` continua selecionando os mesmos símbolos; somente o alvo PC os resolve no pacote no momento da descompressão.
+- Imagens de Pokémon são lidas transitoriamente e liberadas logo após a descompressão, evitando que visitar muitas espécies faça o cache crescer indefinidamente.
+- O executável mede 33.923.321 bytes (aproximadamente 32,35 MiB) e o pacote com 2.962 entradas mede 2.750.848 bytes (aproximadamente 2,62 MiB), portanto o alvo PC já não está preso ao limite de ROM de 32 MiB.
 - O pacote válido, o pacote ausente e um pacote com dados corrompidos foram testados. Nos dois últimos casos o jogo continua de maneira segura, usando o fallback quando ele existir e sem entregar dados corrompidos ao descompressor.
+- A batalha Bulbasaur contra Pikachu foi repetida com sprites externos. Um Pikachu propositalmente corrompido foi rejeitado pelo CRC32 e substituído visualmente pelo sprite de interrogação, sem afetar o sprite traseiro de Bulbasaur.
 - Multiboot e recursos específicos de comunicação do hardware GBA permanecem isolados por stubs; multiboot não fará parte do alvo PC.
-- Próximo marco: migrar progressivamente as famílias grandes de recursos e eliminar suas cópias compiladas no alvo PC.
+- Próximo marco: migrar paletas e ícones de Pokémon, mantendo a mesma geração automática baseada nas configurações ativas.
 
 ## Compatibilidades resolvidas para o primeiro mapa
 
