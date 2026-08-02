@@ -141,13 +141,21 @@
 
 	.macro cry sample:req
 	.byte 0x20, 60, 0, 0
+#ifdef PORTABLE
+	.4byte 0
+#else
 	.4byte \sample
+#endif
 	.byte 0xff, 0, 0xff, 0
 	.endm
 
 	.macro cry_reverse sample:req
 	.byte 0x30, 60, 0, 0
+#ifdef PORTABLE
+	.4byte 0
+#else
 	.4byte \sample
+#endif
 	.byte 0xff, 0, 0xff, 0
 	.endm
 

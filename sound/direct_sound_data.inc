@@ -386,6 +386,7 @@ DirectSoundWaveData_unknown_16::
 DirectSoundWaveData_unknown_17::
 	.incbin "sound/direct_sound_samples/unknown_17.bin"
 
+#ifndef PORTABLE
 .if P_CRIES_ENABLED == TRUE
 .if P_FAMILY_BULBASAUR == TRUE
 	.align 2
@@ -8739,6 +8740,7 @@ Cry_Pecharunt::
 .endif
 .endif @ P_FAMILY_PECHARUNT
 .endif @ P_CRIES_ENABLED
+#endif // PORTABLE
 
 .if TESTING == TRUE
 @ Tests use a single shared cry for all mons, and Fletchling is the standard measurement
