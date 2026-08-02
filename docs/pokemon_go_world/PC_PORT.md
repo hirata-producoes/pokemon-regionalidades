@@ -31,8 +31,8 @@ Este alvo compila diretamente o código decompilado do jogo para Windows/SDL2. E
 - O pacote válido, o pacote ausente e um pacote com dados corrompidos foram testados. Nos dois últimos casos o jogo continua de maneira segura, usando o fallback quando ele existir e sem entregar dados corrompidos ao descompressor.
 - A batalha Bulbasaur contra Pikachu foi repetida com sprites externos. Um Pikachu propositalmente corrompido foi rejeitado pelo CRC32 e substituído visualmente pelo sprite de interrogação, sem afetar o sprite traseiro de Bulbasaur.
 - Multiboot e recursos específicos de comunicação do hardware GBA permanecem isolados por stubs; multiboot não fará parte do alvo PC.
-- Pendência conhecida: no modo diagnóstico, o avanço automatizado da tela de equipe para a tela de resumo expôs corrupção da lista do heap durante a inicialização do resumo. O menu e os ícones já foram validados antes desse ponto; o fluxo de resumo ainda precisa de correção e validação separadas.
-- Próximo marco: corrigir a tela de resumo e migrar cries, tilesets e outras famílias grandes.
+- Tela de resumo validada a partir do menu de equipe, incluindo sprite/paleta externos, dados, habilidade, descrição, memo e transição para renomear. Duas escritas de texto que alcançavam a borda do buffer receberam margens apenas no alvo PC; uma execução automatizada de 15 segundos terminou sem exceção.
+- Próximo marco: migrar cries, tilesets e outras famílias grandes.
 
 ## Compatibilidades resolvidas para o primeiro mapa
 

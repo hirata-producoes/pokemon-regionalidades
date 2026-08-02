@@ -3552,7 +3552,12 @@ static void PrintMonAbilityName(void)
 static void PrintMonAbilityDescription(void)
 {
     enum Ability ability = GetAbilityBySpecies(sMonSummaryScreen->summary.species, sMonSummaryScreen->summary.abilityNum);
-    PrintTextOnWindow(AddWindowFromTemplateList(sPageInfoTemplate, PSS_DATA_WINDOW_INFO_ABILITY), gAbilitiesInfo[ability].description, 0, 17, 0, 0);
+    u8 windowId = AddWindowFromTemplateList(sPageInfoTemplate, PSS_DATA_WINDOW_INFO_ABILITY);
+#ifdef PORTABLE
+    PrintTextOnWindowToFitPx(windowId, gAbilitiesInfo[ability].description, 0, 16, 0, 0, WindowWidthPx(windowId) - 8);
+#else
+    PrintTextOnWindow(windowId, gAbilitiesInfo[ability].description, 0, 17, 0, 0);
+#endif
 }
 
 static void BufferMonTrainerMemo(void)
@@ -4849,7 +4854,11 @@ static inline void ShowUtilityPrompt(s16 mode)
     FillWindowPixelBuffer(PSS_LABEL_WINDOW_PROMPT_UTILITY, PIXEL_FILL(0));
     PutWindowTilemap(PSS_LABEL_WINDOW_PROMPT_UTILITY);
 
+#ifdef PORTABLE
+    int stringXPos = GetStringRightAlignXOffset(FONT_NORMAL, promptText, 60);
+#else
     int stringXPos = GetStringRightAlignXOffset(FONT_NORMAL, promptText, 62);
+#endif
     int iconXPos = stringXPos - 16;
     if (iconXPos < 0)
         iconXPos = 0;
