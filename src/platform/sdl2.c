@@ -1091,10 +1091,27 @@ u16 Platform_GetKeyInput(void)
         // One-frame pulses with release frames between them. This is intended
         // for native-port smoke tests, never enabled during normal play.
         autoplayFrame++;
-        if (autoplayFrame % 12 == 1)
-            automatedKeys = A_BUTTON;
-        else if (autoplayFrame % 60 == 7)
-            automatedKeys = START_BUTTON;
+        if (autoplayFrame < 6100)
+        {
+            if (autoplayFrame % 12 == 1)
+                automatedKeys = A_BUTTON;
+            else if (autoplayFrame % 60 == 7)
+                automatedKeys = START_BUTTON;
+        }
+        else
+        {
+            // Once the new-game flow has reached the first map, walk in each
+            // direction with release gaps to exercise normal field controls.
+            u32 movementPhase = (autoplayFrame - 6100) % 240;
+            if (movementPhase < 45)
+                automatedKeys = DPAD_DOWN;
+            else if (movementPhase >= 60 && movementPhase < 105)
+                automatedKeys = DPAD_LEFT;
+            else if (movementPhase >= 120 && movementPhase < 165)
+                automatedKeys = DPAD_UP;
+            else if (movementPhase >= 180 && movementPhase < 225)
+                automatedKeys = DPAD_RIGHT;
+        }
     }
 
 #ifdef _WIN32
