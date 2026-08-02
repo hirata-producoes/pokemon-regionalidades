@@ -7,6 +7,7 @@ Este alvo compila diretamente o código decompilado do jogo para Windows/SDL2. E
 - Base preservada: Pokémon GO World em `feature/pc-port`.
 - Versão encontrada no repositório: `expansion/1.16.3-69-g84a694709-dirty` (mais nova que a 1.13 inicialmente mencionada).
 - Referência: `gradenGnostic/pokeemerald-multiplatform`, commit `2f35335eff69ea1a08ebf19e64ea4d97ff6c0a05`.
+- Licença e atribuição da camada reutilizada: `docs/pokemon_go_world/THIRD_PARTY_NOTICES.md`.
 - Porte original compilado e inicializado no Windows.
 - Camada SDL2, renderer, BIOS, DMA e áudio CGB integrados na base Expansion.
 - Todo o código C, mapas, scripts, gráficos e músicas do projeto passam pela compilação nativa.
@@ -17,9 +18,11 @@ Este alvo compila diretamente o código decompilado do jogo para Windows/SDL2. E
 - Controles e renderização dinâmica confirmados: o personagem se movimenta no caminhão, atravessa a saída e chega a Littleroot com a primeira conversa da mãe renderizada.
 - Save nativo validado em duas execuções: o jogo grava `pokemon_go_world.sav` com 131.072 bytes e apresenta `CONTINUE` carregando o mapa salvo após reiniciar.
 - Backend SII RTC do PC validado contra a data e hora locais do Windows. O projeto continua respeitando `OW_USE_FAKE_RTC = TRUE`, portanto a jogabilidade usa o relógio persistido no save; se essa opção for desativada, o backend nativo segue o relógio do sistema e persiste seu deslocamento em `pokemon_go_world.cfg`.
-- O executável mede 36.158.587 bytes (aproximadamente 34,48 MiB), portanto o alvo PC já não está preso ao limite de ROM de 32 MiB.
-- Áudio MP2K, multiboot e recursos específicos do hardware GBA estão temporariamente isolados por stubs; multiboot não fará parte do alvo PC e o áudio será substituído pela implementação nativa.
-- Próximo marco: implementar e validar o áudio MP2K nativo.
+- Áudio MP2K nativo integrado: sequenciador, mixer Direct Sound, cries e os quatro canais CGB geram áudio estéreo `float` a 42.060 Hz para a fila SDL2.
+- O áudio foi validado com buffers não silenciosos durante a introdução e com uma regressão automatizada de 90 segundos que chegou ao menu de itens sem falha.
+- O executável mede 36.167.012 bytes (aproximadamente 34,49 MiB), portanto o alvo PC já não está preso ao limite de ROM de 32 MiB.
+- Multiboot e recursos específicos de comunicação do hardware GBA permanecem isolados por stubs; multiboot não fará parte do alvo PC.
+- Próximo marco: validar batalhas, animações, cries e menus do Expansion.
 
 ## Compatibilidades resolvidas para o primeiro mapa
 
@@ -30,6 +33,8 @@ Este alvo compila diretamente o código decompilado do jogo para Windows/SDL2. E
 - Sondagem RFU desativada no PC e encerramentos de tela protegidos contra callbacks de um quadro já liberado.
 - GPIO do RTC do cartucho substituído, somente no alvo portátil, por um backend SDL2 baseado no relógio do sistema.
 - Persistência do flash conectada a um arquivo próprio do projeto, sem alterar o formato do save GBA.
+- Driver ARM/DMA do MP2K substituído no alvo PC pelo sequenciador e mixer C reutilizados do porte multiplataforma, preservando os dados de músicas, instrumentos e cries do projeto.
+- Layouts de 32 bits de instrumentos, tracks e canais mantidos e verificados para continuar compatíveis com as tabelas montadas do Expansion.
 
 ## Como compilar
 
@@ -63,6 +68,6 @@ O executável continua sendo de 32 bits nesta fase porque scripts e tabelas do j
 2. ~~Linkar o primeiro executável Pokémon GO World para PC.~~
 3. ~~Confirmar a tela inicial e chegar ao primeiro mapa.~~
 4. ~~Validar controles, vídeo, RTC e save.~~
-5. Implementar e validar o áudio MP2K nativo.
-6. Validar batalhas, animações e menus do Expansion.
+5. ~~Implementar e validar o áudio MP2K nativo.~~
+6. Validar batalhas, cries, animações e menus do Expansion.
 7. Introduzir o pacote externo de recursos.

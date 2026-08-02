@@ -1,6 +1,9 @@
 #include "global.h"
 #include "gba/m4a_internal.h"
-#include "global.h"
+#ifdef PORTABLE
+#include "cgb_audio.h"
+#include "sound_mixer.h"
+#endif
 
 extern const u8 gCgb3Vol[];
 
@@ -68,13 +71,6 @@ void MPlayFadeOut(struct MusicPlayerInfo *mplayInfo, u16 speed)
 
 void m4aSoundInit(void)
 {
-#ifdef PORTABLE
-    // The ARM MP2K driver configures GBA DMA/timer registers and cannot run
-    // natively. Leave its state inactive until the SDL mixer replacement is
-    // integrated; public music calls already ignore inactive players safely.
-    SOUND_INFO_PTR = &gSoundInfo;
-    return;
-#else
     s32 i;
 
     SoundInit(&gSoundInfo);
@@ -101,12 +97,15 @@ void m4aSoundInit(void)
         MPlayOpen(mplayInfo, track, 2);
         track->chan = 0;
     }
-#endif
 }
 
 void m4aSoundMain(void)
 {
+#ifdef PORTABLE
+    RunMixerFrame();
+#else
     SoundMain();
+#endif
 }
 
 void m4aSongNumStart(u16 n)
@@ -279,6 +278,14 @@ void MPlayExtender(struct CgbChannel *cgbChans)
     REG_NR30 = 0;
     REG_NR50 = 0x77;
 
+#ifdef PORTABLE
+    for (u8 i = 0; i < 4; i++)
+    {
+        cgb_set_envelope(i, 8);
+        cgb_trigger_note(i);
+    }
+#endif
+
     soundInfo = SOUND_INFO_PTR;
 
     ident = soundInfo->ident;
@@ -408,14 +415,23 @@ void SampleFreqSet(u32 freq)
 
     freq = (freq & 0xF0000) >> 16;
     soundInfo->freq = freq;
+#ifdef PORTABLE
+    soundInfo->pcmSamplesPerVBlank = 701;
+#else
     soundInfo->pcmSamplesPerVBlank = gPcmSamplesPerVBlankTable[freq - 1];
+#endif
     soundInfo->pcmDmaPeriod = PCM_DMA_BUF_SIZE / soundInfo->pcmSamplesPerVBlank;
 
+#ifdef PORTABLE
+    soundInfo->pcmFreq = 42060;
+    soundInfo->divFreq = 1.0f / soundInfo->pcmFreq;
+#else
     // LCD refresh rate 59.7275Hz
     soundInfo->pcmFreq = (597275 * soundInfo->pcmSamplesPerVBlank + 5000) / 10000;
 
     // CPU frequency 16.78Mhz
     soundInfo->divFreq = (16777216 / soundInfo->pcmFreq + 1) >> 1;
+#endif
 
     // Turn off timer 0.
     REG_TM0CNT_H = 0;
@@ -425,11 +441,13 @@ void SampleFreqSet(u32 freq)
 
     m4aSoundVSyncOn();
 
+#ifndef PORTABLE
     while (*(vu8 *)REG_ADDR_VCOUNT == 159)
         ;
 
     while (*(vu8 *)REG_ADDR_VCOUNT != 159)
         ;
+#endif
 
     REG_TM0CNT_H = TIMER_ENABLE | TIMER_1CLK;
 }
@@ -878,6 +896,10 @@ void CgbOscOff(u8 chanNum)
         REG_NR42 = 8;
         REG_NR44 = 0x80;
     }
+#ifdef PORTABLE
+    cgb_set_envelope(chanNum - 1, 8);
+    cgb_trigger_note(chanNum - 1);
+#endif
 }
 
 static inline int CgbPan(struct CgbChannel *chan)
@@ -1001,6 +1023,9 @@ void CgbSound(void)
                 {
                 case 1:
                     *nrx0ptr = channels->sweep;
+#ifdef PORTABLE
+                    cgb_set_sweep(channels->sweep);
+#endif
                     // fallthrough
                 case 2:
                     *nrx1ptr = ((u32)channels->wavePointer << 6) + channels->length;
@@ -1014,6 +1039,9 @@ void CgbSound(void)
                         REG_WAVE_RAM2 = channels->wavePointer[2];
                         REG_WAVE_RAM3 = channels->wavePointer[3];
                         channels->currentPointer = channels->wavePointer;
+#ifdef PORTABLE
+                        cgb_set_wavram();
+#endif
                     }
                     *nrx0ptr = 0;
                     *nrx1ptr = channels->length;
@@ -1033,6 +1061,9 @@ void CgbSound(void)
                         channels->n4 = 0x00;
                     break;
                 }
+#ifdef PORTABLE
+                cgb_set_length(ch - 1, channels->length);
+#endif
                 channels->envelopeCounter = channels->attack;
                 if ((s8)(channels->attack & mask))
                 {
@@ -1229,6 +1260,11 @@ void CgbSound(void)
                 if (ch == 1 && !(*nrx0ptr & 0x08))
                     *nrx4ptr = channels->n4 | 0x80;
             }
+#ifdef PORTABLE
+            cgb_set_envelope(ch - 1, *nrx2ptr);
+            cgb_toggle_length(ch - 1, (*nrx4ptr & 0x40));
+            cgb_trigger_note(ch - 1);
+#endif
         }
 
     channel_complete:
