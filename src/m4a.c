@@ -1,6 +1,7 @@
 #include "global.h"
 #include "gba/m4a_internal.h"
 #include "song_resources.h"
+#include "voicegroup_resources.h"
 #ifdef PORTABLE
 #include "cgb_audio.h"
 #include "sound_mixer.h"
@@ -696,6 +697,7 @@ void MPlayStart(struct MusicPlayerInfo *mplayInfo, struct SongHeader *songHeader
 }
 
 #ifdef PORTABLE
+#include "../build/pc-generated/voicegroup_resources.h"
 #include "../build/pc-generated/song_resources.h"
 #endif
 

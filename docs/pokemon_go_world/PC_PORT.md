@@ -38,8 +38,9 @@ Este alvo compila diretamente o código decompilado do jogo para Windows/SDL2. E
 - Os 174 frames de animação de tileset também são externos. O primeiro mapa carregou 26 frames de água, bordas, cachoeira e flores do tileset `General`; sem pacote, cada animação usa um frame zerado seguro e o jogo continua sem exceção.
 - As 106 amostras musicais ativas, referenciadas por 156 identificadores das voicegroups, foram removidas de `sound_data.o` e são resolvidas quando cada nota começa. A introdução produziu áudio não silencioso com 11 instrumentos externos; a batalha diagnóstica carregou 22 instrumentos e preservou os cries externos de Pikachu e Bulbasaur.
 - As 530 faixas MP2K produzidas por `mid2agb` também são externas. O gerador converteu 684.080 bytes de tracks e 10.991 relocações para 872.656 bytes em recursos `PGWSONG`; o link PC usa apenas um objeto de placeholders e nenhuma das 530 cópias originais. Intro, título, primeiro mapa, batalha selvagem e efeitos foram validados com áudio não silencioso. Sem o pacote, cada faixa usa uma música vazia segura e o jogo continua sem exceção.
-- O executável agora mede 17.450.694 bytes (aproximadamente 16,64 MiB), o pacote com 10.485 entradas mede 15.420.832 bytes (aproximadamente 14,71 MiB), `data/sound_data.o` caiu para aproximadamente 0,35 MiB, `src/tilesets.o` mede aproximadamente 0,06 MiB e `src/tileset_anims.o` mede aproximadamente 0,07 MiB no PC.
-- Próximo marco: migrar voicegroups e outras famílias grandes, seguido pela auditoria das dependências de dados ainda compiladas no executável PC.
+- As 195 voicegroups MP2K também são recursos externos relocáveis. O gerador usa as definições fonte para preservar drumsets com índices MIDI deslocados, reconstrói 2.473 ponteiros para voicegroups, keysplits, ondas e amostras e mantém somente placeholders de 12 bytes no executável. Intro, título, batalha, efeitos, drumsets e cries foram validados. Um pacote diagnóstico sem nenhuma voicegroup permaneceu estável usando 128 instrumentos CGB seguros como fallback.
+- O executável agora mede 17.209.712 bytes (aproximadamente 16,41 MiB), o pacote com 10.680 entradas mede 15.752.096 bytes (aproximadamente 15,02 MiB), e `data/sound_data.o` caiu de aproximadamente 0,35 MiB para 96.025 bytes. `src/tilesets.o` mede aproximadamente 0,06 MiB e `src/tileset_anims.o` aproximadamente 0,07 MiB no PC.
+- Próximo marco: auditar e migrar as famílias grandes ainda compiladas, principalmente gráficos gerais, mapas e scripts de eventos.
 
 ## Compatibilidades resolvidas para o primeiro mapa
 
@@ -80,7 +81,7 @@ O alvo interno também está disponível como `make pc` quando `make`, GCC i686,
 
 ## Sobre 32 bits e tamanho
 
-O executável continua sendo de 32 bits nesta fase porque scripts e tabelas do jogo armazenam ponteiros de 32 bits. Isso não impõe o limite de ROM de 32 MiB. Recursos já podem ser carregados sob demanda de um pacote externo com offsets de 64 bits; tela de título, imagens, paletas, ícones, pegadas, cries de Pokémon, tilesets de mapas, seus frames de animação, amostras e faixas musicais já foram migrados.
+O executável continua sendo de 32 bits nesta fase porque scripts e tabelas do jogo armazenam ponteiros de 32 bits. Isso não impõe o limite de ROM de 32 MiB. Recursos já podem ser carregados sob demanda de um pacote externo com offsets de 64 bits; tela de título, imagens, paletas, ícones, pegadas, cries de Pokémon, tilesets de mapas, seus frames de animação, amostras, faixas musicais e voicegroups já foram migrados.
 
 ## Próximos marcos
 

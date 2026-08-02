@@ -133,7 +133,9 @@
 .include "sound/voicegroups/vs_aqua_magma_leader.inc"
 .include "sound/voicegroups/rs_sfx_1.inc"
 .include "sound/voicegroups/rs_sfx_2.inc"
+#ifndef PC_VOICEGROUP_SOURCE
 .include "sound/cry_tables.inc"
+#endif
 .include "sound/voicegroups/frlg_sfx.inc"
 .include "sound/voicegroups/bard.inc"
 .include "sound/voicegroups/unused_2.inc" @ used by unused GSC radio tower takeover test track in RS

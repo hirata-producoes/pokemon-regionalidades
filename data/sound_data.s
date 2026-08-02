@@ -7,7 +7,13 @@
 	.include "asm/macros/music_voice.inc"
 	.include "include/config/general.h"
 	.include "include/config/pokemon.h"
+#ifdef PORTABLE
+	.include "build/pc-generated/voicegroup_placeholders.inc"
+	.include "sound/cry_tables.inc"
+	.include "build/pc-generated/voicegroup_exports.inc"
+#else
 	.include "sound/voice_groups.inc"
+#endif
 	.include "sound/keysplit_tables.inc"
 	.include "sound/programmable_wave_data.inc"
 	.include "sound/music_player_table.inc"
