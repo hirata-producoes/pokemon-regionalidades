@@ -29,6 +29,9 @@
 #include "trainer_pokemon_sprites.h"
 #include "trig.h"
 #include "window.h"
+#ifdef PORTABLE
+#include "pokemon_resources.h"
+#endif
 #include "constants/rgb.h"
 #include "constants/songs.h"
 #include "config/pokedex_plus_hgss.h"
@@ -4816,6 +4819,9 @@ void DrawFootprint(u8 windowId, enum Species species)
 
 #if P_FOOTPRINTS
     footprintGfx = gSpeciesInfo[SanitizeSpeciesId(species)].footprint;
+#ifdef PORTABLE
+    footprintGfx = GetExternalPokemonFootprint(footprintGfx);
+#endif
 #else
     return;
 #endif

@@ -512,6 +512,13 @@ bool32 IsDma3ManagerBusyWithBgCopy(void)
 {
     int i;
 
+#ifdef PORTABLE
+    // GBA VBlank drains these requests asynchronously. Native menu loaders
+    // can poll from a tight loop without yielding a frame, so make progress
+    // before reporting whether a background copy is still pending.
+    ProcessDma3Requests();
+#endif
+
     for (i = 0; i < 0x80; i++)
     {
         u8 div = i / 0x20;

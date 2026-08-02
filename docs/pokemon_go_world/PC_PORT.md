@@ -26,11 +26,13 @@ Este alvo compila diretamente o código decompilado do jogo para Windows/SDL2. E
 - A configuração ativa gera automaticamente 2.950 imagens e 2.889 paletas externas de Pokémon, incluindo sprites frontais, traseiros, diferenças de gênero, formas e ovos. `gSpeciesInfo` continua selecionando os mesmos símbolos; somente o alvo PC os resolve no pacote.
 - Imagens de Pokémon são lidas transitoriamente e liberadas logo após a descompressão, evitando que visitar muitas espécies faça o cache crescer indefinidamente.
 - Paletas são validadas como blocos de pelo menos 32 bytes e mantidas no pequeno cache sob demanda. Imagem ou paleta ausente/corrompida usa a interrogação correspondente quando disponível; sem pacote, um bloco zerado seguro impede leitura inválida.
-- O executável mede 33.756.227 bytes (aproximadamente 32,19 MiB) e o pacote com 5.851 entradas mede 3.103.504 bytes (aproximadamente 2,96 MiB), portanto o alvo PC já não está preso ao limite de ROM de 32 MiB.
+- A configuração ativa também gera 1.420 ícones e 1.031 pegadas externas. O menu de equipe foi validado carregando os ícones animados de Bulbasaur e Pikachu com 1.024 bytes cada; sem pacote, os espaços ficam vazios sem leitura inválida.
+- O executável mede 32.312.283 bytes (aproximadamente 30,82 MiB) e o pacote com 8.302 entradas mede 4.798.304 bytes (aproximadamente 4,58 MiB), portanto o alvo PC já não está preso ao limite de ROM de 32 MiB.
 - O pacote válido, o pacote ausente e um pacote com dados corrompidos foram testados. Nos dois últimos casos o jogo continua de maneira segura, usando o fallback quando ele existir e sem entregar dados corrompidos ao descompressor.
 - A batalha Bulbasaur contra Pikachu foi repetida com sprites externos. Um Pikachu propositalmente corrompido foi rejeitado pelo CRC32 e substituído visualmente pelo sprite de interrogação, sem afetar o sprite traseiro de Bulbasaur.
 - Multiboot e recursos específicos de comunicação do hardware GBA permanecem isolados por stubs; multiboot não fará parte do alvo PC.
-- Próximo marco: migrar ícones de Pokémon, mantendo a mesma geração automática baseada nas configurações ativas.
+- Pendência conhecida: no modo diagnóstico, o avanço automatizado da tela de equipe para a tela de resumo expôs corrupção da lista do heap durante a inicialização do resumo. O menu e os ícones já foram validados antes desse ponto; o fluxo de resumo ainda precisa de correção e validação separadas.
+- Próximo marco: corrigir a tela de resumo e migrar cries, tilesets e outras famílias grandes.
 
 ## Compatibilidades resolvidas para o primeiro mapa
 
@@ -38,6 +40,7 @@ Este alvo compila diretamente o código decompilado do jogo para Windows/SDL2. E
 - Rotinas de descompressão que executavam código copiado para RAM adaptadas para execução direta, compatível com DEP/NX do Windows.
 - Espelho de ROM usado pelo interpretador de scripts do GBA removido somente no alvo PC; o alvo GBA conserva a marcação original.
 - Fila de DMA processada no host durante carregamentos síncronos, reproduzindo o progresso que o VBlank assíncrono realiza no hardware.
+- Consultas de cópia de fundo também drenam a fila DMA no PC. Isso corrige inicializadores em laço síncrono, como a tela de equipe, que no GBA progridem pela interrupção de VBlank.
 - Sondagem RFU desativada no PC e encerramentos de tela protegidos contra callbacks de um quadro já liberado.
 - GPIO do RTC do cartucho substituído, somente no alvo portátil, por um backend SDL2 baseado no relógio do sistema.
 - Persistência do flash conectada a um arquivo próprio do projeto, sem alterar o formato do save GBA.
@@ -70,7 +73,7 @@ O alvo interno também está disponível como `make pc` quando `make`, GCC i686,
 
 ## Sobre 32 bits e tamanho
 
-O executável continua sendo de 32 bits nesta fase porque scripts e tabelas do jogo armazenam ponteiros de 32 bits. Isso não impõe o limite de ROM de 32 MiB. Recursos já podem ser carregados sob demanda de um pacote externo com offsets de 64 bits; tela de título, imagens e paletas de Pokémon já foram migradas.
+O executável continua sendo de 32 bits nesta fase porque scripts e tabelas do jogo armazenam ponteiros de 32 bits. Isso não impõe o limite de ROM de 32 MiB. Recursos já podem ser carregados sob demanda de um pacote externo com offsets de 64 bits; tela de título, imagens, paletas, ícones e pegadas de Pokémon já foram migradas.
 
 ## Próximos marcos
 
