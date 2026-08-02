@@ -16,6 +16,7 @@
 #include "wallclock.h"
 #include "constants/form_change_types.h"
 #include "apricorn_tree.h"
+#include "pokemon_go_world.h"
 
 static void UpdatePerDay(struct Time *localTime);
 static void UpdatePerMinute(struct Time *localTime);
@@ -53,6 +54,7 @@ static void UpdatePerDay(struct Time *localTime)
         daysSince = localTime->days - *days;
         ClearDailyFlags();
         UpdateDailySeed();
+        Pgw_AdvanceWorldDays(daysSince);
         UpdateDewfordTrendPerDay(daysSince);
         UpdateTVShowsPerDay(daysSince);
         UpdateWeatherPerDay(daysSince);

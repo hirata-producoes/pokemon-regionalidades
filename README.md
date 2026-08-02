@@ -1,4 +1,17 @@
-# About `pokeemerald-expansion`
+# Pokémon Go World
+
+Projeto pessoal de um RPG Pokémon mundial e aberto, desenvolvido sobre
+`pokeemerald-expansion`. O objetivo é conectar as regiões da série por novas
+rotas e meios de transporte, com escolha da região inicial, dificuldade,
+horário, estações e clima dinâmico.
+
+O desenvolvimento está dividido em entregas jogáveis. Consulte
+[`docs/pokemon_go_world/PROJECT.md`](docs/pokemon_go_world/PROJECT.md) para o
+escopo, as decisões técnicas e o roteiro atual.
+
+> Estado atual: fundação técnica. O jogo completo ainda não está pronto.
+
+# Base: `pokeemerald-expansion`
 
 ![Gif that shows debugging functionality that is unique to pokeemerald-expansion such as rerolling Trainer ID, Cheat Start, PC from Debug Menu, Debug PC Fill, Pokémon Sprite Visualizer, Debug Warp to Map, and Battle Debug Menu](https://github.com/user-attachments/assets/cf9dfbee-4c6b-4bca-8e0a-07f116ef891c) ![Gif that shows overworld functionality that is unique to pokeemerald-expansion such as indoor running, BW2 style map popups, overworld followers, DNA Splicers, Gen 1 style fishing, OW Item descriptions, Quick Run from Battle, Use Last Ball, Wild Double Battles, and Catch from EXP](https://github.com/user-attachments/assets/383af243-0904-4d41-bced-721492fbc48e) ![Gif that shows off a number of modern Pokémon battle mechanics happening in the pokeemerald-expansion engine: 2 vs 1 battles, modern Pokémon, items, moves, abilities, fully customizable opponents and partners, Trainer Slides, and generational gimmicks](https://github.com/user-attachments/assets/50c576bc-415e-4d66-a38f-ad712f3316be)
 

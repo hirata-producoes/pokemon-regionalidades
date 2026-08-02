@@ -1541,3 +1541,27 @@ const struct Tileset gTileset_HallOfFame =
 };
 
 #endif // IS_FRLG
+
+#if !IS_FRLG
+const struct Tileset gTileset_General_Frlg =
+{
+    .isCompressed = TRUE,
+    .isSecondary = FALSE,
+    .tiles = gTilesetTiles_General_Frlg,
+    .palettes = gTilesetPalettes_General_Frlg,
+    .metatiles = gMetatiles_General_Frlg,
+    .metatileAttributes = gMetatileAttributes_General_Frlg,
+    .callback = NULL,
+};
+
+const struct Tileset gTileset_PalletTown =
+{
+    .isCompressed = TRUE,
+    .isSecondary = TRUE,
+    .tiles = gTilesetTiles_PalletTown,
+    .palettes = gTilesetPalettes_PalletTown,
+    .metatiles = gMetatiles_PalletTown,
+    .metatileAttributes = gMetatileAttributes_PalletTown,
+    .callback = NULL,
+};
+#endif

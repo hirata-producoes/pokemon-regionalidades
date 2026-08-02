@@ -639,3 +639,7 @@ gSpecials::
 	def_special UpdateTrainerCardPhotoIcons
 	def_special StickerManGetBragFlags
 	def_special CheckAddCoins
+	def_special Pgw_ScriptSetStartingRegion
+	def_special Pgw_ScriptSetCurrentRegion
+	def_special Pgw_ScriptGetStartingRegion
+	def_special Pgw_ScriptGetSeason

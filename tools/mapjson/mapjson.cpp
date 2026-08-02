@@ -731,6 +731,7 @@ void process_groups(string groups_filepath, vector<string> &map_filepaths, strin
             FATAL_ERROR("Failed to read '%s' while processing groups: %s\n", filepath.c_str(), err.c_str());
 
         string region = json_to_string(map_data, "region", true);
+        bool worldEnabled = json_to_string(map_data, "world_enabled", true) == "TRUE";
 
         if (region.empty()) {
             if (version == "emerald")
@@ -740,7 +741,7 @@ void process_groups(string groups_filepath, vector<string> &map_filepaths, strin
         }
         string map_name = json_to_string(map_data, "name");
 
-        if ((version == "emerald" && region != "REGION_HOENN")
+        if ((version == "emerald" && region != "REGION_HOENN" && !worldEnabled)
          || (version == "firered" && region != "REGION_KANTO")) {
             invalid_maps.push_back(map_name);
         }
@@ -773,6 +774,7 @@ string generate_layout_headers_text(Json layouts_data) {
         if (!std::filesystem::exists(json_to_string(layout, "border_filepath")))
             continue;
         string layout_version = json_to_string(layout, "layout_version", true);
+        bool worldEnabled = json_to_string(layout, "world_enabled", true) == "TRUE";
 
         if (layout_version.empty()) {
             if (version == "emerald")
@@ -780,7 +782,7 @@ string generate_layout_headers_text(Json layouts_data) {
             else if (version == "firered")
                 layout_version = "frlg";
         }
-        if ((version == "emerald" && layout_version != "emerald")
+        if ((version == "emerald" && layout_version != "emerald" && !worldEnabled)
          || (version == "firered" && layout_version != "frlg"))
             continue;
         string layoutName = json_to_string(layout, "name");
@@ -832,13 +834,14 @@ string generate_layouts_table_text(Json layouts_data) {
         if (!std::filesystem::exists(json_to_string(layout, "border_filepath")))
             continue;
         string layout_version = json_to_string(layout, "layout_version", true);
+        bool worldEnabled = json_to_string(layout, "world_enabled", true) == "TRUE";
         if (layout_version.empty()) {
             if (version == "emerald")
                 layout_version = "emerald";
             else if (version == "firered")
                 layout_version = "frlg";
         }
-        if ((version == "emerald" && layout_version != "emerald") || (version == "firered" && layout_version != "frlg")) {
+        if ((version == "emerald" && layout_version != "emerald" && !worldEnabled) || (version == "firered" && layout_version != "frlg")) {
             text << "\t.4byte NULL\n";
         } else {
             string layout_name = json_to_string(layout, "name", true);
