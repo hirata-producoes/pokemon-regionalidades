@@ -1022,6 +1022,13 @@ bool8 IsBattleTransitionDone(void)
     if (gTasks[taskId].tTransitionDone)
     {
         DestroyTask(taskId);
+#ifdef PORTABLE
+        // Native VBlank/HBlank delivery can occur after the transition task
+        // reports completion but before the battle callback installs its own
+        // handlers. Do not leave callbacks pointing at freed transition data.
+        SetVBlankCallback(NULL);
+        SetHBlankCallback(NULL);
+#endif
         FREE_AND_SET_NULL(sTransitionData);
         return TRUE;
     }
