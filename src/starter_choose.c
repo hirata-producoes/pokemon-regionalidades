@@ -10,6 +10,7 @@
 #include "palette.h"
 #include "pokedex.h"
 #include "pokemon.h"
+#include "pokemon_go_world.h"
 #include "scanline_effect.h"
 #include "sound.h"
 #include "sprite.h"
@@ -110,15 +111,21 @@ static const u8 sStarterLabelCoords[STARTER_MON_COUNT][2] =
     {8, 4},
 };
 
-#define GRASS_STARTER (IS_FRLG ? SPECIES_BULBASAUR  : SPECIES_TREECKO)
-#define FIRE_STARTER  (IS_FRLG ? SPECIES_CHARMANDER : SPECIES_TORCHIC)
-#define WATER_STARTER (IS_FRLG ? SPECIES_SQUIRTLE   : SPECIES_MUDKIP )
-
-static const u16 sStarterMon[STARTER_MON_COUNT] =
+static const u16 sStarterMons[PGW_START_REGION_COUNT][STARTER_MON_COUNT] =
 {
-    GRASS_STARTER,
-    FIRE_STARTER,
-    WATER_STARTER,
+    [PGW_START_KANTO]          = {SPECIES_BULBASAUR,  SPECIES_CHARMANDER, SPECIES_SQUIRTLE},
+    [PGW_START_JOHTO]          = {SPECIES_CHIKORITA,  SPECIES_CYNDAQUIL,  SPECIES_TOTODILE},
+    [PGW_START_HOENN]          = {SPECIES_TREECKO,    SPECIES_TORCHIC,    SPECIES_MUDKIP},
+    [PGW_START_SINNOH]         = {SPECIES_TURTWIG,    SPECIES_CHIMCHAR,   SPECIES_PIPLUP},
+    [PGW_START_UNOVA]          = {SPECIES_SNIVY,      SPECIES_TEPIG,      SPECIES_OSHAWOTT},
+    [PGW_START_KALOS]          = {SPECIES_CHESPIN,    SPECIES_FENNEKIN,   SPECIES_FROAKIE},
+    [PGW_START_ALOLA]          = {SPECIES_ROWLET,     SPECIES_LITTEN,     SPECIES_POPPLIO},
+    [PGW_START_GALAR]          = {SPECIES_GROOKEY,    SPECIES_SCORBUNNY,  SPECIES_SOBBLE},
+    [PGW_START_HISUI]          = {SPECIES_ROWLET,     SPECIES_CYNDAQUIL,  SPECIES_OSHAWOTT},
+    [PGW_START_PALDEA]         = {SPECIES_SPRIGATITO, SPECIES_FUECOCO,    SPECIES_QUAXLY},
+    // The Orange Islands have no official trio. This provisional set is
+    // inspired by the anime and can be changed when that region is designed.
+    [PGW_START_ORANGE_ISLANDS] = {SPECIES_PIKACHU, SPECIES_EEVEE, SPECIES_LAPRAS},
 };
 
 static const struct BgTemplate sBgTemplates[3] =
@@ -349,9 +356,11 @@ static const struct SpriteTemplate sSpriteTemplate_StarterCircle =
 // .text
 u16 GetStarterPokemon(u16 chosenStarterId)
 {
-    if (chosenStarterId > STARTER_MON_COUNT)
+    u16 startingRegion = Pgw_GetStartingRegion();
+
+    if (chosenStarterId >= STARTER_MON_COUNT)
         chosenStarterId = 0;
-    return sStarterMon[chosenStarterId];
+    return sStarterMons[startingRegion][chosenStarterId];
 }
 
 static void VblankCB_StarterChoose(void)

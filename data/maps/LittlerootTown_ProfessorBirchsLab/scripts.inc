@@ -656,6 +656,32 @@ LittlerootTown_ProfessorBirchsLab_EventScript_ScottAboardSSTidalCall::
 	releaseall
 	end
 
+@ Temporary development ferry for testing Kanto before the permanent world
+@ travel system is ready.
+LittlerootTown_ProfessorBirchsLab_EventScript_TravelToKanto::
+	lock
+	faceplayer
+	msgbox LittlerootTown_ProfessorBirchsLab_Text_TravelToKanto, MSGBOX_YESNO
+	goto_if_eq VAR_RESULT, NO, LittlerootTown_ProfessorBirchsLab_EventScript_StayInHoenn
+	setvar VAR_0x8004, 0 @ PGW_START_KANTO
+	special Pgw_ScriptSetCurrentRegion
+	warp MAP_PGW_PALLET_TOWN, 12, 18
+	waitstate
+	release
+	end
+
+LittlerootTown_ProfessorBirchsLab_EventScript_StayInHoenn::
+	msgbox LittlerootTown_ProfessorBirchsLab_Text_StayInHoenn, MSGBOX_DEFAULT
+	release
+	end
+
+LittlerootTown_ProfessorBirchsLab_Text_TravelToKanto:
+	.string "A rota experimental para KANTO esta aberta!\p"
+	.string "Quer viajar agora para PALLET TOWN?$"
+
+LittlerootTown_ProfessorBirchsLab_Text_StayInHoenn:
+	.string "Sem problema. Estarei aqui quando quiser ir.$"
+
 LittlerootTown_ProfessorBirchsLab_Text_BirchAwayOnFieldwork:
 	.string "Hunh? PROF. BIRCH?\p"
 	.string "The PROF's away on fieldwork.\n"

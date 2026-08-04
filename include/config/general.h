@@ -73,15 +73,15 @@
 #define GEN_LATEST GEN_9
 
 // General settings
-#define EXPANSION_INTRO              TRUE    // If TRUE, a custom RHH intro will play after the vanilla copyright screen.
-#define PHONEMES_SHARED              FALSE   // If TRUE, bard phonemes all reference the same sound (sound/direct_sound_samples/phonemes/shared.bin) to save ROM space.
+#define EXPANSION_INTRO              FALSE   // Pokémon Go World uses its own presentation instead of the RHH showcase intro.
+#define PHONEMES_SHARED              TRUE    // Bard is not part of the core world campaign; share its phoneme sample to save ROM space.
 
 // Measurement system constants to be used for UNITS
 #define UNITS_IMPERIAL               0       // Inches, feet, pounds
 #define UNITS_METRIC                 1       // meters, kilograms
 
-#define UNITS                        UNITS_IMPERIAL
-#define CHAR_DEC_SEPARATOR           CHAR_PERIOD // CHAR_PERIOD is used as a decimal separator only in the UK and the US. The rest of the world uses CHAR_COMMA.
+#define UNITS                        UNITS_METRIC
+#define CHAR_DEC_SEPARATOR           CHAR_COMMA // Portuguese uses a comma as the decimal separator.
 
 // Naming Screen
 #define AUTO_LOWERCASE_KEYBOARD      GEN_LATEST  // Starting in GEN_6, after entering the first uppercase character, the keyboard switches to lowercase letters.

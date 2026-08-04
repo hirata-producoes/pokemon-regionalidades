@@ -34,6 +34,7 @@
     "gMapGroup_IndoorRoute123",
     "gMapGroup_IndoorRoute119",
     "gMapGroup_IndoorRoute124",
+    "gMapGroup_PokemonGoWorld",
     "gMapGroup_Link_Frlg",
     "gMapGroup_Dungeons_Frlg",
     "gMapGroup_SpecialArea_Frlg",
@@ -661,6 +662,9 @@
   ],
   "gMapGroup_IndoorRoute124": [
     "Route124_DivingTreasureHuntersHouse"
+  ],
+  "gMapGroup_PokemonGoWorld": [
+    "PalletTown_Pgw"
   ],
   "gMapGroup_Link_Frlg": [
     "BattleColosseum_2P_Frlg",

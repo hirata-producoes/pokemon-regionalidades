@@ -5370,7 +5370,8 @@
       "secondary_tileset": "gTileset_PalletTown",
       "border_filepath": "data/layouts/PalletTown_Frlg/border.bin",
       "blockdata_filepath": "data/layouts/PalletTown_Frlg/map.bin",
-      "layout_version": "frlg"
+      "layout_version": "frlg",
+      "world_enabled": true
     },
     {
       "id": "LAYOUT_VIRIDIAN_CITY",

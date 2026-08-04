@@ -33,6 +33,7 @@
 #include "frontier_util.h"
 #include "pokedex.h"
 #include "save.h"
+#include "pokemon_go_world.h"
 #include "link_rfu.h"
 #include "main.h"
 #include "contest.h"
@@ -230,6 +231,7 @@ void NewGameInitData(void)
     ResetTrainerHillResults();
     ResetTrainerTowerResults();
     ResetContestLinkResults();
+    Pgw_InitWorldState();
     SetCurrentDifficultyLevel(DIFFICULTY_NORMAL);
     ResetItemFlags();
     ResetDexNav();
