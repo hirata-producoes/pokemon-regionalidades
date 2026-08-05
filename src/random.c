@@ -1,6 +1,9 @@
+#if MODERN && defined(_WIN32)
+#include <malloc.h>
+#endif
 #include "global.h"
 #include "random.h"
-#if MODERN
+#if MODERN && !defined(_WIN32)
 #include <alloca.h>
 #endif
 
@@ -42,8 +45,15 @@ static void SFC32_Seed(struct Sfc32State *state, u32 seed, u8 stream)
 /*This ASM implementation uses some shortcuts and is generally faster on the GBA.
 * It's not necessarily faster if inlined, or on other platforms.
 * In addition, it's extremely non-portable. */
-u32 NAKED Random32(void)
+u32
+#ifndef PORTABLE
+NAKED
+#endif
+Random32(void)
 {
+#ifdef PORTABLE
+    return _SFC32_Next_Stream(&gRngValue, STREAM1);
+#else
     asm(".thumb\n\
     push {r4, r5, r6}\n\
     mov r6, #11\n\
@@ -68,6 +78,7 @@ u32 NAKED Random32(void)
     bx lr\n\
     .ltorg"
     );
+#endif
 }
 
 u32 Random2_32(void)

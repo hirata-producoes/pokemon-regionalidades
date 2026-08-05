@@ -1,4 +1,8 @@
+#ifdef _WIN32
+#include <malloc.h>
+#else
 #include <alloca.h>
+#endif
 #include <stdarg.h>
 #include "global.h"
 #include "bg.h"
@@ -21,6 +25,14 @@ struct BitUnPackArgs
 };
 
 extern void BitUnPack(const void *src, void *dest, const struct BitUnPackArgs *);
+
+#ifdef PORTABLE
+void BitUnPack(const void *src, void *dest, const struct BitUnPackArgs *args)
+{
+    // The native crash screen currently only needs the symbol to exist. Its
+    // renderer will be replaced with an SDL error overlay in a later stage.
+}
+#endif
 
 static const u16 sPltts[MODE_COUNT][2] =
 {
@@ -345,6 +357,7 @@ static void CrashScreen(enum Mode mode, const void *return1, const void *return0
     }
 
     // Allocate on stack if possible.
+#ifndef PORTABLE
     if (!backup)
     {
         extern char __iwram_end[];
@@ -355,6 +368,7 @@ static void CrashScreen(enum Mode mode, const void *return1, const void *return0
             backup->onHeap = FALSE;
         }
     }
+#endif
 
     if (!backup)
     {

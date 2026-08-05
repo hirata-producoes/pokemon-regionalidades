@@ -36,7 +36,11 @@ struct RecordedBattleSave
     u16 easyChatSpeech[EASY_CHAT_BATTLE_WORDS_COUNT];
     u8 battleRecord[MAX_BATTLERS_COUNT][BATTLER_RECORD_SIZE];
     u32 checksum;
+#ifdef PORTABLE
+} __attribute__((packed, aligned(4)));
+#else
 };
+#endif
 
 enum
 {
