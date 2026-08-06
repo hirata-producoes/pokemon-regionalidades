@@ -1,12 +1,38 @@
 #ifdef PLATFORM_SDL2
 #include <assert.h>
 #include <stdbool.h>
+#include <stdint.h>
 #include <stdio.h>
 #include <time.h>
 
 #ifdef _WIN32
 #include <windows.h>
 #include <xinput.h>
+
+static LONG CALLBACK LogNativeException(EXCEPTION_POINTERS *exception)
+{
+    if (exception->ExceptionRecord->ExceptionCode != EXCEPTION_ACCESS_VIOLATION)
+        return EXCEPTION_CONTINUE_SEARCH;
+
+    fprintf(stdout, "PC port exception: code=0x%08lX address=%p eip=%p module=%p\n",
+            exception->ExceptionRecord->ExceptionCode,
+            exception->ExceptionRecord->ExceptionAddress,
+            (void *)(uintptr_t)exception->ContextRecord->Eip,
+            GetModuleHandle(NULL));
+    DWORD *stack = (DWORD *)(uintptr_t)exception->ContextRecord->Esp;
+    fprintf(stdout, "PC port registers: eax=%08lX ebx=%08lX ecx=%08lX edx=%08lX esi=%08lX edi=%08lX esp=%p ebp=%p\n",
+            exception->ContextRecord->Eax,
+            exception->ContextRecord->Ebx,
+            exception->ContextRecord->Ecx,
+            exception->ContextRecord->Edx,
+            exception->ContextRecord->Esi,
+            exception->ContextRecord->Edi,
+            stack,
+            (void *)(uintptr_t)exception->ContextRecord->Ebp);
+    for (int i = 0; i < 20; i++)
+        fprintf(stdout, " stack[%02d]=%08lX%s", i, stack[i], i % 4 == 3 ? "\n" : "");
+    return EXCEPTION_CONTINUE_SEARCH;
+}
 #endif
 
 #ifdef __ANDROID__
@@ -91,16 +117,31 @@ int main(int argc, char **argv)
 {
     // Open an output console on Windows
 #ifdef _WIN32
-    AllocConsole() ;
-    AttachConsole( GetCurrentProcessId() ) ;
-    freopen( "CON", "w", stdout ) ;
+    const char *diagnosticDir = SDL_getenv("POKEMON_GO_WORLD_CAPTURE_DIR");
+    if (diagnosticDir != NULL && diagnosticDir[0] != '\0')
+    {
+        char logPath[1200];
+        SDL_snprintf(logPath, sizeof(logPath), "%s/runtime.log", diagnosticDir);
+        freopen(logPath, "w", stdout);
+    }
+    else
+    {
+        AllocConsole();
+        AttachConsole(GetCurrentProcessId());
+        freopen("CON", "w", stdout);
+    }
+    setvbuf(stdout, NULL, _IONBF, 0);
+    AddVectoredExceptionHandler(1, LogNativeException);
 #endif
+
+    DBGPRINTF("PC port: entering SDL main\n");
 
 #ifdef __ANDROID__
     SDL_setenv("SDL_AUDIODRIVER", "openslES", 1);
     SDL_SetHint(SDL_HINT_TOUCH_MOUSE_EVENTS, "0");
     SDL_SetHint(SDL_HINT_MOUSE_TOUCH_EVENTS, "0");
 #endif
+    DBGPRINTF("PC port: initializing SDL\n");
     if(SDL_Init(SDL_INIT_VIDEO | SDL_INIT_AUDIO
 #ifdef __ANDROID__
                 | SDL_INIT_GAMECONTROLLER
@@ -110,6 +151,7 @@ int main(int argc, char **argv)
         DBGPRINTF("SDL could not initialize! SDL_Error: %s\n", SDL_GetError());
         return 1;
     }
+    DBGPRINTF("PC port: SDL initialized\n");
 
 #ifdef __ANDROID__
     for (int i = 0; i < SDL_NumJoysticks() && androidController == NULL; i++)
@@ -128,8 +170,11 @@ int main(int argc, char **argv)
         SDL_free(prefPath);
     }
 #endif
+    DBGPRINTF("PC port: reading save\n");
     ReadSaveFile(sSavePath);
+    DBGPRINTF("PC port: save loaded\n");
     ReadConfigFile();
+    DBGPRINTF("PC port: save and config loaded\n");
 
 #ifdef __ANDROID__
     SDL_SetHint(SDL_HINT_ORIENTATIONS, "LandscapeLeft LandscapeRight");
@@ -144,6 +189,7 @@ int main(int argc, char **argv)
         DBGPRINTF("Window could not be created! SDL_Error: %s\n", SDL_GetError());
         return 1;
     }
+    DBGPRINTF("PC port: window created\n");
 
 #ifdef __ANDROID__
     sdlRenderer = SDL_CreateRenderer(sdlWindow, -1, SDL_RENDERER_ACCELERATED);
@@ -155,6 +201,7 @@ int main(int argc, char **argv)
         DBGPRINTF("Renderer could not be created! SDL_Error: %s\n", SDL_GetError());
         return 1;
     }
+    DBGPRINTF("PC port: renderer created\n");
 
     SDL_SetRenderDrawColor(sdlRenderer, 0, 0, 0, 255);
     SDL_RenderClear(sdlRenderer);
@@ -358,11 +405,7 @@ int main(int argc, char **argv)
 
                     RunDMAs(DMA_HBLANK);
 
-#ifdef __ANDROID__
                     if (REG_IE & INTR_FLAG_VBLANK)
-#else
-                    if (REG_DISPSTAT & DISPSTAT_VBLANK_INTR)
-#endif
                         gIntrTable[4]();
                     REG_DISPSTAT &= ~INTR_FLAG_VBLANK;
 
@@ -498,6 +541,7 @@ static void StoreSaveFile()
     {
         fseek(sSaveFile, 0, SEEK_SET);
         fwrite(FLASH_BASE, 1, sizeof(FLASH_BASE), sSaveFile);
+        fflush(sSaveFile);
     }
 }
 
@@ -508,24 +552,11 @@ void Platform_StoreSaveFile(void)
 
 void Platform_ReadFlash(u16 sectorNum, u32 offset, u8 *dest, u32 size)
 {
-    DBGPRINTF("ReadFlash(sectorNum=0x%04X,offset=0x%08X,size=0x%02X)\n",sectorNum,offset,size);
-    FILE * savefile = fopen(sSavePath, "r+b");
-    if (savefile == NULL)
-    {
-        puts("Error opening save file.");
+    u32 sourceOffset = (sectorNum << gFlash->sector.shift) + offset;
+
+    if (sourceOffset > sizeof(FLASH_BASE) || size > sizeof(FLASH_BASE) - sourceOffset)
         return;
-    }
-    if (fseek(savefile, (sectorNum << gFlash->sector.shift) + offset, SEEK_SET))
-    {
-        fclose(savefile);
-        return;
-    }
-    if (fread(dest, 1, size, savefile) != size)
-    {
-        fclose(savefile);
-        return;
-    }
-    fclose(savefile);
+    memcpy(dest, &FLASH_BASE[sourceOffset], size);
 }
 
 void Platform_QueueAudio(float *audioBuffer, s32 samplesPerFrame)
@@ -1051,20 +1082,36 @@ u16 GetXInputKeys()
 
 u16 Platform_GetKeyInput(void)
 {
+    static u32 autoplayFrame;
+    u16 automatedKeys = 0;
+    const char *autoplay = SDL_getenv("POKEMON_GO_WORLD_AUTOPLAY");
+
+    if (autoplay != NULL && autoplay[0] != '\0' && autoplay[0] != '0')
+    {
+        // One-frame pulses with release frames between them. This is intended
+        // for native-port smoke tests, never enabled during normal play.
+        autoplayFrame++;
+        if (autoplayFrame % 12 == 1)
+            automatedKeys = A_BUTTON;
+        else if (autoplayFrame % 60 == 7)
+            automatedKeys = START_BUTTON;
+    }
+
 #ifdef _WIN32
     u16 gamepadKeys = GetXInputKeys();
-    return gamepadKeys | keyboardKeys;
+    return gamepadKeys | keyboardKeys | automatedKeys;
 #elif defined(__ANDROID__)
-    return keyboardKeys | controllerKeys | controllerAxisKeys;
+    return keyboardKeys | controllerKeys | controllerAxisKeys | automatedKeys;
 #endif
 
-    return keyboardKeys;
+    return keyboardKeys | automatedKeys;
 }
 
 void VDraw(SDL_Texture *texture)
 {
     static uint16_t gbaImage[DISPLAY_WIDTH * DISPLAY_HEIGHT];
     static uint32_t image[DISPLAY_WIDTH * DISPLAY_HEIGHT];
+    static unsigned int frameNumber;
 
     memset(gbaImage, 0, sizeof(gbaImage));
     DrawFrame(gbaImage);
@@ -1077,12 +1124,41 @@ void VDraw(SDL_Texture *texture)
         image[i] = 0xFF000000 | (r << 16) | (g << 8) | b;
     }
     SDL_UpdateTexture(texture, NULL, image, DISPLAY_WIDTH * sizeof(Uint32));
+
+    // Optional native-port regression capture. When the environment variable
+    // points to an existing directory, save the unscaled GBA framebuffer once
+    // per second. Normal players do not pay any file-I/O cost.
+    const char *captureDir = SDL_getenv("POKEMON_GO_WORLD_CAPTURE_DIR");
+    frameNumber++;
+    if (captureDir != NULL && captureDir[0] != '\0' && frameNumber % 60 == 0)
+    {
+        char capturePath[1200];
+        SDL_Surface *surface = SDL_CreateRGBSurfaceFrom(
+            image,
+            DISPLAY_WIDTH,
+            DISPLAY_HEIGHT,
+            32,
+            DISPLAY_WIDTH * sizeof(Uint32),
+            0x00FF0000,
+            0x0000FF00,
+            0x000000FF,
+            0xFF000000);
+
+        if (surface != NULL)
+        {
+            SDL_snprintf(capturePath, sizeof(capturePath), "%s/frame_%06u.bmp", captureDir, frameNumber);
+            SDL_SaveBMP(surface, capturePath);
+            SDL_FreeSurface(surface);
+        }
+    }
     REG_VCOUNT = 161; // prep for being in VBlank period
 }
 
 int DoMain(void *data)
 {
+    DBGPRINTF("PC port: entering AgbMain\n");
     AgbMain();
+    DBGPRINTF("PC port: AgbMain returned\n");
     return 0;
 }
 

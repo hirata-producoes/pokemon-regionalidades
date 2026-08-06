@@ -68,6 +68,13 @@ void MPlayFadeOut(struct MusicPlayerInfo *mplayInfo, u16 speed)
 
 void m4aSoundInit(void)
 {
+#ifdef PORTABLE
+    // The ARM MP2K driver configures GBA DMA/timer registers and cannot run
+    // natively. Leave its state inactive until the SDL mixer replacement is
+    // integrated; public music calls already ignore inactive players safely.
+    SOUND_INFO_PTR = &gSoundInfo;
+    return;
+#else
     s32 i;
 
     SoundInit(&gSoundInfo);
@@ -94,6 +101,7 @@ void m4aSoundInit(void)
         MPlayOpen(mplayInfo, track, 2);
         track->chan = 0;
     }
+#endif
 }
 
 void m4aSoundMain(void)
@@ -1731,6 +1739,10 @@ void SetPokemonCryProgress(u32 val)
 
 bool32 IsPokemonCryPlaying(struct MusicPlayerInfo *mplayInfo)
 {
+#ifdef PORTABLE
+    if (mplayInfo == NULL || mplayInfo->tracks == NULL)
+        return FALSE;
+#endif
     struct MusicPlayerTrack *track = mplayInfo->tracks;
 
     if (track->chan && track->chan->track == track)

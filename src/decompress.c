@@ -528,10 +528,13 @@ static void DecodeLOtANS(const u32 *data, const u32 *pFreqs, u8 *resultVec, u32 
     // We want to store in packs of 2, so count needs to be divisible by 2
     u32 remainingCount = count % 2;
 
+#ifdef PORTABLE
+    DecodeLOtANSLoop(data, sWorkingYkTable, resultVec, &resultVec[count - remainingCount]);
+#else
     u32 funcBuffer[FUNC_BUFFER_SIZE(DecodeLOtANSLoop, SwitchToArmCallLOtANS)];
-
     CopyFuncToIwram(funcBuffer, DecodeLOtANSLoop, SwitchToArmCallLOtANS);
     SwitchToArmCallLOtANS(data, sWorkingYkTable, resultVec, &resultVec[count - remainingCount], (void *) funcBuffer);
+#endif
 
     if (remainingCount)
     {
@@ -604,10 +607,14 @@ static void DecodeSymtANS(const u32 *data, const u32 *pFreqs, u16 *resultVec, u3
 {
     BuildDecompressionTable(pFreqs, sWorkingYkTable);
 
+#ifdef PORTABLE
+    DecodeLOtANSLoop(data, sWorkingYkTable, (u8 *)resultVec, (u8 *)&resultVec[count]);
+#else
     u32 funcBuffer[FUNC_BUFFER_SIZE(DecodeLOtANSLoop, SwitchToArmCallLOtANS)];
     // CopyFuncToIwram(funcBuffer, DecodeSymtANSLoop, SwitchToArmCallDecodeSymtANS);
     CopyFuncToIwram(funcBuffer, DecodeLOtANSLoop, SwitchToArmCallLOtANS);
     SwitchToArmCallDecodeSymtANS(data, sWorkingYkTable, resultVec, &resultVec[count], (void *) funcBuffer);
+#endif
 }
 
 #define ANS_LOOP_MAIN(nibble)   \
@@ -783,9 +790,13 @@ static void DecodeSymDeltatANS(const u32 *data, const u32 *pFreqs, u16 *resultVe
     // We want to store in packs of 2, so count needs to be divisible by 2
     u32 remainingCount = count % 2;
 
+#ifdef PORTABLE
+    u32 currSymbol = DecodeSymDeltatANSLoop(data, sWorkingYkTable, resultVec, &resultVec[count - remainingCount]);
+#else
     u32 funcBuffer[FUNC_BUFFER_SIZE(DecodeSymDeltatANSLoop, SwitchToArmCallSymDeltaANS)];
     CopyFuncToIwram(funcBuffer, DecodeSymDeltatANSLoop, SwitchToArmCallSymDeltaANS);
     u32 currSymbol = SwitchToArmCallSymDeltaANS(data, sWorkingYkTable, resultVec, &resultVec[count - remainingCount], (void *) funcBuffer);
+#endif
 
     if (remainingCount)
     {
@@ -939,10 +950,14 @@ ARM_FUNC __attribute__((no_reorder)) static void SwitchToArmCallDecodeInstructio
 //  Dark Egg magic
 static void DecodeInstructionsIwram(u32 headerLoSize, const u8 *loVec, const u16 *symVec, void *dest)
 {
+#ifdef PORTABLE
+    DecodeInstructions(headerLoSize, loVec, symVec, dest);
+#else
     u32 funcBuffer[FUNC_BUFFER_SIZE(DecodeInstructions, SwitchToArmCallDecodeInstructions)];
 
     CopyFuncToIwram(funcBuffer, DecodeInstructions, SwitchToArmCallDecodeInstructions);
     SwitchToArmCallDecodeInstructions(headerLoSize, loVec, symVec, dest, (void *) funcBuffer);
+#endif
 }
 
 //  Entrance point for smol compressed data
@@ -1095,10 +1110,13 @@ static void SmolDecompressTilemap(const struct SmolTilemapHeader *header, const 
     DecodeInstructionsIwram(header->tileNumberSize, loVec, symVec, dest);
     u32 arraySize = header->tilemapSize/2;
 
+#ifdef PORTABLE
+    DeltaDecodeTileNumbers(deltaDest, arraySize);
+#else
     u32 funcBuffer[FUNC_BUFFER_SIZE(DeltaDecodeTileNumbers, SwitchToArmCallDecodeTileNumbers)];
-
     CopyFuncToIwram(funcBuffer, DeltaDecodeTileNumbers, SwitchToArmCallDecodeTileNumbers);
     SwitchToArmCallDecodeTileNumbers(deltaDest, arraySize, (void *) funcBuffer);
+#endif
 }
 
 //  Helper functions for determining modes
