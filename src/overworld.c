@@ -49,6 +49,9 @@
 #include "new_game.h"
 #include "oras_dowse.h"
 #include "palette.h"
+#ifdef PORTABLE
+#include "platform.h"
+#endif
 #include "play_time.h"
 #include "random.h"
 #include "roamer.h"
@@ -1940,6 +1943,10 @@ void CB2_NewGame(void)
         gFieldCallback = ExecuteTruckSequence;
     gFieldCallback2 = NULL;
     DoMapLoadLoop(&gMain.state);
+#if defined(PORTABLE) && defined(PLATFORM_SDL2)
+    if (Platform_GetEnvironmentFlag("POKEMON_GO_WORLD_TEST_SAVE"))
+        DBGPRINTF("PC save test: TrySavingData=%u\n", TrySavingData(SAVE_NORMAL));
+#endif
     SetFieldVBlankCallback();
     SetMainCallback1(CB1_Overworld);
     SetMainCallback2(CB2_Overworld);
