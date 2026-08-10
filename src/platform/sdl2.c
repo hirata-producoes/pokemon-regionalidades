@@ -586,13 +586,28 @@ void Platform_ReadFlash(u16 sectorNum, u32 offset, u8 *dest, u32 size)
 
 void Platform_QueueAudio(float *audioBuffer, s32 samplesPerFrame)
 {
-    if (sdlAudioDevice != 0)
+    static bool8 sAudioDiagnosticReported;
+
+    if (sdlAudioDevice != 0 && timeScale <= 1.0)
     {
         int floatCount = samplesPerFrame / sizeof(float);
         float adjustedAudio[floatCount];
         float volume = sPlatformSettings[PLATFORM_SETTING_VOLUME] / 10.0f;
+        float peak = 0.0f;
         for (int i = 0; i < floatCount; i++)
+        {
             adjustedAudio[i] = audioBuffer[i] * volume;
+            float magnitude = adjustedAudio[i] < 0.0f ? -adjustedAudio[i] : adjustedAudio[i];
+            if (magnitude > peak)
+                peak = magnitude;
+        }
+        if (!sAudioDiagnosticReported
+         && peak > 0.0001f
+         && Platform_GetEnvironmentFlag("POKEMON_GO_WORLD_TEST_AUDIO"))
+        {
+            DBGPRINTF("PC audio test: non-silent SDL buffer, peak=%f, bytes=%d\n", peak, samplesPerFrame);
+            sAudioDiagnosticReported = TRUE;
+        }
         if (SDL_QueueAudio(sdlAudioDevice, adjustedAudio, samplesPerFrame) < 0)
             SDL_Log("Failed to queue audio: %s", SDL_GetError());
     }

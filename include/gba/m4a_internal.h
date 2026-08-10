@@ -38,8 +38,26 @@
 
 struct WaveData
 {
+#ifdef PORTABLE
+    union
+    {
+        struct
+        {
+            u16 type;
+            u16 status;
+        };
+        struct
+        {
+            u8 compressionFlags1;
+            u8 compressionFlags2;
+            u8 compressionFlags3;
+            u8 loopFlags;
+        };
+    };
+#else
     u16 type;
     u16 status;
+#endif
     u32 freq;
     u32 loopStart;
     u32 size; // number of samples
@@ -57,6 +75,29 @@ struct WaveData
 struct ToneData
 {
     u8 type;
+#ifdef PORTABLE
+    union { u8 key; u8 drumKey; };
+    union { u8 length; u8 cgbLength; };
+    union { u8 pan_sweep; u8 panSweep; };
+    union
+    {
+        struct WaveData *wav;
+        struct ToneData *group;
+        u32 *cgb3Sample;
+        u32 squareNoiseConfig;
+    };
+    union
+    {
+        struct
+        {
+            u8 attack;
+            u8 decay;
+            u8 sustain;
+            u8 release;
+        };
+        u8 *keySplitTable;
+    };
+#else
     u8 key;
     u8 length; // sound length (compatible sound)
     u8 pan_sweep; // pan or sweep (compatible sound ch. 1)
@@ -65,6 +106,7 @@ struct ToneData
     u8 decay;
     u8 sustain;
     u8 release;
+#endif
 };
 
 #define SOUND_CHANNEL_SF_START       0x80
@@ -129,44 +171,86 @@ struct MusicPlayerTrack;
 
 struct SoundChannel
 {
+#ifdef PORTABLE
+    union { u8 statusFlags; u8 status; };
+#else
     u8 statusFlags;
+#endif
     u8 type;
+#ifdef PORTABLE
+    union { u8 rightVolume; u8 rightVol; };
+    union { u8 leftVolume; u8 leftVol; };
+#else
     u8 rightVolume;
     u8 leftVolume;
+#endif
     u8 attack;
     u8 decay;
     u8 sustain;
     u8 release;
     u8 key;             // midi key as it was translated into final pitch
-    u8 envelopeVolume;
-    u8 envelopeVolumeRight;
-    u8 envelopeVolumeLeft;
-    u8 pseudoEchoVolume;
-    u8 pseudoEchoLength;
+    union { u8 envelopeVolume; u8 envelopeVol; };
+    union { u8 envelopeVolumeRight; u8 envelopeVolR; u8 envelopeGoal; };
+    union { u8 envelopeVolumeLeft; u8 envelopeVolL; u8 envelopeCtr; };
+    union { u8 pseudoEchoVolume; u8 echoVol; };
+    union { u8 pseudoEchoLength; u8 echoLen; };
     u8 dummy1;
     u8 dummy2;
     u8 gateTime;
-    u8 midiKey;         // midi key as it was used in the track data
+    union { u8 midiKey; u8 untransposedKey; }; // midi key as it was used in the track data
     u8 velocity;
     u8 priority;
     u8 rhythmPan;
     u8 dummy3[3];
-    u32 count;
+    union
+    {
+        u32 count;
+        u32 ct;
+        struct
+        {
+            u8 padding6;
+            u8 sustainGoal;
+            u8 nrx4;
+            u8 pan;
+        };
+    };
+#ifdef PORTABLE
+    union
+    {
+        float fw;
+        struct
+        {
+            u8 panMask;
+            u8 cgbStatus;
+            u8 length;
+            u8 sweep;
+        };
+    };
+#else
     u32 fw;
-    u32 frequency;
-    struct WaveData *wav;
-    s8 *currentPointer;
+#endif
+    union { u32 frequency; u32 freq; };
+    union { struct WaveData *wav; u32 *newCgb3Sample; };
+    union { s8 *currentPointer; s8 *current; u32 *oldCgb3Sample; };
     struct MusicPlayerTrack *track;
-    void *prevChannelPointer;
-    void *nextChannelPointer;
+    union { void *prevChannelPointer; struct SoundChannel *prev; };
+    union { void *nextChannelPointer; struct SoundChannel *next; };
     u32 dummy4;
+#ifdef PORTABLE
+    u32 blockCount;
+#else
     u16 xpi;
     u16 xpc;
+#endif
 };
 
 #define MAX_DIRECTSOUND_CHANNELS 12
 
+#ifdef PORTABLE
+#define PCM_DMA_BUF_SIZE 4907
+#else
 #define PCM_DMA_BUF_SIZE 1584 // size of Direct Sound buffer
+#endif
 
 struct MusicPlayerInfo;
 
@@ -188,36 +272,48 @@ struct SoundInfo
     // values during sensitive operations for locking purposes.
     // This field should be volatile but isn't. This could potentially cause
     // race conditions.
-    u32 ident;
+    union { u32 ident; vu32 lockStatus; };
 
-    vu8 pcmDmaCounter;
+    union { vu8 pcmDmaCounter; vu8 dmaCounter; };
 
     // Direct Sound
     u8 reverb;
-    u8 maxChans;
-    u8 masterVolume;
-    u8 freq;
+    union { u8 maxChans; u8 numChans; };
+    union { u8 masterVolume; u8 masterVol; };
+    union { u8 freq; u8 freqOption; };
 
-    u8 mode;
-    u8 c15;          // periodically counts from 14 down to 0 (15 states)
-    u8 pcmDmaPeriod; // number of V-blanks per PCM DMA
-    u8 maxLines;
+    union { u8 mode; u8 extensionFlags; };
+    union { u8 c15; u8 cgbCounter15; }; // periodically counts from 14 down to 0 (15 states)
+    union { u8 pcmDmaPeriod; u8 framesPerDmaCycle; }; // number of V-blanks per PCM DMA
+    union { u8 maxLines; u8 maxScanlines; };
     u8 gap[3];
-    s32 pcmSamplesPerVBlank;
-    s32 pcmFreq;
+    union { s32 pcmSamplesPerVBlank; s32 samplesPerFrame; };
+    union { s32 pcmFreq; s32 sampleRate; };
+#ifdef PORTABLE
+    union { float divFreq; float sampleRateReciprocal; };
+    #else
     s32 divFreq;
+    #endif
     struct CgbChannel *cgbChans;
-    MPlayMainFunc MPlayMainHead;
-    struct MusicPlayerInfo *musicPlayerHead;
-    CgbSoundFunc CgbSound;
-    CgbOscOffFunc CgbOscOff;
-    MidiKeyToCgbFreqFunc MidiKeyToCgbFreq;
-    MPlayFunc *MPlayJumpTable;
-    PlyNoteFunc plynote;
+    union { MPlayMainFunc MPlayMainHead; void (*firstPlayerFunc)(void *); };
+    union { struct MusicPlayerInfo *musicPlayerHead; void *firstPlayer; };
+    union { CgbSoundFunc CgbSound; void (*cgbMixerFunc)(void); };
+    union { CgbOscOffFunc CgbOscOff; void (*cgbNoteOffFunc)(u8); };
+    union { MidiKeyToCgbFreqFunc MidiKeyToCgbFreq; u32 (*cgbCalcFreqFunc)(u8, u8, u8); };
+    union { MPlayFunc *MPlayJumpTable; void (**mp2kEventFuncTable)(); };
+    union { PlyNoteFunc plynote; void (*mp2kEventNxxFunc)(u32, struct MusicPlayerInfo *, struct MusicPlayerTrack *); };
     ExtVolPitFunc ExtVolPit;
     u8 gap2[16];
     struct SoundChannel chans[MAX_DIRECTSOUND_CHANNELS];
+#ifdef PORTABLE
+    union
+    {
+        float ALIGNED(4) pcmBuffer[PCM_DMA_BUF_SIZE * 2];
+        float ALIGNED(4) outBuffer[PCM_DMA_BUF_SIZE * 2];
+    };
+#else
     s8 ALIGNED(4) pcmBuffer[PCM_DMA_BUF_SIZE * 2];
+#endif
 };
 
 struct SongHeader
@@ -271,43 +367,47 @@ struct PokemonCrySong
 
 struct MusicPlayerTrack
 {
+#ifdef PORTABLE
+    union { u8 flags; u8 status; };
+#else
     u8 flags;
+#endif
     u8 wait;
     u8 patternLevel;
-    u8 repN;
+    union { u8 repN; u8 repeatCount; };
     u8 gateTime;
     u8 key;
     u8 velocity;
     u8 runningStatus;
-    u8 keyM;
-    u8 pitM;
+    union { u8 keyM; s8 keyShiftCalculated; };
+    union { u8 pitM; u8 pitchCalculated; };
     s8 keyShift;
-    s8 keyShiftX;
+    union { s8 keyShiftX; s8 keyShiftPublic; };
     s8 tune;
-    u8 pitX;
+    union { u8 pitX; u8 pitchPublic; };
     s8 bend;
     u8 bendRange;
-    u8 volMR;
-    u8 volML;
+    union { u8 volMR; u8 volRightCalculated; };
+    union { u8 volML; u8 volLeftCalculated; };
     u8 vol;
-    u8 volX;
+    union { u8 volX; u8 volPublic; };
     s8 pan;
-    s8 panX;
-    s8 modM;
-    u8 mod;
-    u8 modT;
+    union { s8 panX; s8 panPublic; };
+    union { s8 modM; s8 modCalculated; };
+    union { u8 mod; u8 modDepth; };
+    union { u8 modT; u8 modType; };
     u8 lfoSpeed;
-    u8 lfoSpeedC;
+    union { u8 lfoSpeedC; u8 lfoSpeedCounter; };
     u8 lfoDelay;
-    u8 lfoDelayC;
+    union { u8 lfoDelayC; u8 lfoDelayCounter; };
     u8 priority;
-    u8 pseudoEchoVolume;
-    u8 pseudoEchoLength;
+    union { u8 pseudoEchoVolume; u8 echoVolume; };
+    union { u8 pseudoEchoLength; u8 echoLength; };
     struct SoundChannel *chan;
-    struct ToneData tone;
+    union { struct ToneData tone; struct ToneData instrument; };
     u8 gap[10];
     u16 timer;
-    u32 unk_3C;
+    union { u32 unk_3C; u32 ct; };
     u8 *cmdPtr;
     u8 *patternStack[3];
 };
@@ -331,22 +431,32 @@ struct MusicPlayerInfo
     u8 trackCount;
     u8 priority;
     u8 cmd;
-    u8 unk_B;
+    union { u8 unk_B; bool8 checkSongPriority; };
     u32 clock;
     u8 gap[8];
-    u8 *memAccArea;
-    u16 tempoD;
-    u16 tempoU;
-    u16 tempoI;
-    u16 tempoC;
-    u16 fadeOI;
-    u16 fadeOC;
-    u16 fadeOV;
+    union { u8 *memAccArea; u8 *memaccArea; };
+    union { u16 tempoD; u16 tempoRawBPM; };
+    union { u16 tempoU; u16 tempoScale; };
+    union { u16 tempoI; u16 tempoInterval; };
+    union { u16 tempoC; u16 tempoCounter; };
+    union { u16 fadeOI; u16 fadeInterval; };
+    union { u16 fadeOC; u16 fadeCounter; };
+    union
+    {
+        u16 fadeOV;
+        struct
+        {
+            u16 isFadeTemporary:1;
+            u16 isFadeIn:1;
+            u16 fadeVolume:7;
+            u16 :7;
+        };
+    };
     struct MusicPlayerTrack *tracks;
-    struct ToneData *tone;
-    u32 ident;
-    MPlayMainFunc MPlayMainNext;
-    struct MusicPlayerInfo *musicPlayerNext;
+    union { struct ToneData *tone; struct ToneData *voicegroup; };
+    union { u32 ident; vu32 lockStatus; };
+    union { MPlayMainFunc MPlayMainNext; void (*nextPlayerFunc)(void *); };
+    union { struct MusicPlayerInfo *musicPlayerNext; void *nextPlayer; };
 };
 
 struct MusicPlayer
@@ -415,7 +525,11 @@ extern char gMaxLines[];
 
 u32 umul3232H32(u32 multiplier, u32 multiplicand);
 void SoundMain(void);
+#ifdef PORTABLE
+void SoundMainBTM(void *ptr);
+#else
 void SoundMainBTM(void);
+#endif
 void TrackStop(struct MusicPlayerInfo *mplayInfo, struct MusicPlayerTrack *track);
 void MPlayMain(struct MusicPlayerInfo *);
 void RealClearChain(void *x);
