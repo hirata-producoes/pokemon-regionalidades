@@ -191,8 +191,13 @@ extern void DmaSet(int dmaNum, const void *src, void *dest, u32 control);
 #define DMA_COPY(dmaNum, src, dest, size, bit) DMA_COPY_UNCHECKED(dmaNum, src, dest, size, bit)
 #endif
 
+#ifdef PORTABLE
+#define DmaCopy16(dmaNum, src, dest, size) CpuCopy16(src, dest, size)
+#define DmaCopy32(dmaNum, src, dest, size) CpuCopy32(src, dest, size)
+#else
 #define DmaCopy16(dmaNum, src, dest, size) DMA_COPY(dmaNum, src, dest, size, 16)
 #define DmaCopy32(dmaNum, src, dest, size) DMA_COPY(dmaNum, src, dest, size, 32)
+#endif
 
 #define DmaCopyLarge(dmaNum, src, dest, size, block, bit) \
 {                                                         \

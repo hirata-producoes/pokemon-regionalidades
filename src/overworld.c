@@ -53,6 +53,7 @@
 #include "platform.h"
 #endif
 #include "play_time.h"
+#include "pokemon.h"
 #include "random.h"
 #include "roamer.h"
 #include "rotating_gate.h"
@@ -84,6 +85,7 @@
 #include "constants/region_map_sections.h"
 #include "constants/rgb.h"
 #include "constants/songs.h"
+#include "constants/species.h"
 #include "constants/trainer_hill.h"
 #include "constants/weather.h"
 
@@ -1879,6 +1881,24 @@ void CB2_OverworldBasic(void)
 void CB2_Overworld(void)
 {
     bool32 fading = (gPaletteFade.active != 0);
+#if defined(PORTABLE) && defined(PLATFORM_SDL2)
+    static bool32 sPcBattleTestStarted;
+
+    if (!fading
+     && !sPcBattleTestStarted
+     && Platform_GetEnvironmentFlag("POKEMON_GO_WORLD_TEST_BATTLE"))
+    {
+        ZeroPlayerPartyMons();
+        ZeroEnemyPartyMons();
+        CreateRandomMonWithIVs(&gParties[B_TRAINER_PLAYER][0], SPECIES_BULBASAUR, 50, USE_RANDOM_IVS);
+        CreateRandomMonWithIVs(&gParties[B_TRAINER_OPPONENT_A][0], SPECIES_PIKACHU, 45, USE_RANDOM_IVS);
+        CalculatePlayerPartyCount();
+        CalculateEnemyPartyCount();
+        BattleSetup_StartWildBattle();
+        sPcBattleTestStarted = TRUE;
+        DBGPRINTF("PC battle test: wild battle scheduled\n");
+    }
+#endif
     if (fading)
         SetVBlankCallback(NULL);
     OverworldBasic();

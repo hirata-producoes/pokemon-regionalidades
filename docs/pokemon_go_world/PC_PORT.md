@@ -20,9 +20,10 @@ Este alvo compila diretamente o código decompilado do jogo para Windows/SDL2. E
 - Backend SII RTC do PC validado contra a data e hora locais do Windows. O projeto continua respeitando `OW_USE_FAKE_RTC = TRUE`, portanto a jogabilidade usa o relógio persistido no save; se essa opção for desativada, o backend nativo segue o relógio do sistema e persiste seu deslocamento em `pokemon_go_world.cfg`.
 - Áudio MP2K nativo integrado: sequenciador, mixer Direct Sound, cries e os quatro canais CGB geram áudio estéreo `float` a 42.060 Hz para a fila SDL2.
 - O áudio foi validado com buffers não silenciosos durante a introdução e com uma regressão automatizada de 90 segundos que chegou ao menu de itens sem falha.
-- O executável mede 36.167.012 bytes (aproximadamente 34,49 MiB), portanto o alvo PC já não está preso ao limite de ROM de 32 MiB.
+- Batalha selvagem de diagnóstico validada com Bulbasaur nível 50 contra Pikachu nível 45: transição, sprites, cries, HUD, menus, turnos, HP, sono e animações de `Thunder` e `Discharge` funcionaram no alvo PC.
+- O executável mede 36.168.078 bytes (aproximadamente 34,49 MiB), portanto o alvo PC já não está preso ao limite de ROM de 32 MiB.
 - Multiboot e recursos específicos de comunicação do hardware GBA permanecem isolados por stubs; multiboot não fará parte do alvo PC.
-- Próximo marco: validar batalhas, animações, cries e menus do Expansion.
+- Próximo marco: introduzir o primeiro pacote externo de recursos.
 
 ## Compatibilidades resolvidas para o primeiro mapa
 
@@ -35,6 +36,8 @@ Este alvo compila diretamente o código decompilado do jogo para Windows/SDL2. E
 - Persistência do flash conectada a um arquivo próprio do projeto, sem alterar o formato do save GBA.
 - Driver ARM/DMA do MP2K substituído no alvo PC pelo sequenciador e mixer C reutilizados do porte multiplataforma, preservando os dados de músicas, instrumentos e cries do projeto.
 - Layouts de 32 bits de instrumentos, tracks e canais mantidos e verificados para continuar compatíveis com as tabelas montadas do Expansion.
+- Cópias DMA imediatas entre buffers normais convertidas em cópias de CPU no alvo PC; transferências GBA continuam inalteradas.
+- Callbacks de VBlank/HBlank das transições são desligados antes de liberar os dados temporários, evitando uso após liberação entre o campo e a batalha.
 
 ## Como compilar
 
@@ -69,5 +72,5 @@ O executável continua sendo de 32 bits nesta fase porque scripts e tabelas do j
 3. ~~Confirmar a tela inicial e chegar ao primeiro mapa.~~
 4. ~~Validar controles, vídeo, RTC e save.~~
 5. ~~Implementar e validar o áudio MP2K nativo.~~
-6. Validar batalhas, cries, animações e menus do Expansion.
+6. ~~Validar batalhas, cries, animações e menus do Expansion.~~
 7. Introduzir o pacote externo de recursos.
