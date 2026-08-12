@@ -21,9 +21,12 @@ Este alvo compila diretamente o código decompilado do jogo para Windows/SDL2. E
 - Áudio MP2K nativo integrado: sequenciador, mixer Direct Sound, cries e os quatro canais CGB geram áudio estéreo `float` a 42.060 Hz para a fila SDL2.
 - O áudio foi validado com buffers não silenciosos durante a introdução e com uma regressão automatizada de 90 segundos que chegou ao menu de itens sem falha.
 - Batalha selvagem de diagnóstico validada com Bulbasaur nível 50 contra Pikachu nível 45: transição, sprites, cries, HUD, menus, turnos, HP, sono e animações de `Thunder` e `Discharge` funcionaram no alvo PC.
-- O executável mede 36.168.078 bytes (aproximadamente 34,49 MiB), portanto o alvo PC já não está preso ao limite de ROM de 32 MiB.
+- Pacote externo versionado integrado com índice e offsets de 64 bits, leitura sob demanda, cache por recurso, validação de limites, FNV-1a e CRC32. O formato e o fluxo de adição estão documentados em `docs/pokemon_go_world/RESOURCE_PACK.md`.
+- O logotipo Pokémon da tela inicial é o primeiro recurso removido de fato do executável PC e carregado de `pokemon_go_world.pak`; sua definição original continua no alvo GBA.
+- O executável mede 36.169.519 bytes (aproximadamente 34,49 MiB) e o primeiro pacote mede 5.312 bytes, portanto o alvo PC já não está preso ao limite de ROM de 32 MiB.
+- O pacote válido, o pacote ausente e um pacote com dados corrompidos foram testados. Nos dois últimos casos o jogo continua de maneira segura, usando o fallback quando ele existir e sem entregar dados corrompidos ao descompressor.
 - Multiboot e recursos específicos de comunicação do hardware GBA permanecem isolados por stubs; multiboot não fará parte do alvo PC.
-- Próximo marco: introduzir o primeiro pacote externo de recursos.
+- Próximo marco: migrar progressivamente as famílias grandes de recursos e eliminar suas cópias compiladas no alvo PC.
 
 ## Compatibilidades resolvidas para o primeiro mapa
 
@@ -63,7 +66,7 @@ O alvo interno também está disponível como `make pc` quando `make`, GCC i686,
 
 ## Sobre 32 bits e tamanho
 
-O executável continua sendo de 32 bits nesta fase porque scripts e tabelas do jogo armazenam ponteiros de 32 bits. Isso não impõe o limite de ROM de 32 MiB. O executável do PC pode crescer muito além disso e, numa etapa posterior, os recursos serão carregados de um pacote externo.
+O executável continua sendo de 32 bits nesta fase porque scripts e tabelas do jogo armazenam ponteiros de 32 bits. Isso não impõe o limite de ROM de 32 MiB. Recursos já podem ser carregados sob demanda de um pacote externo com offsets de 64 bits; a migração começou pelo logotipo da tela inicial.
 
 ## Próximos marcos
 
@@ -73,4 +76,5 @@ O executável continua sendo de 32 bits nesta fase porque scripts e tabelas do j
 4. ~~Validar controles, vídeo, RTC e save.~~
 5. ~~Implementar e validar o áudio MP2K nativo.~~
 6. ~~Validar batalhas, cries, animações e menus do Expansion.~~
-7. Introduzir o pacote externo de recursos.
+7. ~~Introduzir o pacote externo de recursos.~~
+8. Migrar progressivamente gráficos, áudio e demais dados grandes, removendo suas cópias compiladas somente do alvo PC.

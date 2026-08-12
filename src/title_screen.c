@@ -24,6 +24,9 @@
 #include "graphics.h"
 #include "constants/rgb.h"
 #include "constants/songs.h"
+#ifdef PORTABLE
+#include "resource_pack.h"
+#endif
 
 enum {
     TAG_VERSION = 1000,
@@ -595,7 +598,16 @@ void CB2_InitTitleScreen(void)
         break;
     case 1:
         // bg2
+#ifdef PORTABLE
+        {
+            const void *pokemonLogoGfx = ResourcePack_Get(
+                "graphics/title_screen/pokemon_logo.8bpp.smol", NULL, 0, NULL);
+            if (pokemonLogoGfx != NULL)
+                DecompressDataWithHeaderVram(pokemonLogoGfx, (void *)(BG_CHAR_ADDR(0)));
+        }
+#else
         DecompressDataWithHeaderVram(gTitleScreenPokemonLogoGfx, (void *)(BG_CHAR_ADDR(0)));
+#endif
         DecompressDataWithHeaderVram(gTitleScreenPokemonLogoTilemap, (void *)(BG_SCREEN_ADDR(9)));
         LoadPalette(gTitleScreenBgPalettes, BG_PLTT_ID(0), 15 * PLTT_SIZE_4BPP);
         // bg3
