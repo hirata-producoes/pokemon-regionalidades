@@ -61,14 +61,20 @@ static void SpriteCB_VersionBannerLeft(struct Sprite *sprite);
 static void SpriteCB_VersionBannerRight(struct Sprite *sprite);
 static void SpriteCB_PressStartCopyrightBanner(struct Sprite *sprite);
 static void SpriteCB_PokemonLogoShine(struct Sprite *sprite);
+#ifdef PORTABLE
+static void LoadPcTitleBackgroundResources(void);
+static void LoadPcTitleSpriteResources(void);
+#endif
 
 // const rom data
+#ifndef PORTABLE
 static const u16 sUnusedUnknownPal[] = INCGFX_U16("graphics/title_screen/unused.pal", ".gbapal");
 
 static const u32 sTitleScreenRayquazaGfx[] = INCGFX_U32("graphics/title_screen/rayquaza.png", ".4bpp.smol");
 static const u32 sTitleScreenRayquazaTilemap[] = INCGFX_U32("graphics/title_screen/rayquaza.bin", ".smolTM");
 static const u32 sTitleScreenLogoShineGfx[] = INCGFX_U32("graphics/title_screen/logo_shine.png", ".4bpp.smol");
 static const u32 sTitleScreenCloudsGfx[] = INCGFX_U32("graphics/title_screen/clouds.png", ".4bpp.smol");
+#endif
 
 
 
@@ -185,6 +191,7 @@ static const struct SpriteTemplate sVersionBannerRightSpriteTemplate =
     .callback = SpriteCB_VersionBannerRight,
 };
 
+#ifndef PORTABLE
 static const struct CompressedSpriteSheet sSpriteSheet_EmeraldVersion[] =
 {
     {
@@ -194,6 +201,7 @@ static const struct CompressedSpriteSheet sSpriteSheet_EmeraldVersion[] =
     },
     {},
 };
+#endif
 
 static const struct OamData sOamData_CopyrightBanner =
 {
@@ -291,6 +299,7 @@ static const struct SpriteTemplate sStartCopyrightBannerSpriteTemplate =
     .callback = SpriteCB_PressStartCopyrightBanner,
 };
 
+#ifndef PORTABLE
 static const struct CompressedSpriteSheet sSpriteSheet_PressStart[] =
 {
     {
@@ -309,6 +318,7 @@ static const struct SpritePalette sSpritePalette_PressStart[] =
     },
     {},
 };
+#endif
 
 static const struct OamData sPokemonLogoShineOamData =
 {
@@ -347,6 +357,7 @@ static const struct SpriteTemplate sPokemonLogoShineSpriteTemplate =
     .callback = SpriteCB_PokemonLogoShine,
 };
 
+#ifndef PORTABLE
 static const struct CompressedSpriteSheet sPokemonLogoShineSpriteSheet[] =
 {
     {
@@ -356,6 +367,103 @@ static const struct CompressedSpriteSheet sPokemonLogoShineSpriteSheet[] =
     },
     {},
 };
+#endif
+
+#ifdef PORTABLE
+static bool8 sPcTitleVersionAssetsReady;
+static bool8 sPcTitlePressStartAssetsReady;
+static bool8 sPcTitleLogoShineAssetReady;
+
+static const void *GetPcTitleResource(const char *name, u64 minimumSize)
+{
+    u64 size = 0;
+    const void *data = ResourcePack_Get(name, NULL, 0, &size);
+
+    if (data != NULL && size < minimumSize)
+    {
+        DBGPRINTF("Title resource: %s is too small (%llu < %llu bytes)\n",
+                  name, (unsigned long long)size, (unsigned long long)minimumSize);
+        return NULL;
+    }
+    return data;
+}
+
+static void DecompressPcTitleResource(const char *name, void *destination)
+{
+    const void *data = GetPcTitleResource(name, sizeof(u32));
+
+    if (data != NULL)
+        DecompressDataWithHeaderVram(data, destination);
+}
+
+static void LoadPcTitleBackgroundResources(void)
+{
+    const void *palette;
+
+    DecompressPcTitleResource("graphics/title_screen/pokemon_logo.8bpp.smol", BG_CHAR_ADDR(0));
+    DecompressPcTitleResource("graphics/title_screen/pokemon_logo.smolTM", BG_SCREEN_ADDR(9));
+
+    palette = GetPcTitleResource("graphics/title_screen/background.gbapal", 15 * PLTT_SIZE_4BPP);
+    if (palette != NULL)
+        LoadPalette(palette, BG_PLTT_ID(0), 15 * PLTT_SIZE_4BPP);
+
+    DecompressPcTitleResource("graphics/title_screen/rayquaza.4bpp.smol", BG_CHAR_ADDR(2));
+    DecompressPcTitleResource("graphics/title_screen/rayquaza.smolTM", BG_SCREEN_ADDR(26));
+    DecompressPcTitleResource("graphics/title_screen/clouds.4bpp.smol", BG_CHAR_ADDR(3));
+    DecompressPcTitleResource("graphics/title_screen/clouds.smolTM", BG_SCREEN_ADDR(27));
+}
+
+static void LoadPcTitleSpriteResources(void)
+{
+    const void *emeraldVersionGfx;
+    const void *emeraldVersionPalette;
+    const void *pressStartGfx;
+    const void *pressStartPalette;
+    const void *logoShineGfx;
+    struct CompressedSpriteSheet spriteSheet;
+    struct SpritePalette spritePalette;
+
+    sPcTitleVersionAssetsReady = FALSE;
+    sPcTitlePressStartAssetsReady = FALSE;
+    sPcTitleLogoShineAssetReady = FALSE;
+
+    emeraldVersionGfx = GetPcTitleResource("graphics/title_screen/emerald_version.8bpp.smol", sizeof(u32));
+    emeraldVersionPalette = GetPcTitleResource("graphics/title_screen/emerald_version.gbapal", PLTT_SIZE_4BPP);
+    if (emeraldVersionGfx != NULL && emeraldVersionPalette != NULL)
+    {
+        spriteSheet.data = emeraldVersionGfx;
+        spriteSheet.size = 0x1000;
+        spriteSheet.tag = TAG_VERSION;
+        LoadCompressedSpriteSheet(&spriteSheet);
+        LoadPalette(emeraldVersionPalette, OBJ_PLTT_ID(0), PLTT_SIZE_4BPP);
+        sPcTitleVersionAssetsReady = TRUE;
+    }
+
+    pressStartGfx = GetPcTitleResource("graphics/title_screen/press_start.4bpp.smol", sizeof(u32));
+    pressStartPalette = GetPcTitleResource("graphics/title_screen/press_start.gbapal", PLTT_SIZE_4BPP);
+    if (pressStartGfx != NULL && pressStartPalette != NULL)
+    {
+        spriteSheet.data = pressStartGfx;
+        spriteSheet.size = 0x520;
+        spriteSheet.tag = TAG_PRESS_START_COPYRIGHT;
+        LoadCompressedSpriteSheet(&spriteSheet);
+        spritePalette.data = pressStartPalette;
+        spritePalette.tag = TAG_PRESS_START_COPYRIGHT;
+        LoadSpritePalette(&spritePalette);
+        sPcTitlePressStartAssetsReady = TRUE;
+    }
+
+    logoShineGfx = GetPcTitleResource("graphics/title_screen/logo_shine.4bpp.smol", sizeof(u32));
+    if (logoShineGfx != NULL)
+    {
+        spriteSheet.data = logoShineGfx;
+        spriteSheet.size = 0x800;
+        spriteSheet.tag = TAG_LOGO_SHINE;
+        LoadCompressedSpriteSheet(&spriteSheet);
+        sPcTitleLogoShineAssetReady = sPcTitlePressStartAssetsReady;
+    }
+}
+#endif
 
 // Task data for the main title screen tasks (Task_TitleScreenPhase#)
 #define tCounter    data[0]
@@ -424,6 +532,10 @@ static void CreatePressStartBanner(s16 x, s16 y)
     u8 i;
     u8 spriteId;
 
+#ifdef PORTABLE
+    if (!sPcTitlePressStartAssetsReady)
+        return;
+#endif
     x -= 64;
     for (i = 0; i < NUM_PRESS_START_FRAMES; i++, x += 32)
     {
@@ -438,6 +550,10 @@ static void CreateCopyrightBanner(s16 x, s16 y)
     u8 i;
     u8 spriteId;
 
+#ifdef PORTABLE
+    if (!sPcTitlePressStartAssetsReady)
+        return;
+#endif
     x -= 64;
     for (i = 0; i < NUM_COPYRIGHT_FRAMES; i++, x += 32)
     {
@@ -523,6 +639,10 @@ static void StartPokemonLogoShine(u8 mode)
 {
     u8 spriteId;
 
+#ifdef PORTABLE
+    if (!sPcTitleLogoShineAssetReady)
+        return;
+#endif
     switch (mode)
     {
     case SHINE_MODE_SINGLE_NO_BG_COLOR:
@@ -599,15 +719,9 @@ void CB2_InitTitleScreen(void)
     case 1:
         // bg2
 #ifdef PORTABLE
-        {
-            const void *pokemonLogoGfx = ResourcePack_Get(
-                "graphics/title_screen/pokemon_logo.8bpp.smol", NULL, 0, NULL);
-            if (pokemonLogoGfx != NULL)
-                DecompressDataWithHeaderVram(pokemonLogoGfx, (void *)(BG_CHAR_ADDR(0)));
-        }
+        LoadPcTitleBackgroundResources();
 #else
         DecompressDataWithHeaderVram(gTitleScreenPokemonLogoGfx, (void *)(BG_CHAR_ADDR(0)));
-#endif
         DecompressDataWithHeaderVram(gTitleScreenPokemonLogoTilemap, (void *)(BG_SCREEN_ADDR(9)));
         LoadPalette(gTitleScreenBgPalettes, BG_PLTT_ID(0), 15 * PLTT_SIZE_4BPP);
         // bg3
@@ -616,16 +730,21 @@ void CB2_InitTitleScreen(void)
         // bg1
         DecompressDataWithHeaderVram(sTitleScreenCloudsGfx, (void *)(BG_CHAR_ADDR(3)));
         DecompressDataWithHeaderVram(gTitleScreenCloudsTilemap, (void *)(BG_SCREEN_ADDR(27)));
+#endif
         ScanlineEffect_Stop();
         ResetTasks();
         ResetSpriteData();
         FreeAllSpritePalettes();
         gReservedSpritePaletteCount = 9;
+#ifdef PORTABLE
+        LoadPcTitleSpriteResources();
+#else
         LoadCompressedSpriteSheet(&sSpriteSheet_EmeraldVersion[0]);
         LoadCompressedSpriteSheet(&sSpriteSheet_PressStart[0]);
         LoadCompressedSpriteSheet(&sPokemonLogoShineSpriteSheet[0]);
         LoadPalette(gTitleScreenEmeraldVersionPal, OBJ_PLTT_ID(0), PLTT_SIZE_4BPP);
         LoadSpritePalette(&sSpritePalette_PressStart[0]);
+#endif
         gMain.state = 2;
         break;
     case 2:
@@ -722,14 +841,19 @@ static void Task_TitleScreenPhase1(u8 taskId)
         SetGpuReg(REG_OFFSET_BLDALPHA, BLDALPHA_BLEND(16, 0));
         SetGpuReg(REG_OFFSET_BLDY, 0);
 
-        // Create left side of version banner
-        spriteId = CreateSprite(&sVersionBannerLeftSpriteTemplate, VERSION_BANNER_LEFT_X, VERSION_BANNER_Y, 0);
-        gSprites[spriteId].sAlphaBlendIdx = ARRAY_COUNT(gTitleScreenAlphaBlend);
-        gSprites[spriteId].sParentTaskId = taskId;
+#ifdef PORTABLE
+        if (sPcTitleVersionAssetsReady)
+#endif
+        {
+            // Create left side of version banner
+            spriteId = CreateSprite(&sVersionBannerLeftSpriteTemplate, VERSION_BANNER_LEFT_X, VERSION_BANNER_Y, 0);
+            gSprites[spriteId].sAlphaBlendIdx = ARRAY_COUNT(gTitleScreenAlphaBlend);
+            gSprites[spriteId].sParentTaskId = taskId;
 
-        // Create right side of version banner
-        spriteId = CreateSprite(&sVersionBannerRightSpriteTemplate, VERSION_BANNER_RIGHT_X, VERSION_BANNER_Y, 0);
-        gSprites[spriteId].sParentTaskId = taskId;
+            // Create right side of version banner
+            spriteId = CreateSprite(&sVersionBannerRightSpriteTemplate, VERSION_BANNER_RIGHT_X, VERSION_BANNER_Y, 0);
+            gSprites[spriteId].sParentTaskId = taskId;
+        }
 
         gTasks[taskId].tCounter = 144;
         gTasks[taskId].func = Task_TitleScreenPhase2;

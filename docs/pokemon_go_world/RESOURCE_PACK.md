@@ -4,13 +4,13 @@ O alvo PC gera `pokemon_go_world.pak` ao lado de `pokemon_go_world-pc.exe`. O pa
 
 ## Como adicionar um recurso
 
-1. Adicione uma entrada com nome único e caminho de origem em `resources/pc/manifest.json`.
+1. Adicione uma entrada com nome único e `source` em `resources/pc/manifest.json`. Use `sources` para concatenar vários arquivos, na ordem informada, em uma única entrada.
 2. Garanta que o alvo `pc` produza o arquivo de origem se ele for gerado por uma ferramenta do projeto.
 3. No código PC, obtenha o dado com `ResourcePack_Get` no momento em que ele for necessário.
 4. Mantenha o código GBA sob o caminho original com `#ifndef PORTABLE`.
 5. Compile com `tools/pokemon_go_world/build_pc.ps1` e valide o recurso com o pacote presente e ausente.
 
-O primeiro recurso efetivamente removido do executável PC é `graphics/title_screen/pokemon_logo.8bpp.smol`. Sua definição compilada permanece no alvo GBA.
+Os 12 recursos usados pela tela de título Emerald foram removidos do executável PC: gráficos comprimidos, tilemaps e paletas do logo, Rayquaza, nuvens, versão, brilho e banners. Suas definições compiladas permanecem no alvo GBA.
 
 ## Formato versão 1
 

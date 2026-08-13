@@ -32,11 +32,12 @@ def align(value: int) -> int:
     return (value + ALIGNMENT - 1) & ~(ALIGNMENT - 1)
 
 
-def calculate_crc32(path: Path) -> int:
+def calculate_crc32(paths: list[Path]) -> int:
     checksum = 0
-    with path.open("rb") as source:
-        while chunk := source.read(1024 * 1024):
-            checksum = zlib.crc32(chunk, checksum)
+    for path in paths:
+        with path.open("rb") as source:
+            while chunk := source.read(1024 * 1024):
+                checksum = zlib.crc32(chunk, checksum)
     return checksum
 
 
@@ -49,16 +50,22 @@ def load_manifest(path: Path, root: Path) -> list[dict[str, object]]:
     seen: set[str] = set()
     for item in document.get("resources", []):
         name = item["name"]
-        source = root / item["source"]
+        if ("source" in item) == ("sources" in item):
+            raise ValueError(f"resource {name!r} must define exactly one of source or sources")
+        source_names = [item["source"]] if "source" in item else item["sources"]
+        if not isinstance(source_names, list) or not source_names:
+            raise ValueError(f"resource {name!r} has no sources")
+        sources = [root / source_name for source_name in source_names]
         if (not isinstance(name, str) or not name or "\\" in name
                 or len(name.encode("utf-8")) > MAX_NAME_LENGTH):
             raise ValueError(f"invalid resource name: {name!r}")
         if name in seen:
             raise ValueError(f"duplicate resource name: {name}")
-        if not source.is_file():
-            raise FileNotFoundError(f"resource source does not exist: {source}")
+        for source in sources:
+            if not source.is_file():
+                raise FileNotFoundError(f"resource source does not exist: {source}")
         seen.add(name)
-        resources.append({"name": name, "source": source, "hash": fnv1a64(name)})
+        resources.append({"name": name, "sources": sources, "hash": fnv1a64(name)})
 
     resources.sort(key=lambda resource: (resource["hash"], resource["name"]))
     return resources
@@ -79,9 +86,9 @@ def build(manifest: Path, output: Path, root: Path) -> None:
     data_offset = align(string_offset + len(strings))
     next_offset = data_offset
     for resource in resources:
-        source = Path(resource["source"])
-        resource["size"] = source.stat().st_size
-        resource["checksum"] = calculate_crc32(source)
+        sources = [Path(source) for source in resource["sources"]]
+        resource["size"] = sum(source.stat().st_size for source in sources)
+        resource["checksum"] = calculate_crc32(sources)
         resource["offset"] = next_offset
         next_offset = align(next_offset + int(resource["size"]))
     file_size = next_offset
@@ -102,9 +109,10 @@ def build(manifest: Path, output: Path, root: Path) -> None:
             for resource in resources:
                 desired_offset = int(resource["offset"])
                 pack.write(b"\0" * (desired_offset - pack.tell()))
-                with Path(resource["source"]).open("rb") as source:
-                    while chunk := source.read(1024 * 1024):
-                        pack.write(chunk)
+                for source_path in resource["sources"]:
+                    with Path(source_path).open("rb") as source:
+                        while chunk := source.read(1024 * 1024):
+                            pack.write(chunk)
             pack.write(b"\0" * (file_size - pack.tell()))
         os.replace(temp_name, output)
         temp_name = None
