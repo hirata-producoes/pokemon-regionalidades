@@ -4,6 +4,14 @@
 #define INCGFX_COMP INCGFX_U32
 #endif
 
+// Native PC builds use the symbols below only as stable identifiers. Their
+// compressed picture data lives in pokemon_go_world.pak and is resolved on
+// demand by the generated Pokemon resource table.
+#ifdef PORTABLE
+#define PC_EXTERNAL_POKEMON_PIC(...) {0}
+#define INCGFX_U32 PC_EXTERNAL_POKEMON_PIC
+#endif
+
 const u32 gMonFrontPic_CircledQuestionMark[] = INCGFX_U32("graphics/pokemon/question_mark/circled/anim_front.png", ".4bpp.smol");
 const u32 gMonBackPic_CircledQuestionMark[] = INCGFX_U32("graphics/pokemon/question_mark/circled/back.png", ".4bpp.smol");
 const u16 gMonPalette_CircledQuestionMark[] = INCGFX_U16("graphics/pokemon/question_mark/circled/normal.pal", ".gbapal");
@@ -27503,3 +27511,8 @@ const u32 gObjectEventPic_Substitute[] = INCGFX_COMP("graphics/pokemon/question_
     const u32 gMonFrontPic_Egg[] = INCGFX_U32("graphics/pokemon/egg/anim_front.png", ".4bpp.smol");
     const u16 gMonPalette_Egg[] = INCGFX_U16("graphics/pokemon/egg/normal.pal", ".gbapal");
     const u8 gMonIcon_Egg[] = INCGFX_U8("graphics/pokemon/egg/icon.png", ".4bpp");
+
+#ifdef PORTABLE
+#undef INCGFX_U32
+#undef PC_EXTERNAL_POKEMON_PIC
+#endif

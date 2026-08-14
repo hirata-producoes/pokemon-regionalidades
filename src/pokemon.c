@@ -455,6 +455,10 @@ const struct NatureInfo gNaturesInfo[NUM_NATURES] =
 
 #include "data/graphics/pokemon.h"
 
+#ifdef PORTABLE
+#include "../build/pc-generated/pokemon_resources.h"
+#endif
+
 #include "data/pokemon/trainer_class_lookups.h"
 #include "data/pokemon/experience_tables.h"
 

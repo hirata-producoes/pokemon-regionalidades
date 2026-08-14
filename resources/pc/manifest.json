@@ -1,5 +1,8 @@
 {
   "format_version": 1,
+  "resource_lists": [
+    "build/pc-generated/pokemon_resources.json"
+  ],
   "resources": [
     {
       "name": "graphics/title_screen/pokemon_logo.8bpp.smol",

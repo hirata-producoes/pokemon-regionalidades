@@ -8,6 +8,10 @@
 #include "pokemon_sprite_visualizer.h"
 #include "text.h"
 #include "menu.h"
+#ifdef PORTABLE
+#include "pokemon_resources.h"
+#include "resource_pack.h"
+#endif
 
 //  === WARNING === WARNING === WARNING ===
 //  === No user serviceable code before ===
@@ -21,7 +25,6 @@ static void SmolDecompressTilemap(const struct SmolTilemapHeader *header, const 
 static bool32 isModeLoEncoded(enum CompressionMode mode);
 static bool32 isModeSymEncoded(enum CompressionMode mode);
 static bool32 isModeSymDelta(enum CompressionMode mode);
-
 
 #define TABLE_READ_K(tableVal)((tableVal & 7))
 #define TABLE_READ_SYMBOL(tableVal)((tableVal & 0xFF) >> 3)
@@ -1147,6 +1150,22 @@ static bool32 isModeSymDelta(enum CompressionMode mode)
     return FALSE;
 }
 
+static void DecompressPokemonPic(const void *compiledData, void *dest)
+{
+#ifdef PORTABLE
+    u64 externalSize = 0;
+    void *externalData = LoadExternalPokemonPic(compiledData, &externalSize);
+
+    if (externalData != NULL && externalSize >= sizeof(u32))
+        DecompressDataWithHeaderWram(externalData, dest);
+    else
+        memset(dest, 0, MON_PIC_SIZE);
+    ResourcePack_Free(externalData);
+#else
+    DecompressDataWithHeaderWram(compiledData, dest);
+#endif
+}
+
 void LoadSpecialPokePic(void *dest, enum Species species, u32 personality, bool8 isFrontPic)
 {
     LoadSpecialPokePicIsEgg(dest, species, personality, isFrontPic, FALSE);
@@ -1161,33 +1180,33 @@ void LoadSpecialPokePicIsEgg(void *dest, enum Species species, u32 personality, 
     if (isEgg)
     {
         if (gSpeciesInfo[species].eggId != EGG_ID_NONE)
-            DecompressDataWithHeaderWram(gEggDatas[gSpeciesInfo[species].eggId].eggSprite, dest);
+            DecompressPokemonPic(gEggDatas[gSpeciesInfo[species].eggId].eggSprite, dest);
         else
-            DecompressDataWithHeaderWram(gSpeciesInfo[SPECIES_EGG].frontPic, dest);
+            DecompressPokemonPic(gSpeciesInfo[SPECIES_EGG].frontPic, dest);
     }
     else if (isFrontPic)
     {
     #if P_GENDER_DIFFERENCES
         if (gSpeciesInfo[species].frontPicFemale != NULL && IsPersonalityFemale(species, personality))
-            DecompressDataWithHeaderWram(gSpeciesInfo[species].frontPicFemale, dest);
+            DecompressPokemonPic(gSpeciesInfo[species].frontPicFemale, dest);
         else
     #endif
         if (gSpeciesInfo[species].frontPic != NULL)
-            DecompressDataWithHeaderWram(gSpeciesInfo[species].frontPic, dest);
+            DecompressPokemonPic(gSpeciesInfo[species].frontPic, dest);
         else
-            DecompressDataWithHeaderWram(gSpeciesInfo[SPECIES_NONE].frontPic, dest);
+            DecompressPokemonPic(gSpeciesInfo[SPECIES_NONE].frontPic, dest);
     }
     else
     {
     #if P_GENDER_DIFFERENCES
         if (gSpeciesInfo[species].backPicFemale != NULL && IsPersonalityFemale(species, personality))
-            DecompressDataWithHeaderWram(gSpeciesInfo[species].backPicFemale, dest);
+            DecompressPokemonPic(gSpeciesInfo[species].backPicFemale, dest);
         else
     #endif
         if (gSpeciesInfo[species].backPic != NULL)
-            DecompressDataWithHeaderWram(gSpeciesInfo[species].backPic, dest);
+            DecompressPokemonPic(gSpeciesInfo[species].backPic, dest);
         else
-            DecompressDataWithHeaderWram(gSpeciesInfo[SPECIES_NONE].backPic, dest);
+            DecompressPokemonPic(gSpeciesInfo[SPECIES_NONE].backPic, dest);
     }
 
     if (ShouldDrawSpotsOnSpecies(species) && isFrontPic && !isEgg)
