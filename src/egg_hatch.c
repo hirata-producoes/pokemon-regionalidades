@@ -565,6 +565,9 @@ static void CB2_LoadEggHatch(void)
 
             struct SpritePalette tempPal;
             tempPal.data = gEggDatas[gSpeciesInfo[species].eggId].eggHatchPal;
+#ifdef PORTABLE
+            tempPal.data = GetExternalPokemonPalette(tempPal.data);
+#endif
             tempPal.tag = PALTAG_EGG;
             LoadSpritePalette(&tempPal);
             if (gEggDatas[gSpeciesInfo[species].eggId].eggShardsGfx != NULL)

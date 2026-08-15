@@ -56,6 +56,7 @@ def load_manifest(path: Path, root: Path) -> list[dict[str, object]]:
 
     resources: list[dict[str, object]] = []
     seen: set[str] = set()
+    seen_hashes: dict[int, str] = {}
     items = [item for current_document in documents for item in current_document.get("resources", [])]
     for item in items:
         name = item["name"]
@@ -73,8 +74,15 @@ def load_manifest(path: Path, root: Path) -> list[dict[str, object]]:
         for source in sources:
             if not source.is_file():
                 raise FileNotFoundError(f"resource source does not exist: {source}")
+        hash_value = fnv1a64(name)
+        if hash_value in seen_hashes:
+            raise ValueError(
+                f"FNV-1a hash collision: {name!r} and {seen_hashes[hash_value]!r} "
+                f"both use {hash_value:016x}"
+            )
         seen.add(name)
-        resources.append({"name": name, "sources": sources, "hash": fnv1a64(name)})
+        seen_hashes[hash_value] = name
+        resources.append({"name": name, "sources": sources, "hash": hash_value})
 
     resources.sort(key=lambda resource: (resource["hash"], resource["name"]))
     return resources
