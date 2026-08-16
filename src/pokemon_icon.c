@@ -6,6 +6,9 @@
 #include "pokemon_icon.h"
 #include "sprite.h"
 #include "data.h"
+#ifdef PORTABLE
+#include "pokemon_resources.h"
+#endif
 #include "constants/pokemon_icon.h"
 
 struct MonIconSpriteTemplate
@@ -340,16 +343,28 @@ const u8 *GetMonIconTilesIsEgg(enum Species species, u32 personality, bool32 isE
             iconSprite = gSpeciesInfo[SPECIES_NONE].iconSprite;
     }
 
+#ifdef PORTABLE
+    return GetExternalPokemonIcon(iconSprite);
+#else
     return iconSprite;
+#endif
 }
 
 const u8 *GetMonIconTilesByIconType(enum Species species, enum SpeciesIconType iconType)
 {
+    const u8 *iconSprite;
+
     if (iconType == EGG_ICON)
-        return gEggDatas[gSpeciesInfo[species].eggId].eggIcon;
-    if (iconType == FEMALE_ICON)
-        return gSpeciesInfo[species].iconSpriteFemale;
-    return gSpeciesInfo[species].iconSprite;
+        iconSprite = gEggDatas[gSpeciesInfo[species].eggId].eggIcon;
+    else if (iconType == FEMALE_ICON)
+        iconSprite = gSpeciesInfo[species].iconSpriteFemale;
+    else
+        iconSprite = gSpeciesInfo[species].iconSprite;
+#ifdef PORTABLE
+    return GetExternalPokemonIcon(iconSprite);
+#else
+    return iconSprite;
+#endif
 }
 
 void TryLoadAllMonIconPalettesAtOffset(u16 offset)

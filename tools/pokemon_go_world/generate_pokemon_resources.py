@@ -32,10 +32,19 @@ PALETTE_DECLARATION = re.compile(
     r"\[\]\s*=\s*INCGFX_U16\(\"([^\"]+)\",\s*\"([^\"]+)\"\);"
 )
 
+U8_DECLARATION = re.compile(
+    r"const\s+u8\s+"
+    r"((?:gMonIcon|gMonEggIcon|gMonFootprint)_[A-Za-z0-9_]+)"
+    r"\[\]\s*=\s*INCGFX_U8\(\"([^\"]+)\",\s*\"([^\"]+)\"\);"
+)
+
 FRONT_FALLBACK = "graphics/pokemon/pics/gMonFrontPic_CircledQuestionMark"
 BACK_FALLBACK = "graphics/pokemon/pics/gMonBackPic_CircledQuestionMark"
 PALETTE_FALLBACK = "graphics/pokemon/palettes/gMonPalette_CircledQuestionMark"
 SHINY_PALETTE_FALLBACK = "graphics/pokemon/palettes/gMonShinyPalette_CircledQuestionMark"
+ICON_FALLBACK = "graphics/pokemon/icons/gMonIcon_QuestionMark"
+EGG_ICON_FALLBACK = "graphics/pokemon/icons/gMonIcon_Egg"
+FOOTPRINT_FALLBACK = "graphics/pokemon/footprints/gMonFootprint_QuestionMark"
 
 
 def fnv1a64(value: str) -> int:
@@ -91,6 +100,20 @@ def palette_fallback_for(symbol: str) -> str:
     return PALETTE_FALLBACK
 
 
+def u8_resource_family(symbol: str) -> str:
+    if symbol.startswith("gMonFootprint_"):
+        return "footprints"
+    return "icons"
+
+
+def u8_fallback_for(symbol: str) -> str:
+    if symbol.startswith("gMonEggIcon_"):
+        return EGG_ICON_FALLBACK
+    if symbol.startswith("gMonFootprint_"):
+        return FOOTPRINT_FALLBACK
+    return ICON_FALLBACK
+
+
 def generate(root: Path, cpp: Path, header: Path, resource_list: Path, makefile: Path) -> None:
     preprocessed = preprocess(root, cpp)
     pic_declarations: dict[str, tuple[str, str]] = {}
@@ -109,6 +132,14 @@ def generate(root: Path, cpp: Path, header: Path, resource_list: Path, makefile:
             raise ValueError(f"conflicting active definitions for {symbol}")
         palette_declarations[symbol] = value
 
+    u8_declarations: dict[str, tuple[str, str]] = {}
+    for match in U8_DECLARATION.finditer(preprocessed):
+        symbol, source, extension = match.groups()
+        value = (source, extension)
+        if symbol in u8_declarations and u8_declarations[symbol] != value:
+            raise ValueError(f"conflicting active definitions for {symbol}")
+        u8_declarations[symbol] = value
+
     if FRONT_FALLBACK.rsplit("/", 1)[1] not in pic_declarations:
         raise ValueError("front picture fallback is missing from active graphics")
     if BACK_FALLBACK.rsplit("/", 1)[1] not in pic_declarations:
@@ -117,10 +148,15 @@ def generate(root: Path, cpp: Path, header: Path, resource_list: Path, makefile:
         raise ValueError("normal palette fallback is missing from active graphics")
     if SHINY_PALETTE_FALLBACK.rsplit("/", 1)[1] not in palette_declarations:
         raise ValueError("shiny palette fallback is missing from active graphics")
+    for fallback in (ICON_FALLBACK, EGG_ICON_FALLBACK, FOOTPRINT_FALLBACK):
+        if fallback.rsplit("/", 1)[1] not in u8_declarations:
+            raise ValueError(f"u8 fallback is missing from active graphics: {fallback}")
 
     resources: list[dict[str, str]] = []
     pic_entries: list[tuple[str, str, str | None]] = []
     palette_entries: list[tuple[str, str, str]] = []
+    icon_entries: list[tuple[str, str, str]] = []
+    footprint_entries: list[tuple[str, str, str]] = []
     asset_paths: set[str] = set()
     for symbol, (source, extension) in sorted(pic_declarations.items()):
         name = f"graphics/pokemon/pics/{symbol}"
@@ -138,6 +174,20 @@ def generate(root: Path, cpp: Path, header: Path, resource_list: Path, makefile:
             raise FileNotFoundError(f"Pokemon palette source does not exist: {root / source}")
         resources.append({"name": name, "source": generated_source})
         palette_entries.append((symbol, name, palette_fallback_for(symbol)))
+        asset_paths.add(generated_source)
+
+    for symbol, (source, extension) in sorted(u8_declarations.items()):
+        family = u8_resource_family(symbol)
+        name = f"graphics/pokemon/{family}/{symbol}"
+        generated_source = f"build/assets/{source}{extension}"
+        if not (root / source).is_file():
+            raise FileNotFoundError(f"Pokemon {family} source does not exist: {root / source}")
+        resources.append({"name": name, "source": generated_source})
+        entry = (symbol, name, u8_fallback_for(symbol))
+        if family == "icons":
+            icon_entries.append(entry)
+        else:
+            footprint_entries.append(entry)
         asset_paths.add(generated_source)
 
     header_lines = [
@@ -167,14 +217,14 @@ def generate(root: Path, cpp: Path, header: Path, resource_list: Path, makefile:
     header_lines.extend([
         "};",
         "",
-        "struct PcPokemonPaletteResource",
+        "struct PcPokemonCachedResource",
         "{",
         "    const void *compiledData;",
         "    u64 hash;",
         "    u64 fallbackHash;",
         "};",
         "",
-        "static const struct PcPokemonPaletteResource sPcPokemonPaletteResources[] =",
+        "static const struct PcPokemonCachedResource sPcPokemonPaletteResources[] =",
         "{",
     ])
     for symbol, name, fallback in palette_entries:
@@ -184,7 +234,29 @@ def generate(root: Path, cpp: Path, header: Path, resource_list: Path, makefile:
     header_lines.extend([
         "};",
         "",
+        "static const struct PcPokemonCachedResource sPcPokemonIconResources[] =",
+        "{",
+    ])
+    for symbol, name, fallback in icon_entries:
+        header_lines.append(
+            f"    {{ {symbol}, UINT64_C({fnv1a64(name)}), UINT64_C({fnv1a64(fallback)}) }},"
+        )
+    header_lines.extend([
+        "};",
+        "",
+        "static const struct PcPokemonCachedResource sPcPokemonFootprintResources[] =",
+        "{",
+    ])
+    for symbol, name, fallback in footprint_entries:
+        header_lines.append(
+            f"    {{ {symbol}, UINT64_C({fnv1a64(name)}), UINT64_C({fnv1a64(fallback)}) }},"
+        )
+    header_lines.extend([
+        "};",
+        "",
         "static const u16 sMissingPokemonPalette[16] = {0};",
+        "static const u8 sMissingPokemonIcon[0x400] = {0};",
+        "static const u8 sMissingPokemonFootprint[32] = {0};",
         "",
         "void *LoadExternalPokemonPic(const void *compiledData, u64 *sizeOut)",
         "{",
@@ -209,28 +281,54 @@ def generate(root: Path, cpp: Path, header: Path, resource_list: Path, makefile:
         "    return NULL;",
         "}",
         "",
-        "const u16 *GetExternalPokemonPalette(const void *compiledData)",
+        "static const void *GetExternalPokemonCachedResource(",
+        "    const struct PcPokemonCachedResource *resources,",
+        "    u32 resourceCount,",
+        "    const void *compiledData,",
+        "    u64 minimumSize,",
+        "    const void *missingData)",
         "{",
         "    u32 i;",
         "",
-        "    for (i = 0; i < ARRAY_COUNT(sPcPokemonPaletteResources); i++)",
+        "    for (i = 0; i < resourceCount; i++)",
         "    {",
-        "        const struct PcPokemonPaletteResource *resource = &sPcPokemonPaletteResources[i];",
+        "        const struct PcPokemonCachedResource *resource = &resources[i];",
         "        const void *data;",
         "        u64 size = 0;",
         "",
         "        if (resource->compiledData != compiledData)",
         "            continue;",
         "        data = ResourcePack_GetByHash(resource->hash, &size);",
-        "        if ((data == NULL || size < sizeof(sMissingPokemonPalette))",
+        "        if ((data == NULL || size < minimumSize)",
         "         && resource->hash != resource->fallbackHash)",
         "            data = ResourcePack_GetByHash(resource->fallbackHash, &size);",
-        "        if (data != NULL && size >= sizeof(sMissingPokemonPalette))",
+        "        if (data != NULL && size >= minimumSize)",
         "            return data;",
-        "        return sMissingPokemonPalette;",
+        "        return missingData;",
         "    }",
-        "    DBGPRINTF(\"Pokemon resource: unknown compiled palette identifier %p\\n\", compiledData);",
-        "    return sMissingPokemonPalette;",
+        "    DBGPRINTF(\"Pokemon resource: unknown cached identifier %p\\n\", compiledData);",
+        "    return missingData;",
+        "}",
+        "",
+        "const u16 *GetExternalPokemonPalette(const void *compiledData)",
+        "{",
+        "    return GetExternalPokemonCachedResource(",
+        "        sPcPokemonPaletteResources, ARRAY_COUNT(sPcPokemonPaletteResources),",
+        "        compiledData, sizeof(sMissingPokemonPalette), sMissingPokemonPalette);",
+        "}",
+        "",
+        "const u8 *GetExternalPokemonIcon(const void *compiledData)",
+        "{",
+        "    return GetExternalPokemonCachedResource(",
+        "        sPcPokemonIconResources, ARRAY_COUNT(sPcPokemonIconResources),",
+        "        compiledData, sizeof(sMissingPokemonIcon), sMissingPokemonIcon);",
+        "}",
+        "",
+        "const u8 *GetExternalPokemonFootprint(const void *compiledData)",
+        "{",
+        "    return GetExternalPokemonCachedResource(",
+        "        sPcPokemonFootprintResources, ARRAY_COUNT(sPcPokemonFootprintResources),",
+        "        compiledData, sizeof(sMissingPokemonFootprint), sMissingPokemonFootprint);",
         "}",
         "",
         "#endif // GUARD_GENERATED_PC_POKEMON_RESOURCES_H",
@@ -256,7 +354,8 @@ def generate(root: Path, cpp: Path, header: Path, resource_list: Path, makefile:
     write_if_changed(makefile, "\n".join(make_lines))
     print(
         f"Generated {len(pic_entries)} active Pokemon pictures and "
-        f"{len(palette_entries)} palettes"
+        f"{len(palette_entries)} palettes, {len(icon_entries)} icons and "
+        f"{len(footprint_entries)} footprints"
     )
 
 

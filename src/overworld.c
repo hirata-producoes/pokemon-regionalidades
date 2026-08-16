@@ -50,6 +50,7 @@
 #include "oras_dowse.h"
 #include "palette.h"
 #ifdef PORTABLE
+#include "party_menu.h"
 #include "platform.h"
 #endif
 #include "play_time.h"
@@ -1883,6 +1884,22 @@ void CB2_Overworld(void)
     bool32 fading = (gPaletteFade.active != 0);
 #if defined(PORTABLE) && defined(PLATFORM_SDL2)
     static bool32 sPcBattleTestStarted;
+    static bool32 sPcPartyTestReady;
+
+    if (!fading
+     && !sPcPartyTestReady
+     && Platform_GetEnvironmentFlag("POKEMON_GO_WORLD_TEST_PARTY"))
+    {
+        ZeroPlayerPartyMons();
+        CreateRandomMonWithIVs(&gParties[B_TRAINER_PLAYER][0], SPECIES_BULBASAUR, 50, USE_RANDOM_IVS);
+        CreateRandomMonWithIVs(&gParties[B_TRAINER_PLAYER][1], SPECIES_PIKACHU, 45, USE_RANDOM_IVS);
+        CalculatePlayerPartyCount();
+        sPcPartyTestReady = TRUE;
+        DBGPRINTF("PC party test: diagnostic party prepared\n");
+        CleanupOverworldWindowsAndTilemaps();
+        SetMainCallback2(CB2_PartyMenuFromStartMenu);
+        return;
+    }
 
     if (!fading
      && !sPcBattleTestStarted
