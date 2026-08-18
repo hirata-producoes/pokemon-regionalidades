@@ -104,6 +104,10 @@ PC_POKEMON_GENERATED_DIR := $(BUILD_DIR)/pc-generated
 PC_POKEMON_RESOURCE_HEADER := $(PC_POKEMON_GENERATED_DIR)/pokemon_resources.h
 PC_POKEMON_RESOURCE_LIST := $(PC_POKEMON_GENERATED_DIR)/pokemon_resources.json
 PC_POKEMON_RESOURCE_MAKEFILE := $(PC_POKEMON_GENERATED_DIR)/pokemon_resources.mk
+PC_CRY_RESOURCE_GENERATOR := tools/pokemon_go_world/generate_cry_resources.py
+PC_CRY_RESOURCE_HEADER := $(PC_POKEMON_GENERATED_DIR)/cry_resources.h
+PC_CRY_RESOURCE_LIST := $(PC_POKEMON_GENERATED_DIR)/cry_resources.json
+PC_CRY_RESOURCE_MAKEFILE := $(PC_POKEMON_GENERATED_DIR)/cry_resources.mk
 PC_RESOURCE_ASSETS := \
 	$(ASSETS_DIR_NAME)/graphics/title_screen/pokemon_logo.png.8bpp.smol \
 	$(ASSETS_DIR_NAME)/graphics/title_screen/pokemon_logo.bin.smolTM \
@@ -121,6 +125,7 @@ PC_RESOURCE_SOURCE_FILES := \
 	graphics/title_screen/rayquaza_and_clouds.gbapal
 
 -include $(PC_POKEMON_RESOURCE_MAKEFILE)
+-include $(PC_CRY_RESOURCE_MAKEFILE)
 
 ELF_NAME := $(ROM_NAME:.exe=.elf)
 MAP_NAME := $(ROM_NAME:.exe=.map)
@@ -605,6 +610,17 @@ $(PC_POKEMON_RESOURCE_HEADER) $(PC_POKEMON_RESOURCE_LIST) $(PC_POKEMON_RESOURCE_
 
 $(C_BUILDDIR)/pokemon.o: $(PC_POKEMON_RESOURCE_HEADER)
 
+$(PC_CRY_RESOURCE_HEADER) $(PC_CRY_RESOURCE_LIST) $(PC_CRY_RESOURCE_MAKEFILE) &: \
+		$(PC_CRY_RESOURCE_GENERATOR) sound/cry_tables.inc sound/direct_sound_data.inc \
+		$(wildcard include/config/*.h)
+	@mkdir -p $(PC_POKEMON_GENERATED_DIR)
+	$(PYTHON) $(PC_CRY_RESOURCE_GENERATOR) --root . --cpp $(CPP) \
+		--header $(PC_CRY_RESOURCE_HEADER) \
+		--resource-list $(PC_CRY_RESOURCE_LIST) \
+		--makefile $(PC_CRY_RESOURCE_MAKEFILE)
+
+$(C_BUILDDIR)/sound.o: $(PC_CRY_RESOURCE_HEADER)
+
 # Native Windows final link. A response file avoids the Windows command-line
 # length limit once Expansion contributes thousands of objects.
 PLATFORM_LIBS := -lmingw32 -lSDL2main -lSDL2.dll -lwinmm -lxinput
@@ -614,7 +630,8 @@ $(ROM): $(OBJS) $(PC_RESOURCE_ASSETS)
 	$(CC) $(CFLAGS) -Wl,--demangle -Wl,-Map,$(MAP) @$(OBJ_DIR)/objects.rsp -static-libgcc -L$(SDL_DIR)/lib $(PLATFORM_LIBS) -o $@
 
 $(RESOURCE_PACK): $(PC_RESOURCE_ASSETS) $(PC_RESOURCE_SOURCE_FILES) $(PC_POKEMON_RESOURCE_ASSETS) \
-		$(PC_POKEMON_RESOURCE_LIST) $(RESOURCE_PACK_MANIFEST) $(RESOURCE_PACK_BUILDER)
+		$(PC_CRY_RESOURCE_ASSETS) $(PC_POKEMON_RESOURCE_LIST) $(PC_CRY_RESOURCE_LIST) \
+		$(RESOURCE_PACK_MANIFEST) $(RESOURCE_PACK_BUILDER)
 	$(PYTHON) $(RESOURCE_PACK_BUILDER) build --manifest $(RESOURCE_PACK_MANIFEST) --output $@ --root .
 
 emerald: all

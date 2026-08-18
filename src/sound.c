@@ -10,6 +10,10 @@
 #include "constants/songs.h"
 #include "task.h"
 #include "test_runner.h"
+#ifdef PORTABLE
+#include "resource_pack.h"
+#include "../build/pc-generated/cry_resources.h"
+#endif
 
 struct Fanfare
 {
@@ -32,6 +36,39 @@ COMMON_DATA bool8 gDisableMusic = 0;
 
 extern struct ToneData gCryTable[];
 extern struct ToneData gCryTable_Reverse[];
+
+#ifdef PORTABLE
+static struct ToneData sPcCryTones[2][CRY_COUNT - 1];
+static struct WaveData *sPcCrySamples[CRY_COUNT - 1];
+
+static struct ToneData *GetExternalPokemonCryTone(u32 index, bool32 reverse)
+{
+    struct WaveData *wav = sPcCrySamples[index];
+    u64 size = 0;
+
+    if (wav == NULL)
+    {
+        wav = (struct WaveData *)ResourcePack_GetByHash(sPcCryResourceHashes[index], &size);
+        if (wav == NULL || size < offsetof(struct WaveData, data)
+         || wav->freq == 0 || wav->size == 0)
+        {
+            DBGPRINTF("Pokemon cry: resource %u is missing or invalid; continuing silently\n", index + 1);
+            return NULL;
+        }
+
+        // Keep the assembled tables immutable: they are linked into the
+        // read-only PE section. The writable native copies share the sample,
+        // whose pack allocation remains alive until platform shutdown.
+        sPcCryTones[0][index] = gCryTable[index];
+        sPcCryTones[1][index] = gCryTable_Reverse[index];
+        sPcCryTones[0][index].wav = wav;
+        sPcCryTones[1][index].wav = wav;
+        sPcCrySamples[index] = wav;
+    }
+
+    return &sPcCryTones[reverse][index];
+}
+#endif
 
 static void Task_Fanfare(u8 taskId);
 static void CreateFanfareTask(void);
@@ -485,7 +522,13 @@ void PlayCryInternal(enum Species species, s8 pan, s8 volume, u8 priority, u8 mo
     if (cryId != CRY_NONE)
     {
         cryId--;
+#ifdef PORTABLE
+        struct ToneData *tone = GetExternalPokemonCryTone(cryId, reverse);
+        if (tone != NULL)
+            gMPlay_PokemonCry = SetPokemonCryTone(tone);
+#else
         gMPlay_PokemonCry = SetPokemonCryTone(reverse ? &gCryTable_Reverse[cryId] : &gCryTable[cryId]);
+#endif
     }
 }
 

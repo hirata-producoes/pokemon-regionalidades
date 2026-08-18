@@ -27,12 +27,14 @@ Este alvo compila diretamente o código decompilado do jogo para Windows/SDL2. E
 - Imagens de Pokémon são lidas transitoriamente e liberadas logo após a descompressão, evitando que visitar muitas espécies faça o cache crescer indefinidamente.
 - Paletas são validadas como blocos de pelo menos 32 bytes e mantidas no pequeno cache sob demanda. Imagem ou paleta ausente/corrompida usa a interrogação correspondente quando disponível; sem pacote, um bloco zerado seguro impede leitura inválida.
 - A configuração ativa também gera 1.420 ícones e 1.031 pegadas externas. O menu de equipe foi validado carregando os ícones animados de Bulbasaur e Pikachu com 1.024 bytes cada; sem pacote, os espaços ficam vazios sem leitura inválida.
-- O executável mede 32.312.283 bytes (aproximadamente 30,82 MiB) e o pacote com 8.302 entradas mede 4.798.304 bytes (aproximadamente 4,58 MiB), portanto o alvo PC já não está preso ao limite de ROM de 32 MiB.
 - O pacote válido, o pacote ausente e um pacote com dados corrompidos foram testados. Nos dois últimos casos o jogo continua de maneira segura, usando o fallback quando ele existir e sem entregar dados corrompidos ao descompressor.
 - A batalha Bulbasaur contra Pikachu foi repetida com sprites externos. Um Pikachu propositalmente corrompido foi rejeitado pelo CRC32 e substituído visualmente pelo sprite de interrogação, sem afetar o sprite traseiro de Bulbasaur.
 - Multiboot e recursos específicos de comunicação do hardware GBA permanecem isolados por stubs; multiboot não fará parte do alvo PC.
 - Tela de resumo validada a partir do menu de equipe, incluindo sprite/paleta externos, dados, habilidade, descrição, memo e transição para renomear. Duas escritas de texto que alcançavam a borda do buffer receberam margens apenas no alvo PC; uma execução automatizada de 15 segundos terminou sem exceção.
-- Próximo marco: migrar cries, tilesets e outras famílias grandes.
+- A configuração ativa gera 1.067 cries externos (7,74 MiB). O mixer os carrega e mantém em cache somente quando cada espécie toca; as tabelas montadas permanecem imutáveis e o GBA conserva as amostras compiladas originais.
+- Batalha de regressão confirmou `Cry_Pikachu` e `Cry_Bulbasaur` vindos do pacote. Sem o pacote, ambos são omitidos com segurança e a batalha continua sem exceção.
+- O executável agora mede 24.171.265 bytes (aproximadamente 23,05 MiB), o pacote com 9.369 entradas mede 12.985.552 bytes (aproximadamente 12,38 MiB) e `data/sound_data.o` caiu para aproximadamente 0,96 MiB no PC.
+- Próximo marco: migrar tilesets e outras famílias grandes.
 
 ## Compatibilidades resolvidas para o primeiro mapa
 
@@ -73,7 +75,7 @@ O alvo interno também está disponível como `make pc` quando `make`, GCC i686,
 
 ## Sobre 32 bits e tamanho
 
-O executável continua sendo de 32 bits nesta fase porque scripts e tabelas do jogo armazenam ponteiros de 32 bits. Isso não impõe o limite de ROM de 32 MiB. Recursos já podem ser carregados sob demanda de um pacote externo com offsets de 64 bits; tela de título, imagens, paletas, ícones e pegadas de Pokémon já foram migradas.
+O executável continua sendo de 32 bits nesta fase porque scripts e tabelas do jogo armazenam ponteiros de 32 bits. Isso não impõe o limite de ROM de 32 MiB. Recursos já podem ser carregados sob demanda de um pacote externo com offsets de 64 bits; tela de título, imagens, paletas, ícones, pegadas e cries de Pokémon já foram migrados.
 
 ## Próximos marcos
 
