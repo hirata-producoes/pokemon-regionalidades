@@ -2,7 +2,8 @@
   "format_version": 1,
   "resource_lists": [
     "build/pc-generated/pokemon_resources.json",
-    "build/pc-generated/cry_resources.json"
+    "build/pc-generated/cry_resources.json",
+    "build/pc-generated/tileset_resources.json"
   ],
   "resources": [
     {

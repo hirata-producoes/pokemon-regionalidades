@@ -33,6 +33,7 @@
 #include "string_util.h"
 #include "strings.h"
 #include "text_window.h"
+#include "tileset_resources.h"
 #include "tv.h"
 #include "shop_criteria.h"
 #include "constants/decorations.h"
@@ -815,6 +816,8 @@ static void BuyMenuDrawMapBg(void)
     u8 metatileLayerType;
 
     mapLayout = gMapHeader.mapLayout;
+    const u16 *primaryMetatiles = ResolveTilesetMetatiles(mapLayout->primaryTileset->metatiles);
+    const u16 *secondaryMetatiles = ResolveTilesetMetatiles(mapLayout->secondaryTileset->metatiles);
     numMetatilesInPrimary = GetNumMetatilesInPrimary(mapLayout);
     GetXYCoordsOneStepInFrontOfPlayer(&x, &y);
     x -= 4;
@@ -831,9 +834,9 @@ static void BuyMenuDrawMapBg(void)
                 metatileLayerType = METATILE_LAYER_TYPE_COVERED;
 
             if (metatile < numMetatilesInPrimary)
-                BuyMenuDrawMapMetatile(i, j, mapLayout->primaryTileset->metatiles + metatile * NUM_TILES_PER_METATILE, metatileLayerType);
+                BuyMenuDrawMapMetatile(i, j, primaryMetatiles + metatile * NUM_TILES_PER_METATILE, metatileLayerType);
             else
-                BuyMenuDrawMapMetatile(i, j, mapLayout->secondaryTileset->metatiles + ((metatile - numMetatilesInPrimary) * NUM_TILES_PER_METATILE), metatileLayerType);
+                BuyMenuDrawMapMetatile(i, j, secondaryMetatiles + ((metatile - numMetatilesInPrimary) * NUM_TILES_PER_METATILE), metatileLayerType);
         }
     }
 }
