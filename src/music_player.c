@@ -4,6 +4,7 @@
 
 #include "mp2k_common.h"
 #include "music_player.h"
+#include "music_sample_resources.h"
 #include "sound_mixer.h"
 #include "gba/types.h"
 #include "gba/m4a_internal.h"
@@ -712,7 +713,7 @@ void MP2K_event_nxx(u32 clock, struct MP2KPlayerState *player, struct MP2KTrack 
     chan->key = key;
     chan->rhythmPan = forcedPan;
     chan->type = instrument->type;
-    chan->wav = instrument->wav;
+    chan->wav = cgbType == 0 ? ResolveMusicSample(instrument->wav) : instrument->wav;
     chan->attack = instrument->attack;
     chan->decay = instrument->decay;
     chan->sustain = instrument->sustain;
@@ -872,3 +873,7 @@ static u32 MidiKeyToFreq(struct WaveData2 *wav, u8 key, u8 pitch) {
 #endif
 
 #endif // PORTABLE
+
+#ifdef PORTABLE
+#include "../build/pc-generated/music_sample_resources.h"
+#endif

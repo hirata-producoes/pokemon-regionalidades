@@ -12,6 +12,10 @@
 	.include "sound/programmable_wave_data.inc"
 	.include "sound/music_player_table.inc"
 	.include "sound/song_table.inc"
+#ifdef PORTABLE
+	.include "build/pc-generated/music_sample_placeholders.inc"
+#else
 	.include "sound/direct_sound_data.inc"
+#endif
 
 	.align 2

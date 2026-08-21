@@ -35,8 +35,9 @@ Este alvo compila diretamente o código decompilado do jogo para Windows/SDL2. E
 - Batalha de regressão confirmou `Cry_Pikachu` e `Cry_Bulbasaur` vindos do pacote. Sem o pacote, ambos são omitidos com segurança e a batalha continua sem exceção.
 - Os tilesets de mapa ativos também foram externalizados: 85 gráficos de tiles, 77 conjuntos de paletas, 72 tabelas de metatiles e 72 tabelas de atributos. O primeiro mapa carregou `General` e `InsideOfTruck` diretamente do pacote; sem pacote, dados zerados seguros evitam leituras inválidas.
 - Os 174 frames de animação de tileset também são externos. O primeiro mapa carregou 26 frames de água, bordas, cachoeira e flores do tileset `General`; sem pacote, cada animação usa um frame zerado seguro e o jogo continua sem exceção.
-- O executável agora mede 23.386.795 bytes (aproximadamente 22,30 MiB), o pacote com 9.849 entradas mede 13.861.968 bytes (aproximadamente 13,22 MiB), `data/sound_data.o` permanece em aproximadamente 0,96 MiB, `src/tilesets.o` mede aproximadamente 0,06 MiB e `src/tileset_anims.o` caiu para aproximadamente 0,07 MiB no PC.
-- Próximo marco: migrar músicas/instrumentos e outras famílias grandes.
+- As 106 amostras musicais ativas, referenciadas por 156 identificadores das voicegroups, foram removidas de `sound_data.o` e são resolvidas quando cada nota começa. A introdução produziu áudio não silencioso com 11 instrumentos externos; a batalha diagnóstica carregou 22 instrumentos e preservou os cries externos de Pikachu e Bulbasaur.
+- O executável agora mede 22.751.029 bytes (aproximadamente 21,70 MiB), o pacote com 9.955 entradas mede 14.512.928 bytes (aproximadamente 13,84 MiB), `data/sound_data.o` caiu para aproximadamente 0,35 MiB, `src/tilesets.o` mede aproximadamente 0,06 MiB e `src/tileset_anims.o` mede aproximadamente 0,07 MiB no PC.
+- Próximo marco: migrar faixas musicais, voicegroups e outras famílias grandes.
 
 ## Compatibilidades resolvidas para o primeiro mapa
 
@@ -77,7 +78,7 @@ O alvo interno também está disponível como `make pc` quando `make`, GCC i686,
 
 ## Sobre 32 bits e tamanho
 
-O executável continua sendo de 32 bits nesta fase porque scripts e tabelas do jogo armazenam ponteiros de 32 bits. Isso não impõe o limite de ROM de 32 MiB. Recursos já podem ser carregados sob demanda de um pacote externo com offsets de 64 bits; tela de título, imagens, paletas, ícones, pegadas, cries de Pokémon, tilesets de mapas e seus frames de animação já foram migrados.
+O executável continua sendo de 32 bits nesta fase porque scripts e tabelas do jogo armazenam ponteiros de 32 bits. Isso não impõe o limite de ROM de 32 MiB. Recursos já podem ser carregados sob demanda de um pacote externo com offsets de 64 bits; tela de título, imagens, paletas, ícones, pegadas, cries de Pokémon, tilesets de mapas, seus frames de animação e amostras musicais já foram migrados.
 
 ## Próximos marcos
 
