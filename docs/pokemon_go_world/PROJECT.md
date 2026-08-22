@@ -97,9 +97,14 @@ Gigantamax e conteúdo redundante quando o orçamento da ROM for medido.
 
 ## Limites técnicos
 
-Uma ROM GBA tradicional possui 32 MiB. A base moderna, antes de adicionar
-regiões e tradução, já ocupa grande parte desse espaço. Por isso, o projeto terá
-um orçamento de ROM por fase e priorizará:
+O porte nativo para PC é o alvo principal para o mundo completo. Ele não usa
+uma ROM nem herda o limite de 32 MiB do cartucho GBA: dados grandes são movidos
+gradualmente para `pokemon_go_world.pak`, cujo índice e offsets são de 64 bits.
+O executável continua temporariamente em 32 bits para preservar os layouts de
+ponteiros do Expansion, mas o pacote pode ter 100, 128 MiB ou mais e é lido sob
+demanda. O alvo GBA permanece disponível como uma edição compatível e limitada.
+
+Durante o desenvolvimento, o projeto ainda priorizará:
 
 - reutilização e compressão de tilesets;
 - músicas compartilhadas antes de arranjos exclusivos;
@@ -107,9 +112,9 @@ um orçamento de ROM por fase e priorizará:
 - mapas compactos com conexões convincentes em vez de cópias 1:1 gigantes;
 - testes em emulador e, enquanto possível, em hardware real.
 
-Se o conteúdo final exceder o limite, a decisão entre uma ROM estendida para
-emuladores e módulos regionais será tomada somente depois de medir uma build
-real.
+O conteúdo mundial não será dividido em ROMs regionais por causa do antigo
+limite. Recursos serão organizados em entradas independentes do pacote para
+controlar tempo de carregamento, cache e consumo de RAM.
 
 ## Entregas
 

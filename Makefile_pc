@@ -121,6 +121,12 @@ PC_MUSIC_SAMPLE_RESOURCE_HEADER := $(PC_POKEMON_GENERATED_DIR)/music_sample_reso
 PC_MUSIC_SAMPLE_RESOURCE_PLACEHOLDERS := $(PC_POKEMON_GENERATED_DIR)/music_sample_placeholders.inc
 PC_MUSIC_SAMPLE_RESOURCE_LIST := $(PC_POKEMON_GENERATED_DIR)/music_sample_resources.json
 PC_MUSIC_SAMPLE_RESOURCE_MAKEFILE := $(PC_POKEMON_GENERATED_DIR)/music_sample_resources.mk
+PC_SONG_RESOURCE_GENERATOR := tools/pokemon_go_world/generate_song_resources.py
+PC_SONG_RESOURCE_DIR := $(PC_POKEMON_GENERATED_DIR)/song_resources
+PC_SONG_RESOURCE_HEADER := $(PC_POKEMON_GENERATED_DIR)/song_resources.h
+PC_SONG_RESOURCE_PLACEHOLDERS := $(PC_POKEMON_GENERATED_DIR)/song_placeholders.s
+PC_SONG_RESOURCE_LIST := $(PC_POKEMON_GENERATED_DIR)/song_resources.json
+PC_SONG_RESOURCE_MAKEFILE := $(PC_POKEMON_GENERATED_DIR)/song_resources.mk
 PC_RESOURCE_ASSETS := \
 	$(ASSETS_DIR_NAME)/graphics/title_screen/pokemon_logo.png.8bpp.smol \
 	$(ASSETS_DIR_NAME)/graphics/title_screen/pokemon_logo.bin.smolTM \
@@ -142,6 +148,7 @@ PC_RESOURCE_SOURCE_FILES := \
 -include $(PC_TILESET_RESOURCE_MAKEFILE)
 -include $(PC_TILESET_ANIM_RESOURCE_MAKEFILE)
 -include $(PC_MUSIC_SAMPLE_RESOURCE_MAKEFILE)
+-include $(PC_SONG_RESOURCE_MAKEFILE)
 
 ELF_NAME := $(ROM_NAME:.exe=.elf)
 MAP_NAME := $(ROM_NAME:.exe=.map)
@@ -375,9 +382,10 @@ $(DATA_ASM_BUILDDIR)/event_scripts.o: $(DATA_ASM_SUBDIR)/script_cmd_table.inc Ma
 
 MID_SRCS := $(wildcard $(MID_SUBDIR)/*.mid)
 MID_OBJS := $(patsubst $(MID_SUBDIR)/%.mid,$(MID_BUILDDIR)/%.o,$(MID_SRCS))
+PC_SONG_PLACEHOLDER_OBJ := $(OBJ_DIR)/pc-generated/song_placeholders.o
 
 # ARM implementation files under src/*.s are replaced by src/platform/*.c.
-OBJS     := $(C_OBJS) $(ASM_OBJS) $(DATA_ASM_OBJS) $(MID_OBJS)
+OBJS     := $(C_OBJS) $(ASM_OBJS) $(DATA_ASM_OBJS) $(PC_SONG_PLACEHOLDER_OBJ)
 OBJS_REL := $(patsubst $(OBJ_DIR)/%,%,$(OBJS))
 
 SUBDIRS  := $(sort $(dir $(OBJS) $(dir $(TEST_OBJS))))
@@ -672,6 +680,23 @@ $(PC_MUSIC_SAMPLE_RESOURCE_HEADER) $(PC_MUSIC_SAMPLE_RESOURCE_PLACEHOLDERS) \
 $(C_BUILDDIR)/music_player.o: $(PC_MUSIC_SAMPLE_RESOURCE_HEADER)
 $(DATA_ASM_BUILDDIR)/sound_data.o: $(PC_MUSIC_SAMPLE_RESOURCE_PLACEHOLDERS)
 
+$(PC_SONG_RESOURCE_HEADER) $(PC_SONG_RESOURCE_PLACEHOLDERS) \
+		$(PC_SONG_RESOURCE_LIST) $(PC_SONG_RESOURCE_MAKEFILE) &: \
+		$(PC_SONG_RESOURCE_GENERATOR) $(MID_OBJS)
+	@mkdir -p $(PC_POKEMON_GENERATED_DIR) $(PC_SONG_RESOURCE_DIR)
+	$(PYTHON) $(PC_SONG_RESOURCE_GENERATOR) --root . \
+		--object-dir $(MID_BUILDDIR) --output-dir $(PC_SONG_RESOURCE_DIR) \
+		--header $(PC_SONG_RESOURCE_HEADER) \
+		--placeholders $(PC_SONG_RESOURCE_PLACEHOLDERS) \
+		--resource-list $(PC_SONG_RESOURCE_LIST) \
+		--makefile $(PC_SONG_RESOURCE_MAKEFILE)
+
+$(PC_SONG_PLACEHOLDER_OBJ): $(PC_SONG_RESOURCE_PLACEHOLDERS)
+	$(AS) $(ASFLAGS) -o $@ $<
+	$(FIX_UNDERSCORE) $@
+
+$(C_BUILDDIR)/m4a.o: $(PC_SONG_RESOURCE_HEADER)
+
 # Native Windows final link. A response file avoids the Windows command-line
 # length limit once Expansion contributes thousands of objects.
 PLATFORM_LIBS := -lmingw32 -lSDL2main -lSDL2.dll -lwinmm -lxinput
@@ -685,6 +710,7 @@ $(RESOURCE_PACK): $(PC_RESOURCE_ASSETS) $(PC_RESOURCE_SOURCE_FILES) $(PC_POKEMON
 		$(PC_TILESET_RESOURCE_ASSETS) $(PC_TILESET_RESOURCE_LIST) \
 		$(PC_TILESET_ANIM_RESOURCE_ASSETS) $(PC_TILESET_ANIM_RESOURCE_LIST) \
 		$(PC_MUSIC_SAMPLE_RESOURCE_ASSETS) $(PC_MUSIC_SAMPLE_RESOURCE_LIST) \
+		$(PC_SONG_RESOURCE_ASSETS) $(PC_SONG_RESOURCE_LIST) \
 		$(RESOURCE_PACK_MANIFEST) $(RESOURCE_PACK_BUILDER)
 	$(PYTHON) $(RESOURCE_PACK_BUILDER) build --manifest $(RESOURCE_PACK_MANIFEST) --output $@ --root .
 

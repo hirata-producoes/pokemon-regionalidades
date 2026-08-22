@@ -1,5 +1,6 @@
 #include "global.h"
 #include "gba/m4a_internal.h"
+#include "song_resources.h"
 #ifdef PORTABLE
 #include "cgb_audio.h"
 #include "sound_mixer.h"
@@ -124,8 +125,9 @@ void m4aSongNumStartOrChange(u16 n)
     const struct Song *songTable = gSongTable;
     const struct Song *song = &songTable[n];
     const struct MusicPlayer *mplay = &mplayTable[song->ms];
+    struct SongHeader *songHeader = ResolveSongHeader(song->header);
 
-    if (mplay->info->songHeader != song->header)
+    if (mplay->info->songHeader != songHeader)
     {
         MPlayStart(mplay->info, song->header);
     }
@@ -145,8 +147,9 @@ static void UNUSED m4aSongNumStartOrContinue(u16 n)
     const struct Song *songTable = gSongTable;
     const struct Song *song = &songTable[n];
     const struct MusicPlayer *mplay = &mplayTable[song->ms];
+    struct SongHeader *songHeader = ResolveSongHeader(song->header);
 
-    if (mplay->info->songHeader != song->header)
+    if (mplay->info->songHeader != songHeader)
         MPlayStart(mplay->info, song->header);
     else if ((mplay->info->status & MUSICPLAYER_STATUS_TRACK) == 0)
         MPlayStart(mplay->info, song->header);
@@ -160,8 +163,9 @@ void m4aSongNumStop(u16 n)
     const struct Song *songTable = gSongTable;
     const struct Song *song = &songTable[n];
     const struct MusicPlayer *mplay = &mplayTable[song->ms];
+    struct SongHeader *songHeader = ResolveSongHeader(song->header);
 
-    if (mplay->info->songHeader == song->header)
+    if (mplay->info->songHeader == songHeader)
         m4aMPlayStop(mplay->info);
 }
 
@@ -171,8 +175,9 @@ static void UNUSED m4aSongNumContinue(u16 n)
     const struct Song *songTable = gSongTable;
     const struct Song *song = &songTable[n];
     const struct MusicPlayer *mplay = &mplayTable[song->ms];
+    struct SongHeader *songHeader = ResolveSongHeader(song->header);
 
-    if (mplay->info->songHeader == song->header)
+    if (mplay->info->songHeader == songHeader)
         MPlayContinue(mplay->info);
 }
 
@@ -637,6 +642,8 @@ void MPlayStart(struct MusicPlayerInfo *mplayInfo, struct SongHeader *songHeader
     u8 unk_B;
     struct MusicPlayerTrack *track;
 
+    songHeader = ResolveSongHeader(songHeader);
+
     if (mplayInfo->ident != ID_NUMBER)
         return;
 
@@ -687,6 +694,10 @@ void MPlayStart(struct MusicPlayerInfo *mplayInfo, struct SongHeader *songHeader
         mplayInfo->ident = ID_NUMBER;
     }
 }
+
+#ifdef PORTABLE
+#include "../build/pc-generated/song_resources.h"
+#endif
 
 void m4aMPlayStop(struct MusicPlayerInfo *mplayInfo)
 {
