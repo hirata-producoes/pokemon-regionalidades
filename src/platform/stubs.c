@@ -32,6 +32,10 @@ void GameCubeMultiBoot_ExecuteProgram(struct GcmbStruct *state)
 
 void GameCubeMultiBoot_Init(struct GcmbStruct *state)
 {
+    // The native target does not execute GBA/GameCube multiboot payloads.
+    // Keep the state deterministically inactive so callers never attempt to
+    // access the zero-length payload symbols used by the PC build.
+    memset(state, 0, sizeof(*state));
 }
 
 void GameCubeMultiBoot_HandleSerialInterrupt(struct GcmbStruct *state)
