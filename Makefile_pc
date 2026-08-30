@@ -134,6 +134,11 @@ PC_VOICEGROUP_RESOURCE_PLACEHOLDERS := $(PC_POKEMON_GENERATED_DIR)/voicegroup_pl
 PC_VOICEGROUP_RESOURCE_EXPORTS := $(PC_POKEMON_GENERATED_DIR)/voicegroup_exports.inc
 PC_VOICEGROUP_RESOURCE_LIST := $(PC_POKEMON_GENERATED_DIR)/voicegroup_resources.json
 PC_VOICEGROUP_RESOURCE_MAKEFILE := $(PC_POKEMON_GENERATED_DIR)/voicegroup_resources.mk
+PC_MAP_LAYOUT_RESOURCE_GENERATOR := tools/pokemon_go_world/generate_map_layout_resources.py
+PC_MAP_LAYOUT_INCLUDE := $(PC_POKEMON_GENERATED_DIR)/map_layouts.inc
+PC_MAP_LAYOUT_RESOURCE_HEADER := $(PC_POKEMON_GENERATED_DIR)/map_layout_resources.h
+PC_MAP_LAYOUT_RESOURCE_LIST := $(PC_POKEMON_GENERATED_DIR)/map_layout_resources.json
+PC_MAP_LAYOUT_RESOURCE_MAKEFILE := $(PC_POKEMON_GENERATED_DIR)/map_layout_resources.mk
 PC_RESOURCE_ASSETS := \
 	$(ASSETS_DIR_NAME)/graphics/title_screen/pokemon_logo.png.8bpp.smol \
 	$(ASSETS_DIR_NAME)/graphics/title_screen/pokemon_logo.bin.smolTM \
@@ -157,6 +162,7 @@ PC_RESOURCE_SOURCE_FILES := \
 -include $(PC_MUSIC_SAMPLE_RESOURCE_MAKEFILE)
 -include $(PC_SONG_RESOURCE_MAKEFILE)
 -include $(PC_VOICEGROUP_RESOURCE_MAKEFILE)
+-include $(PC_MAP_LAYOUT_RESOURCE_MAKEFILE)
 
 ELF_NAME := $(ROM_NAME:.exe=.elf)
 MAP_NAME := $(ROM_NAME:.exe=.map)
@@ -732,6 +738,21 @@ $(PC_SONG_PLACEHOLDER_OBJ): $(PC_SONG_RESOURCE_PLACEHOLDERS)
 
 $(C_BUILDDIR)/m4a.o: $(PC_SONG_RESOURCE_HEADER) $(PC_VOICEGROUP_RESOURCE_HEADER)
 
+$(PC_MAP_LAYOUT_INCLUDE) $(PC_MAP_LAYOUT_RESOURCE_HEADER) \
+		$(PC_MAP_LAYOUT_RESOURCE_LIST) $(PC_MAP_LAYOUT_RESOURCE_MAKEFILE) &: \
+		$(PC_MAP_LAYOUT_RESOURCE_GENERATOR) data/layouts/layouts.inc \
+		$(shell find data/layouts -type f \( -name 'map.bin' -o -name 'border.bin' \))
+	@mkdir -p $(PC_POKEMON_GENERATED_DIR)
+	$(PYTHON) $(PC_MAP_LAYOUT_RESOURCE_GENERATOR) --root . \
+		--source data/layouts/layouts.inc \
+		--output-include $(PC_MAP_LAYOUT_INCLUDE) \
+		--header $(PC_MAP_LAYOUT_RESOURCE_HEADER) \
+		--resource-list $(PC_MAP_LAYOUT_RESOURCE_LIST) \
+		--makefile $(PC_MAP_LAYOUT_RESOURCE_MAKEFILE)
+
+$(DATA_ASM_BUILDDIR)/maps.o: $(PC_MAP_LAYOUT_INCLUDE)
+$(C_BUILDDIR)/overworld.o: $(PC_MAP_LAYOUT_RESOURCE_HEADER)
+
 # Native Windows final link. A response file avoids the Windows command-line
 # length limit once Expansion contributes thousands of objects.
 PLATFORM_LIBS := -lmingw32 -lSDL2main -lSDL2.dll -lwinmm -lxinput
@@ -747,6 +768,7 @@ $(RESOURCE_PACK): $(PC_RESOURCE_ASSETS) $(PC_RESOURCE_SOURCE_FILES) $(PC_POKEMON
 		$(PC_MUSIC_SAMPLE_RESOURCE_ASSETS) $(PC_MUSIC_SAMPLE_RESOURCE_LIST) \
 		$(PC_SONG_RESOURCE_ASSETS) $(PC_SONG_RESOURCE_LIST) \
 		$(PC_VOICEGROUP_RESOURCE_ASSETS) $(PC_VOICEGROUP_RESOURCE_LIST) \
+		$(PC_MAP_LAYOUT_RESOURCE_ASSETS) $(PC_MAP_LAYOUT_RESOURCE_LIST) \
 		$(RESOURCE_PACK_MANIFEST) $(RESOURCE_PACK_BUILDER)
 	$(PYTHON) $(RESOURCE_PACK_BUILDER) build --manifest $(RESOURCE_PACK_MANIFEST) --output $@ --root .
 
