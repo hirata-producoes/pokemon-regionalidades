@@ -11,7 +11,11 @@
 
 	.section .rodata
 
+#ifdef PORTABLE
+	.include "build/pc-generated/map_layouts.inc"
+#else
 	.include "data/layouts/layouts.inc"
+#endif
 	.include "data/layouts/layouts_table.inc"
 	.include "data/maps/headers.inc"
 	.include "data/maps/groups.inc"

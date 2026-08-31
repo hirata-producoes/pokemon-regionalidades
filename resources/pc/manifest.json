@@ -7,7 +7,8 @@
     "build/pc-generated/tileset_anim_resources.json",
     "build/pc-generated/music_sample_resources.json",
     "build/pc-generated/song_resources.json",
-    "build/pc-generated/voicegroup_resources.json"
+    "build/pc-generated/voicegroup_resources.json",
+    "build/pc-generated/map_layout_resources.json"
   ],
   "resources": [
     {

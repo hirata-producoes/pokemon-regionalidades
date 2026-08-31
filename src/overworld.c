@@ -35,6 +35,7 @@
 #include "line_break.h"
 #include "link.h"
 #include "link_rfu.h"
+#include "map_layout_resources.h"
 #include "load_save.h"
 #include "main.h"
 #include "malloc.h"
@@ -90,6 +91,10 @@
 #include "constants/species.h"
 #include "constants/trainer_hill.h"
 #include "constants/weather.h"
+
+#ifdef PORTABLE
+#include "../build/pc-generated/map_layout_resources.h"
+#endif
 
 STATIC_ASSERT((B_FLAG_FOLLOWERS_DISABLED == 0 || OW_FOLLOWERS_ENABLED), FollowersFlagAssignedWithoutEnablingThem);
 
@@ -620,7 +625,11 @@ static void InitMapView(void)
 
 const struct MapLayout *GetMapLayout(u16 mapLayoutId)
 {
+#ifdef PORTABLE
+    return ResolvePcMapLayout(mapLayoutId, gMapLayouts[mapLayoutId - 1]);
+#else
     return gMapLayouts[mapLayoutId - 1];
+#endif
 }
 
 void ApplyCurrentWarp(void)
