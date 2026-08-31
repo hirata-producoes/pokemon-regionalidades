@@ -1,5 +1,5 @@
 #!/usr/bin/env python3
-"""Build or inspect the Pokemon GO World native resource pack."""
+"""Build or inspect the Pokemon Regionalidades native resource pack."""
 
 from __future__ import annotations
 

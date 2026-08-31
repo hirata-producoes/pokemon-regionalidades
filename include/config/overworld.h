@@ -138,7 +138,7 @@
 
 // Pokémon Center
 #define OW_IGNORE_EGGS_ON_HEAL           GEN_LATEST         // In Gen 4+, the nurse in the Pokémon Center does not heal Eggs on healing machine.
-#define OW_UNION_DISABLE_CHECK           TRUE               // Pokémon Go World is single-player; skip the Union Room check and speed up Pokémon Centers.
+#define OW_UNION_DISABLE_CHECK           TRUE               // Pokémon Regionalidades is single-player; skip the Union Room check and speed up Pokémon Centers.
 #define OW_FLAG_MOVE_UNION_ROOM_CHECK    0                  // If this flag is set, the game will only check if players are in the Union Room while healing Pokémon, and not when players enter the Pokémon Center. This speeds up the loading of the Pokémon Center. This is ignored if OW_UNION_DISABLE_CHECK is TRUE.
 
 // Berry Blender

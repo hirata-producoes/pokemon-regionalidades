@@ -1,8 +1,8 @@
 GAME_VERSION ?= EMERALD
 PORTABLE     := 1
-TITLE        ?= PKMN GO WRLD
-GAME_CODE    ?= BGWP
-BUILD_NAME   ?= mon_go_world
+TITLE        ?= PKMN REGION
+GAME_CODE    ?= BRGP
+BUILD_NAME   ?= mon_regionalidades
 MAP_VERSION  ?= emerald
 
 ifeq (firered, $(or $(BUILD), $(MAKECMDGOALS)))
@@ -96,7 +96,7 @@ OBJ_DIR_NAME_TEST := $(BUILD_DIR)/pc-native-test
 OBJ_DIR_NAME_DEBUG := $(BUILD_DIR)/pc-native-debug
 OBJ_DIR_NAME_RELEASE := $(BUILD_DIR)/pc-native-release
 ASSETS_DIR_NAME := $(BUILD_DIR)/assets
-RESOURCE_PACK := pokemon_go_world.pak
+RESOURCE_PACK := pokemon_regionalidades.pak
 RESOURCE_PACK_MANIFEST := resources/pc/manifest.json
 RESOURCE_PACK_BUILDER := tools/pokemon_go_world/pack_resources.py
 PC_POKEMON_RESOURCE_GENERATOR := tools/pokemon_go_world/generate_pokemon_resources.py

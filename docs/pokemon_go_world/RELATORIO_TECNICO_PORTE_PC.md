@@ -1,5 +1,7 @@
 # Relatório técnico do porte nativo para PC
 
+> Relatório histórico da conversão inicial. A documentação corrente está em [`docs/pokemon_regionalidades`](../pokemon_regionalidades/README.md); nomes e caminhos antigos abaixo são mantidos como registro técnico.
+
 **Projeto:** Pokémon GO World
 
 **Base:** pokeemerald-expansion + camada multiplataforma SDL2

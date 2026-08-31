@@ -1,5 +1,7 @@
 # Porte nativo para PC
 
+> Documento histórico da fase Pokémon GO World. Os nomes atuais de executável, save e pacote estão no [guia de compilação para Windows](../pokemon_regionalidades/BUILDING_WINDOWS.md).
+
 Este alvo compila diretamente o código decompilado do jogo para Windows/SDL2. Ele não executa uma ROM dentro do mGBA.
 
 ## Estado da implementação

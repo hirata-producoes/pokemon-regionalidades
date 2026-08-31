@@ -20,15 +20,15 @@ if ($InstallDependencies) {
 }
 
 $buildAction = if ($Clean) { "make clean && make -j`$(nproc)" } else { "make -j`$(nproc)" }
-Write-Host "Building Pokemon Go World..."
+Write-Host "Building Pokemon Regionalidades..."
 & wsl.exe -d Ubuntu -- bash -lc "cd '$wslPath' && $buildAction"
 if ($LASTEXITCODE -ne 0) {
     throw "ROM build failed."
 }
 
-$romPath = Join-Path $projectRoot "pokemon_go_world.gba"
+$romPath = Join-Path $projectRoot "pokemon_regionalidades.gba"
 if (-not (Test-Path $romPath)) {
-    throw "The build finished but pokemon_go_world.gba was not found."
+    throw "The build finished but pokemon_regionalidades.gba was not found."
 }
 
 Write-Host "ROM ready: $romPath"

@@ -1,7 +1,7 @@
 GAME_VERSION ?= EMERALD
-TITLE        ?= PKMN GO WRLD
-GAME_CODE    ?= BGWP
-BUILD_NAME   ?= mon_go_world
+TITLE        ?= PKMN REGION
+GAME_CODE    ?= BRGP
+BUILD_NAME   ?= mon_regionalidades
 MAP_VERSION  ?= emerald
 
 ifeq (firered, $(or $(BUILD), $(MAKECMDGOALS)))

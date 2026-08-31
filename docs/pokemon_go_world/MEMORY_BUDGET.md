@@ -1,5 +1,7 @@
 # Orçamento de memória e política de conteúdo
 
+> Documento técnico criado antes da mudança de nome para Pokémon Regionalidades. Seus nomes antigos foram preservados para manter o histórico reproduzível.
+
 ## Medição de referência
 
 A ROM jogável de 1º de agosto de 2026 usa 26.650.720 bytes (25,42 MiB) dos

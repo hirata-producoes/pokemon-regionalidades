@@ -1,5 +1,7 @@
 # Pokémon Go World — visão e arquitetura
 
+> Documento histórico anterior à mudança de nome para Pokémon Regionalidades. Para o estado atual, consulte [a documentação principal](../pokemon_regionalidades/README.md).
+
 ## Visão
 
 Pokémon Go World será uma aventura de mundo aberto baseada em Pokémon Emerald,

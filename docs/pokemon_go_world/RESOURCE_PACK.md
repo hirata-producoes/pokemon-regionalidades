@@ -1,5 +1,7 @@
 # Pacote externo de recursos do PC
 
+> Documento histórico do primeiro protótipo. O pacote público atual chama-se `pokemon_regionalidades.pak`; identificadores internos antigos continuam compatíveis.
+
 O alvo PC gera `pokemon_go_world.pak` ao lado de `pokemon_go_world-pc.exe`. O pacote não é uma ROM GBA e não possui o limite de 32 MiB. Ele foi projetado para receber gradualmente gráficos, áudio e outros dados grandes sem aumentar o executável.
 
 ## Como adicionar um recurso

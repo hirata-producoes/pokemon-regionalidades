@@ -84,8 +84,8 @@ struct SiiRtcInfo internalClock;
 static time_t sRtcOffsetSeconds;
 
 static FILE *sSaveFile = NULL;
-static char sSavePath[1024] = "pokemon_go_world.sav";
-static char sConfigPath[1024] = "pokemon_go_world.cfg";
+static char sSavePath[1024] = "pokemon_regionalidades.sav";
+static char sConfigPath[1024] = "pokemon_regionalidades.cfg";
 static u8 sBorderBackground;
 static bool sHasBorderBackgroundConfig;
 static u8 sBackgroundOrderVersion;
@@ -107,9 +107,64 @@ static void StoreConfigFile(void);
 static void ApplyPlatformSettings(void);
 static void StoreSaveFile(void);
 static void CloseSaveFile(void);
+static bool FileExists(const char *path);
+static void CopyLegacyFileIfNeeded(const char *legacyPath, const char *newPath);
 
 static void UpdateInternalClock(void);
 static void SetInternalClockFromRtc(const struct SiiRtcInfo *rtc, bool includeDate);
+
+static bool FileExists(const char *path)
+{
+    FILE *file = fopen(path, "rb");
+    if (file == NULL)
+        return false;
+    fclose(file);
+    return true;
+}
+
+static void CopyLegacyFileIfNeeded(const char *legacyPath, const char *newPath)
+{
+    unsigned char buffer[4096];
+    size_t bytesRead;
+    bool failed = false;
+    FILE *source;
+    FILE *destination;
+
+    if (FileExists(newPath) || !FileExists(legacyPath))
+        return;
+
+    source = fopen(legacyPath, "rb");
+    destination = fopen(newPath, "wb");
+    if (source == NULL || destination == NULL)
+    {
+        if (source != NULL)
+            fclose(source);
+        if (destination != NULL)
+            fclose(destination);
+        remove(newPath);
+        return;
+    }
+
+    while ((bytesRead = fread(buffer, 1, sizeof(buffer), source)) != 0)
+    {
+        if (fwrite(buffer, 1, bytesRead, destination) != bytesRead)
+        {
+            failed = true;
+            break;
+        }
+    }
+    if (ferror(source))
+        failed = true;
+
+    fclose(source);
+    if (fclose(destination) != 0)
+        failed = true;
+
+    if (failed)
+        remove(newPath);
+    else
+        DBGPRINTF("PC port: copied legacy file %s to %s\n", legacyPath, newPath);
+}
 
 #ifdef __ANDROID__
 static void HandleTouchEvent(const SDL_TouchFingerEvent *event);
@@ -157,9 +212,13 @@ int main(int argc, char **argv)
     DBGPRINTF("PC port: SDL initialized\n");
 
     {
-        const char *resourcePackPath = SDL_getenv("POKEMON_GO_WORLD_RESOURCE_PACK");
+        const char *resourcePackPath = SDL_getenv("POKEMON_REGIONALIDADES_RESOURCE_PACK");
         if (resourcePackPath == NULL || resourcePackPath[0] == '\0')
-            resourcePackPath = "pokemon_go_world.pak";
+            resourcePackPath = SDL_getenv("POKEMON_GO_WORLD_RESOURCE_PACK");
+        if (resourcePackPath == NULL || resourcePackPath[0] == '\0')
+            resourcePackPath = FileExists("pokemon_regionalidades.pak")
+                ? "pokemon_regionalidades.pak"
+                : "pokemon_go_world.pak";
         ResourcePack_Open(resourcePackPath);
     }
 
@@ -175,10 +234,19 @@ int main(int argc, char **argv)
     char *prefPath = SDL_GetPrefPath("pokeemerald", "pokeemerald");
     if (prefPath != NULL)
     {
-        SDL_snprintf(sSavePath, sizeof(sSavePath), "%spokemon_go_world.sav", prefPath);
-        SDL_snprintf(sConfigPath, sizeof(sConfigPath), "%spokemon_go_world.cfg", prefPath);
+        char legacySavePath[1024];
+        char legacyConfigPath[1024];
+        SDL_snprintf(sSavePath, sizeof(sSavePath), "%spokemon_regionalidades.sav", prefPath);
+        SDL_snprintf(sConfigPath, sizeof(sConfigPath), "%spokemon_regionalidades.cfg", prefPath);
+        SDL_snprintf(legacySavePath, sizeof(legacySavePath), "%spokemon_go_world.sav", prefPath);
+        SDL_snprintf(legacyConfigPath, sizeof(legacyConfigPath), "%spokemon_go_world.cfg", prefPath);
+        CopyLegacyFileIfNeeded(legacySavePath, sSavePath);
+        CopyLegacyFileIfNeeded(legacyConfigPath, sConfigPath);
         SDL_free(prefPath);
     }
+#else
+    CopyLegacyFileIfNeeded("pokemon_go_world.sav", sSavePath);
+    CopyLegacyFileIfNeeded("pokemon_go_world.cfg", sConfigPath);
 #endif
     DBGPRINTF("PC port: reading save\n");
     ReadSaveFile(sSavePath);
@@ -190,7 +258,7 @@ int main(int argc, char **argv)
     SDL_SetHint(SDL_HINT_ORIENTATIONS, "LandscapeLeft LandscapeRight");
 #endif
 #if defined(NATIVE_LINUX) || defined(_WIN32)
-    sdlWindow = SDL_CreateWindow("Pokemon Emerald", SDL_WINDOWPOS_CENTERED, SDL_WINDOWPOS_CENTERED, 1280, 720, SDL_WINDOW_SHOWN | SDL_WINDOW_RESIZABLE);
+    sdlWindow = SDL_CreateWindow("Pokemon Regionalidades", SDL_WINDOWPOS_CENTERED, SDL_WINDOWPOS_CENTERED, 1280, 720, SDL_WINDOW_SHOWN | SDL_WINDOW_RESIZABLE);
 #else
     sdlWindow = SDL_CreateWindow("pokeemerald", SDL_WINDOWPOS_CENTERED, SDL_WINDOWPOS_CENTERED, DISPLAY_WIDTH * videoScale, DISPLAY_HEIGHT * videoScale, SDL_WINDOW_SHOWN | SDL_WINDOW_RESIZABLE);
 #endif

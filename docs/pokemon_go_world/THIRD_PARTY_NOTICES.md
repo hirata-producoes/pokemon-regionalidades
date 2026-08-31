@@ -1,5 +1,7 @@
 # Avisos de terceiros do porte PC
 
+> Estes avisos continuam aplicáveis ao Pokémon Regionalidades e devem acompanhar qualquer distribuição do porte.
+
 ## pokeemerald-multiplatform
 
 Partes da camada de plataforma, do sequenciador MP2K e do mixer de áudio foram
