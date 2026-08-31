@@ -1,66 +1,98 @@
-# Pokémon Go World
+# Pokémon Regionalidades
 
-Projeto pessoal de um RPG Pokémon mundial e aberto, desenvolvido sobre
-`pokeemerald-expansion`. O objetivo é conectar as regiões da série por novas
-rotas e meios de transporte, com escolha da região inicial, dificuldade,
-horário, estações e clima dinâmico.
+Pokémon Regionalidades é um projeto de estudo e desenvolvimento de jogos que explora como transformar uma base criada para Game Boy Advance em uma experiência multirregional com versão nativa para PC.
 
-O desenvolvimento está dividido em entregas jogáveis. Consulte
-[`docs/pokemon_go_world/PROJECT.md`](docs/pokemon_go_world/PROJECT.md) para o
-escopo, as decisões técnicas e o roteiro atual.
+O projeto começou sobre o `pokeemerald-expansion`, que por sua vez deriva da descompilação comunitária de Pokémon Emerald. A lógica de mapas, batalhas, menus, scripts e Pokémon continua compartilhada com o alvo GBA. No PC, uma camada SDL2 substitui serviços específicos do console, como vídeo, entrada, áudio, relógio e armazenamento.
 
-> Estado atual: fundação técnica. O jogo completo ainda não está pronto.
+> O projeto está em desenvolvimento. A fundação técnica funciona, mas o jogo mundial completo ainda não está pronto.
 
-# Base: `pokeemerald-expansion`
+## Por que este repositório existe
 
-![Gif that shows debugging functionality that is unique to pokeemerald-expansion such as rerolling Trainer ID, Cheat Start, PC from Debug Menu, Debug PC Fill, Pokémon Sprite Visualizer, Debug Warp to Map, and Battle Debug Menu](https://github.com/user-attachments/assets/cf9dfbee-4c6b-4bca-8e0a-07f116ef891c) ![Gif that shows overworld functionality that is unique to pokeemerald-expansion such as indoor running, BW2 style map popups, overworld followers, DNA Splicers, Gen 1 style fishing, OW Item descriptions, Quick Run from Battle, Use Last Ball, Wild Double Battles, and Catch from EXP](https://github.com/user-attachments/assets/383af243-0904-4d41-bced-721492fbc48e) ![Gif that shows off a number of modern Pokémon battle mechanics happening in the pokeemerald-expansion engine: 2 vs 1 battles, modern Pokémon, items, moves, abilities, fully customizable opponents and partners, Trainer Slides, and generational gimmicks](https://github.com/user-attachments/assets/50c576bc-415e-4d66-a38f-ad712f3316be)
+Este trabalho tem três objetivos complementares:
 
-<!-- If you want to re-record or change these gifs, here are some notes that I used: https://files.catbox.moe/05001g.md -->
+- desenvolver uma aventura que conecte várias regiões em uma única jornada;
+- estudar arquitetura de jogos, C, build systems, formatos binários e portabilidade;
+- documentar decisões e resultados de forma útil para iniciantes, colaboradores e portfólio profissional.
 
-**`pokeemerald-expansion`** is a GBA ROM hack base that equips developers with a comprehensive toolkit for creating Pokémon ROM hacks. **`pokeemerald-expansion`** is built on top of [pret's `pokeemerald`](https://github.com/pret/pokeemerald) decompilation project. **It is not a playable Pokémon game on its own.**
+Não é necessário dominar emulação ou programação de baixo nível para começar a ler. A documentação apresenta os termos técnicos quando eles se tornam necessários e aponta os arquivos responsáveis por cada parte.
 
-# [Features](FEATURES.md)
+## Estado atual
 
-**`pokeemerald-expansion`** offers hundreds of features from various [core series Pokémon games](https://bulbapedia.bulbagarden.net/wiki/Core_series), along with popular quality-of-life enhancements designed to streamline development and improve the player experience. A full list of those features can be found in [`FEATURES.md`](FEATURES.md).
+O porte para Windows já compila o jogo nativamente, renderiza por SDL2, aceita teclado e controle, salva, usa RTC, reproduz áudio MP2K e executa mapas, menus e batalhas. Milhares de recursos são lidos de `pokemon_regionalidades.pak` sob demanda.
 
-# [Credits](CREDITS.md)
+Layouts de mapas já foram preparados para o pacote externo e compilam, mas sua validação completa em execução ainda está em andamento. Consulte [Estado do projeto](docs/pokemon_regionalidades/STATUS.md) para diferenciar protótipo, implementação e planejamento.
 
- [![](https://img.shields.io/github/all-contributors/rh-hideout/pokeemerald-expansion/upcoming)](CREDITS.md)
+## Regiões
 
-If you use **`pokeemerald-expansion`**, please credit **RHH (Rom Hacking Hideout)**. Optionally, include the version number for clarity.
+Hoenn é a base jogável atual. Kanto possui dados de FireRed/LeafGreen e uma primeira integração própria em Pallet Town. Johto, Sinnoh, Hisui, Unova, Kalos, Alola, Galar, Paldea e Ilhas Laranja fazem parte do planejamento, com definições de região e iniciais já preparadas, mas ainda não são campanhas completas.
 
+Veja [Regiões e jogos de referência](docs/pokemon_regionalidades/REGIONS.md).
+
+## Duas formas de executar
+
+### Alvo nativo para PC
+
+O programa é recompilado para Windows. Ele não abre uma ROM dentro de um emulador:
+
+```text
+código e dados do projeto
+        |
+        +-- compilador x86 ----> pokemon_regionalidades-pc.exe
+        |
+        +-- geradores ---------> pokemon_regionalidades.pak
 ```
-Based off RHH's pokeemerald-expansion 1.16.3 https://github.com/rh-hideout/pokeemerald-expansion/
-```
 
-Please consider [crediting all contributors](CREDITS.md) involved in the project!
+O pacote externo pode crescer além do limite tradicional de 32 MiB da ROM GBA. Ele mantém um índice de 64 bits e carrega recursos quando são necessários.
 
-# Choosing `pokeemerald` or **`pokeemerald-expansion`**
+### Alvo GBA
 
-- **`pokeemerald-expansion`** supports multiplayer functionality with other games built on **`pokeemerald-expansion`**. It is not compatible with official Pokémon games.
-- If compatibility with official games is important, use [`pokeemerald`](https://github.com/pret/pokeemerald). Otherwise, we recommend using **`pokeemerald-expansion`**.
-- **`pokeemerald-expansion`** incorporates regular updates from `pokeemerald`, including bug fixes and documentation improvements.
+O alvo GBA continua disponível para estudo e compatibilidade. Ele produz `pokemon_regionalidades.gba` e continua sujeito às limitações reais do console. A ROM e os saves compilados localmente não são distribuídos neste repositório.
 
-# [Getting Started](INSTALL.md)
+## Começando
 
-❗❗ **Important**: Do not use GitHub's "Download Zip" option as it will not include commit history. This is necessary if you want to update or merge other feature branches.
+- [Compilar no Windows](docs/pokemon_regionalidades/BUILDING_WINDOWS.md)
+- [Compilar o alvo GBA](docs/pokemon_regionalidades/BUILDING_GBA.md)
+- [Entender a arquitetura](docs/pokemon_regionalidades/ARCHITECTURE.md)
+- [Consultar o roteiro](docs/pokemon_regionalidades/ROADMAP.md)
+- [Aprender como contribuir](docs/pokemon_regionalidades/CONTRIBUTING.md)
+- [Consultar créditos e referências](docs/pokemon_regionalidades/CREDITS_AND_REFERENCES.md)
+- [Acompanhar o histórico próprio](PROJECT_CHANGELOG.md)
 
-If you're new to git and GitHub, [Team Aqua's Asset Repo](https://github.com/Pawkkie/Team-Aquas-Asset-Repo/) has a [guide to forking and cloning the repository](https://github.com/Pawkkie/Team-Aquas-Asset-Repo/wiki/The-Basics-of-GitHub). Then you can follow one of the following guides:
+O processo completo está no [Relatório técnico do porte PC](docs/pokemon_go_world/RELATORIO_TECNICO_PORTE_PC.md). Ele preserva nomes e caminhos históricos quando isso é necessário para reproduzir etapas anteriores.
 
-## 📥 [Installing **`pokeemerald-expansion`**](INSTALL.md)
-## 🏗️ [Building **`pokeemerald-expansion`**](INSTALL.md#Building-pokeemerald-expansion)
-## 🚚 [Migrating from **`pokeemerald`**](INSTALL.md#Migrating-from-pokeemerald)
-## 🚀 [Updating **`pokeemerald-expansion`**](INSTALL.md#Updating-pokeemerald-expansion)
+## Organização do código
 
-# [Documentation](https://rh-hideout.github.io/pokeemerald-expansion/)
+| Caminho | Conteúdo |
+|---|---|
+| `src` | lógica do jogo e implementações de plataforma |
+| `src/platform` | SDL2, renderização, BIOS, DMA, áudio e pacote externo |
+| `include` | interfaces, tipos, constantes e configurações |
+| `data` | mapas, scripts e dados montados |
+| `graphics` e `sound` | recursos gráficos e de áudio |
+| `resources/pc` | manifesto do pacote externo |
+| `tools/pokemon_go_world` | ferramentas e geradores; o nome é legado |
+| `docs/pokemon_regionalidades` | documentação atual |
+| `docs/pokemon_go_world` | registros anteriores à troca de nome |
 
-For detailed documentation, visit the [pokeemerald-expansion documentation page](https://rh-hideout.github.io/pokeemerald-expansion/).
+O namespace interno `PGW_*` e alguns diretórios antigos foram mantidos temporariamente. Renomeá-los de uma só vez produziria uma alteração ampla e difícil de revisar. Eles serão migrados gradualmente.
 
-# [Contributions](CONTRIBUTING.md)
-If you are looking to [report a bug](CONTRIBUTING.md#Bug-Report), [open a pull request](CONTRIBUTING.md#Pull-Requests), or [request a feature](CONTRIBUTING.md#Feature-Request), our [`CONTRIBUTING.md`](CONTRIBUTING.md) has guides for each.
+## Base e referências
 
-# [Community](https://discord.gg/6CzjAG6GZk)
+- [pret/pokeemerald](https://github.com/pret/pokeemerald)
+- [rh-hideout/pokeemerald-expansion](https://github.com/rh-hideout/pokeemerald-expansion), versão-base 1.16.3
+- [gradenGnostic/pokeemerald-multiplatform](https://github.com/gradenGnostic/pokeemerald-multiplatform), commit `2f35335eff69ea1a08ebf19e64ea4d97ff6c0a05`
+- [SDL](https://github.com/libsdl-org/SDL)
 
-[![](https://dcbadge.limes.pink/api/server/6CzjAG6GZk)](https://discord.gg/6CzjAG6GZk)
+Os créditos herdados permanecem em [CREDITS.md](CREDITS.md). As atribuições do porte estão em [THIRD_PARTY_NOTICES.md](docs/pokemon_go_world/THIRD_PARTY_NOTICES.md).
 
-Our community uses the [ROM Hacking Hideout (RHH) Discord server](https://discord.gg/6CzjAG6GZk) to communicate and organize. Most of our discussions take place there, and we welcome anybody to join us!
+## Uso educacional e portfólio
+
+O repositório pode ser estudado por temas: C, Git, compilação cruzada, Makefiles, abstração de hardware, formatos binários, hashes, CRC, relocações, carregamento sob demanda, testes de jogos e documentação técnica.
+
+O código não deve ser tratado como exemplo perfeito ou produto concluído. Os documentos registram acertos, limitações, falhas encontradas e decisões provisórias porque esses elementos também fazem parte do aprendizado.
+
+## Avisos legais
+
+Pokémon Regionalidades é um projeto independente, não oficial e sem afiliação com Nintendo, Game Freak, Creatures Inc. ou The Pokémon Company.
+
+Pokémon e propriedades relacionadas pertencem aos seus respectivos titulares. A presença de código e recursos de diferentes origens não significa que todo o conteúdo esteja sob uma única licença. Consulte [Avisos legais e distribuição](docs/pokemon_regionalidades/LEGAL.md) antes de redistribuir qualquer build.

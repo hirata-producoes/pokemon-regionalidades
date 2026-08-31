@@ -5,7 +5,7 @@
 #endif
 
 // Native PC builds use the symbols below only as stable identifiers. Their
-// compressed picture and palette data lives in pokemon_go_world.pak and is
+// compressed picture and palette data lives in pokemon_regionalidades.pak and is
 // resolved on demand by the generated Pokemon resource table.
 #ifdef PORTABLE
 #define PC_EXTERNAL_POKEMON_PIC(...) {0}

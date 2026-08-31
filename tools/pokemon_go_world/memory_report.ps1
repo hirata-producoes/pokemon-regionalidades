@@ -7,7 +7,7 @@ $ErrorActionPreference = "Stop"
 $projectRoot = (Resolve-Path (Join-Path $PSScriptRoot "..\..")).Path
 
 if ([string]::IsNullOrWhiteSpace($MapPath)) {
-    $MapPath = Join-Path $projectRoot "pokemon_go_world.map"
+    $MapPath = Join-Path $projectRoot "pokemon_regionalidades.map"
 }
 
 if (-not (Test-Path -LiteralPath $MapPath)) {
@@ -75,7 +75,7 @@ $rows = @(
     New-BudgetRow 'IWRAM' $iwramUsed $iwramLimit $recommendedIwramReserve
 )
 
-Write-Host "Pokemon Go World memory budget"
+Write-Host "Pokemon Regionalidades memory budget"
 $rows | Format-Table -AutoSize
 Write-Host ('ROM available for planned content after the 1.5 MiB safety reserve: {0:N2} MiB' -f (($romLimit - $romUsed - $recommendedRomReserve) / 1MB))
 

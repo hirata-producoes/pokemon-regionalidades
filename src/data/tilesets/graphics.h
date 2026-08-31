@@ -3049,7 +3049,7 @@ const u32 gTilesetTiles_General_Frlg[] = INCGFX_U32("data/tilesets/primary/gener
 
 #endif // IS_FRLG
 
-// Pokemon Go World selectively makes Kanto outdoor tilesets available to the
+// Pokemon Regionalidades selectively makes Kanto outdoor tilesets available to the
 // Emerald build. Keep this list limited to maps explicitly enabled for the
 // unified world so the rest of the FRLG graphics remain excluded.
 #if !IS_FRLG

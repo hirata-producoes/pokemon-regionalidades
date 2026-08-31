@@ -73,7 +73,7 @@
 #define GEN_LATEST GEN_9
 
 // General settings
-#define EXPANSION_INTRO              FALSE   // Pokémon Go World uses its own presentation instead of the RHH showcase intro.
+#define EXPANSION_INTRO              FALSE   // Pokémon Regionalidades uses its own presentation instead of the RHH showcase intro.
 #define PHONEMES_SHARED              TRUE    // Bard is not part of the core world campaign; share its phoneme sample to save ROM space.
 
 // Measurement system constants to be used for UNITS

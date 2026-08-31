@@ -269,7 +269,7 @@
                                           // This var should never remain non-zero long enough for the player to save.
                                           // For better wild AI handling, edit GetWildAiFlags() in src/battle_ai_main.c
 
-#define B_VAR_DIFFICULTY            VAR_PGW_DIFFICULTY // Pokémon Go World difficulty selected by the player.
+#define B_VAR_DIFFICULTY            VAR_PGW_DIFFICULTY // Difficulty selected by the Pokémon Regionalidades player.
 
 // No bag settings
 #define NO_BAG_RESTRICTION       0
