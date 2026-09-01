@@ -103,3 +103,29 @@ TEST("Pokemon Regionalidades exposes stable season names for the environmental p
     EXPECT_NE(Pgw_GetSeasonName(PGW_SEASON_AUTUMN), Pgw_GetSeasonName(PGW_SEASON_WINTER));
     EXPECT_EQ(Pgw_GetSeasonName(PGW_SEASON_COUNT), Pgw_GetSeasonName(PGW_SEASON_SPRING));
 }
+
+TEST("Pokemon Regionalidades climate stays stable inside each six-hour forecast slot")
+{
+    enum PgwClimate first = Pgw_CalculateClimate(0x1234, PGW_SEASON_SPRING, 10, PGW_START_HOENN, 1, 1, 0);
+    enum PgwClimate later = Pgw_CalculateClimate(0x1234, PGW_SEASON_SPRING, 10, PGW_START_HOENN, 1, 1, 3);
+
+    EXPECT_LT(first, PGW_CLIMATE_COUNT);
+    EXPECT_EQ(first, later);
+}
+
+TEST("Pokemon Regionalidades forecast remains identical after crossing midnight")
+{
+    u16 todaySeed = 0x4567;
+    u16 tomorrowSeed = Pgw_CalculateWeatherSeedAfterDays(todaySeed, 1);
+    enum PgwClimate forecast = Pgw_CalculateClimate(todaySeed, PGW_SEASON_SPRING, 30, PGW_START_HOENN, 1, 23, 2);
+    enum PgwClimate observed = Pgw_CalculateClimate(tomorrowSeed, PGW_SEASON_SUMMER, 1, PGW_START_HOENN, 1, 1, 0);
+
+    EXPECT_EQ(forecast, observed);
+}
+
+TEST("Pokemon Regionalidades exposes stable climate names for the environmental popup")
+{
+    EXPECT_NE(Pgw_GetClimateName(PGW_CLIMATE_CLEAR), Pgw_GetClimateName(PGW_CLIMATE_RAIN));
+    EXPECT_NE(Pgw_GetClimateName(PGW_CLIMATE_RAIN), Pgw_GetClimateName(PGW_CLIMATE_FOG));
+    EXPECT_EQ(Pgw_GetClimateName(PGW_CLIMATE_COUNT), Pgw_GetClimateName(PGW_CLIMATE_CLEAR));
+}

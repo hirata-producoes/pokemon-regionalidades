@@ -50,14 +50,18 @@ As decisões D-023, D-029 e D-052 formam a base ambiental:
 | rotação Primavera→Verão→Outono→Inverno | Contrato criado e testado | `Pgw_CalculateSeasonAfterDays` |
 | avanço enquanto o jogo está fechado | Integrada e compilada no PC | âncora real de 32 bits nas variáveis `VAR_PGW_REAL_TIME_ANCHOR_*` |
 | pausa seletiva em menus | Integrada e compilada no PC; teste manual pendente | pausa transitória em `FakeRtc_SetMenuPaused`, acionada pelo start menu |
-| estado ambiental de mapas descarregados | Planejada | exige registro lógico por área/grupo de mapas |
-| apresentação ambiental | Protótipo integrado e compilado no PC | popup de área mostra estação/dia à esquerda e horário à direita; HUD/Rotom final ainda não foi congelado |
+| estado ambiental de mapas descarregados | Protótipo integrado e compilado no PC | condição reconstruída por seed, estação, região, área e bloco horário, sem reroll por carregamento |
+| previsão natural de 24 horas | Contrato criado e testado | quatro blocos determinísticos de seis horas; interface do Rotom ainda não implementada |
+| primeira reação ambiental de mapa | Protótipo integrado e compilado no PC | mapa externo de Littleroot traduz a condição lógica para clima visual |
+| apresentação ambiental | Protótipo integrado e compilado no PC | popup de área mostra estação, dia, clima e horário; HUD/Rotom final ainda não foi congelado |
 
 A âncora offline ocupa duas variáveis que estavam livres no save, sem aumentar `SaveBlock1`, `SaveBlock2` ou `SaveBlock3`. Saves anteriores começam com âncora zero: no primeiro carregamento eles apenas registram o horário atual, evitando aplicar retroativamente um intervalo desconhecido. Se o relógio do computador ou cartucho voltar no tempo, o jogo atualiza a âncora sem reduzir o World Clock.
 
 A pausa de menu não usa `OW_FLAG_PAUSE_TIME`, porque esse flag pertence ao save e é destinado a scripts. O estado do menu é transitório e existe somente durante a execução. Ao voltar ao mundo, a âncora de tempo real é sincronizada para impedir que os minutos pausados sejam reaplicados posteriormente como avanço offline.
 
-O popup de área da geração 5 foi escolhido como primeiro protótipo de apresentação porque já mostrava o horário e existe nos dois alvos. A faixa secundária agora apresenta `ESTAÇÃO DD` à esquerda e o horário em 24 horas à direita. Essa solução serve para validar legibilidade e utilidade durante a vertical slice; ela não define o HUD permanente nem substitui o futuro protótipo do Rotom Phone. Clima e fase de transição ainda não aparecem nessa faixa.
+O popup de área da geração 5 foi escolhido como primeiro protótipo de apresentação porque já mostrava o horário e existe nos dois alvos. A faixa secundária agora apresenta `ESTAÇÃO DD CLIMA` à esquerda e o horário em 24 horas à direita. Essa solução serve para validar legibilidade e utilidade durante a vertical slice; ela não define o HUD permanente nem substitui o futuro protótipo do Rotom Phone. A fase de transição ainda não aparece nessa faixa.
+
+O clima lógico usa blocos de seis horas e uma janela determinística de 24 horas. Os pesos sazonais atuais são valores de protótipo: D-029 exige continuidade, mas a fórmula ecológica e os perfis de bioma ainda não estão congelados. Consulte [Sistema ambiental](ENVIRONMENT_SYSTEM.md).
 
 ## Registro resumido das decisões
 

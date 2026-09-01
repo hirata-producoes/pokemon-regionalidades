@@ -84,6 +84,7 @@ static void UpdatePerMinute(struct Time *localTime)
         {
             BerryTreeTimeUpdate(minutes);
             gSaveBlock2Ptr->lastBerryTreeUpdate = *localTime;
+            UpdateDynamicWeather();
         }
     }
 }

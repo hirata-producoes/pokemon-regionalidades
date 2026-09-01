@@ -4,9 +4,11 @@
 #include "fieldmap.h"
 #include "field_weather.h"
 #include "overworld.h"
+#include "pokemon_go_world.h"
 #include "random.h"
 #include "script.h"
 #include "constants/region_map_sections.h"
+#include "constants/layouts.h"
 #include "constants/weather.h"
 #include "constants/songs.h"
 #include "constants/rgb.h"
@@ -2512,6 +2514,14 @@ static u8 TranslateWeatherNum(u8);
 static void UpdateRainCounter(u8, u8);
 static u8 GetDynamicWeather(void);
 
+static bool32 UsesRegionalidadesDynamicWeather(void)
+{
+    // Vertical-slice profile. Keeping this opt-in prevents the prototype from
+    // overriding Hoenn's scripted, indoor, underwater and story weather.
+    return gMapHeader.regionMapSectionId == MAPSEC_LITTLEROOT_TOWN
+        && gMapHeader.mapLayoutId == LAYOUT_LITTLEROOT_TOWN;
+}
+
 void SetSavedWeather(u32 weather)
 {
     u8 oldWeather = gSaveBlock1Ptr->weather;
@@ -2527,7 +2537,9 @@ u8 GetSavedWeather(void)
 void SetSavedWeatherFromCurrMapHeader(void)
 {
     u8 oldWeather = gSaveBlock1Ptr->weather;
-    gSaveBlock1Ptr->weather = TranslateWeatherNum(gMapHeader.weather);
+    u8 mapWeather = UsesRegionalidadesDynamicWeather() ? WEATHER_DYNAMIC : gMapHeader.weather;
+
+    gSaveBlock1Ptr->weather = TranslateWeatherNum(mapWeather);
     UpdateRainCounter(gSaveBlock1Ptr->weather, oldWeather);
 }
 
@@ -2609,13 +2621,12 @@ struct DynamicWeatherPool
 
 static const u8 sDefaultDynamicWeathers[] =
 {
-    WEATHER_SUNNY,
-    WEATHER_RAIN,
-    WEATHER_SNOW,
-    WEATHER_SANDSTORM,
-    WEATHER_VOLCANIC_ASH,
-    WEATHER_RAIN_THUNDERSTORM,
-    WEATHER_DROUGHT,
+    [PGW_CLIMATE_CLEAR] = WEATHER_SUNNY,
+    [PGW_CLIMATE_CLOUDY] = WEATHER_SUNNY_CLOUDS,
+    [PGW_CLIMATE_RAIN] = WEATHER_RAIN,
+    [PGW_CLIMATE_STORM] = WEATHER_RAIN_THUNDERSTORM,
+    [PGW_CLIMATE_FOG] = WEATHER_FOG_HORIZONTAL,
+    [PGW_CLIMATE_WIND] = WEATHER_SUNNY_CLOUDS,
 };
 
 /*static const u8 sDynamicWeathers_DewfordTown[] =
@@ -2651,21 +2662,16 @@ static u8 GetDynamicWeather(void)
 {
     u8 count;
     const u8 *weathers = GetDynamicWeatherPool(&count);
-    rng_value_t localRngState;
-    const u32 hashPieces[] =
+    enum PgwClimate climate = Pgw_GetCurrentClimate(gMapHeader.regionMapSectionId);
+
+    if (count != PGW_CLIMATE_COUNT)
     {
-        gSaveBlock1Ptr->dailySeed,
-        gSaveBlock1Ptr->location.mapGroup,
-        gSaveBlock1Ptr->location.mapNum,
-        gMapHeader.mapLayoutId,
-        gMapHeader.regionMapSectionId,
-    };
-
-    if (count == 0)
+        weathers = sDefaultDynamicWeathers;
+        count = ARRAY_COUNT(sDefaultDynamicWeathers);
+    }
+    if (climate >= count)
         return WEATHER_NONE;
-
-    localRngState = LocalRandomSeed(Crc32B((const u8 *)hashPieces, sizeof(hashPieces)));
-    return weathers[LocalRandom32(&localRngState) % count];
+    return weathers[climate];
 }
 
 static u8 TranslateWeatherNum(u8 weather)
@@ -2700,6 +2706,18 @@ void UpdateWeatherPerDay(u16 increment)
     u16 weatherStage = gSaveBlock1Ptr->weatherCycleStage + increment;
     weatherStage %= WEATHER_CYCLE_LENGTH;
     gSaveBlock1Ptr->weatherCycleStage = weatherStage;
+}
+
+void UpdateDynamicWeather(void)
+{
+    u8 weather;
+
+    if (!UsesRegionalidadesDynamicWeather())
+        return;
+
+    weather = GetDynamicWeather();
+    if (weather != GetSavedWeather())
+        SetWeather(weather);
 }
 
 static void UpdateRainCounter(u8 newWeather, u8 oldWeather)

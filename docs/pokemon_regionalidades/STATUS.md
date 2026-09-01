@@ -28,12 +28,16 @@ O primeiro contrato de gameplay derivado da planilha foi integrado:
 - âncora offline armazenada em duas variáveis antes não utilizadas, sem ampliar os SaveBlocks;
 - menu inicial e submenus pausam o relógio por estado transitório, sem gravar um flag de pausa no save;
 - popup de área apresenta um protótipo compacto com estação, dia sazonal e horário;
+- clima lógico determinístico calculado por estação, região, área e blocos de seis horas;
+- previsão das próximas 24 horas permanece estável e não consome o RNG de gameplay;
+- mapa externo de Littleroot traduz o estado lógico em clima visual e pode atualizar o efeito durante a permanência no mapa;
+- popup de área passou a separar corretamente o texto ambiental do horário e agora inclui a condição climática;
 - cálculo determinístico da troca de estação coberto por testes de fronteira;
 - build nativo para Windows concluído depois da alteração.
 
 O executável recompilado também passou por smoke test isolado: permaneceu estável durante a inicialização, validou o RTC nativo, abriu o pacote de 11.564 recursos e produziu frames da introdução sem usar o save de desenvolvimento.
 
-Os casos de teste da pausa e dos nomes sazonais foram adicionados e compilados no alvo de testes. A execução automatizada continua pendente porque as ferramentas POSIX do test runner não compilam pelo MinGW e o serviço WSL não estava acessível nesta sessão. Ainda faltam o teste manual da pausa, a validação visual completa do popup e um teste com fechamento e reabertura controlados. Portanto, D-023 está integrada em sua base, mas ainda não está validada por completo.
+Os casos de teste da pausa, dos nomes sazonais, da estabilidade climática no bloco de seis horas e da previsão através da meia-noite foram adicionados e compilados no alvo de testes. A execução automatizada continua pendente porque as ferramentas POSIX do test runner não compilam pelo MinGW e o serviço WSL não estava acessível nesta sessão. Ainda faltam o teste manual da pausa, a validação visual completa do popup e de Littleroot, a mudança climática ao vivo e um teste com fechamento e reabertura controlados. Portanto, D-023 e o protótipo de D-029 estão integrados em sua base, mas ainda não estão validados por completo.
 
 Layouts de mapas foram externalizados em 884 recursos. O build foi concluído e `maps.o` diminuiu de 955.473 para 305.313 bytes. Ainda faltam:
 
@@ -66,11 +70,13 @@ Ao iniciar pela primeira vez com o nome novo, o PC copia save e configuração a
 
 ## Última validação de build
 
-Em 31 de agosto de 2026, o alvo Windows foi recompilado depois da integração do World Clock e do protótipo de popup ambiental. O resultado foi:
+Em 1º de setembro de 2026, o alvo Windows foi recompilado depois da integração da previsão climática e do perfil ambiental de Littleroot. O resultado foi:
 
-- executável de 16.594.793 bytes;
+- executável de 16.595.903 bytes;
 - pacote de 16.489.008 bytes;
 - 11.564 recursos indexados;
 - leitura integral do índice do pacote concluída.
+
+O executável permaneceu ativo por 12 segundos em um smoke test isolado. O stderr registrou apenas a ausência opcional das imagens de fundo e borda da janela nativa; não ocorreu encerramento inesperado.
 
 O alvo GBA não foi revalidado nessa execução porque o ambiente do Codex não recebeu acesso ao serviço WSL do Windows. Isso não indica erro no código da ROM; a compilação precisa ser repetida no PowerShell normal do usuário conforme [BUILDING_GBA.md](BUILDING_GBA.md).

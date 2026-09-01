@@ -107,3 +107,68 @@ enum PgwSeasonPhase Pgw_GetSeasonPhaseForDay(u16 seasonDay)
         return PGW_SEASON_PHASE_TRANSITION_OUT;
     return PGW_SEASON_PHASE_ESTABLISHED;
 }
+
+u16 Pgw_CalculateWeatherSeedAfterDays(u16 seed, u32 elapsedDays)
+{
+    if (seed == 0)
+        seed = 1;
+
+    while (elapsedDays--)
+        seed = seed * 25173 + 13849;
+    return seed;
+}
+
+static u32 MixClimateValue(u32 value)
+{
+    // Small deterministic mixer suitable for both GBA and native builds. It
+    // never consumes the gameplay RNG, so opening a forecast cannot alter
+    // encounters, battles or scripts.
+    value ^= value >> 16;
+    value *= 0x7FEB352D;
+    value ^= value >> 15;
+    value *= 0x846CA68B;
+    value ^= value >> 16;
+    return value;
+}
+
+// Cumulative prototype weights for clear, cloudy, rain, storm, fog and wind.
+// They make the vertical slice readable and intentionally remain tuning data,
+// not a frozen ecological model. Biome profiles will refine them later.
+static const u8 sClimateThresholds[PGW_SEASON_COUNT][PGW_CLIMATE_COUNT] =
+{
+    [PGW_SEASON_SPRING] = {35, 60, 82, 88, 96, 100},
+    [PGW_SEASON_SUMMER] = {50, 72, 86, 93, 96, 100},
+    [PGW_SEASON_AUTUMN] = {30, 60, 80, 87, 95, 100},
+    [PGW_SEASON_WINTER] = {30, 65, 80, 84, 94, 100},
+};
+
+enum PgwClimate Pgw_CalculateClimate(u16 seed, enum PgwSeason season, u16 seasonDay, enum PgwStartingRegion region, u16 locationId, u8 currentHour, u8 hoursAhead)
+{
+    u32 absoluteHour = currentHour + hoursAhead;
+    u32 elapsedDays = absoluteHour / HOURS_PER_DAY;
+    u32 climateSlot = absoluteHour % HOURS_PER_DAY / PGW_CLIMATE_SLOT_HOURS;
+    u32 value;
+    u32 roll;
+    enum PgwClimate climate;
+
+    if (region >= PGW_START_REGION_COUNT)
+        region = PGW_DEFAULT_STARTING_REGION;
+
+    seed = Pgw_CalculateWeatherSeedAfterDays(seed, elapsedDays);
+    Pgw_CalculateSeasonAfterDays(season, seasonDay, elapsedDays, &season, &seasonDay);
+
+    value = seed;
+    value ^= (u32)season << 28;
+    value ^= (u32)seasonDay << 20;
+    value ^= (u32)region << 16;
+    value ^= (u32)locationId << 2;
+    value ^= climateSlot;
+    roll = MixClimateValue(value) % 100;
+
+    for (climate = PGW_CLIMATE_CLEAR; climate < PGW_CLIMATE_COUNT; climate++)
+    {
+        if (roll < sClimateThresholds[season][climate])
+            return climate;
+    }
+    return PGW_CLIMATE_CLEAR;
+}

@@ -8,6 +8,12 @@ static const u8 sText_SeasonSpring[] = _("SPRING");
 static const u8 sText_SeasonSummer[] = _("SUMMER");
 static const u8 sText_SeasonAutumn[] = _("AUTUMN");
 static const u8 sText_SeasonWinter[] = _("WINTER");
+static const u8 sText_ClimateClear[] = _("CLEAR");
+static const u8 sText_ClimateCloudy[] = _("CLOUDY");
+static const u8 sText_ClimateRain[] = _("RAIN");
+static const u8 sText_ClimateStorm[] = _("STORM");
+static const u8 sText_ClimateFog[] = _("FOG");
+static const u8 sText_ClimateWind[] = _("WIND");
 
 static const u8 *const sSeasonNames[PGW_SEASON_COUNT] =
 {
@@ -17,10 +23,15 @@ static const u8 *const sSeasonNames[PGW_SEASON_COUNT] =
     [PGW_SEASON_WINTER] = sText_SeasonWinter,
 };
 
-static u16 AdvanceWeatherSeed(u16 seed)
+static const u8 *const sClimateNames[PGW_CLIMATE_COUNT] =
 {
-    return seed * 25173 + 13849;
-}
+    [PGW_CLIMATE_CLEAR] = sText_ClimateClear,
+    [PGW_CLIMATE_CLOUDY] = sText_ClimateCloudy,
+    [PGW_CLIMATE_RAIN] = sText_ClimateRain,
+    [PGW_CLIMATE_STORM] = sText_ClimateStorm,
+    [PGW_CLIMATE_FOG] = sText_ClimateFog,
+    [PGW_CLIMATE_WIND] = sText_ClimateWind,
+};
 
 static bool32 GetRealTimeSeconds(u32 *seconds)
 {
@@ -102,9 +113,7 @@ void Pgw_AdvanceWorldDays(u16 days)
     VarSet(VAR_PGW_SEASON, season);
     VarSet(VAR_PGW_SEASON_DAY, seasonDay);
 
-    seed = VarGet(VAR_PGW_WEATHER_SEED);
-    while (days--)
-        seed = AdvanceWeatherSeed(seed);
+    seed = Pgw_CalculateWeatherSeedAfterDays(VarGet(VAR_PGW_WEATHER_SEED), days);
     VarSet(VAR_PGW_WEATHER_SEED, seed);
 }
 
@@ -170,6 +179,25 @@ u16 Pgw_GetSeasonDay(void)
 enum PgwSeasonPhase Pgw_GetSeasonPhase(void)
 {
     return Pgw_GetSeasonPhaseForDay(Pgw_GetSeasonDay());
+}
+
+enum PgwClimate Pgw_GetCurrentClimate(u16 locationId)
+{
+    RtcCalcLocalTime();
+    return Pgw_CalculateClimate(VarGet(VAR_PGW_WEATHER_SEED),
+                                Pgw_GetSeason(),
+                                Pgw_GetSeasonDay(),
+                                Pgw_GetCurrentRegion(),
+                                locationId,
+                                gLocalTime.hours,
+                                0);
+}
+
+const u8 *Pgw_GetClimateName(enum PgwClimate climate)
+{
+    if (climate >= PGW_CLIMATE_COUNT)
+        climate = PGW_CLIMATE_CLEAR;
+    return sClimateNames[climate];
 }
 
 void Pgw_ScriptSetStartingRegion(void)

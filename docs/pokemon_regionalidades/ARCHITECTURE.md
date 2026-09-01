@@ -23,6 +23,8 @@ mapas, scripts, batalhas e menus
 | `src/platform/dma.c` | modela transferências DMA |
 | `src/platform/cgb_audio.c` | reproduz canais de áudio no estilo CGB |
 | `src/platform/resource_pack.c` | abre, valida e lê o pacote externo |
+| `src/pokemon_regionalidades_clock.c` | cálculos puros de relógio, calendário, seed e previsão climática |
+| `src/pokemon_go_world.c` | estado mundial persistido e consultas ambientais de gameplay |
 | `Makefile_pc` | gera recursos e vincula o executável Windows |
 
 ## Por que ainda é 32 bits
@@ -42,3 +44,5 @@ Músicas e voicegroups contêm referências internas. Seus geradores registram r
 `PGW_*`, `tools/pokemon_go_world` e algumas variáveis de ambiente continuam presentes. Eles formam um namespace interno estável. A interface pública já usa Pokémon Regionalidades; a migração interna será incremental para facilitar revisão e regressão.
 
 Para detalhes de formatos, métricas e histórico, consulte o [relatório técnico](../pokemon_go_world/RELATORIO_TECNICO_PORTE_PC.md).
+
+O fluxo ambiental e seus limites de protótipo estão documentados em [Sistema ambiental](ENVIRONMENT_SYSTEM.md).

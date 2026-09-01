@@ -44,7 +44,9 @@ Fundação ambiental iniciada a partir das decisões D-023, D-029 e D-052:
 - [x] avanço offline com âncora persistida no save;
 - [x] pausa seletiva no menu inicial e seus submenus;
 - [x] protótipo de estação, dia e horário no popup de área;
-- [ ] primeiro mapa reagindo a período, estação e clima.
+- [x] previsão climática determinística em blocos de seis horas;
+- [x] mapa externo de Littleroot ligado ao clima dinâmico como protótipo;
+- [ ] validar visualmente Littleroot em diferentes horários, estações e climas.
 
 Uma *vertical slice* é uma pequena parte do jogo funcionando de ponta a ponta. O objetivo é validar:
 

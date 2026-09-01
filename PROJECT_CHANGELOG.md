@@ -11,6 +11,10 @@ Este arquivo acompanha apenas mudanças específicas do projeto. O `CHANGELOG.md
 - cálculo sazonal separado em API determinística e testes de fronteira adicionados;
 - pausa transitória do World Clock integrada ao menu inicial e aos seus submenus, sem persistir um flag de pausa no save;
 - protótipo de interface ambiental adicionado ao popup de área, mostrando estação, dia sazonal e horário;
+- previsão ambiental determinística criada em blocos de seis horas, estável pelas próximas 24 horas;
+- clima lógico separado de estação e bioma, sem consumir o RNG de gameplay;
+- mapa externo de Littleroot conectado ao primeiro perfil de clima dinâmico;
+- popup ambiental ampliado para mostrar a condição climática e corrigido para separar o texto do horário;
 - identidade pública alterada de Pokémon GO World para Pokémon Regionalidades;
 - executáveis, ROM, pacote de recursos, save e configuração receberam nomes públicos próprios;
 - leitura compatível dos nomes antigos de recursos;
