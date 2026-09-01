@@ -11,6 +11,8 @@ void FakeRtc_ManuallySetTime(u32 day, u32 hour, u32 minute, u32 second);
 void FakeRtc_ForwardTimeTo(u32 hour, u32 minute, u32 second);
 void FakeRtc_TickTimeForward(void);
 u32 FakeRtc_GetSecondsRatio(void);
+void FakeRtc_SetMenuPaused(bool8 paused);
+bool8 FakeRtc_IsMenuPaused(void);
 void Script_PauseFakeRtc(void);
 void Script_ResumeFakeRtc(void);
 void Script_ToggleFakeRtc(void);

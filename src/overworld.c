@@ -56,6 +56,7 @@
 #endif
 #include "play_time.h"
 #include "pokemon.h"
+#include "pokemon_go_world.h"
 #include "random.h"
 #include "roamer.h"
 #include "rotating_gate.h"
@@ -2187,6 +2188,7 @@ void CB2_ContinueSavedGame(void)
         LoadSaveblockObjEventScripts();
 
     UnfreezeObjectEvents();
+    Pgw_ApplyOfflineWorldClock();
     DoTimeBasedEvents();
     UpdateMiscOverworldStates();
     if (gMapHeader.mapLayoutId == LAYOUT_BATTLE_FRONTIER_BATTLE_PYRAMID_FLOOR)

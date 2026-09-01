@@ -34,7 +34,17 @@ Estado: funcional, em validação contínua.
 
 ## Marco 3 — Vertical slice de Hoenn
 
-Estado: próximo marco de jogabilidade.
+Estado: em andamento.
+
+Fundação ambiental iniciada a partir das decisões D-023, D-029 e D-052:
+
+- [x] ritmo 3× durante a execução;
+- [x] calendário de 30 dias e fronteiras sazonais;
+- [x] contrato das fases de transição;
+- [x] avanço offline com âncora persistida no save;
+- [x] pausa seletiva no menu inicial e seus submenus;
+- [x] protótipo de estação, dia e horário no popup de área;
+- [ ] primeiro mapa reagindo a período, estação e clima.
 
 Uma *vertical slice* é uma pequena parte do jogo funcionando de ponta a ponta. O objetivo é validar:
 
@@ -44,6 +54,8 @@ Uma *vertical slice* é uma pequena parte do jogo funcionando de ponta a ponta. 
 - captura e batalha;
 - centro Pokémon, loja e save;
 - retorno ao jogo depois de fechar o programa.
+
+O detalhamento das decisões importadas da planilha está em [DESIGN_PLAN.md](DESIGN_PLAN.md).
 
 ## Marco 4 — Estrutura multirregional
 

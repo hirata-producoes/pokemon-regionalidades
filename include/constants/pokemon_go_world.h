@@ -29,8 +29,19 @@ enum PgwSeason
     PGW_SEASON_COUNT,
 };
 
+// A four-day transition crosses the boundary between two seasons: the final
+// two days of the old season and the first two days of the new one.
+enum PgwSeasonPhase
+{
+    PGW_SEASON_PHASE_ESTABLISHED,
+    PGW_SEASON_PHASE_TRANSITION_OUT,
+    PGW_SEASON_PHASE_TRANSITION_IN,
+};
+
 #define PGW_DEFAULT_STARTING_REGION PGW_START_HOENN
 #define PGW_DEFAULT_SEASON          PGW_SEASON_SPRING
-#define PGW_DAYS_PER_SEASON         28
+#define PGW_WORLD_CLOCK_REALTIME_MULTIPLIER 3
+#define PGW_DAYS_PER_SEASON                 30
+#define PGW_SEASON_TRANSITION_HALF_DAYS      2
 
 #endif // GUARD_CONSTANTS_POKEMON_GO_WORLD_H

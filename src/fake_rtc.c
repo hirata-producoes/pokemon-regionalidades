@@ -9,10 +9,12 @@
 #include "script.h"
 
 static void FakeRtc_CalcTimeDifference(struct Time *result, struct SiiRtcInfo *t1, struct Time *t2);
+static bool8 sMenuPaused;
 
 void FakeRtc_Reset(void)
 {
 #if OW_USE_FAKE_RTC
+    sMenuPaused = FALSE;
     memset(&gSaveBlock3Ptr->fakeRTC, 0, sizeof(gSaveBlock3Ptr->fakeRTC));
     gSaveBlock3Ptr->fakeRTC.year = 0; // offset by gGen3Epoch.year
     gSaveBlock3Ptr->fakeRTC.month = gGen3Epoch.month;
@@ -42,7 +44,7 @@ void FakeRtc_TickTimeForward(void)
     if (!OW_USE_FAKE_RTC)
         return;
 
-    if (FlagGet(OW_FLAG_PAUSE_TIME))
+    if (FlagGet(OW_FLAG_PAUSE_TIME) || sMenuPaused)
         return;
 
     FakeRtc_AdvanceTimeBy(0, 0, 0, FakeRtc_GetSecondsRatio());
@@ -118,8 +120,19 @@ u32 FakeRtc_GetSecondsRatio(void)
 {
     return (OW_ALTERED_TIME_RATIO == GEN_8_PLA)   ? 60 :
            (OW_ALTERED_TIME_RATIO == GEN_9)       ? 20 :
+           (OW_ALTERED_TIME_RATIO == TIME_REGIONALIDADES) ? PGW_WORLD_CLOCK_REALTIME_MULTIPLIER :
            (OW_ALTERED_TIME_RATIO == TIME_DEBUG)  ?  1 :
                                                      1;
+}
+
+void FakeRtc_SetMenuPaused(bool8 paused)
+{
+    sMenuPaused = paused;
+}
+
+bool8 FakeRtc_IsMenuPaused(void)
+{
+    return sMenuPaused;
 }
 
 STATIC_ASSERT((OW_FLAG_PAUSE_TIME == 0 || OW_USE_FAKE_RTC == TRUE), FakeRtcMustBeTrueToPauseTime);
