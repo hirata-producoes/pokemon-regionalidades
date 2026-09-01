@@ -10,6 +10,7 @@
 #include "menu.h"
 #include "map_name_popup.h"
 #include "palette.h"
+#include "pokemon_go_world.h"
 #include "region_map.h"
 #include "rtc.h"
 #include "start_menu.h"
@@ -510,6 +511,11 @@ static void UpdateSecondaryPopUpWindow(u8 secondaryPopUpWindowId)
 {
     u8 mapDisplayHeader[24];
     u8 *withoutPrefixPtr = &(mapDisplayHeader[0]);
+
+    withoutPrefixPtr = StringCopy(mapDisplayHeader, Pgw_GetSeasonName(Pgw_GetSeason()));
+    *withoutPrefixPtr++ = CHAR_SPACE;
+    ConvertIntToDecimalStringN(withoutPrefixPtr, Pgw_GetSeasonDay(), STR_CONV_MODE_LEADING_ZEROS, 2);
+    AddTextPrinterParameterized(secondaryPopUpWindowId, FONT_SMALL, mapDisplayHeader, 5, 8, TEXT_SKIP_DRAW, NULL);
 
     if (OW_POPUP_BW_TIME_MODE != OW_POPUP_BW_TIME_NONE)
     {

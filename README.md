@@ -20,6 +20,8 @@ Não é necessário dominar emulação ou programação de baixo nível para com
 
 O porte para Windows já compila o jogo nativamente, renderiza por SDL2, aceita teclado e controle, salva, usa RTC, reproduz áudio MP2K e executa mapas, menus e batalhas. Milhares de recursos são lidos de `pokemon_regionalidades.pak` sob demanda.
 
+O primeiro sistema importado do planejamento atualizado já entrou na base de gameplay: World Clock 3×, estações de 30 dias, fases de transição e reconciliação do tempo transcorrido com o jogo fechado.
+
 Layouts de mapas já foram preparados para o pacote externo e compilam, mas sua validação completa em execução ainda está em andamento. Consulte [Estado do projeto](docs/pokemon_regionalidades/STATUS.md) para diferenciar protótipo, implementação e planejamento.
 
 ## Regiões
@@ -53,6 +55,7 @@ O alvo GBA continua disponível para estudo e compatibilidade. Ele produz `pokem
 - [Compilar no Windows](docs/pokemon_regionalidades/BUILDING_WINDOWS.md)
 - [Compilar o alvo GBA](docs/pokemon_regionalidades/BUILDING_GBA.md)
 - [Entender a arquitetura](docs/pokemon_regionalidades/ARCHITECTURE.md)
+- [Consultar o planejamento de design](docs/pokemon_regionalidades/DESIGN_PLAN.md)
 - [Consultar o roteiro](docs/pokemon_regionalidades/ROADMAP.md)
 - [Aprender como contribuir](docs/pokemon_regionalidades/CONTRIBUTING.md)
 - [Consultar créditos e referências](docs/pokemon_regionalidades/CREDITS_AND_REFERENCES.md)

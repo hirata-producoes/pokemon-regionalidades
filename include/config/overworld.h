@@ -87,11 +87,12 @@
 // These defines only make a distinction for OW_ALTERED_TIME_RATIO
 #define GEN_8_PLA                       GEN_COUNT + 2
 #define TIME_DEBUG                      GEN_COUNT + 3
+#define TIME_REGIONALIDADES             GEN_COUNT + 4
 
 // Time
 #define OW_TIMES_OF_DAY                 GEN_LATEST   // Different generations have the times of day change at different times.
-#define OW_USE_FAKE_RTC                 TRUE         // The world clock advances from play time instead of the host's real clock.
-#define OW_ALTERED_TIME_RATIO           GEN_LATEST   // In GEN_8_PLA, the time in game moves forward 60 seconds for every second in the RTC. In GEN_9, it is 20 seconds. TIME_DEBUG is 1:1, and meant for debugging purposes. This has no effect if OW_USE_FAKE_RTC is FALSE.
+#define OW_USE_FAKE_RTC                 TRUE         // The persisted world clock advances during play; Regionalidades also reconciles elapsed real time when loading.
+#define OW_ALTERED_TIME_RATIO           TIME_REGIONALIDADES // Pokémon Regionalidades uses the 3x World Clock specified by decision D-023.
 #define OW_TIME_OF_DAY_ENCOUNTERS       TRUE         // Morning, day and night can use different encounter tables.
 #define OW_TIME_OF_DAY_DISABLE_FALLBACK FALSE        // If TRUE, if the encounter table for a specific map and time is empty, the area will have no encounters instead of falling back to the vanilla map and time.
 #define OW_TIME_OF_DAY_FALLBACK         TIME_MORNING // The time of day that encounter tables fall back to. If you set OW_TIMES_OF_DAY to GEN_3, change this to TIME_DAY or you won't have any encounters!

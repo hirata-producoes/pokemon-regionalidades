@@ -8,8 +8,9 @@ Para conhecer o projeto:
 
 1. [README principal](../../README.md)
 2. [Regiões e jogos de referência](REGIONS.md)
-3. [Estado atual](STATUS.md)
-4. [Roteiro de desenvolvimento](ROADMAP.md)
+3. [Planejamento de design e rastreabilidade](DESIGN_PLAN.md)
+4. [Estado atual](STATUS.md)
+5. [Roteiro de desenvolvimento](ROADMAP.md)
 
 Para estudar o porte:
 

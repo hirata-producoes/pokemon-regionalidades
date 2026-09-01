@@ -12,6 +12,7 @@
 #include "overworld.h"
 #include "hall_of_fame.h"
 #include "pokemon_storage_system.h"
+#include "pokemon_go_world.h"
 #include "trainer_hill.h"
 #include "link.h"
 #include "constants/game_stat.h"
@@ -147,6 +148,7 @@ static u8 WriteSaveSectorOrSlot(u16 sectorId, const struct SaveSectorLocation *l
     u16 i;
 
     gReadWriteSector = &gSaveDataBuffer;
+    Pgw_SnapshotWorldClockRealTime();
 
     if (sectorId != FULL_SAVE_SLOT)
     {

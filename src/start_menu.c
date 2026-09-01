@@ -6,6 +6,7 @@
 #include "bg.h"
 #include "debug.h"
 #include "event_data.h"
+#include "fake_rtc.h"
 #include "event_object_movement.h"
 #include "event_object_lock.h"
 #include "event_scripts.h"
@@ -31,6 +32,7 @@
 #include "party_menu.h"
 #include "pokedex.h"
 #include "pokenav.h"
+#include "pokemon_go_world.h"
 #include "safari_zone.h"
 #include "save.h"
 #include "scanline_effect.h"
@@ -594,6 +596,7 @@ static bool8 FieldCB_ReturnToFieldStartMenu(void)
 
 void ShowReturnToFieldStartMenu(void)
 {
+    FakeRtc_SetMenuPaused(TRUE);
     sInitStartMenuData[0] = 0;
     sInitStartMenuData[1] = 0;
     gFieldCallback2 = FieldCB_ReturnToFieldStartMenu;
@@ -621,6 +624,7 @@ void Task_ShowStartMenu(u8 taskId)
 
 void ShowStartMenu(void)
 {
+    FakeRtc_SetMenuPaused(TRUE);
     if (!IsOverworldLinkActive())
     {
         FreezeObjectEvents();
@@ -822,6 +826,8 @@ static bool8 StartMenuSafariZoneRetireCallback(void)
 
 static void HideStartMenuDebug(void)
 {
+    FakeRtc_SetMenuPaused(FALSE);
+    Pgw_SnapshotWorldClockRealTime();
     PlaySE(SE_SELECT);
     ClearStdWindowAndFrame(GetStartMenuWindowId(), TRUE);
     RemoveStartMenuWindow();
@@ -1495,6 +1501,8 @@ static void HideStartMenuWindow(void)
 
 void HideStartMenu(void)
 {
+    FakeRtc_SetMenuPaused(FALSE);
+    Pgw_SnapshotWorldClockRealTime();
     PlaySE(SE_SELECT);
     HideStartMenuWindow();
 }

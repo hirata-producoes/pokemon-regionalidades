@@ -273,8 +273,8 @@
 #define VAR_PGW_WEATHER_SEED                             0x40FB
 #define VAR_PGW_DIFFICULTY                               0x40FC
 #define VAR_PGW_WORLD_LEVEL                              0x40FD
-#define VAR_UNUSED_0x40FE                                0x40FE // Unused Var
-#define VAR_UNUSED_0x40FF                                0x40FF // Unused Var
+#define VAR_PGW_REAL_TIME_ANCHOR_LO                      0x40FE
+#define VAR_PGW_REAL_TIME_ANCHOR_HI                      0x40FF
 
 #define VARS_END                                         0x40FF
 #define VARS_COUNT                                       (VARS_END - VARS_START + 1)
