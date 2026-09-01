@@ -98,6 +98,12 @@ Execute pelo PowerShell para enxergar a mensagem de erro. Verifique também se o
 
 Confirme que o arquivo foi salvo, que a compilação terminou sem erro e que você está executando o binário recém-gerado.
 
+### `mapjson` falha com `Error 87` ou `Parâmetro incorreto`
+
+O pipeline herdado pode tentar enviar centenas de caminhos de mapas em uma única linha de comando. No Windows, uma regeneração global pode ultrapassar o limite aceito por `CreateProcess`. Isso é um limite do gerador atual, não uma indicação de JSON inválido.
+
+Enquanto o gerador não usar arquivo de resposta ou processamento em lotes, alterações em `data/maps/*/map.json` devem ser feitas e regeneradas pelo ambiente Linux/WSL documentado para o alvo GBA. Não apague arquivos gerados nem reduza a lista de mapas para contornar o erro, pois isso pode produzir uma árvore incompleta.
+
 ## Validação mínima
 
 Antes de publicar uma alteração no alvo PC, verifique:
@@ -108,4 +114,3 @@ Antes de publicar uma alteração no alvo PC, verifique:
 4. o mapa carrega sem artefatos graves;
 5. salvar, fechar e carregar preserva o progresso;
 6. áudio, menus e uma batalha simples funcionam.
-

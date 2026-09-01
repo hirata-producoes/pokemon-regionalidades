@@ -509,19 +509,22 @@ void HideMapNamePopUpWindow(void)
 
 static void UpdateSecondaryPopUpWindow(u8 secondaryPopUpWindowId)
 {
-    u8 mapDisplayHeader[24];
-    u8 *withoutPrefixPtr = &(mapDisplayHeader[0]);
+    u8 environmentalText[32];
+    u8 timeText[16];
+    u8 *dest;
 
-    withoutPrefixPtr = StringCopy(mapDisplayHeader, Pgw_GetSeasonName(Pgw_GetSeason()));
-    *withoutPrefixPtr++ = CHAR_SPACE;
-    ConvertIntToDecimalStringN(withoutPrefixPtr, Pgw_GetSeasonDay(), STR_CONV_MODE_LEADING_ZEROS, 2);
-    AddTextPrinterParameterized(secondaryPopUpWindowId, FONT_SMALL, mapDisplayHeader, 5, 8, TEXT_SKIP_DRAW, NULL);
+    dest = StringCopy(environmentalText, Pgw_GetSeasonName(Pgw_GetSeason()));
+    *dest++ = CHAR_SPACE;
+    dest = ConvertIntToDecimalStringN(dest, Pgw_GetSeasonDay(), STR_CONV_MODE_LEADING_ZEROS, 2);
+    *dest++ = CHAR_SPACE;
+    StringCopy(dest, Pgw_GetClimateName(Pgw_GetCurrentClimate(gMapHeader.regionMapSectionId)));
+    AddTextPrinterParameterized(secondaryPopUpWindowId, FONT_SMALL, environmentalText, 5, 8, TEXT_SKIP_DRAW, NULL);
 
     if (OW_POPUP_BW_TIME_MODE != OW_POPUP_BW_TIME_NONE)
     {
         RtcCalcLocalTime();
-        FormatDecimalTimeWithoutSeconds(withoutPrefixPtr, gLocalTime.hours, gLocalTime.minutes, OW_POPUP_BW_TIME_MODE == OW_POPUP_BW_TIME_24_HR);
-        AddTextPrinterParameterized(secondaryPopUpWindowId, FONT_SMALL, mapDisplayHeader, GetStringRightAlignXOffset(FONT_SMALL, mapDisplayHeader, DISPLAY_WIDTH) - 5, 8, TEXT_SKIP_DRAW, NULL);
+        FormatDecimalTimeWithoutSeconds(timeText, gLocalTime.hours, gLocalTime.minutes, OW_POPUP_BW_TIME_MODE == OW_POPUP_BW_TIME_24_HR);
+        AddTextPrinterParameterized(secondaryPopUpWindowId, FONT_SMALL, timeText, GetStringRightAlignXOffset(FONT_SMALL, timeText, DISPLAY_WIDTH) - 5, 8, TEXT_SKIP_DRAW, NULL);
     }
     CopyWindowToVram(secondaryPopUpWindowId, COPYWIN_FULL);
 }

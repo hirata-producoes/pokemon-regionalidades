@@ -38,10 +38,27 @@ enum PgwSeasonPhase
     PGW_SEASON_PHASE_TRANSITION_IN,
 };
 
+// Logical climate states are deliberately independent from field-weather
+// effects. A biome profile may translate the same state differently (for
+// example, precipitation can become rain or snow) without conflating climate,
+// season and biome.
+enum PgwClimate
+{
+    PGW_CLIMATE_CLEAR,
+    PGW_CLIMATE_CLOUDY,
+    PGW_CLIMATE_RAIN,
+    PGW_CLIMATE_STORM,
+    PGW_CLIMATE_FOG,
+    PGW_CLIMATE_WIND,
+    PGW_CLIMATE_COUNT,
+};
+
 #define PGW_DEFAULT_STARTING_REGION PGW_START_HOENN
 #define PGW_DEFAULT_SEASON          PGW_SEASON_SPRING
 #define PGW_WORLD_CLOCK_REALTIME_MULTIPLIER 3
 #define PGW_DAYS_PER_SEASON                 30
 #define PGW_SEASON_TRANSITION_HALF_DAYS      2
+#define PGW_CLIMATE_SLOT_HOURS                6
+#define PGW_CLIMATE_FORECAST_HOURS           24
 
 #endif // GUARD_CONSTANTS_POKEMON_GO_WORLD_H
