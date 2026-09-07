@@ -963,7 +963,10 @@ static void AnimShakeMonOrBattlePlatforms(struct Sprite *sprite)
         break;
     }
 
-    sprite->sOriginalValue = *(u16 *)(sprite->sShakePtrLo | (sprite->sShakePtrHi << 16));
+    // Sprite data fields are signed 16-bit values. Cast both halves before
+    // rebuilding the pointer so ASLR addresses whose low half starts at
+    // 0x8000 are not sign-extended on the native PC build.
+    sprite->sOriginalValue = *(u16 *)((u16)sprite->sShakePtrLo | ((u32)(u16)sprite->sShakePtrHi << 16));
     sprite->sType = cmd->type;
     if (sprite->sType == SHAKE_MON_X || sprite->sType == SHAKE_MON_Y)
         AnimShakeMonOrBattlePlatforms_UpdateCoordOffsetEnabled();
@@ -983,13 +986,13 @@ static void AnimShakeMonOrBattlePlatforms_Step(struct Sprite *sprite)
         else
         {
             sprite->sShakeTimer = sprite->sShakeDuration;
-            *(u16 *)(sprite->sShakePtrLo | (sprite->sShakePtrHi << 16)) += sprite->sShakeVelocity;
+            *(u16 *)((u16)sprite->sShakePtrLo | ((u32)(u16)sprite->sShakePtrHi << 16)) += sprite->sShakeVelocity;
             sprite->sShakeVelocity = -sprite->sShakeVelocity;
         }
     }
     else
     {
-        *(u16 *)(sprite->sShakePtrLo | (sprite->sShakePtrHi << 16)) = sprite->sOriginalValue;
+        *(u16 *)((u16)sprite->sShakePtrLo | ((u32)(u16)sprite->sShakePtrHi << 16)) = sprite->sOriginalValue;
         if (sprite->sType == SHAKE_MON_X || sprite->sType == SHAKE_MON_Y)
         {
             for (enum BattlerId i = 0; i < gBattlersCount; i++)
