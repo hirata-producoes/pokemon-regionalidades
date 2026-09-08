@@ -7,11 +7,19 @@
 
 #ifdef _WIN32
 #include <windows.h>
+#include <shellapi.h>
 #include <xinput.h>
+#include <SDL2/SDL_syswm.h>
+
+extern const void *gPlatformLastCpuSetSource;
+extern void *gPlatformLastCpuSetDestination;
+extern uint32_t gPlatformLastCpuSetControl;
+extern const void *gPlatformLastCpuSetCaller;
 
 static LONG CALLBACK LogNativeException(EXCEPTION_POINTERS *exception)
 {
-    if (exception->ExceptionRecord->ExceptionCode != EXCEPTION_ACCESS_VIOLATION)
+    if (exception->ExceptionRecord->ExceptionCode != EXCEPTION_ACCESS_VIOLATION
+     && exception->ExceptionRecord->ExceptionCode != EXCEPTION_INT_DIVIDE_BY_ZERO)
         return EXCEPTION_CONTINUE_SEARCH;
 
     fprintf(stdout, "PC port exception: code=0x%08lX address=%p eip=%p module=%p\n",
@@ -29,8 +37,14 @@ static LONG CALLBACK LogNativeException(EXCEPTION_POINTERS *exception)
             exception->ContextRecord->Edi,
             stack,
             (void *)(uintptr_t)exception->ContextRecord->Ebp);
+    fprintf(stdout, "Last CpuSet: src=%p dst=%p control=%08lX caller=%p\n",
+            gPlatformLastCpuSetSource,
+            gPlatformLastCpuSetDestination,
+            (unsigned long)gPlatformLastCpuSetControl,
+            gPlatformLastCpuSetCaller);
     for (int i = 0; i < 20; i++)
         fprintf(stdout, " stack[%02d]=%08lX%s", i, stack[i], i % 4 == 3 ? "\n" : "");
+    fflush(stdout);
     return EXCEPTION_CONTINUE_SEARCH;
 }
 #endif
@@ -54,6 +68,7 @@ static LONG CALLBACK LogNativeException(EXCEPTION_POINTERS *exception)
 #include "gba/flash_internal.h"
 #include "platform/dma.h"
 #include "platform/framedraw.h"
+#include "platform/save_file.h"
 #include "resource_pack.h"
 
 extern void (*const gIntrTable[])(void);
@@ -83,13 +98,110 @@ double timeScale = 1.0;
 struct SiiRtcInfo internalClock;
 static time_t sRtcOffsetSeconds;
 
-static FILE *sSaveFile = NULL;
 static char sSavePath[1024] = "pokemon_regionalidades.sav";
 static char sConfigPath[1024] = "pokemon_regionalidades.cfg";
 static u8 sBorderBackground;
 static bool sHasBorderBackgroundConfig;
 static u8 sBackgroundOrderVersion;
 static u8 sPlatformSettings[PLATFORM_SETTING_COUNT] = {0, 4, 0, 1, 1, 10};
+
+enum PcKeyAction
+{
+    PC_KEY_A,
+    PC_KEY_B,
+    PC_KEY_START,
+    PC_KEY_SELECT,
+    PC_KEY_L,
+    PC_KEY_R,
+    PC_KEY_UP,
+    PC_KEY_DOWN,
+    PC_KEY_LEFT,
+    PC_KEY_RIGHT,
+    PC_KEY_SPEED,
+    PC_KEY_COUNT,
+};
+
+static SDL_Keycode sKeyboardMappings[PC_KEY_COUNT] =
+{
+    SDLK_z, SDLK_x, SDLK_RETURN, SDLK_BACKSPACE, SDLK_a, SDLK_s,
+    SDLK_UP, SDLK_DOWN, SDLK_LEFT, SDLK_RIGHT, SDLK_SPACE,
+};
+static const char *const sKeyboardConfigNames[PC_KEY_COUNT] =
+{
+    "keyA", "keyB", "keyStart", "keySelect", "keyL", "keyR",
+    "keyUp", "keyDown", "keyLeft", "keyRight", "keySpeed",
+};
+static const u16 sKeyboardButtonMasks[PC_KEY_SPEED] =
+{
+    A_BUTTON, B_BUTTON, START_BUTTON, SELECT_BUTTON, L_BUTTON, R_BUTTON,
+    DPAD_UP, DPAD_DOWN, DPAD_LEFT, DPAD_RIGHT,
+};
+static unsigned int sSpeedMultiplier = 5;
+
+#ifdef _WIN32
+#define PC_MENU_GAME_PAUSE       1001
+#define PC_MENU_GAME_RESTART     1002
+#define PC_MENU_GAME_PROFILES    1003
+#define PC_MENU_GAME_EXIT        1004
+#define PC_MENU_SETTINGS         1101
+#define PC_MENU_HELP_CONTROLS    1201
+
+static HMENU sNativeMenu;
+static FILETIME sConfigWriteTime;
+static bool sHasConfigWriteTime;
+static Uint32 sNextConfigPoll;
+static bool sRestartRequested;
+static bool sReturnToProfilesRequested;
+
+enum PcControllerInput
+{
+    PC_CONTROLLER_A,
+    PC_CONTROLLER_B,
+    PC_CONTROLLER_X,
+    PC_CONTROLLER_Y,
+    PC_CONTROLLER_START,
+    PC_CONTROLLER_BACK,
+    PC_CONTROLLER_LB,
+    PC_CONTROLLER_RB,
+    PC_CONTROLLER_LEFT_STICK,
+    PC_CONTROLLER_RIGHT_STICK,
+    PC_CONTROLLER_LT,
+    PC_CONTROLLER_RT,
+    PC_CONTROLLER_INPUT_COUNT,
+};
+
+enum PcControllerAction
+{
+    PC_CONTROLLER_ACTION_A,
+    PC_CONTROLLER_ACTION_B,
+    PC_CONTROLLER_ACTION_START,
+    PC_CONTROLLER_ACTION_SELECT,
+    PC_CONTROLLER_ACTION_L,
+    PC_CONTROLLER_ACTION_R,
+    PC_CONTROLLER_ACTION_SPEED,
+    PC_CONTROLLER_ACTION_COUNT,
+};
+
+static u8 sControllerMappings[PC_CONTROLLER_ACTION_COUNT] =
+{
+    PC_CONTROLLER_A, PC_CONTROLLER_X, PC_CONTROLLER_START,
+    PC_CONTROLLER_BACK, PC_CONTROLLER_LB, PC_CONTROLLER_RB, PC_CONTROLLER_RT,
+};
+static const char *const sControllerConfigNames[PC_CONTROLLER_ACTION_COUNT] =
+{
+    "controllerA", "controllerB", "controllerStart", "controllerSelect",
+    "controllerL", "controllerR", "controllerSpeed",
+};
+static const char *const sControllerInputNames[PC_CONTROLLER_INPUT_COUNT] =
+{
+    "A", "B", "X", "Y", "Start", "Back", "LB", "RB",
+    "LeftStick", "RightStick", "LT", "RT",
+};
+static const u16 sControllerButtonMasks[PC_CONTROLLER_ACTION_SPEED] =
+{
+    A_BUTTON, B_BUTTON, START_BUTTON, SELECT_BUTTON, L_BUTTON, R_BUTTON,
+};
+#endif
 #ifdef __ANDROID__
 static SDL_GameController *androidController;
 #endif
@@ -105,10 +217,25 @@ static void ReadSaveFile(const char *path);
 static void ReadConfigFile(void);
 static void StoreConfigFile(void);
 static void ApplyPlatformSettings(void);
-static void StoreSaveFile(void);
-static void CloseSaveFile(void);
+static bool32 StoreSaveFile(void);
 static bool FileExists(const char *path);
 static void CopyLegacyFileIfNeeded(const char *legacyPath, const char *newPath);
+static bool ResolveConfiguredFilePath(const char *variableName, char *path, size_t pathCapacity, bool *wasConfigured);
+static bool OpenRegionalidadesResourcePack(void);
+static bool ReadConfigTextValue(const char *line, const char *name, char *value, size_t valueCapacity);
+static bool ReadKeyboardMapping(const char *line, enum PcKeyAction action);
+#ifdef _WIN32
+static bool ReadControllerMapping(const char *line, enum PcControllerAction action);
+static bool IsControllerInputActive(const XINPUT_STATE *state, enum PcControllerInput input);
+static void InstallNativeMenu(void);
+static void HandleNativeMenuCommand(WORD command);
+static void PollConfigFileChanges(void);
+static void LaunchPowerShellScript(const char *environmentName);
+static void RelaunchCurrentExecutable(void);
+#endif
+#ifdef _WIN32
+static void ArchivePreviousCrashLog(void);
+#endif
 
 static void UpdateInternalClock(void);
 static void SetInternalClockFromRtc(const struct SiiRtcInfo *rtc, bool includeDate);
@@ -120,6 +247,253 @@ static bool FileExists(const char *path)
         return false;
     fclose(file);
     return true;
+}
+
+#ifdef _WIN32
+static void ArchivePreviousCrashLog(void)
+{
+    FILE *log = fopen("runtime-last.log", "r");
+    char line[512];
+    bool crashed = false;
+
+    if (log == NULL)
+        return;
+
+    while (fgets(line, sizeof(line), log) != NULL)
+    {
+        if (strstr(line, "PC port exception:") != NULL)
+        {
+            crashed = true;
+            break;
+        }
+    }
+    fclose(log);
+
+    if (crashed)
+    {
+        SYSTEMTIME timestamp;
+        char archivePath[96];
+
+        GetLocalTime(&timestamp);
+        SDL_snprintf(archivePath, sizeof(archivePath),
+                     "runtime-crash-%04u%02u%02u-%02u%02u%02u.log",
+                     timestamp.wYear, timestamp.wMonth, timestamp.wDay,
+                     timestamp.wHour, timestamp.wMinute, timestamp.wSecond);
+        CopyFileA("runtime-last.log", archivePath, TRUE);
+    }
+}
+
+static void LaunchPowerShellScript(const char *environmentName)
+{
+    const char *scriptPath = SDL_getenv(environmentName);
+    char parameters[2300];
+
+    if (scriptPath == NULL || scriptPath[0] == '\0')
+    {
+        SDL_ShowSimpleMessageBox(SDL_MESSAGEBOX_ERROR, "Pokemon Regionalidades",
+                                 "Este comando so esta disponivel quando o jogo e aberto pela tela de perfis.",
+                                 sdlWindow);
+        return;
+    }
+
+    SDL_snprintf(parameters, sizeof(parameters),
+                 "-NoProfile -WindowStyle Hidden -ExecutionPolicy Bypass -File \"%s\"", scriptPath);
+    if ((INT_PTR)ShellExecuteA(NULL, "open", "powershell.exe", parameters, NULL, SW_HIDE) <= 32)
+        SDL_ShowSimpleMessageBox(SDL_MESSAGEBOX_ERROR, "Pokemon Regionalidades",
+                                 "Nao foi possivel abrir a janela solicitada.", sdlWindow);
+}
+
+static void RelaunchCurrentExecutable(void)
+{
+    const char *profileRunner = SDL_getenv("POKEMON_REGIONALIDADES_PROFILE_RUNNER");
+    const char *profileId = SDL_getenv("POKEMON_REGIONALIDADES_PROFILE_ID");
+    char executable[MAX_PATH];
+    char commandLine[MAX_PATH + 3];
+    STARTUPINFOA startupInfo;
+    PROCESS_INFORMATION processInfo;
+
+    if (profileRunner != NULL && profileRunner[0] != '\0'
+     && profileId != NULL && (profileId[0] == '1' || profileId[0] == '2') && profileId[1] == '\0')
+    {
+        char parameters[2300];
+        SDL_snprintf(parameters, sizeof(parameters),
+                     "-NoProfile -WindowStyle Hidden -ExecutionPolicy Bypass -File \"%s\" -Profile %s",
+                     profileRunner, profileId);
+        if ((INT_PTR)ShellExecuteA(NULL, "open", "powershell.exe", parameters, NULL, SW_HIDE) > 32)
+            return;
+    }
+
+    if (GetModuleFileNameA(NULL, executable, sizeof(executable)) == 0)
+        return;
+    SDL_snprintf(commandLine, sizeof(commandLine), "\"%s\"", executable);
+    memset(&startupInfo, 0, sizeof(startupInfo));
+    memset(&processInfo, 0, sizeof(processInfo));
+    startupInfo.cb = sizeof(startupInfo);
+    if (CreateProcessA(executable, commandLine, NULL, NULL, FALSE, 0, NULL, NULL,
+                       &startupInfo, &processInfo))
+    {
+        CloseHandle(processInfo.hThread);
+        CloseHandle(processInfo.hProcess);
+    }
+}
+
+static void UpdateNativePauseMenu(void)
+{
+    if (sNativeMenu != NULL)
+        CheckMenuItem(sNativeMenu, PC_MENU_GAME_PAUSE,
+                      MF_BYCOMMAND | (paused ? MF_CHECKED : MF_UNCHECKED));
+}
+
+static void HandleNativeMenuCommand(WORD command)
+{
+    switch (command)
+    {
+    case PC_MENU_GAME_PAUSE:
+        paused = !paused;
+        UpdateNativePauseMenu();
+        break;
+    case PC_MENU_GAME_RESTART:
+        DBGPRINTF("PC shutdown: restart selected from menu\n");
+        sRestartRequested = true;
+        isRunning = false;
+        break;
+    case PC_MENU_GAME_PROFILES:
+        DBGPRINTF("PC shutdown: returning to profile selection\n");
+        sReturnToProfilesRequested = true;
+        isRunning = false;
+        break;
+    case PC_MENU_GAME_EXIT:
+        DBGPRINTF("PC shutdown: exit selected from menu\n");
+        isRunning = false;
+        break;
+    case PC_MENU_SETTINGS:
+        LaunchPowerShellScript("POKEMON_REGIONALIDADES_SETTINGS_SCRIPT");
+        break;
+    case PC_MENU_HELP_CONTROLS:
+        SDL_ShowSimpleMessageBox(
+            SDL_MESSAGEBOX_INFORMATION,
+            "Controles",
+            "Os controles podem ser alterados em Configuracoes > Controles e aceleracao.\n\n"
+            "Atalhos do programa:\nCtrl+P: pausar ou continuar\nCtrl+R: reiniciar",
+            sdlWindow);
+        break;
+    }
+}
+
+static void InstallNativeMenu(void)
+{
+    SDL_SysWMinfo windowInfo;
+    HMENU gameMenu = CreatePopupMenu();
+    HMENU settingsMenu = CreatePopupMenu();
+    HMENU helpMenu = CreatePopupMenu();
+
+    SDL_VERSION(&windowInfo.version);
+    if (!SDL_GetWindowWMInfo(sdlWindow, &windowInfo))
+        return;
+
+    sNativeMenu = CreateMenu();
+    AppendMenuW(gameMenu, MF_STRING, PC_MENU_GAME_PAUSE, L"Pausar/Continuar\tCtrl+P");
+    AppendMenuW(gameMenu, MF_STRING, PC_MENU_GAME_RESTART, L"Reiniciar\tCtrl+R");
+    AppendMenuW(gameMenu, MF_SEPARATOR, 0, NULL);
+    AppendMenuW(gameMenu, MF_STRING, PC_MENU_GAME_PROFILES, L"Voltar aos perfis");
+    AppendMenuW(gameMenu, MF_STRING, PC_MENU_GAME_EXIT, L"Sair");
+    AppendMenuW(settingsMenu, MF_STRING, PC_MENU_SETTINGS, L"Controles e acelera\u00e7\u00e3o...");
+    AppendMenuW(helpMenu, MF_STRING, PC_MENU_HELP_CONTROLS, L"Controles e atalhos");
+    AppendMenuW(sNativeMenu, MF_POPUP, (UINT_PTR)gameMenu, L"Jogo");
+    AppendMenuW(sNativeMenu, MF_POPUP, (UINT_PTR)settingsMenu, L"Configura\u00e7\u00f5es");
+    AppendMenuW(sNativeMenu, MF_POPUP, (UINT_PTR)helpMenu, L"Ajuda");
+    SetMenu(windowInfo.info.win.window, sNativeMenu);
+    DrawMenuBar(windowInfo.info.win.window);
+    SDL_EventState(SDL_SYSWMEVENT, SDL_ENABLE);
+    UpdateNativePauseMenu();
+}
+
+static void RememberConfigWriteTime(void)
+{
+    WIN32_FILE_ATTRIBUTE_DATA attributes;
+    if (GetFileAttributesExA(sConfigPath, GetFileExInfoStandard, &attributes))
+    {
+        sConfigWriteTime = attributes.ftLastWriteTime;
+        sHasConfigWriteTime = true;
+    }
+}
+
+static void PollConfigFileChanges(void)
+{
+    WIN32_FILE_ATTRIBUTE_DATA attributes;
+    Uint32 now = SDL_GetTicks();
+
+    if (!SDL_TICKS_PASSED(now, sNextConfigPoll))
+        return;
+    sNextConfigPoll = now + 500;
+    if (!GetFileAttributesExA(sConfigPath, GetFileExInfoStandard, &attributes))
+        return;
+    if (!sHasConfigWriteTime || CompareFileTime(&attributes.ftLastWriteTime, &sConfigWriteTime) != 0)
+    {
+        sConfigWriteTime = attributes.ftLastWriteTime;
+        sHasConfigWriteTime = true;
+        speedUp = false;
+        timeScale = 1.0;
+        ReadConfigFile();
+        ApplyPlatformSettings();
+        DBGPRINTF("PC settings: configuration reloaded while running (speed=%ux)\n", sSpeedMultiplier);
+    }
+}
+#endif
+
+static bool OpenRegionalidadesResourcePack(void)
+{
+    const char *configuredPath = SDL_getenv("POKEMON_REGIONALIDADES_RESOURCE_PACK");
+    const char *resourcePackPath = configuredPath;
+    char executablePath[2048];
+    char *basePath = NULL;
+
+    if (resourcePackPath == NULL || resourcePackPath[0] == '\0')
+    {
+        configuredPath = SDL_getenv("POKEMON_GO_WORLD_RESOURCE_PACK");
+        resourcePackPath = configuredPath;
+    }
+
+    if (resourcePackPath == NULL || resourcePackPath[0] == '\0')
+    {
+#ifndef __ANDROID__
+        basePath = SDL_GetBasePath();
+        if (basePath != NULL)
+        {
+            SDL_snprintf(executablePath, sizeof(executablePath),
+                         "%spokemon_regionalidades.pak", basePath);
+            if (FileExists(executablePath))
+                resourcePackPath = executablePath;
+            else
+            {
+                SDL_snprintf(executablePath, sizeof(executablePath),
+                             "%spokemon_go_world.pak", basePath);
+                if (FileExists(executablePath))
+                    resourcePackPath = executablePath;
+            }
+        }
+#endif
+        if (resourcePackPath == NULL || resourcePackPath[0] == '\0')
+            resourcePackPath = FileExists("pokemon_regionalidades.pak")
+                ? "pokemon_regionalidades.pak"
+                : "pokemon_go_world.pak";
+    }
+
+    DBGPRINTF("PC port: opening resource pack %s\n", resourcePackPath);
+    bool opened = ResourcePack_Open(resourcePackPath);
+    if (basePath != NULL)
+        SDL_free(basePath);
+    if (!opened)
+    {
+        SDL_ShowSimpleMessageBox(
+            SDL_MESSAGEBOX_ERROR,
+            "Pokemon Regionalidades",
+            "O pacote pokemon_regionalidades.pak nao foi encontrado ou esta invalido. "
+            "Coloque o arquivo ao lado do executavel ou configure "
+            "POKEMON_REGIONALIDADES_RESOURCE_PACK.",
+            NULL);
+    }
+    return opened;
 }
 
 static void CopyLegacyFileIfNeeded(const char *legacyPath, const char *newPath)
@@ -166,6 +540,23 @@ static void CopyLegacyFileIfNeeded(const char *legacyPath, const char *newPath)
         DBGPRINTF("PC port: copied legacy file %s to %s\n", legacyPath, newPath);
 }
 
+static bool ResolveConfiguredFilePath(const char *variableName, char *path, size_t pathCapacity, bool *wasConfigured)
+{
+    const char *configuredPath = SDL_getenv(variableName);
+
+    *wasConfigured = false;
+    if (configuredPath == NULL || configuredPath[0] == '\0')
+        return true;
+    if ((size_t)SDL_snprintf(path, pathCapacity, "%s", configuredPath) >= pathCapacity)
+    {
+        SDL_Log("Configured path is too long: %s", variableName);
+        return false;
+    }
+
+    *wasConfigured = true;
+    return true;
+}
+
 #ifdef __ANDROID__
 static void HandleTouchEvent(const SDL_TouchFingerEvent *event);
 static void DrawTouchControls(void);
@@ -173,10 +564,18 @@ static void DrawTouchControls(void);
 
 int main(int argc, char **argv)
 {
+    bool hasConfiguredSavePath;
+    bool hasConfiguredConfigPath;
+
     // Open an output console on Windows
 #ifdef _WIN32
+    const char *diagnosticLogPath = SDL_getenv("POKEMON_REGIONALIDADES_LOG_PATH");
     const char *diagnosticDir = SDL_getenv("POKEMON_GO_WORLD_CAPTURE_DIR");
-    if (diagnosticDir != NULL && diagnosticDir[0] != '\0')
+    if (diagnosticLogPath != NULL && diagnosticLogPath[0] != '\0')
+    {
+        freopen(diagnosticLogPath, "w", stdout);
+    }
+    else if (diagnosticDir != NULL && diagnosticDir[0] != '\0')
     {
         char logPath[1200];
         SDL_snprintf(logPath, sizeof(logPath), "%s/runtime.log", diagnosticDir);
@@ -184,9 +583,9 @@ int main(int argc, char **argv)
     }
     else
     {
-        AllocConsole();
-        AttachConsole(GetCurrentProcessId());
-        freopen("CON", "w", stdout);
+        // Keep diagnostics available when launched by desktop shortcut.
+        ArchivePreviousCrashLog();
+        freopen("runtime-last.log", "w", stdout);
     }
     setvbuf(stdout, NULL, _IONBF, 0);
     AddVectoredExceptionHandler(1, LogNativeException);
@@ -211,15 +610,25 @@ int main(int argc, char **argv)
     }
     DBGPRINTF("PC port: SDL initialized\n");
 
+    if (!OpenRegionalidadesResourcePack())
     {
-        const char *resourcePackPath = SDL_getenv("POKEMON_REGIONALIDADES_RESOURCE_PACK");
-        if (resourcePackPath == NULL || resourcePackPath[0] == '\0')
-            resourcePackPath = SDL_getenv("POKEMON_GO_WORLD_RESOURCE_PACK");
-        if (resourcePackPath == NULL || resourcePackPath[0] == '\0')
-            resourcePackPath = FileExists("pokemon_regionalidades.pak")
-                ? "pokemon_regionalidades.pak"
-                : "pokemon_go_world.pak";
-        ResourcePack_Open(resourcePackPath);
+        SDL_Quit();
+        return 1;
+    }
+
+    if (!ResolveConfiguredFilePath("POKEMON_REGIONALIDADES_SAVE_PATH",
+                                   sSavePath, sizeof(sSavePath), &hasConfiguredSavePath)
+     || !ResolveConfiguredFilePath("POKEMON_REGIONALIDADES_CONFIG_PATH",
+                                   sConfigPath, sizeof(sConfigPath), &hasConfiguredConfigPath))
+    {
+        SDL_ShowSimpleMessageBox(
+            SDL_MESSAGEBOX_ERROR,
+            "Pokemon Regionalidades",
+            "O caminho configurado para os dados do jogador e muito longo.",
+            NULL);
+        ResourcePack_Close();
+        SDL_Quit();
+        return 1;
     }
 
 #ifdef __ANDROID__
@@ -236,22 +645,48 @@ int main(int argc, char **argv)
     {
         char legacySavePath[1024];
         char legacyConfigPath[1024];
-        SDL_snprintf(sSavePath, sizeof(sSavePath), "%spokemon_regionalidades.sav", prefPath);
-        SDL_snprintf(sConfigPath, sizeof(sConfigPath), "%spokemon_regionalidades.cfg", prefPath);
+        if (!hasConfiguredSavePath)
+            SDL_snprintf(sSavePath, sizeof(sSavePath), "%spokemon_regionalidades.sav", prefPath);
+        if (!hasConfiguredConfigPath)
+            SDL_snprintf(sConfigPath, sizeof(sConfigPath), "%spokemon_regionalidades.cfg", prefPath);
         SDL_snprintf(legacySavePath, sizeof(legacySavePath), "%spokemon_go_world.sav", prefPath);
         SDL_snprintf(legacyConfigPath, sizeof(legacyConfigPath), "%spokemon_go_world.cfg", prefPath);
-        CopyLegacyFileIfNeeded(legacySavePath, sSavePath);
-        CopyLegacyFileIfNeeded(legacyConfigPath, sConfigPath);
+        if (!hasConfiguredSavePath)
+            CopyLegacyFileIfNeeded(legacySavePath, sSavePath);
+        if (!hasConfiguredConfigPath)
+            CopyLegacyFileIfNeeded(legacyConfigPath, sConfigPath);
         SDL_free(prefPath);
     }
 #else
-    CopyLegacyFileIfNeeded("pokemon_go_world.sav", sSavePath);
-    CopyLegacyFileIfNeeded("pokemon_go_world.cfg", sConfigPath);
+    if (!hasConfiguredSavePath)
+        CopyLegacyFileIfNeeded("pokemon_go_world.sav", sSavePath);
+    if (!hasConfiguredConfigPath)
+        CopyLegacyFileIfNeeded("pokemon_go_world.cfg", sConfigPath);
 #endif
+    DBGPRINTF("PC port: save path %s\n", sSavePath);
+    DBGPRINTF("PC port: config path %s\n", sConfigPath);
     DBGPRINTF("PC port: reading save\n");
     ReadSaveFile(sSavePath);
     DBGPRINTF("PC port: save loaded\n");
     ReadConfigFile();
+#ifdef _WIN32
+    RememberConfigWriteTime();
+#endif
+    char keyAName[32];
+    char keyBName[32];
+    char keySpeedName[32];
+    SDL_snprintf(keyAName, sizeof(keyAName), "%s", SDL_GetKeyName(sKeyboardMappings[PC_KEY_A]));
+    SDL_snprintf(keyBName, sizeof(keyBName), "%s", SDL_GetKeyName(sKeyboardMappings[PC_KEY_B]));
+    SDL_snprintf(keySpeedName, sizeof(keySpeedName), "%s", SDL_GetKeyName(sKeyboardMappings[PC_KEY_SPEED]));
+    DBGPRINTF("PC controls: keyA=%s keyB=%s keySpeed=%s speed=%ux\n",
+              keyAName, keyBName, keySpeedName,
+              sSpeedMultiplier);
+#ifdef _WIN32
+    DBGPRINTF("PC controller: A=%s B=%s speed=%s\n",
+              sControllerInputNames[sControllerMappings[PC_CONTROLLER_ACTION_A]],
+              sControllerInputNames[sControllerMappings[PC_CONTROLLER_ACTION_B]],
+              sControllerInputNames[sControllerMappings[PC_CONTROLLER_ACTION_SPEED]]);
+#endif
     DBGPRINTF("PC port: save and config loaded\n");
 
 #ifdef __ANDROID__
@@ -268,6 +703,9 @@ int main(int argc, char **argv)
         return 1;
     }
     DBGPRINTF("PC port: window created\n");
+#ifdef _WIN32
+    InstallNativeMenu();
+#endif
 
 #ifdef __ANDROID__
     sdlRenderer = SDL_CreateRenderer(sdlWindow, -1, SDL_RENDERER_ACCELERATED);
@@ -423,6 +861,9 @@ int main(int argc, char **argv)
     while (isRunning)
     {
         ProcessEvents();
+#ifdef _WIN32
+        PollConfigFileChanges();
+#endif
 
         if (!paused)
         {
@@ -430,8 +871,11 @@ int main(int argc, char **argv)
 
             curGameTime = SDL_GetPerformanceCounter();
             double deltaTime = (double)((curGameTime - lastGameTime) / (double)SDL_GetPerformanceFrequency());
-            if (deltaTime > (dt * 5))
-                deltaTime = dt;
+            // Limit only real host stalls. Basing this guard on the accelerated
+            // timestep makes every multiplier above 5x look like a stall at
+            // 60 Hz and collapses acceleration back to roughly normal speed.
+            if (deltaTime > (fixedTimestep * 5))
+                deltaTime = fixedTimestep;
             lastGameTime = curGameTime;
 
             accumulator += deltaTime;
@@ -512,8 +956,6 @@ int main(int argc, char **argv)
 #endif
     }
 
-    //StoreSaveFile();
-    CloseSaveFile();
     ResourcePack_Close();
 
 #if defined(NATIVE_LINUX) || defined(_WIN32)
@@ -524,43 +966,86 @@ int main(int argc, char **argv)
 #ifdef NATIVE_LINUX
     IMG_Quit();
 #endif
+#ifdef _WIN32
+    if (sNativeMenu != NULL)
+    {
+        SDL_SysWMinfo windowInfo;
+        SDL_VERSION(&windowInfo.version);
+        if (SDL_GetWindowWMInfo(sdlWindow, &windowInfo))
+            SetMenu(windowInfo.info.win.window, NULL);
+        DestroyMenu(sNativeMenu);
+        sNativeMenu = NULL;
+    }
+#endif
     SDL_DestroyWindow(sdlWindow);
+    sdlWindow = NULL;
     SDL_Quit();
+#ifdef _WIN32
+    if (sReturnToProfilesRequested)
+        LaunchPowerShellScript("POKEMON_REGIONALIDADES_PROFILE_LAUNCHER");
+    else if (sRestartRequested)
+        RelaunchCurrentExecutable();
+#endif
     return 0;
 }
 
 static void ReadSaveFile(const char *path)
 {
-    // Check whether the saveFile exists, and create it if not
-    sSaveFile = fopen(path, "r+b");
-    if (sSaveFile == NULL)
-    {
-        sSaveFile = fopen(path, "w+b");
-    }
-
-    if (sSaveFile == NULL)
-    {
-        memset(FLASH_BASE, 0xFF, sizeof(FLASH_BASE));
+    if (!PlatformSave_Load(path, FLASH_BASE, sizeof(FLASH_BASE)))
         SDL_Log("Unable to open save file: %s", path);
-        return;
-    }
-
-    fseek(sSaveFile, 0, SEEK_END);
-    int fileSize = ftell(sSaveFile);
-    fseek(sSaveFile, 0, SEEK_SET);
-
-    // Only read as many bytes as fit inside the buffer
-    // or as many bytes as are in the file
-    int bytesToRead = (fileSize < sizeof(FLASH_BASE)) ? fileSize : sizeof(FLASH_BASE);
-
-    int bytesRead = fread(FLASH_BASE, 1, bytesToRead, sSaveFile);
-
-    // Fill the buffer if the savefile was just created or smaller than the buffer itself
-    for (int i = bytesRead; i < sizeof(FLASH_BASE); i++)
-    {
-        FLASH_BASE[i] = 0xFF;
-    }
 }
+
+static bool ReadConfigTextValue(const char *line, const char *name, char *value, size_t valueCapacity)
+{
+    size_t nameLength = strlen(name);
+    size_t valueLength;
+
+    if (strncmp(line, name, nameLength) != 0 || line[nameLength] != '=')
+        return false;
+
+    line += nameLength + 1;
+    valueLength = strcspn(line, "\r\n");
+    if (valueLength == 0 || valueLength >= valueCapacity)
+        return true;
+
+    memcpy(value, line, valueLength);
+    value[valueLength] = '\0';
+    return true;
+}
+
+static bool ReadKeyboardMapping(const char *line, enum PcKeyAction action)
+{
+    char value[64] = {0};
+
+    if (!ReadConfigTextValue(line, sKeyboardConfigNames[action], value, sizeof(value)))
+        return false;
+    if (value[0] != '\0')
+    {
+        SDL_Keycode key = SDL_GetKeyFromName(value);
+        if (key != SDLK_UNKNOWN)
+            sKeyboardMappings[action] = key;
+    }
+    return true;
+}
+
+#ifdef _WIN32
+static bool ReadControllerMapping(const char *line, enum PcControllerAction action)
+{
+    char value[32] = {0};
+
+    if (!ReadConfigTextValue(line, sControllerConfigNames[action], value, sizeof(value)))
+        return false;
+    for (int input = 0; input < PC_CONTROLLER_INPUT_COUNT; input++)
+    {
+        if (strcmp(value, sControllerInputNames[input]) == 0)
+        {
+            sControllerMappings[action] = input;
+            break;
+        }
+    }
+    return true;
+}
+#endif
 
 static void ReadConfigFile(void)
 {
@@ -594,6 +1079,18 @@ static void ReadConfigFile(void)
             sPlatformSettings[PLATFORM_SETTING_VOLUME] = value;
         else if (sscanf(line, "rtcOffsetSeconds=%lld", &signedValue) == 1)
             sRtcOffsetSeconds = (time_t)signedValue;
+        else if (sscanf(line, "speedMultiplier=%u", &value) == 1 && value >= 2 && value <= 10)
+            sSpeedMultiplier = value;
+        else
+        {
+            bool mappingRead = false;
+            for (int action = 0; action < PC_KEY_COUNT && !mappingRead; action++)
+                mappingRead = ReadKeyboardMapping(line, action);
+#ifdef _WIN32
+            for (int action = 0; action < PC_CONTROLLER_ACTION_COUNT && !mappingRead; action++)
+                mappingRead = ReadControllerMapping(line, action);
+#endif
+        }
     }
     fclose(configFile);
 }
@@ -613,6 +1110,13 @@ static void StoreConfigFile(void)
     fprintf(configFile, "border=%u\n", sPlatformSettings[PLATFORM_SETTING_BORDER]);
     fprintf(configFile, "volume=%u\n", sPlatformSettings[PLATFORM_SETTING_VOLUME]);
     fprintf(configFile, "rtcOffsetSeconds=%lld\n", (long long)sRtcOffsetSeconds);
+    fprintf(configFile, "speedMultiplier=%u\n", sSpeedMultiplier);
+    for (int action = 0; action < PC_KEY_COUNT; action++)
+        fprintf(configFile, "%s=%s\n", sKeyboardConfigNames[action], SDL_GetKeyName(sKeyboardMappings[action]));
+#ifdef _WIN32
+    for (int action = 0; action < PC_CONTROLLER_ACTION_COUNT; action++)
+        fprintf(configFile, "%s=%s\n", sControllerConfigNames[action], sControllerInputNames[sControllerMappings[action]]);
+#endif
     fclose(configFile);
 }
 
@@ -631,25 +1135,31 @@ static void ApplyPlatformSettings(void)
 #endif
 }
 
-static void StoreSaveFile()
+static bool32 StoreSaveFile(void)
 {
-    if (sSaveFile != NULL)
+    if (!PlatformSave_Commit(sSavePath, FLASH_BASE, sizeof(FLASH_BASE), 3))
     {
-        fseek(sSaveFile, 0, SEEK_SET);
-        fwrite(FLASH_BASE, 1, sizeof(FLASH_BASE), sSaveFile);
-        fflush(sSaveFile);
+        SDL_Log("Unable to store save file safely: %s", sSavePath);
+        return FALSE;
     }
+
+    return TRUE;
 }
 
-void Platform_StoreSaveFile(void)
+bool32 Platform_StoreSaveFile(void)
 {
-    StoreSaveFile();
+    return StoreSaveFile();
 }
 
 bool32 Platform_GetEnvironmentFlag(const char *name)
 {
     const char *value = SDL_getenv(name);
     return value != NULL && value[0] != '\0' && value[0] != '0';
+}
+
+const char *Platform_GetEnvironmentValue(const char *name)
+{
+    return SDL_getenv(name);
 }
 
 void Platform_ReadFlash(u16 sectorNum, u32 offset, u8 *dest, u32 size)
@@ -754,33 +1264,20 @@ JNIEXPORT jint JNICALL Java_com_pokeemerald_experimental_GbaControlsView_getPlat
 #endif
 
 
-static void CloseSaveFile()
-{
-    if (sSaveFile != NULL)
-    {
-        fclose(sSaveFile);
-    }
-}
-
-// Key mappings
-#define KEY_A_BUTTON      SDLK_z
-#define KEY_B_BUTTON      SDLK_x
-#define KEY_START_BUTTON  SDLK_RETURN
-#define KEY_SELECT_BUTTON SDLK_BACKSLASH
-#define KEY_L_BUTTON      SDLK_a
-#define KEY_R_BUTTON      SDLK_s
-#define KEY_DPAD_UP       SDLK_UP
-#define KEY_DPAD_DOWN     SDLK_DOWN
-#define KEY_DPAD_LEFT     SDLK_LEFT
-#define KEY_DPAD_RIGHT    SDLK_RIGHT
-
-#define HANDLE_KEYUP(key) \
-case KEY_##key:  keyboardKeys &= ~key; break;
-
-#define HANDLE_KEYDOWN(key) \
-case KEY_##key:  keyboardKeys |= key; break;
-
 static u16 keyboardKeys;
+static u16 keyboardPressedKeys;
+
+static u16 KeyboardButtonMask(SDL_Keycode key)
+{
+    u16 mask = 0;
+
+    for (int action = 0; action < PC_KEY_SPEED; action++)
+    {
+        if (sKeyboardMappings[action] == key)
+            mask |= sKeyboardButtonMasks[action];
+    }
+    return mask;
+}
 
 #ifdef __ANDROID__
 #define MAX_TOUCH_FINGERS 10
@@ -1039,8 +1536,17 @@ void ProcessEvents(void)
         switch (event.type)
         {
         case SDL_QUIT:
+            DBGPRINTF("PC shutdown: window close requested\n");
             isRunning = false;
             break;
+#ifdef _WIN32
+        case SDL_SYSWMEVENT:
+            if (event.syswm.msg != NULL
+             && event.syswm.msg->subsystem == SDL_SYSWM_WINDOWS
+             && event.syswm.msg->msg.win.msg == WM_COMMAND)
+                HandleNativeMenuCommand(LOWORD(event.syswm.msg->msg.win.wParam));
+            break;
+#endif
 #ifdef __ANDROID__
         case SDL_CONTROLLERDEVICEADDED:
             if (androidController == NULL && SDL_IsGameController(event.cdevice.which))
@@ -1078,70 +1584,81 @@ void ProcessEvents(void)
             break;
 #endif
         case SDL_KEYUP:
-            switch (event.key.keysym.sym)
+        {
+            SDL_Keycode key = event.key.keysym.sym;
+            keyboardKeys &= ~KeyboardButtonMask(key);
+            if (key == sKeyboardMappings[PC_KEY_SPEED] && speedUp)
             {
-            HANDLE_KEYUP(A_BUTTON)
-            HANDLE_KEYUP(B_BUTTON)
-            HANDLE_KEYUP(START_BUTTON)
-            HANDLE_KEYUP(SELECT_BUTTON)
-            HANDLE_KEYUP(L_BUTTON)
-            HANDLE_KEYUP(R_BUTTON)
-            HANDLE_KEYUP(DPAD_UP)
-            HANDLE_KEYUP(DPAD_DOWN)
-            HANDLE_KEYUP(DPAD_LEFT)
-            HANDLE_KEYUP(DPAD_RIGHT)
-            case SDLK_SPACE:
-                if (speedUp)
-                {
-                    speedUp = false;
-                    timeScale = 1.0;
-                    SDL_ClearQueuedAudio(sdlAudioDevice);
-                    SDL_PauseAudioDevice(sdlAudioDevice, 0);
-                }
-                break;
+                speedUp = false;
+                timeScale = 1.0;
+                SDL_ClearQueuedAudio(sdlAudioDevice);
+                SDL_PauseAudioDevice(sdlAudioDevice, 0);
             }
             break;
+        }
         case SDL_KEYDOWN:
-            switch (event.key.keysym.sym)
+        {
+            SDL_Keycode key = event.key.keysym.sym;
+            u16 keyMask = KeyboardButtonMask(key);
+            keyboardKeys |= keyMask;
+            keyboardPressedKeys |= keyMask;
+            if (key == SDLK_r && (event.key.keysym.mod & (KMOD_LCTRL | KMOD_RCTRL)))
             {
-            HANDLE_KEYDOWN(A_BUTTON)
-            HANDLE_KEYDOWN(B_BUTTON)
-            HANDLE_KEYDOWN(START_BUTTON)
-            HANDLE_KEYDOWN(SELECT_BUTTON)
-            HANDLE_KEYDOWN(L_BUTTON)
-            HANDLE_KEYDOWN(R_BUTTON)
-            HANDLE_KEYDOWN(DPAD_UP)
-            HANDLE_KEYDOWN(DPAD_DOWN)
-            HANDLE_KEYDOWN(DPAD_LEFT)
-            HANDLE_KEYDOWN(DPAD_RIGHT)
-            case SDLK_r:
-                if (event.key.keysym.mod & (KMOD_LCTRL | KMOD_RCTRL))
-                {
-                    DoSoftReset();
-                }
-                break;
-            case SDLK_p:
-                if (event.key.keysym.mod & (KMOD_LCTRL | KMOD_RCTRL))
-                {
-                    paused = !paused;
-                }
-                break;
-            case SDLK_SPACE:
+#ifdef _WIN32
+                DBGPRINTF("PC shutdown: restart requested by Ctrl+R\n");
+                sRestartRequested = true;
+                isRunning = false;
+#else
+                DoSoftReset();
+#endif
+            }
+            else if (key == SDLK_p && (event.key.keysym.mod & (KMOD_LCTRL | KMOD_RCTRL)))
+            {
+                paused = !paused;
+#ifdef _WIN32
+                UpdateNativePauseMenu();
+#endif
+            }
+            if (key == sKeyboardMappings[PC_KEY_SPEED])
+            {
                 if (!speedUp)
                 {
                     speedUp = true;
-                    timeScale = 5.0;
+                    timeScale = sSpeedMultiplier;
                     SDL_PauseAudioDevice(sdlAudioDevice, 1);
                 }
-                break;
             }
             break;
+        }
         }
     }
 }
 
 #ifdef _WIN32
 #define STICK_THRESHOLD 0.5f
+static bool IsControllerInputActive(const XINPUT_STATE *state, enum PcControllerInput input)
+{
+    static const WORD buttonMasks[PC_CONTROLLER_LT] =
+    {
+        XINPUT_GAMEPAD_A,
+        XINPUT_GAMEPAD_B,
+        XINPUT_GAMEPAD_X,
+        XINPUT_GAMEPAD_Y,
+        XINPUT_GAMEPAD_START,
+        XINPUT_GAMEPAD_BACK,
+        XINPUT_GAMEPAD_LEFT_SHOULDER,
+        XINPUT_GAMEPAD_RIGHT_SHOULDER,
+        XINPUT_GAMEPAD_LEFT_THUMB,
+        XINPUT_GAMEPAD_RIGHT_THUMB,
+    };
+
+    if (input < PC_CONTROLLER_LT)
+        return (state->Gamepad.wButtons & buttonMasks[input]) != 0;
+    if (input == PC_CONTROLLER_LT)
+        return state->Gamepad.bLeftTrigger > XINPUT_GAMEPAD_TRIGGER_THRESHOLD;
+    return state->Gamepad.bRightTrigger > XINPUT_GAMEPAD_TRIGGER_THRESHOLD;
+}
+
 u16 GetXInputKeys()
 {
     XINPUT_STATE state;
@@ -1152,12 +1669,11 @@ u16 GetXInputKeys()
 
     if (dwResult == ERROR_SUCCESS)
     {
-        /* A */      xinputKeys |= (state.Gamepad.wButtons & XINPUT_GAMEPAD_A) >> 12;
-        /* B */      xinputKeys |= (state.Gamepad.wButtons & XINPUT_GAMEPAD_X) >> 13;
-        /* Start */  xinputKeys |= (state.Gamepad.wButtons & XINPUT_GAMEPAD_START) >> 1;
-        /* Select */ xinputKeys |= (state.Gamepad.wButtons & XINPUT_GAMEPAD_BACK) >> 3;
-        /* L */      xinputKeys |= (state.Gamepad.wButtons & XINPUT_GAMEPAD_LEFT_SHOULDER) << 1;
-        /* R */      xinputKeys |= (state.Gamepad.wButtons & XINPUT_GAMEPAD_RIGHT_SHOULDER) >> 1;
+        for (int action = 0; action < PC_CONTROLLER_ACTION_SPEED; action++)
+        {
+            if (IsControllerInputActive(&state, sControllerMappings[action]))
+                xinputKeys |= sControllerButtonMasks[action];
+        }
         /* Up */     xinputKeys |= (state.Gamepad.wButtons & XINPUT_GAMEPAD_DPAD_UP) << 6;
         /* Down */   xinputKeys |= (state.Gamepad.wButtons & XINPUT_GAMEPAD_DPAD_DOWN) << 6;
         /* Left */   xinputKeys |= (state.Gamepad.wButtons & XINPUT_GAMEPAD_DPAD_LEFT) << 3;
@@ -1173,23 +1689,26 @@ u16 GetXInputKeys()
         if (yAxis < -STICK_THRESHOLD) xinputKeys |= DPAD_DOWN;
         if (yAxis >  STICK_THRESHOLD) xinputKeys |= DPAD_UP;
 
+    }
 
-        /* Speedup */
-        // Note: 'speedup' variable is only (un)set on keyboard input
-        double oldTimeScale = timeScale;
-        timeScale = (state.Gamepad.bRightTrigger > 0x80 || speedUp) ? 5.0 : 1.0;
+    /* Speedup */
+    // Automated smoke tests must not depend on a physical XInput device.
+    double oldTimeScale = timeScale;
+    bool autoplay = Platform_GetEnvironmentFlag("POKEMON_GO_WORLD_AUTOPLAY");
+    bool controllerSpeedUp = dwResult == ERROR_SUCCESS
+                          && IsControllerInputActive(&state, sControllerMappings[PC_CONTROLLER_ACTION_SPEED]);
+    timeScale = autoplay ? 5.0 : (controllerSpeedUp || speedUp) ? sSpeedMultiplier : 1.0;
 
-        if (oldTimeScale != timeScale)
+    if (oldTimeScale != timeScale)
+    {
+        if (timeScale > 1.0)
         {
-            if (timeScale > 1.0)
-            {
-                SDL_PauseAudioDevice(sdlAudioDevice, 1);
-            }
-            else
-            {
-                SDL_ClearQueuedAudio(sdlAudioDevice);
-                SDL_PauseAudioDevice(sdlAudioDevice, 0);
-            }
+            SDL_PauseAudioDevice(sdlAudioDevice, 1);
+        }
+        else
+        {
+            SDL_ClearQueuedAudio(sdlAudioDevice);
+            SDL_PauseAudioDevice(sdlAudioDevice, 0);
         }
     }
 
@@ -1201,12 +1720,15 @@ u16 Platform_GetKeyInput(void)
 {
     static u32 autoplayFrame;
     u16 automatedKeys = 0;
+    u16 pressedKeys = keyboardPressedKeys;
     const char *autoplay = SDL_getenv("POKEMON_GO_WORLD_AUTOPLAY");
+
+    keyboardPressedKeys = 0;
 
     if (autoplay != NULL && autoplay[0] != '\0' && autoplay[0] != '0')
     {
-        // One-frame pulses with release frames between them. This is intended
-        // for native-port smoke tests, never enabled during normal play.
+        // Generic input smoke test only. Narrative routes and object positions
+        // must be validated from an authentic save, not synthesized here.
         autoplayFrame++;
         if (autoplayFrame < 6100)
         {
@@ -1217,8 +1739,6 @@ u16 Platform_GetKeyInput(void)
         }
         else
         {
-            // Once the new-game flow has reached the first map, walk in each
-            // direction with release gaps to exercise normal field controls.
             u32 movementPhase = (autoplayFrame - 6100) % 240;
             if (movementPhase < 45)
                 automatedKeys = DPAD_DOWN;
@@ -1233,12 +1753,12 @@ u16 Platform_GetKeyInput(void)
 
 #ifdef _WIN32
     u16 gamepadKeys = GetXInputKeys();
-    return gamepadKeys | keyboardKeys | automatedKeys;
+    return gamepadKeys | keyboardKeys | pressedKeys | automatedKeys;
 #elif defined(__ANDROID__)
-    return keyboardKeys | controllerKeys | controllerAxisKeys | automatedKeys;
+    return keyboardKeys | pressedKeys | controllerKeys | controllerAxisKeys | automatedKeys;
 #endif
 
-    return keyboardKeys | automatedKeys;
+    return keyboardKeys | pressedKeys | automatedKeys;
 }
 
 void VDraw(SDL_Texture *texture)
