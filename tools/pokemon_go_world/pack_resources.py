@@ -140,21 +140,134 @@ def build(manifest: Path, output: Path, root: Path) -> None:
     print(f"Built {output} with {len(resources)} resources ({file_size} bytes)")
 
 
-def inspect(path: Path) -> None:
+def read_pack(path: Path, verify_payloads: bool = False) -> tuple[list[dict[str, int | str]], int]:
+    actual_file_size = path.stat().st_size
     with path.open("rb") as pack:
         raw_header = pack.read(HEADER.size)
         if len(raw_header) != HEADER.size:
             raise ValueError("truncated resource pack header")
         magic, version, count, index_offset, string_offset, data_offset, file_size = HEADER.unpack(raw_header)
-        if magic != MAGIC or version != VERSION or file_size != path.stat().st_size:
+        if magic != MAGIC or version != VERSION or file_size != actual_file_size:
             raise ValueError("invalid resource pack header")
+        if index_offset != HEADER.size:
+            raise ValueError(f"invalid index offset: {index_offset}")
+        expected_string_offset = index_offset + count * ENTRY.size
+        if string_offset != expected_string_offset:
+            raise ValueError(
+                f"invalid string-table offset: {string_offset} != {expected_string_offset}"
+            )
+        if not string_offset <= data_offset <= file_size or data_offset % ALIGNMENT != 0:
+            raise ValueError("invalid string-table or data offset")
+
+        entries: list[dict[str, int | str]] = []
         for index in range(count):
             pack.seek(index_offset + index * ENTRY.size)
-            hash_value, offset, size, name_offset, name_length, checksum = ENTRY.unpack(pack.read(ENTRY.size))
+            raw_entry = pack.read(ENTRY.size)
+            if len(raw_entry) != ENTRY.size:
+                raise ValueError(f"truncated resource entry {index}")
+            hash_value, offset, size, name_offset, name_length, checksum = ENTRY.unpack(raw_entry)
+            if name_length == 0 or name_length > MAX_NAME_LENGTH:
+                raise ValueError(f"invalid name length in resource entry {index}")
+            if name_offset < string_offset or name_offset + name_length > data_offset:
+                raise ValueError(f"resource entry {index} points outside the string table")
+            if offset < data_offset or offset > file_size or size > file_size - offset:
+                raise ValueError(f"resource entry {index} points outside the payload area")
+            if offset % ALIGNMENT != 0:
+                raise ValueError(f"resource entry {index} has an unaligned payload")
             pack.seek(name_offset)
-            name = pack.read(name_length).decode("utf-8")
-            print(f"{name}\t{size}\t@{offset}\thash={hash_value:016x}\tcrc32={checksum:08x}")
-        print(f"{count} resources; data starts at {data_offset}; file size {file_size}")
+            encoded_name = pack.read(name_length)
+            if len(encoded_name) != name_length:
+                raise ValueError(f"truncated name in resource entry {index}")
+            name = encoded_name.decode("utf-8")
+            if not name or "\\" in name or fnv1a64(name) != hash_value:
+                raise ValueError(f"invalid name or hash in resource entry {index}: {name!r}")
+            entry: dict[str, int | str] = {
+                "name": name,
+                "hash": hash_value,
+                "offset": offset,
+                "size": size,
+                "checksum": checksum,
+            }
+            entries.append(entry)
+
+        ordering = [(int(entry["hash"]), str(entry["name"])) for entry in entries]
+        if ordering != sorted(ordering):
+            raise ValueError("resource index is not sorted by hash and name")
+        names = [str(entry["name"]) for entry in entries]
+        if len(names) != len(set(names)):
+            raise ValueError("resource index contains duplicate names")
+
+        if verify_payloads:
+            buffer_size = 1024 * 1024
+            for index, entry in enumerate(entries):
+                remaining = int(entry["size"])
+                checksum = 0
+                pack.seek(int(entry["offset"]))
+                while remaining:
+                    chunk = pack.read(min(buffer_size, remaining))
+                    if not chunk:
+                        raise ValueError(f"truncated payload for resource {entry['name']!r}")
+                    checksum = zlib.crc32(chunk, checksum)
+                    remaining -= len(chunk)
+                if checksum != int(entry["checksum"]):
+                    raise ValueError(
+                        f"checksum mismatch for resource {entry['name']!r}: "
+                        f"{checksum:08x} != {int(entry['checksum']):08x}"
+                    )
+
+    return entries, data_offset
+
+
+def inspect(path: Path) -> None:
+    entries, data_offset = read_pack(path)
+    for entry in entries:
+        print(
+            f"{entry['name']}\t{entry['size']}\t@{entry['offset']}\t"
+            f"hash={int(entry['hash']):016x}\tcrc32={int(entry['checksum']):08x}"
+        )
+    print(f"{len(entries)} resources; data starts at {data_offset}; file size {path.stat().st_size}")
+
+
+def verify(path: Path, manifest: Path | None, root: Path) -> None:
+    entries, _ = read_pack(path, verify_payloads=True)
+    actual = {str(entry["name"]): entry for entry in entries}
+
+    if manifest is not None:
+        expected_resources = load_manifest(manifest, root)
+        expected_names = {str(resource["name"]) for resource in expected_resources}
+        actual_names = set(actual)
+        missing = sorted(expected_names - actual_names)
+        unexpected = sorted(actual_names - expected_names)
+        if missing or unexpected:
+            details = []
+            if missing:
+                details.append(f"missing={missing[:10]!r}")
+            if unexpected:
+                details.append(f"unexpected={unexpected[:10]!r}")
+            raise ValueError("resource pack differs from manifest: " + ", ".join(details))
+
+        for resource in expected_resources:
+            name = str(resource["name"])
+            sources = [Path(source) for source in resource["sources"]]
+            expected_size = sum(source.stat().st_size for source in sources)
+            expected_checksum = calculate_crc32(sources)
+            entry = actual[name]
+            if int(entry["size"]) != expected_size:
+                raise ValueError(
+                    f"size mismatch for resource {name!r}: "
+                    f"{entry['size']} != {expected_size}"
+                )
+            if int(entry["checksum"]) != expected_checksum:
+                raise ValueError(
+                    f"manifest checksum mismatch for resource {name!r}: "
+                    f"{int(entry['checksum']):08x} != {expected_checksum:08x}"
+                )
+
+    manifest_note = f" and {manifest}" if manifest is not None else ""
+    print(
+        f"Verified {path}: {len(entries)} resources, all payload checksums valid"
+        f"{manifest_note}."
+    )
 
 
 def main() -> None:
@@ -169,11 +282,22 @@ def main() -> None:
     inspect_parser = subparsers.add_parser("inspect")
     inspect_parser.add_argument("pack", type=Path)
 
+    verify_parser = subparsers.add_parser("verify")
+    verify_parser.add_argument("pack", type=Path)
+    verify_parser.add_argument("--manifest", type=Path)
+    verify_parser.add_argument("--root", type=Path, default=Path.cwd())
+
     args = parser.parse_args()
     if args.command == "build":
         build(args.manifest.resolve(), args.output.resolve(), args.root.resolve())
-    else:
+    elif args.command == "inspect":
         inspect(args.pack.resolve())
+    else:
+        verify(
+            args.pack.resolve(),
+            args.manifest.resolve() if args.manifest is not None else None,
+            args.root.resolve(),
+        )
 
 
 if __name__ == "__main__":
