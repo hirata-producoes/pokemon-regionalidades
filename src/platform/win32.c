@@ -52,7 +52,7 @@ DWORD WINAPI DoMain(LPVOID lpParam);
 void VDraw();
 
 static void ReadSaveFile(char *path);
-static void StoreSaveFile(void);
+static bool32 StoreSaveFile(void);
 static void CloseSaveFile(void);
 static void UpdateInternalClock(void);
 
@@ -535,21 +535,25 @@ static void ReadSaveFile(char *path)
     CloseHandle(sSaveFile);
 }
 
-static void StoreSaveFile()
+static bool32 StoreSaveFile(void)
 {
-    DWORD bytesRead;
+    DWORD bytesWritten = 0;
+    BOOL writeSucceeded = FALSE;
     sSaveFile = CreateFileA(savePath, GENERIC_READ | GENERIC_WRITE, FILE_SHARE_READ, NULL, OPEN_EXISTING, FILE_ATTRIBUTE_NORMAL, NULL); 
-    if (sSaveFile != NULL || sSaveFile != INVALID_HANDLE_VALUE)
+    if (sSaveFile != NULL && sSaveFile != INVALID_HANDLE_VALUE)
     {
         SetFilePointer(sSaveFile, 0, 0, FILE_BEGIN);
-        WriteFile(sSaveFile, &FLASH_BASE, sizeof(FLASH_BASE), &bytesRead, NULL);
+        writeSucceeded = WriteFile(sSaveFile, &FLASH_BASE, sizeof(FLASH_BASE), &bytesWritten, NULL);
+        CloseHandle(sSaveFile);
     }
-    CloseHandle(sSaveFile);
+
+    sSaveFile = NULL;
+    return writeSucceeded && bytesWritten == sizeof(FLASH_BASE);
 }
 
-void Platform_StoreSaveFile(void)
+bool32 Platform_StoreSaveFile(void)
 {
-    StoreSaveFile();
+    return StoreSaveFile();
 }
 
 void Platform_ReadFlash(u16 sectorNum, u32 offset, u8 *dest, u32 size)

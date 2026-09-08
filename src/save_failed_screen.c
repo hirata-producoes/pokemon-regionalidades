@@ -1,4 +1,7 @@
 #include "global.h"
+#ifdef PORTABLE
+#include "platform.h"
+#endif
 #include "text.h"
 #include "main.h"
 #include "malloc.h"
@@ -272,6 +275,16 @@ static void CB2_WipeSave(void)
         FillWindowPixelBuffer(sWindowIds[TEXT_WIN_ID], PIXEL_FILL(1));
         SaveFailedScreenTextPrint(gText_CheckCompleted, 1, 0);
         HandleSavingData(sSaveFailedType);
+
+#ifdef PORTABLE
+        if (gDamagedSaveSectors == 0 && !Platform_StoreSaveFile())
+        {
+            FillWindowPixelBuffer(sWindowIds[TEXT_WIN_ID], PIXEL_FILL(1));
+            SaveFailedScreenTextPrint(gText_BackupMemoryDamaged, 1, 0);
+            SetMainCallback2(CB2_GameplayCannotBeContinued);
+            return;
+        }
+#endif
 
         if (gDamagedSaveSectors != 0)
         {

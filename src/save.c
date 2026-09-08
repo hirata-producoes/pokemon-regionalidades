@@ -777,9 +777,6 @@ u8 HandleSavingData(u8 saveType)
         WriteSaveSectorOrSlot(FULL_SAVE_SLOT, gRamSaveSectorLocations);
         break;
     }
-#ifdef PORTABLE
-    Platform_StoreSaveFile();
-#endif
     gTrainerHillVBlankCounter = backupVar;
     return 0;
 }
@@ -796,7 +793,11 @@ u8 TrySavingData(u8 saveType)
     if (!gDamagedSaveSectors)
     {
 #ifdef PORTABLE
-        Platform_StoreSaveFile();
+        if (!Platform_StoreSaveFile())
+        {
+            gSaveAttemptStatus = SAVE_STATUS_ERROR;
+            return SAVE_STATUS_ERROR;
+        }
 #endif
         gSaveAttemptStatus = SAVE_STATUS_OK;
         return SAVE_STATUS_OK;
