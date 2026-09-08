@@ -2,6 +2,8 @@
 #include "gba/gba.h"
 #include "gba/flash_internal.h"
 
+#ifdef PORTABLE
+
 static const u16 sDummyMaxTime[] =
 {
       10, 65469, TIMER_ENABLE | TIMER_INTR_ENABLE | TIMER_256CLK,
@@ -54,3 +56,5 @@ u16 ProgramFlashSector_DUMMY(u16 sectorNum, u8 *src)
     memcpy(&FLASH_BASE[sectorNum << gFlash->sector.shift], src, 0x1000);
     return 0;
 }
+
+#endif // PORTABLE

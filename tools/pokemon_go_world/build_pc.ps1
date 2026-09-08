@@ -3,6 +3,7 @@ param(
     [string]$SdlRoot,
     [string]$PythonPath,
     [switch]$Debug,
+    [switch]$VerifyResources,
     [int]$Jobs = [Environment]::ProcessorCount
 )
 
@@ -67,6 +68,23 @@ try {
     }
 
     Copy-Item -LiteralPath $sdlDll -Destination (Join-Path $repoRoot 'SDL2.dll') -Force
+    if ($VerifyResources) {
+        & $PythonPath `
+            (Join-Path $repoRoot 'tools\pokemon_go_world\pack_resources.py') `
+            verify `
+            (Join-Path $repoRoot 'pokemon_regionalidades.pak') `
+            --manifest (Join-Path $repoRoot 'resources\pc\manifest.json') `
+            --root $repoRoot
+        if ($LASTEXITCODE -ne 0) {
+            throw "A verificação do pacote externo terminou com código $LASTEXITCODE."
+        }
+        & $PythonPath `
+            (Join-Path $repoRoot 'tools\pokemon_go_world\verify_map_data.py') `
+            --root $repoRoot
+        if ($LASTEXITCODE -ne 0) {
+            throw "A verificação dos mapas terminou com código $LASTEXITCODE."
+        }
+    }
     Write-Host 'Porte PC compilado com sucesso.' -ForegroundColor Green
 }
 finally {

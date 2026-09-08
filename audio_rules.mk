@@ -1,5 +1,11 @@
 # This file contains rules for making assemblies for most music in the game.
 
+# Native PC builds override this with a command that translates pseudo-ops for
+# the host assembler and prefixes symbols in the resulting object. The GBA
+# toolchain accepts both the generated directives and symbol names as-is.
+ASM_PSEUDO_OP_CONV ?= cat
+FIX_UNDERSCORE ?= true
+
 CRY_SUBDIR := sound/direct_sound_samples/cries
 
 MID_ASM_DIR := $(MID_SUBDIR)

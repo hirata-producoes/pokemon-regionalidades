@@ -304,7 +304,10 @@ ifeq ($(SETUP_PREREQS),1)
 endif
 
 # Collect sources
-C_SRCS_IN := $(wildcard $(C_SUBDIR)/*.c $(C_SUBDIR)/*/*.c $(C_SUBDIR)/*/*/*.c)
+# Implementations under src/platform emulate GBA hardware for native PC builds.
+# Compiling them into the ROM would replace hardware registers and BIOS routines
+# with the host-side emulation layer.
+C_SRCS_IN := $(filter-out $(C_SUBDIR)/platform/%,$(wildcard $(C_SUBDIR)/*.c $(C_SUBDIR)/*/*.c $(C_SUBDIR)/*/*/*.c))
 C_SRCS := $(foreach src,$(C_SRCS_IN),$(if $(findstring .inc.c,$(src)),,$(src)))
 C_OBJS := $(patsubst $(C_SUBDIR)/%.c,$(C_BUILDDIR)/%.o,$(C_SRCS))
 

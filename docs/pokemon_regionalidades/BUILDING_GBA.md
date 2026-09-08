@@ -30,6 +30,25 @@ Depois, para compilações normais:
 powershell -ExecutionPolicy Bypass -File .\tools\pokemon_go_world\build_rom.ps1
 ```
 
+O script usa a execução direta do WSL para preservar corretamente as barras e os
+espaços do caminho do projeto. Por isso, ele também pode ser chamado de qualquer
+pasta com um caminho absoluto:
+
+```powershell
+$Project = 'C:\Users\Rafael\Documents\Codex\2026-08-02\pokemon-go-world-pc'
+powershell -ExecutionPolicy Bypass -File "$Project\tools\pokemon_go_world\build_rom.ps1"
+```
+
+Quando o projeto estiver em um `git worktree`, o script converte separadamente o
+caminho do código e o diretório administrativo do Git. Assim, a verificação de
+histórico feita pela base continua válida dentro do Ubuntu; não é necessário criar
+um arquivo `.histignore` para ocultá-la.
+
+As implementações de `src/platform` simulam no computador componentes físicos do
+GBA, como BIOS, DMA, áudio e registradores. O alvo GBA exclui essa pasta e utiliza
+diretamente as rotinas e os endereços do console. Essa separação evita que uma
+correção específica do porte PC substitua acidentalmente o comportamento da ROM.
+
 O resultado esperado é:
 
 ```text

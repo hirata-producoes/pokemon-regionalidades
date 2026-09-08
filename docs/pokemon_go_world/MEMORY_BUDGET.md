@@ -2,17 +2,23 @@
 
 > Documento técnico criado antes da mudança de nome para Pokémon Regionalidades. Seus nomes antigos foram preservados para manter o histórico reproduzível.
 
-## Medição de referência
+## Medição atual
 
-A ROM jogável de 1º de agosto de 2026 usa 26.650.720 bytes (25,42 MiB) dos
-32 MiB tradicionais do GBA. Restam 6,58 MiB físicos, ou 5,08 MiB para conteúdo
-se for preservada uma reserva de segurança de 1,5 MiB.
+O build GBA limpo concluído em 7 de setembro de 2026 usa 23.988.592 bytes
+(22,88 MiB) dos 32 MiB tradicionais do GBA. Restam 9,12 MiB físicos, ou 7,62 MiB
+para conteúdo se for preservada uma reserva de segurança de 1,5 MiB. A
+recompilação completa reproduziu a medição e estabeleceu a baseline do marco.
 
 | Área | Uso | Livre | Observação |
 | --- | ---: | ---: | --- |
-| ROM | 25,42 MiB | 6,58 MiB | Mapas, áudio, gráficos, textos e código |
-| EWRAM | 221,28 KiB | 34,72 KiB | Estado dinâmico do jogo |
-| IWRAM | 27,71 KiB | 4,29 KiB | Margem crítica para pilha e rotinas rápidas |
+| ROM | 22,88 MiB | 9,12 MiB | Mapas, áudio, gráficos, textos e código |
+| EWRAM | 217,74 KiB | 38,26 KiB | Estado dinâmico do jogo |
+| IWRAM | 28,39 KiB | 3,61 KiB | Margem crítica; acompanhar antes de sistemas grandes |
+
+Em comparação com a referência de 1º de agosto de 2026, a ROM diminuiu cerca de
+2,54 MiB. A IWRAM, porém, perdeu aproximadamente 0,68 KiB de margem, reforçando
+que espaço de ROM e memória ativa precisam ser tratados como orçamentos
+independentes.
 
 O relatório deve ser executado depois de cada build completa:
 
