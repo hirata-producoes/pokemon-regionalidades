@@ -3,7 +3,9 @@
 // Native MP2K sample mixer adapted from gradenGnostic/pokeemerald-multiplatform.
 
 #include "global.h"
+#include "m4a.h"
 #include "music_player.h"
+#include "platform.h"
 #include "sound_mixer.h"
 #include "mp2k_common.h"
 
@@ -16,10 +18,26 @@
 
 
 static inline void GenerateAudio(struct SoundMixerState *mixer, struct MixerSource *chan, struct WaveData2 *wav, float *outBuffer, u16 samplesPerFrame, float sampleRateReciprocal);
+static u8 GetMixerSourceVolume(const struct MixerSource *chan);
 void SampleMixer(struct SoundMixerState *mixer, u32 scanlineLimit, u16 samplesPerFrame, float *outBuffer, u8 dmaCounter, u16 maxBufSize);
 static inline bool32 TickEnvelope(struct MixerSource *chan, struct WaveData2 *wav);
 void GeneratePokemonSampleAudio(struct SoundMixerState *mixer, struct MixerSource *chan, s8 *current, float *outBuffer, u16 samplesPerFrame, float sampleRateReciprocal, s32 samplesLeftInWav, signed envR, signed envL, s32 loopLen);
 static s8 sub_82DF758(struct MixerSource *chan, u32 current);
+
+static u8 GetMixerSourceVolume(const struct MixerSource *chan)
+{
+    u32 i;
+
+    if (chan->track != NULL && gMPlayInfo_BGM.tracks != NULL)
+    {
+        for (i = 0; i < gMPlayInfo_BGM.trackCount; i++)
+        {
+            if (chan->track == &gMPlayInfo_BGM.tracks[i])
+                return Platform_GetSetting(PLATFORM_SETTING_MUSIC_VOLUME);
+        }
+    }
+    return Platform_GetSetting(PLATFORM_SETTING_EFFECTS_VOLUME);
+}
 
 void RunMixerFrame(void) {
     struct SoundMixerState *mixer = (struct SoundMixerState *)SOUND_INFO_PTR;
@@ -232,6 +250,7 @@ static inline void GenerateAudio(struct SoundMixerState *mixer, struct MixerSour
     uf8 v = chan->envelopeVol * (mixer->masterVol + 1) / 16U;
     chan->envelopeVolR = chan->rightVol * v / 256U;
     chan->envelopeVolL = chan->leftVol * v / 256U;
+    u8 categoryVolume = GetMixerSourceVolume(chan);
 
     s32 loopLen = 0;
     s8 *loopStart;
@@ -241,8 +260,8 @@ static inline void GenerateAudio(struct SoundMixerState *mixer, struct MixerSour
     }
     s32 samplesLeftInWav = chan->ct;
     s8 *current = chan->current;
-    signed envR = chan->envelopeVolR;
-    signed envL = chan->envelopeVolL;
+    signed envR = chan->envelopeVolR * categoryVolume / 10;
+    signed envL = chan->envelopeVolL * categoryVolume / 10;
 #ifdef POKEMON_EXTENSIONS
     if (chan->type & 0x30) {
         GeneratePokemonSampleAudio(mixer, chan, current, outBuffer, samplesPerFrame, sampleRateReciprocal, samplesLeftInWav, envR, envL, loopLen);

@@ -706,6 +706,9 @@ void m4aMPlayStop(struct MusicPlayerInfo *mplayInfo)
     s32 i;
     struct MusicPlayerTrack *track;
 
+    if (mplayInfo == NULL)
+        return;
+
     if (mplayInfo->ident != ID_NUMBER)
         return;
 
