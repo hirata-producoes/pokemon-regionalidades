@@ -103,7 +103,13 @@ static char sConfigPath[1024] = "pokemon_regionalidades.cfg";
 static u8 sBorderBackground;
 static bool sHasBorderBackgroundConfig;
 static u8 sBackgroundOrderVersion;
-static u8 sPlatformSettings[PLATFORM_SETTING_COUNT] = {0, 4, 0, 1, 1, 10};
+static u8 sPlatformSettings[PLATFORM_SETTING_COUNT] = {0, 4, 0, 1, 1, 10, 10, 10};
+static bool sWindowResizable = true;
+#if defined(NATIVE_LINUX) || defined(_WIN32)
+static int sAppliedFullscreen = -1;
+static int sAppliedWindowScale = -1;
+static int sAppliedWindowResizable = -1;
+#endif
 
 enum PcKeyAction
 {
@@ -373,8 +379,9 @@ static void HandleNativeMenuCommand(WORD command)
         SDL_ShowSimpleMessageBox(
             SDL_MESSAGEBOX_INFORMATION,
             "Controles",
-            "Os controles podem ser alterados em Configuracoes > Controles e aceleracao.\n\n"
-            "Atalhos do programa:\nCtrl+P: pausar ou continuar\nCtrl+R: reiniciar",
+            "Os controles podem ser alterados em Configuracoes > Controles, video e aceleracao.\n\n"
+            "Atalhos do programa:\nCtrl+P: pausar ou continuar\nCtrl+R: reiniciar\n"
+            "Alt+Enter: entrar ou sair da tela cheia",
             sdlWindow);
         break;
     }
@@ -397,7 +404,7 @@ static void InstallNativeMenu(void)
     AppendMenuW(gameMenu, MF_SEPARATOR, 0, NULL);
     AppendMenuW(gameMenu, MF_STRING, PC_MENU_GAME_PROFILES, L"Voltar aos perfis");
     AppendMenuW(gameMenu, MF_STRING, PC_MENU_GAME_EXIT, L"Sair");
-    AppendMenuW(settingsMenu, MF_STRING, PC_MENU_SETTINGS, L"Controles e acelera\u00e7\u00e3o...");
+    AppendMenuW(settingsMenu, MF_STRING, PC_MENU_SETTINGS, L"Controles, v\u00eddeo e acelera\u00e7\u00e3o...");
     AppendMenuW(helpMenu, MF_STRING, PC_MENU_HELP_CONTROLS, L"Controles e atalhos");
     AppendMenuW(sNativeMenu, MF_POPUP, (UINT_PTR)gameMenu, L"Jogo");
     AppendMenuW(sNativeMenu, MF_POPUP, (UINT_PTR)settingsMenu, L"Configura\u00e7\u00f5es");
@@ -436,7 +443,12 @@ static void PollConfigFileChanges(void)
         timeScale = 1.0;
         ReadConfigFile();
         ApplyPlatformSettings();
-        DBGPRINTF("PC settings: configuration reloaded while running (speed=%ux)\n", sSpeedMultiplier);
+        DBGPRINTF("PC settings: configuration reloaded while running "
+                  "(speed=%ux fullscreen=%u resizable=%u scale=%ux)\n",
+                  sSpeedMultiplier,
+                  sPlatformSettings[PLATFORM_SETTING_FULLSCREEN],
+                  sWindowResizable,
+                  sPlatformSettings[PLATFORM_SETTING_WINDOW_SCALE]);
     }
 }
 #endif
@@ -681,6 +693,16 @@ int main(int argc, char **argv)
     DBGPRINTF("PC controls: keyA=%s keyB=%s keySpeed=%s speed=%ux\n",
               keyAName, keyBName, keySpeedName,
               sSpeedMultiplier);
+    DBGPRINTF("PC video: fullscreen=%u resizable=%u scale=%ux integer=%u vsync=%u border=%u\n",
+              sPlatformSettings[PLATFORM_SETTING_FULLSCREEN], sWindowResizable,
+              sPlatformSettings[PLATFORM_SETTING_WINDOW_SCALE],
+              sPlatformSettings[PLATFORM_SETTING_INTEGER_SCALE],
+              sPlatformSettings[PLATFORM_SETTING_VSYNC],
+              sPlatformSettings[PLATFORM_SETTING_BORDER]);
+    DBGPRINTF("PC audio: master=%u music=%u effects=%u\n",
+              sPlatformSettings[PLATFORM_SETTING_VOLUME],
+              sPlatformSettings[PLATFORM_SETTING_MUSIC_VOLUME],
+              sPlatformSettings[PLATFORM_SETTING_EFFECTS_VOLUME]);
 #ifdef _WIN32
     DBGPRINTF("PC controller: A=%s B=%s speed=%s\n",
               sControllerInputNames[sControllerMappings[PC_CONTROLLER_ACTION_A]],
@@ -908,8 +930,15 @@ int main(int argc, char **argv)
                     }
                     else
                     {
-                        gameHeight = outputHeight * 8 / 9;
-                        gameWidth = gameHeight * 3 / 2;
+                        // Use the largest 3:2 viewport that fits the window. A
+                        // previous 8/9 inset left an unnecessary black margin.
+                        gameWidth = outputWidth;
+                        gameHeight = gameWidth * DISPLAY_HEIGHT / DISPLAY_WIDTH;
+                        if (gameHeight > outputHeight)
+                        {
+                            gameHeight = outputHeight;
+                            gameWidth = gameHeight * DISPLAY_WIDTH / DISPLAY_HEIGHT;
+                        }
                     }
                     SDL_Rect gameViewport = {(outputWidth - gameWidth) / 2,
                                              (outputHeight - gameHeight) / 2,
@@ -1069,6 +1098,8 @@ static void ReadConfigFile(void)
             sPlatformSettings[PLATFORM_SETTING_FULLSCREEN] = value != 0;
         else if (sscanf(line, "windowScale=%u", &value) == 1 && value >= 2 && value <= 5)
             sPlatformSettings[PLATFORM_SETTING_WINDOW_SCALE] = value;
+        else if (sscanf(line, "windowResizable=%u", &value) == 1)
+            sWindowResizable = value != 0;
         else if (sscanf(line, "integerScale=%u", &value) == 1)
             sPlatformSettings[PLATFORM_SETTING_INTEGER_SCALE] = value != 0;
         else if (sscanf(line, "vsync=%u", &value) == 1)
@@ -1077,6 +1108,10 @@ static void ReadConfigFile(void)
             sPlatformSettings[PLATFORM_SETTING_BORDER] = value != 0;
         else if (sscanf(line, "volume=%u", &value) == 1 && value <= 10)
             sPlatformSettings[PLATFORM_SETTING_VOLUME] = value;
+        else if (sscanf(line, "musicVolume=%u", &value) == 1 && value <= 10)
+            sPlatformSettings[PLATFORM_SETTING_MUSIC_VOLUME] = value;
+        else if (sscanf(line, "effectsVolume=%u", &value) == 1 && value <= 10)
+            sPlatformSettings[PLATFORM_SETTING_EFFECTS_VOLUME] = value;
         else if (sscanf(line, "rtcOffsetSeconds=%lld", &signedValue) == 1)
             sRtcOffsetSeconds = (time_t)signedValue;
         else if (sscanf(line, "speedMultiplier=%u", &value) == 1 && value >= 2 && value <= 10)
@@ -1105,10 +1140,13 @@ static void StoreConfigFile(void)
     fprintf(configFile, "backgroundOrder=2\n");
     fprintf(configFile, "fullscreen=%u\n", sPlatformSettings[PLATFORM_SETTING_FULLSCREEN]);
     fprintf(configFile, "windowScale=%u\n", sPlatformSettings[PLATFORM_SETTING_WINDOW_SCALE]);
+    fprintf(configFile, "windowResizable=%u\n", sWindowResizable);
     fprintf(configFile, "integerScale=%u\n", sPlatformSettings[PLATFORM_SETTING_INTEGER_SCALE]);
     fprintf(configFile, "vsync=%u\n", sPlatformSettings[PLATFORM_SETTING_VSYNC]);
     fprintf(configFile, "border=%u\n", sPlatformSettings[PLATFORM_SETTING_BORDER]);
     fprintf(configFile, "volume=%u\n", sPlatformSettings[PLATFORM_SETTING_VOLUME]);
+    fprintf(configFile, "musicVolume=%u\n", sPlatformSettings[PLATFORM_SETTING_MUSIC_VOLUME]);
+    fprintf(configFile, "effectsVolume=%u\n", sPlatformSettings[PLATFORM_SETTING_EFFECTS_VOLUME]);
     fprintf(configFile, "rtcOffsetSeconds=%lld\n", (long long)sRtcOffsetSeconds);
     fprintf(configFile, "speedMultiplier=%u\n", sSpeedMultiplier);
     for (int action = 0; action < PC_KEY_COUNT; action++)
@@ -1124,14 +1162,26 @@ static void ApplyPlatformSettings(void)
 {
     SDL_RenderSetVSync(sdlRenderer, sPlatformSettings[PLATFORM_SETTING_VSYNC]);
 #if defined(NATIVE_LINUX) || defined(_WIN32)
-    SDL_SetWindowFullscreen(sdlWindow, sPlatformSettings[PLATFORM_SETTING_FULLSCREEN]
-                                      ? SDL_WINDOW_FULLSCREEN_DESKTOP : 0);
-    if (!sPlatformSettings[PLATFORM_SETTING_FULLSCREEN])
+    int fullscreen = sPlatformSettings[PLATFORM_SETTING_FULLSCREEN] != 0;
+    int scale = sPlatformSettings[PLATFORM_SETTING_WINDOW_SCALE];
+    int resizable = sWindowResizable != 0;
+    bool fullscreenChanged = fullscreen != sAppliedFullscreen;
+    bool scaleChanged = scale != sAppliedWindowScale;
+    bool resizableChanged = resizable != sAppliedWindowResizable;
+
+    if (fullscreenChanged)
+        SDL_SetWindowFullscreen(sdlWindow, fullscreen ? SDL_WINDOW_FULLSCREEN_DESKTOP : 0);
+    SDL_SetWindowResizable(sdlWindow, resizable ? SDL_TRUE : SDL_FALSE);
+    SDL_SetWindowMinimumSize(sdlWindow, 640, 360);
+    if (!fullscreen && (scaleChanged || (fullscreenChanged && sAppliedFullscreen == 1)
+                     || (resizableChanged && !resizable)))
     {
-        int scale = sPlatformSettings[PLATFORM_SETTING_WINDOW_SCALE];
         SDL_SetWindowSize(sdlWindow, 320 * scale, 180 * scale);
         SDL_SetWindowPosition(sdlWindow, SDL_WINDOWPOS_CENTERED, SDL_WINDOWPOS_CENTERED);
     }
+    sAppliedFullscreen = fullscreen;
+    sAppliedWindowScale = scale;
+    sAppliedWindowResizable = resizable;
 #endif
 }
 
@@ -1602,7 +1652,18 @@ void ProcessEvents(void)
             u16 keyMask = KeyboardButtonMask(key);
             keyboardKeys |= keyMask;
             keyboardPressedKeys |= keyMask;
-            if (key == SDLK_r && (event.key.keysym.mod & (KMOD_LCTRL | KMOD_RCTRL)))
+            if (key == SDLK_RETURN
+             && (event.key.keysym.mod & (KMOD_LALT | KMOD_RALT))
+             && event.key.repeat == 0)
+            {
+                sPlatformSettings[PLATFORM_SETTING_FULLSCREEN] =
+                    !sPlatformSettings[PLATFORM_SETTING_FULLSCREEN];
+                ApplyPlatformSettings();
+                StoreConfigFile();
+                DBGPRINTF("PC video: fullscreen toggled by Alt+Enter (%u)\n",
+                          sPlatformSettings[PLATFORM_SETTING_FULLSCREEN]);
+            }
+            else if (key == SDLK_r && (event.key.keysym.mod & (KMOD_LCTRL | KMOD_RCTRL)))
             {
 #ifdef _WIN32
                 DBGPRINTF("PC shutdown: restart requested by Ctrl+R\n");

@@ -30,16 +30,23 @@ try {
     }
     $log = [IO.File]::ReadAllText($logPath)
     if ($log -notmatch 'PC controls: keyA=C keyB=V keySpeed=Left Shift speed=3x' -or
-        $log -notmatch 'PC controller: A=B B=Y speed=LT') {
-        throw "O executável não carregou os controles esperados.`r`n$log"
+        $log -notmatch 'PC controller: A=B B=Y speed=LT' -or
+        $log -notmatch 'PC video: fullscreen=0 resizable=0 scale=3x integer=1 vsync=0 border=0' -or
+        $log -notmatch 'PC audio: master=8 music=4 effects=6') {
+        throw "O executável não carregou os controles, o vídeo e o áudio esperados.`r`n$log"
     }
     $storedConfig = [IO.File]::ReadAllText($configPath)
-    foreach ($expected in @('keyA=C','keyB=V','keySpeed=Left Shift','controllerA=B','controllerB=Y','controllerSpeed=LT','speedMultiplier=3')) {
+    foreach ($expected in @(
+        'keyA=C','keyB=V','keySpeed=Left Shift','controllerA=B','controllerB=Y',
+        'controllerSpeed=LT','speedMultiplier=3','fullscreen=0','windowScale=3',
+        'windowResizable=0','integerScale=1','vsync=0','border=0',
+        'volume=8','musicVolume=4','effectsVolume=6'
+    )) {
         if ($storedConfig -notmatch ('(?m)^' + [regex]::Escape($expected) + '\r?$')) {
             throw "O executável não preservou a configuração ao regravá-la: $expected"
         }
     }
-    Write-Output 'PC_CONTROLS_CONFIG_TEST_OK'
+    Write-Output 'PC_CONTROLS_VIDEO_AND_AUDIO_CONFIG_TEST_OK'
 }
 finally {
     foreach ($name in $previous.Keys) {
