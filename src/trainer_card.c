@@ -359,6 +359,9 @@ static void CB2_TrainerCard(void)
 
 static void CloseTrainerCard(u8 taskId)
 {
+    // The frame callback must stop using sData before it is released.
+    SetVBlankCallback(NULL);
+    SetHBlankCallback(NULL);
     SetMainCallback2(sData->callback2);
     FreeAllWindowBuffers();
     FREE_AND_SET_NULL(sData);

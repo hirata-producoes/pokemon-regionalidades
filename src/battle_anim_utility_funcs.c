@@ -144,7 +144,7 @@ static void AnimTask_BlendSpriteColor_Step2(u8 taskId)
     if (gTasks[taskId].data[9] == gTasks[taskId].data[2])
     {
         gTasks[taskId].data[9] = 0;
-        selectedPalettes = gTasks[taskId].data[0] | (gTasks[taskId].data[1] << 16);
+        selectedPalettes = (u16)gTasks[taskId].data[0] | ((u32)(u16)gTasks[taskId].data[1] << 16);
         while (selectedPalettes != 0)
         {
             if (selectedPalettes & 1)

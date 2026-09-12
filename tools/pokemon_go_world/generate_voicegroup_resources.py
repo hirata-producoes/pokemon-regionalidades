@@ -260,6 +260,16 @@ def parse_voicegroups(path: Path, definitions_dir: Path) -> tuple[list[Voicegrou
                 )
             struct.pack_into("<I", mutable, owner_offset, 0)
             relocations.append(relocation)
+        # MP2K songs address voices with an unsigned byte. A few original songs
+        # intentionally select a high, otherwise undefined slot (mus_title uses
+        # voice 127). On GBA this reads into adjacent ROM data; splitting each
+        # voicegroup into an independent PC resource would instead read beyond
+        # its allocation. Keep all 128 addressable slots inside the resource.
+        # The source banks conventionally use this harmless square-wave filler
+        # for undefined voices; mus_title's voice 127 also reaches the same
+        # filler in the adjacent GBA ROM data.
+        filler = bytes((1, 60, 0, 0, 2, 0, 0, 0, 0, 0, 15, 0))
+        mutable.extend(filler * (MAX_VOICES - len(mutable) // TONE_DATA_SIZE))
         groups.append(Voicegroup(owner_name, bytes(mutable), tuple(relocations)))
     return groups, sorted(external_symbols)
 

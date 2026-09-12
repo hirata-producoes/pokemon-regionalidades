@@ -273,7 +273,7 @@ function New-ProfileCard {
     $importButton.Add_Click({
         $dialog = New-Object Windows.Forms.OpenFileDialog
         $dialog.Title = "Importar save para o perfil $profileId"
-        $dialog.Filter = 'Save de Pokémon (*.sav)|*.sav|Todos os arquivos (*.*)|*.*'
+        $dialog.Filter = 'Save de Pokémon Regionalidades (*.pgrsave;*.sav)|*.pgrsave;*.sav|Todos os arquivos (*.*)|*.*'
         if ($dialog.ShowDialog($form) -eq [Windows.Forms.DialogResult]::OK) {
             try {
                 & $profileRunner -Profile $profileId -DataRoot $DataRoot -ImportSave $dialog.FileName -PrepareOnly
@@ -294,11 +294,11 @@ function New-ProfileCard {
     $exportButton.Add_Click({
         $dialog = New-Object Windows.Forms.SaveFileDialog
         $dialog.Title = "Exportar save do perfil $profileId"
-        $dialog.Filter = 'Save de Pokémon (*.sav)|*.sav'
-        $dialog.DefaultExt = 'sav'
+        $dialog.Filter = 'Save nativo de Pokémon Regionalidades (*.pgrsave)|*.pgrsave'
+        $dialog.DefaultExt = 'pgrsave'
         $dialog.AddExtension = $true
         $dialog.OverwritePrompt = $true
-        $dialog.FileName = "pokemon-regionalidades-perfil-$profileId-$(Get-Date -Format 'yyyyMMdd-HHmm').sav"
+        $dialog.FileName = "pokemon-regionalidades-perfil-$profileId-$(Get-Date -Format 'yyyyMMdd-HHmm').pgrsave"
         if ($dialog.ShowDialog($form) -eq [Windows.Forms.DialogResult]::OK) {
             try {
                 & $profileRunner -Profile $profileId -DataRoot $DataRoot -ExportSave $dialog.FileName -AllowExportOverwrite -PrepareOnly
@@ -363,12 +363,14 @@ if ($ValidateOnly) {
         $settingsButton.Text -ne 'Configurações') {
         throw 'A validacao estrutural da interface de perfis falhou.'
     }
-    $profile1Save = Join-Path $DataRoot 'profiles\profile-1\pokemon_regionalidades.sav'
-    if ((Test-Path -LiteralPath $profile1Save -PathType Leaf) -and
+    $profile1Save = Join-Path $DataRoot 'profiles\profile-1\pokemon_regionalidades.pgrsave'
+    $profile1LegacySave = Join-Path $DataRoot 'profiles\profile-1\pokemon_regionalidades.sav'
+    if (((Test-Path -LiteralPath $profile1Save -PathType Leaf) -or
+         (Test-Path -LiteralPath $profile1LegacySave -PathType Leaf)) -and
         ($cards[1].Status.Text -notlike 'Save ativo*' -or $cards[1].Import.Enabled -or -not $cards[1].Export.Enabled)) {
         throw 'A interface nao reconheceu corretamente o save ativo do perfil 1.'
     }
-    $expectedRecoveries = @(Get-ChildItem -LiteralPath (Split-Path $profile1Save) -Filter 'pokemon_regionalidades.sav.recovery-*' -ErrorAction SilentlyContinue).Count
+    $expectedRecoveries = @(Get-ProfileEntries -Profile 1 | Where-Object Slot -gt 0).Count
     if ($cards[1].Recoveries.Items.Count -ne $expectedRecoveries) {
         throw 'A interface nao apresentou todas as recuperacoes do perfil 1.'
     }

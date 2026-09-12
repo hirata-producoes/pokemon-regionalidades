@@ -31,6 +31,7 @@
 #include "overworld.h"
 #include "palette.h"
 #include "party_menu.h"
+#include "pokemon_regionalidades_inventory.h"
 #include "player_pc.h"
 #include "pokemon.h"
 #include "pokemon_summary_screen.h"
@@ -116,8 +117,8 @@ struct ListBuffer2 {
 };
 
 struct TempWallyBag {
-    struct ItemSlot bagPocket_Items[BAG_ITEMS_COUNT];
-    struct ItemSlot bagPocket_PokeBalls[BAG_POKEBALLS_COUNT];
+    struct LegacyItemSlot bagPocket_Items[BAG_ITEMS_COUNT];
+    struct LegacyItemSlot bagPocket_PokeBalls[BAG_POKEBALLS_COUNT];
     u16 cursorPosition[POCKETS_COUNT];
     u16 scrollPosition[POCKETS_COUNT];
     u16 unused;
@@ -149,7 +150,7 @@ static void Task_CloseBagMenu(u8);
 static u8 AddItemMessageWindow(u8);
 static void RemoveItemMessageWindow(u8);
 static void ReturnToItemList(u8);
-static void PrintItemQuantity(u8, s16);
+static void PrintItemQuantity(u8, u32);
 static u8 BagMenu_AddWindow(u8);
 static u8 GetSwitchBagPocketDirection(void);
 static void SwitchBagPocket(u8, s16, bool16);
@@ -696,9 +697,9 @@ void VBlankCB_BagMenuRun(void)
 
 #define tListTaskId        data[0]
 #define tListPosition      data[1]
-#define tQuantity          data[2]
+#define tQuantity          gBagMenu->quantity
 #define tNeverRead         data[3]
-#define tItemCount         data[8]
+#define tItemCount         gBagMenu->itemCount
 #define tMsgWindowId       data[10]
 #define tPocketSwitchDir   data[11]
 #define tPocketSwitchTimer data[12]
@@ -784,7 +785,7 @@ static bool8 SetupBagMenu(void)
         taskId = CreateBagInputHandlerTask(gBagPosition.location);
         gTasks[taskId].tListTaskId = ListMenuInit(&gMultiuseListMenuTemplate, gBagPosition.scrollPosition[gBagPosition.pocket], gBagPosition.cursorPosition[gBagPosition.pocket]);
         gTasks[taskId].tNeverRead = 0;
-        gTasks[taskId].tItemCount = 0;
+        gBagMenu->itemCount = 0;
         gMain.state++;
         break;
     case 15:
@@ -1238,7 +1239,7 @@ static void AddItemQuantityWindow(u8 windowType)
     PrintItemQuantity(BagMenu_AddWindow(windowType), 1);
 }
 
-static void PrintItemQuantity(u8 windowId, s16 quantity)
+static void PrintItemQuantity(u8 windowId, u32 quantity)
 {
     ConvertIntToDecimalStringN(gStringVar1, quantity, STR_CONV_MODE_LEADING_ZEROS, MAX_ITEM_DIGITS);
     StringExpandPlaceholders(gStringVar4, gText_xVar1);
@@ -1299,7 +1300,6 @@ static void Task_BagMenu_HandleInput(u8 taskId)
                     struct ItemSlot tempItem;
                     data[1] = GetItemListPosition(gBagPosition.pocket);
                     tempItem = GetBagItemIdAndQuantity(gBagPosition.pocket, data[1]);
-                    data[2] = tempItem.quantity;
                     if (gBagPosition.cursorPosition[gBagPosition.pocket] == gBagMenu->numItemStacks[gBagPosition.pocket])
                         break;
                     else
@@ -1885,8 +1885,6 @@ static void ItemMenu_UseOutOfBattle(u8 taskId)
 
 static void ItemMenu_Toss(u8 taskId)
 {
-    s16 *data = gTasks[taskId].data;
-
     RemoveContextWindow();
     tItemCount = 1;
     if (tQuantity == 1)
@@ -1907,8 +1905,6 @@ static void ItemMenu_Toss(u8 taskId)
 
 static void AskTossItems(u8 taskId)
 {
-    s16 *data = gTasks[taskId].data;
-
     u8 *end = CopyItemNameHandlePlural(gSpecialVar_ItemId, gStringVar1, tItemCount);
     WrapFontIdToFit(gStringVar1, end, FONT_NORMAL, WindowWidthPx(WIN_DESCRIPTION) - 10 - 6);
     ConvertIntToDecimalStringN(gStringVar2, tItemCount, STR_CONV_MODE_LEFT_ALIGN, MAX_ITEM_DIGITS);
@@ -1929,9 +1925,7 @@ static void CancelToss(u8 taskId)
 
 static void Task_ChooseHowManyToToss(u8 taskId)
 {
-    s16 *data = gTasks[taskId].data;
-
-    if (AdjustQuantityAccordingToDPadInput(&tItemCount, tQuantity) == TRUE)
+    if (AdjustQuantityAccordingToDPadInputU32(&tItemCount, tQuantity) == TRUE)
     {
         PrintItemQuantity(gBagMenu->windowIds[ITEMWIN_QUANTITY], tItemCount);
     }
@@ -1951,8 +1945,6 @@ static void Task_ChooseHowManyToToss(u8 taskId)
 
 static void ConfirmToss(u8 taskId)
 {
-    s16 *data = gTasks[taskId].data;
-
     u8 *end = CopyItemNameHandlePlural(gSpecialVar_ItemId, gStringVar1, tItemCount);
     WrapFontIdToFit(gStringVar1, end, FONT_NORMAL, WindowWidthPx(WIN_DESCRIPTION) - 10 - 6);
     ConvertIntToDecimalStringN(gStringVar2, tItemCount, STR_CONV_MODE_LEFT_ALIGN, MAX_ITEM_DIGITS);
@@ -2178,8 +2170,6 @@ bool8 UseRegisteredKeyItemOnField(void)
 
 static void Task_ItemContext_Sell(u8 taskId)
 {
-    s16 *data = gTasks[taskId].data;
-
     if (GetItemPrice(gSpecialVar_ItemId) == 0 || GetItemImportance(gSpecialVar_ItemId))
     {
         CopyItemName(gSpecialVar_ItemId, gStringVar2);
@@ -2210,8 +2200,6 @@ static void Task_ItemContext_Sell(u8 taskId)
 
 static void DisplaySellItemPriceAndConfirm(u8 taskId)
 {
-    s16 *data = gTasks[taskId].data;
-
     ConvertIntToDecimalStringN(gStringVar1, GetItemSellPrice(gSpecialVar_ItemId) * tItemCount, STR_CONV_MODE_LEFT_ALIGN, MAX_MONEY_DIGITS);
     StringExpandPlaceholders(gStringVar4, gText_ICanPayVar1);
     DisplayItemMessage(taskId, FONT_NORMAL, gStringVar4, AskSellItems);
@@ -2234,7 +2222,6 @@ static void CancelSell(u8 taskId)
 
 static void InitSellHowManyInput(u8 taskId)
 {
-    s16 *data = gTasks[taskId].data;
     u8 windowId = BagMenu_AddWindow(ITEMWIN_QUANTITY_WIDE);
 
     PrintItemSoldAmount(windowId, 1, GetItemSellPrice(gSpecialVar_ItemId) * tItemCount);
@@ -2246,7 +2233,7 @@ static void Task_ChooseHowManyToSell(u8 taskId)
 {
     s16 *data = gTasks[taskId].data;
 
-    if (AdjustQuantityAccordingToDPadInput(&tItemCount, tQuantity) == TRUE)
+    if (AdjustQuantityAccordingToDPadInputU32(&tItemCount, tQuantity) == TRUE)
     {
         PrintItemSoldAmount(gBagMenu->windowIds[ITEMWIN_QUANTITY_WIDE], tItemCount, GetItemSellPrice(gSpecialVar_ItemId) * tItemCount);
     }
@@ -2269,8 +2256,6 @@ static void Task_ChooseHowManyToSell(u8 taskId)
 
 static void ConfirmSell(u8 taskId)
 {
-    s16 *data = gTasks[taskId].data;
-
     CopyItemName(gSpecialVar_ItemId, gStringVar2);
     ConvertIntToDecimalStringN(gStringVar1, GetItemSellPrice(gSpecialVar_ItemId) * tItemCount, STR_CONV_MODE_LEFT_ALIGN, MAX_MONEY_DIGITS);
     StringExpandPlaceholders(gStringVar4, gText_TurnedOverVar1ForVar2);
@@ -2308,8 +2293,6 @@ static void WaitAfterItemSell(u8 taskId)
 
 static void Task_ItemContext_Deposit(u8 taskId)
 {
-    s16 *data = gTasks[taskId].data;
-
     tItemCount = 1;
     if (tQuantity == 1)
     {
@@ -2331,7 +2314,7 @@ static void Task_ChooseHowManyToDeposit(u8 taskId)
 {
     s16 *data = gTasks[taskId].data;
 
-    if (AdjustQuantityAccordingToDPadInput(&tItemCount, tQuantity) == TRUE)
+    if (AdjustQuantityAccordingToDPadInputU32(&tItemCount, tQuantity) == TRUE)
     {
         PrintItemQuantity(gBagMenu->windowIds[ITEMWIN_QUANTITY], tItemCount);
     }
@@ -2353,8 +2336,6 @@ static void Task_ChooseHowManyToDeposit(u8 taskId)
 
 static void TryDepositItem(u8 taskId)
 {
-    s16 *data = gTasks[taskId].data;
-
     FillWindowPixelBuffer(WIN_DESCRIPTION, PIXEL_FILL(0));
     if (GetItemImportance(gSpecialVar_ItemId))
     {
@@ -2404,6 +2385,7 @@ static void PrepareBagForWallyTutorial(void)
 {
     u32 i;
 
+    PgrInventory_BeginTemporaryLegacyOverride();
     sTempWallyBag = AllocZeroed(sizeof(*sTempWallyBag));
     memcpy(sTempWallyBag->bagPocket_Items, gSaveBlock1Ptr->bag.items, sizeof(gSaveBlock1Ptr->bag.items));
     memcpy(sTempWallyBag->bagPocket_PokeBalls, gSaveBlock1Ptr->bag.pokeBalls, sizeof(gSaveBlock1Ptr->bag.pokeBalls));
@@ -2415,6 +2397,7 @@ static void PrepareBagForWallyTutorial(void)
     }
     memset(gSaveBlock1Ptr->bag.items, 0, sizeof(gSaveBlock1Ptr->bag.items));
     memset(gSaveBlock1Ptr->bag.pokeBalls, 0, sizeof(gSaveBlock1Ptr->bag.pokeBalls));
+    PgrInventory_SyncFromLegacy();
     ResetBagScrollPositions();
 }
 
@@ -2424,6 +2407,7 @@ static void RestoreBagAfterWallyTutorial(void)
 
     memcpy(gSaveBlock1Ptr->bag.items, sTempWallyBag->bagPocket_Items, sizeof(sTempWallyBag->bagPocket_Items));
     memcpy(gSaveBlock1Ptr->bag.pokeBalls, sTempWallyBag->bagPocket_PokeBalls, sizeof(sTempWallyBag->bagPocket_PokeBalls));
+    PgrInventory_EndTemporaryLegacyOverride();
     gBagPosition.pocket = sTempWallyBag->pocket;
     for (i = 0; i < POCKETS_COUNT; i++)
     {

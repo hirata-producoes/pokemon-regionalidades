@@ -5,6 +5,7 @@
 #include "follower_npc.h"
 #include "item.h"
 #include "load_save.h"
+#include "pokemon_regionalidades_inventory.h"
 #include "main.h"
 #include "overworld.h"
 #include "pokemon.h"
@@ -257,6 +258,7 @@ void LoadPlayerBag(void)
 {
     int i;
 
+    PgrInventory_BeginTemporaryLegacyOverride();
     // load player bag.
     memcpy(&gLoadedSaveData.bag, &gSaveBlock1Ptr->bag, sizeof(struct Bag));
 
@@ -283,6 +285,7 @@ void SavePlayerBag(void)
     gSaveBlock2Ptr->encryptionKey = gLastEncryptionKey;
     ApplyNewEncryptionKeyToBagItems(encryptionKeyBackup);
     gSaveBlock2Ptr->encryptionKey = encryptionKeyBackup; // updated twice?
+    PgrInventory_EndTemporaryLegacyOverride();
 }
 
 void ApplyNewEncryptionKeyToHword(u16 *hWord, u32 newKey)

@@ -17,10 +17,10 @@ static bool BuildAuxiliaryPath(char *destination, size_t capacity, const char *p
     return length > 0 && (size_t)length < capacity;
 }
 
-static bool FileHasSize(const char *path, size_t expectedSize)
+static bool QuerySaveFileSize(const char *path, size_t *size)
 {
     FILE *file = fopen(path, "rb");
-    long size;
+    long fileSize;
 
     if (file == NULL)
         return false;
@@ -29,9 +29,18 @@ static bool FileHasSize(const char *path, size_t expectedSize)
         fclose(file);
         return false;
     }
-    size = ftell(file);
+    fileSize = ftell(file);
     fclose(file);
-    return size >= 0 && (size_t)size == expectedSize;
+    if (fileSize < 0)
+        return false;
+    *size = (size_t)fileSize;
+    return true;
+}
+
+static bool FileHasSize(const char *path, size_t expectedSize)
+{
+    size_t size;
+    return QuerySaveFileSize(path, &size) && size == expectedSize;
 }
 
 static bool FileMatchesBuffer(const char *path, const unsigned char *data, size_t size)
@@ -144,7 +153,7 @@ static bool CopyFileAtomically(const char *sourcePath, const char *destinationPa
     return true;
 }
 
-static bool RotateRecoveryFiles(const char *path, size_t size, unsigned int recoveryCount)
+static bool RotateRecoveryFiles(const char *path, unsigned int recoveryCount)
 {
     char sourcePath[SAVE_PATH_CAPACITY];
     char destinationPath[SAVE_PATH_CAPACITY];
@@ -160,9 +169,10 @@ static bool RotateRecoveryFiles(const char *path, size_t size, unsigned int reco
          || !BuildAuxiliaryPath(destinationPath, sizeof(destinationPath), path, destinationSuffix))
             return false;
 
-        if (FileHasSize(sourcePath, size))
+        size_t sourceSize;
+        if (QuerySaveFileSize(sourcePath, &sourceSize))
         {
-            if (!CopyFileAtomically(sourcePath, destinationPath, size))
+            if (!CopyFileAtomically(sourcePath, destinationPath, sourceSize))
                 return false;
         }
         else
@@ -173,7 +183,9 @@ static bool RotateRecoveryFiles(const char *path, size_t size, unsigned int reco
 
     if (!BuildAuxiliaryPath(destinationPath, sizeof(destinationPath), path, ".recovery-1"))
         return false;
-    return CopyFileAtomically(path, destinationPath, size);
+    size_t activeSize;
+    return QuerySaveFileSize(path, &activeSize)
+        && CopyFileAtomically(path, destinationPath, activeSize);
 }
 
 bool PlatformSave_Load(const char *path, unsigned char *data, size_t size)
@@ -203,7 +215,8 @@ bool PlatformSave_Load(const char *path, unsigned char *data, size_t size)
 bool PlatformSave_Commit(const char *path, const unsigned char *data, size_t size, unsigned int recoveryCount)
 {
     char pendingPath[SAVE_PATH_CAPACITY];
-    bool hasPreviousSave = FileHasSize(path, size);
+    size_t previousSize;
+    bool hasPreviousSave = QuerySaveFileSize(path, &previousSize);
 
     if (!BuildAuxiliaryPath(pendingPath, sizeof(pendingPath), path, ".pending")
      || !WriteBufferFile(pendingPath, data, size))
@@ -216,7 +229,7 @@ bool PlatformSave_Commit(const char *path, const unsigned char *data, size_t siz
     }
 
     if (hasPreviousSave && recoveryCount != 0
-     && !RotateRecoveryFiles(path, size, recoveryCount))
+     && !RotateRecoveryFiles(path, recoveryCount))
     {
         remove(pendingPath);
         return false;

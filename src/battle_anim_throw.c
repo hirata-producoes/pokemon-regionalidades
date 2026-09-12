@@ -2105,7 +2105,7 @@ static void Task_FadeMon_ToBallColor(u8 taskId)
     }
     else if (!gPaletteFade.active)
     {
-        u32 selectedPalettes = (u16)gTasks[taskId].tPaletteLo | ((u16)gTasks[taskId].tPaletteHi << 16);
+        u32 selectedPalettes = (u16)gTasks[taskId].tPaletteLo | ((u32)(u16)gTasks[taskId].tPaletteHi << 16);
         BeginNormalPaletteFade(selectedPalettes, 0, 16, 0, RGB_WHITE);
         DestroyTask(taskId);
     }
@@ -2115,7 +2115,7 @@ static void Task_FadeMon_ToNormal(u8 taskId)
 {
     if (!gPaletteFade.active)
     {
-        u32 selectedPalettes = (u16)gTasks[taskId].tPaletteLo | ((u16)gTasks[taskId].tPaletteHi << 16);
+        u32 selectedPalettes = (u16)gTasks[taskId].tPaletteLo | ((u32)(u16)gTasks[taskId].tPaletteHi << 16);
         BeginNormalPaletteFade(selectedPalettes, 0, 16, 0, RGB_WHITE);
         gTasks[taskId].func = Task_FadeMon_ToNormal_Step;
     }

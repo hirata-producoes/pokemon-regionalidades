@@ -1,7 +1,19 @@
 #include "global.h"
 #include "fake_rtc.h"
+#include "item_use.h"
 #include "pokemon_go_world.h"
+#include "pokemon_regionalidades_progress.h"
 #include "test/test.h"
+#include "constants/items.h"
+
+TEST("Pokemon Regionalidades validates a Poke Ball without a party-menu target")
+{
+    bool32 cannotUse = CannotUseItemsInBattle(ITEM_POKE_BALL, NULL);
+
+    // The result depends on the battle fixture state. This regression checks
+    // that bag-only items never dereference the deliberately absent target.
+    EXPECT_LE(cannotUse, TRUE);
+}
 
 TEST("Pokemon Regionalidades World Clock advances at three times real time")
 {
@@ -128,4 +140,51 @@ TEST("Pokemon Regionalidades exposes stable climate names for the environmental 
     EXPECT_NE(Pgw_GetClimateName(PGW_CLIMATE_CLEAR), Pgw_GetClimateName(PGW_CLIMATE_RAIN));
     EXPECT_NE(Pgw_GetClimateName(PGW_CLIMATE_RAIN), Pgw_GetClimateName(PGW_CLIMATE_FOG));
     EXPECT_EQ(Pgw_GetClimateName(PGW_CLIMATE_COUNT), Pgw_GetClimateName(PGW_CLIMATE_CLEAR));
+}
+
+TEST("Pokemon Regionalidades regional story events require their dependencies")
+{
+    const struct PgrStoryRequirement needsArrival[] =
+    {
+        { PGW_START_HOENN, PGR_HOENN_STORY_ARRIVED_LITTLEROOT },
+    };
+
+    PgrProgress_Reset();
+    EXPECT(PgrProgress_CanStartRegisteredStoryEvent(PGW_START_HOENN,
+                                                     PGR_HOENN_STORY_ARRIVED_LITTLEROOT));
+    EXPECT_EQ(PgrProgress_TryCompleteStoryEvent(PGW_START_HOENN,
+                                                PGR_HOENN_STORY_RESCUED_BIRCH,
+                                                needsArrival,
+                                                ARRAY_COUNT(needsArrival)),
+              PGR_PROGRESS_REQUIREMENTS_NOT_MET);
+    EXPECT_EQ(PgrProgress_TryCompleteStoryEvent(PGW_START_HOENN,
+                                                PGR_HOENN_STORY_ARRIVED_LITTLEROOT,
+                                                NULL,
+                                                0),
+              PGR_PROGRESS_COMPLETED);
+    EXPECT(!PgrProgress_CanStartRegisteredStoryEvent(PGW_START_HOENN,
+                                                      PGR_HOENN_STORY_ARRIVED_LITTLEROOT));
+    EXPECT_EQ(PgrProgress_TryCompleteStoryEvent(PGW_START_HOENN,
+                                                PGR_HOENN_STORY_RESCUED_BIRCH,
+                                                needsArrival,
+                                                ARRAY_COUNT(needsArrival)),
+              PGR_PROGRESS_COMPLETED);
+    EXPECT_EQ(PgrProgress_TryCompleteStoryEvent(PGW_START_HOENN,
+                                                PGR_HOENN_STORY_RESCUED_BIRCH,
+                                                needsArrival,
+                                                ARRAY_COUNT(needsArrival)),
+              PGR_PROGRESS_ALREADY_COMPLETE);
+}
+
+TEST("Pokemon Regionalidades separates global and regional reward ledgers")
+{
+    PgrProgress_Reset();
+    EXPECT(!PgrProgress_IsRewardClaimed(PGR_REWARD_GLOBAL, PGW_START_HOENN, PGR_REWARD_EXP_SHARE));
+    EXPECT(PgrProgress_MarkRewardClaimed(PGR_REWARD_GLOBAL, PGW_START_HOENN, PGR_REWARD_EXP_SHARE));
+    EXPECT(PgrProgress_IsRewardClaimed(PGR_REWARD_GLOBAL, PGW_START_KANTO, PGR_REWARD_EXP_SHARE));
+
+    EXPECT(!PgrProgress_IsRewardClaimed(PGR_REWARD_REGIONAL, PGW_START_KANTO, PGR_REWARD_BICYCLE_ACCESS));
+    EXPECT(PgrProgress_MarkRewardClaimed(PGR_REWARD_REGIONAL, PGW_START_KANTO, PGR_REWARD_BICYCLE_ACCESS));
+    EXPECT(PgrProgress_IsRewardClaimed(PGR_REWARD_REGIONAL, PGW_START_KANTO, PGR_REWARD_BICYCLE_ACCESS));
+    EXPECT(!PgrProgress_IsRewardClaimed(PGR_REWARD_REGIONAL, PGW_START_HOENN, PGR_REWARD_BICYCLE_ACCESS));
 }

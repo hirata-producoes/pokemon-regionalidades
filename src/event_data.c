@@ -1,6 +1,9 @@
 #include "global.h"
 #include "event_data.h"
 #include "pokedex.h"
+#include "pokemon_go_world.h"
+#include "pokemon_regionalidades_dex.h"
+#include "pokemon_regionalidades_progress.h"
 
 #define SPECIAL_FLAGS_SIZE  (NUM_SPECIAL_FLAGS / 8)  // 8 flags per byte
 #define TEMP_FLAGS_SIZE     (NUM_TEMP_FLAGS / 8)
@@ -243,6 +246,9 @@ u8 FlagSet(u16 id)
     u8 *ptr = GetFlagPointer(id);
     if (ptr)
         *ptr |= 1 << (id & 7);
+    if (id == FLAG_SYS_POKEDEX_GET)
+        PgwDex_UnlockRegion(Pgw_GetCurrentRegion());
+    PgrProgress_OnLegacyFlagSet(id);
     return 0;
 }
 

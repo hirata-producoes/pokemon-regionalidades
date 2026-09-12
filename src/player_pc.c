@@ -21,6 +21,7 @@
 #include "palette.h"
 #include "party_menu.h"
 #include "player_pc.h"
+#include "pokemon_regionalidades_inventory.h"
 #include "script.h"
 #include "sound.h"
 #include "sprite.h"
@@ -83,6 +84,7 @@ struct ItemStorageMenu
     u8 toSwapPos;
     u8 spriteId;
     u8 swapLineSpriteIds[SWAP_LINE_LENGTH];
+    u32 quantity;
 };
 
 static void InitPlayerPCMenu(u8);
@@ -357,6 +359,7 @@ void NewGameInitPCItems(void)
 {
     u8 i = 0;
     CpuFastFill(0, gSaveBlock1Ptr->pcItems, sizeof(gSaveBlock1Ptr->pcItems));
+    PgrInventory_SyncFromLegacy();
 
     while (TRUE)
     {
@@ -383,7 +386,7 @@ void PlayerPC(void)
 }
 
 #define tUsedSlots  data[1]
-#define tQuantity   data[2]
+#define tQuantity   sItemStorageMenu->quantity
 #define tInTossMenu data[3]
 #define tWindowId   data[4]
 #define tListTaskId data[5]
@@ -1031,6 +1034,8 @@ static void ItemStorage_PrintMenuItem(u8 windowId, u32 id, u8 yOffset)
 {
     if (id != LIST_CANCEL)
     {
+        struct ItemSlot item = GetPCItemIdAndQuantity(id);
+
         if (sItemStorageMenu->toSwapPos != NOT_SWAPPING)
         {
             if (sItemStorageMenu->toSwapPos == (u8)id)
@@ -1038,7 +1043,7 @@ static void ItemStorage_PrintMenuItem(u8 windowId, u32 id, u8 yOffset)
             else
                 ItemStorage_DrawSwapArrow(yOffset, 0xFF, TEXT_SKIP_DRAW);
         }
-        ConvertIntToDecimalStringN(gStringVar1, gSaveBlock1Ptr->pcItems[id].quantity, STR_CONV_MODE_RIGHT_ALIGN, 3);
+        ConvertIntToDecimalStringN(gStringVar1, item.quantity, STR_CONV_MODE_RIGHT_ALIGN, MAX_ITEM_DIGITS);
         StringExpandPlaceholders(gStringVar4, gText_xVar1);
         AddTextPrinterParameterized(windowId, FONT_NARROW, gStringVar4, GetStringRightAlignXOffset(FONT_NARROW, gStringVar4, 104), yOffset, TEXT_SKIP_DRAW, NULL);
     }
@@ -1301,7 +1306,7 @@ static void ItemStorage_UpdateSwapLinePos(u8 y)
     UpdateSwapLineSpritesPos(sItemStorageMenu->swapLineSpriteIds, SWAP_LINE_LENGTH, 128, (y+1) * 16);
 }
 
-static void ItemStorage_PrintItemQuantity(u8 windowId, u16 value, u32 mode, u8 x, u8 y, u8 n)
+static void ItemStorage_PrintItemQuantity(u8 windowId, u32 value, u32 mode, u8 x, u8 y, u8 n)
 {
     ConvertIntToDecimalStringN(gStringVar1, value, mode, n);
     StringExpandPlaceholders(gStringVar4, gText_xVar1);
@@ -1314,12 +1319,13 @@ static void ItemStorage_DoItemAction(u8 taskId)
     u8 *end;
     s16 *data = gTasks[taskId].data;
     u16 pos = gPlayerPCItemPageInfo.cursorPos + gPlayerPCItemPageInfo.itemsAbove;
+    struct ItemSlot item = GetPCItemIdAndQuantity(pos);
     ItemStorage_RemoveScrollIndicator();
     tQuantity = 1;
 
     if (!tInTossMenu)
     {
-        if (gSaveBlock1Ptr->pcItems[pos].quantity == 1)
+        if (item.quantity == 1)
         {
             // Withdrawing 1 item, do it automatically
             ItemStorage_DoItemWithdraw(taskId);
@@ -1327,13 +1333,13 @@ static void ItemStorage_DoItemAction(u8 taskId)
         }
 
         // Withdrawing multiple items, show "how many" message
-        end = CopyItemNameHandlePlural(gSaveBlock1Ptr->pcItems[pos].itemId, gStringVar1, 2);
+        end = CopyItemNameHandlePlural(item.itemId, gStringVar1, 2);
         WrapFontIdToFit(gStringVar1, end, FONT_NORMAL, WindowWidthPx(ITEMPC_WIN_MESSAGE) - 6);
         ItemStorage_PrintMessage(sText_WithdrawHowManyItems);
     }
     else
     {
-        if (gSaveBlock1Ptr->pcItems[pos].quantity == 1)
+        if (item.quantity == 1)
         {
             // Tossing 1 item, do it automatically
             ItemStorage_DoItemToss(taskId);
@@ -1341,13 +1347,13 @@ static void ItemStorage_DoItemAction(u8 taskId)
         }
 
         // Tossing multiple items, show "how many" message
-        end = CopyItemNameHandlePlural(gSaveBlock1Ptr->pcItems[pos].itemId, gStringVar1, 2);
+        end = CopyItemNameHandlePlural(item.itemId, gStringVar1, 2);
         WrapFontIdToFit(gStringVar1, end, FONT_NORMAL, WindowWidthPx(ITEMPC_WIN_MESSAGE) - 6);
         ItemStorage_PrintMessage(gText_TossHowManyVar1s);
     }
 
     // Set up "how many" prompt
-    ItemStorage_PrintItemQuantity(ItemStorage_AddWindow(ITEMPC_WIN_QUANTITY), tQuantity, STR_CONV_MODE_LEADING_ZEROS, 8, 1, 3);
+    ItemStorage_PrintItemQuantity(ItemStorage_AddWindow(ITEMPC_WIN_QUANTITY), tQuantity, STR_CONV_MODE_LEADING_ZEROS, 8, 1, MAX_ITEM_DIGITS);
     gTasks[taskId].func = ItemStorage_HandleQuantityRolling;
 }
 
@@ -1355,10 +1361,11 @@ static void ItemStorage_HandleQuantityRolling(u8 taskId)
 {
     s16 *data = gTasks[taskId].data;
     u16 pos = gPlayerPCItemPageInfo.cursorPos + gPlayerPCItemPageInfo.itemsAbove;
+    struct ItemSlot item = GetPCItemIdAndQuantity(pos);
 
-    if (AdjustQuantityAccordingToDPadInput(&tQuantity, gSaveBlock1Ptr->pcItems[pos].quantity) == TRUE)
+    if (AdjustQuantityAccordingToDPadInputU32(&tQuantity, item.quantity) == TRUE)
     {
-        ItemStorage_PrintItemQuantity(ItemStorage_AddWindow(ITEMPC_WIN_QUANTITY), tQuantity, STR_CONV_MODE_LEADING_ZEROS, 8, 1, 3);
+        ItemStorage_PrintItemQuantity(ItemStorage_AddWindow(ITEMPC_WIN_QUANTITY), tQuantity, STR_CONV_MODE_LEADING_ZEROS, 8, 1, MAX_ITEM_DIGITS);
     }
     else
     {
@@ -1377,7 +1384,7 @@ static void ItemStorage_HandleQuantityRolling(u8 taskId)
             // Canceled action
             PlaySE(SE_SELECT);
             ItemStorage_RemoveWindow(ITEMPC_WIN_QUANTITY);
-            ItemStorage_PrintMessage(GetItemDescription(gSaveBlock1Ptr->pcItems[pos].itemId));
+            ItemStorage_PrintMessage(GetItemDescription(item.itemId));
             ItemStorage_ReturnToListInput(taskId);
         }
     }
@@ -1385,15 +1392,15 @@ static void ItemStorage_HandleQuantityRolling(u8 taskId)
 
 static void ItemStorage_DoItemWithdraw(u8 taskId)
 {
-    s16 *data = gTasks[taskId].data;
     u16 pos = gPlayerPCItemPageInfo.cursorPos + gPlayerPCItemPageInfo.itemsAbove;
+    struct ItemSlot item = GetPCItemIdAndQuantity(pos);
 
-    if (AddBagItem(gSaveBlock1Ptr->pcItems[pos].itemId, tQuantity) == TRUE)
+    if (AddBagItem(item.itemId, tQuantity) == TRUE)
     {
         // Item withdrawn
-        u8 *end = CopyItemNameHandlePlural(gSaveBlock1Ptr->pcItems[pos].itemId, gStringVar1, tQuantity);
+        u8 *end = CopyItemNameHandlePlural(item.itemId, gStringVar1, tQuantity);
         WrapFontIdToFit(gStringVar1, end, FONT_NORMAL, WindowWidthPx(ITEMPC_WIN_MESSAGE) - 6);
-        ConvertIntToDecimalStringN(gStringVar2, tQuantity, STR_CONV_MODE_LEFT_ALIGN, 3);
+        ConvertIntToDecimalStringN(gStringVar2, tQuantity, STR_CONV_MODE_LEFT_ALIGN, MAX_ITEM_DIGITS);
         ItemStorage_PrintMessage(sText_WithdrawXItems);
         gTasks[taskId].func = ItemStorage_HandleRemoveItem;
     }
@@ -1408,15 +1415,15 @@ static void ItemStorage_DoItemWithdraw(u8 taskId)
 
 static void ItemStorage_DoItemToss(u8 taskId)
 {
-    s16 *data = gTasks[taskId].data;
     u16 pos = gPlayerPCItemPageInfo.cursorPos + gPlayerPCItemPageInfo.itemsAbove;
+    struct ItemSlot item = GetPCItemIdAndQuantity(pos);
 
-    if (!GetItemImportance(gSaveBlock1Ptr->pcItems[pos].itemId))
+    if (!GetItemImportance(item.itemId))
     {
         // Show toss confirmation prompt
-        u8 *end = CopyItemNameHandlePlural(gSaveBlock1Ptr->pcItems[pos].itemId, gStringVar1, tQuantity);
+        u8 *end = CopyItemNameHandlePlural(item.itemId, gStringVar1, tQuantity);
         WrapFontIdToFit(gStringVar1, end, FONT_NORMAL, WindowWidthPx(ITEMPC_WIN_MESSAGE) - 6);
-        ConvertIntToDecimalStringN(gStringVar2, tQuantity, STR_CONV_MODE_LEFT_ALIGN, 3);
+        ConvertIntToDecimalStringN(gStringVar2, tQuantity, STR_CONV_MODE_LEFT_ALIGN, MAX_ITEM_DIGITS);
         ItemStorage_PrintMessage(gText_ConfirmTossItems);
         CreateYesNoMenuWithCallbacks(taskId, &sWindowTemplates_ItemStorage[ITEMPC_WIN_YESNO], 1, 0, 1, 0x214, 0xE, &ItemTossYesNoFuncs);
     }

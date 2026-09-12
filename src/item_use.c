@@ -1249,7 +1249,11 @@ bool32 CannotUseItemsInBattle(enum Item itemId, struct Pokemon *mon)
     bool8 cannotUse = FALSE;
     const u8* failStr = NULL;
     u32 i, battlerTarget;
-    u16 hp = GetMonData(mon, MON_DATA_HP);
+    // Bag-only battle items, including Poke Balls, deliberately call this
+    // function without a party Pokemon. The HP value is only consulted by
+    // item effects that target a Pokemon, so do not dereference that null
+    // pointer on the native PC build.
+    u16 hp = mon == NULL ? 0 : GetMonData(mon, MON_DATA_HP);
 
     if (gPartyMenu.slotId == 0)
         battlerTarget = B_POSITION_PLAYER_LEFT;

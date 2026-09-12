@@ -23,6 +23,9 @@
 #include "overworld.h"
 #include "palette.h"
 #include "party_menu.h"
+#include "pokemon_regionalidades_dev_save.h"
+#include "pokemon_regionalidades_regions.h"
+#include "pokemon_go_world.h"
 #include "pokeball.h"
 #include "pokedex.h"
 #include "pokemon.h"
@@ -192,6 +195,9 @@ static void Task_HandleMainMenuInput(u8);
 static void Task_HandleMainMenuAPressed(u8);
 static void Task_HandleMainMenuBPressed(u8);
 static void Task_NewGameBirchSpeech_Init(u8);
+static void Task_NewGameRegionSelect_HandleInput(u8);
+static void Task_NewGameRegionSelect_WaitForFadeOut(u8);
+static void NewGameBirchSpeech_InitScene(u8);
 static void Task_DisplayMainMenuInvalidActionError(u8);
 static void AddBirchSpeechObjects(u8);
 static void Task_NewGameBirchSpeech_WaitToShowBirch(u8);
@@ -422,6 +428,26 @@ static const struct WindowTemplate sNewGameBirchSpeechTextWindows[] =
     },
     DUMMY_WIN_TEMPLATE
 };
+
+static const struct WindowTemplate sNewGameRegionSelectWindows[] =
+{
+    {
+        .bg = 0,
+        .tilemapLeft = 4,
+        .tilemapTop = 4,
+        .width = 22,
+        .height = 10,
+        .paletteNum = 15,
+        .baseBlock = 1
+    },
+    DUMMY_WIN_TEMPLATE
+};
+
+static const u8 sText_ChooseStartingRegion[] = _("ESCOLHA A REGIAO");
+static const u8 sText_RegionPlayable[] = _("JOGAVEL");
+static const u8 sText_RegionMapData[] = _("EM PREPARACAO");
+static const u8 sText_RegionPlanned[] = _("PLANEJADA");
+static const u8 sText_RegionUnavailable[] = _("REGIAO AINDA NAO JOGAVEL");
 
 static const u16 sMainMenuBgPal[] = INCGFX_U16("graphics/interface/main_menu_bg.pal", ".gbapal");
 static const u16 sMainMenuTextPal[] = INCGFX_U16("graphics/interface/main_menu_text.pal", ".gbapal");
@@ -898,6 +924,15 @@ static void Task_DisplayMainMenu(u8 taskId)
 static void Task_HighlightSelectedMainMenuItem(u8 taskId)
 {
     HighlightSelectedMainMenuItem(gTasks[taskId].tMenuType, gTasks[taskId].tCurrItem, gTasks[taskId].tIsScrolled);
+    if (Pgr_IsMobilityProfileRequested()
+     && gTasks[taskId].tMenuType != HAS_NO_SAVED_GAME)
+    {
+        gTasks[taskId].tCurrItem = 0;
+        PlaySE(SE_SELECT);
+        BeginNormalPaletteFade(PALETTES_ALL, 0, 0, 0x10, RGB_BLACK);
+        gTasks[taskId].func = Task_HandleMainMenuAPressed;
+        return;
+    }
     gTasks[taskId].func = Task_HandleMainMenuInput;
 }
 
@@ -1294,7 +1329,7 @@ static void HighlightSelectedMainMenuItem(enum PartyMenuType menuType, u8 select
 #define tBrendanSpriteId data[10]
 #define tMaySpriteId data[11]
 
-static void Task_NewGameBirchSpeech_Init(u8 taskId)
+static void NewGameBirchSpeech_InitScene(u8 taskId)
 {
     SetGpuReg(REG_OFFSET_DISPCNT, 0);
     SetGpuReg(REG_OFFSET_DISPCNT, DISPCNT_OBJ_ON | DISPCNT_OBJ_1D_MAP);
@@ -1316,15 +1351,92 @@ static void Task_NewGameBirchSpeech_Init(u8 taskId)
     FreeAllSpritePalettes();
     ResetAllPicSprites();
     AddBirchSpeechObjects(taskId);
-    BeginNormalPaletteFade(PALETTES_ALL, 0, 16, 0, RGB_BLACK);
     gTasks[taskId].tBG1HOFS = 0;
-    gTasks[taskId].func = Task_NewGameBirchSpeech_WaitToShowBirch;
     gTasks[taskId].tPlayerSpriteId = SPRITE_NONE;
     gTasks[taskId].data[3] = 0xFF;
     gTasks[taskId].tTimer = 0xD8;
-    PlayBGM(MUS_ROUTE122);
     ShowBg(0);
     ShowBg(1);
+}
+
+static void Task_NewGameBirchSpeech_Init(u8 taskId)
+{
+    u32 i;
+
+    NewGameBirchSpeech_InitScene(taskId);
+    InitWindows(sNewGameRegionSelectWindows);
+    DeactivateAllTextPrinters();
+    LoadMainMenuWindowFrameTiles(0, 0xF3);
+    LoadPalette(sMainMenuTextPal, BG_PLTT_ID(15), PLTT_SIZE_4BPP);
+    FillWindowPixelBuffer(0, PIXEL_FILL(1));
+    DrawMainMenuWindowBorder(&sNewGameRegionSelectWindows[0], 0xF3);
+    AddTextPrinterParameterized(0, FONT_NORMAL, sText_ChooseStartingRegion, 8, 1, TEXT_SKIP_DRAW, NULL);
+    for (i = 0; i < PGR_WORLD_REGION_COUNT; i++)
+    {
+        const struct PgrRegionDefinition *definition = Pgr_GetWorldRegion(i);
+        const u8 *status;
+
+        if (definition->availability == PGR_REGION_PLAYABLE)
+            status = sText_RegionPlayable;
+        else if (definition->availability == PGR_REGION_MAP_DATA)
+            status = sText_RegionMapData;
+        else
+            status = sText_RegionPlanned;
+        AddTextPrinterParameterized(0, FONT_NORMAL, definition->name, 8, 17 + i * 16, TEXT_SKIP_DRAW, NULL);
+        AddTextPrinterParameterized(0, FONT_NORMAL, status, 80, 17 + i * 16, TEXT_SKIP_DRAW, NULL);
+    }
+    PutWindowTilemap(0);
+    CopyWindowToVram(0, COPYWIN_FULL);
+    InitMenuNormal(0, FONT_NORMAL, 0, 17, 16, PGR_WORLD_REGION_COUNT, PGW_START_HOENN);
+    BeginNormalPaletteFade(PALETTES_ALL, 0, 16, 0, RGB_BLACK);
+    gTasks[taskId].func = Task_NewGameRegionSelect_HandleInput;
+}
+
+static void Task_NewGameRegionSelect_HandleInput(u8 taskId)
+{
+    s8 input;
+    const struct PgrRegionDefinition *definition;
+
+    if (gPaletteFade.active)
+        return;
+
+    input = Menu_ProcessInputNoWrap();
+    if (input == MENU_NOTHING_CHOSEN || input == MENU_B_PRESSED)
+        return;
+
+    definition = Pgr_GetWorldRegion(input);
+    if (!Pgr_CanStartAdventureInRegion(definition->id))
+    {
+        PlaySE(SE_FAILURE);
+        FillWindowPixelRect(0, PIXEL_FILL(1), 0, 0, 176, 16);
+        AddTextPrinterParameterized(0, FONT_SMALL, sText_RegionUnavailable, 8, 1, TEXT_SKIP_DRAW, NULL);
+        CopyWindowToVram(0, COPYWIN_GFX);
+        return;
+    }
+
+    PlaySE(SE_SELECT);
+    Pgw_SelectStartingRegionForNewGame(definition->id);
+    DBGPRINTF("New game: selected region=%u\n", definition->id);
+    BeginNormalPaletteFade(PALETTES_ALL, 0, 0, 16, RGB_BLACK);
+    gTasks[taskId].func = Task_NewGameRegionSelect_WaitForFadeOut;
+}
+
+static void Task_NewGameRegionSelect_WaitForFadeOut(u8 taskId)
+{
+    if (gPaletteFade.active)
+        return;
+
+    FillBgTilemapBufferRect(0, 0, 0, 0, 32, 32, 0);
+    CopyBgTilemapBufferToVram(0);
+    FreeAllWindowBuffers();
+    NewGameBirchSpeech_InitScene(taskId);
+    FillBgTilemapBufferRect(0, 0, 0, 0, 32, 32, 0);
+    CopyBgTilemapBufferToVram(0);
+    BeginNormalPaletteFade(PALETTES_ALL, 0, 16, 0, RGB_BLACK);
+    gTasks[taskId].tTimer = 30;
+    PlayBGM(MUS_ROUTE122);
+    DBGPRINTF("New game: regional selection cleared; Birch scene restarted\n");
+    gTasks[taskId].func = Task_NewGameBirchSpeech_WaitToShowBirch;
 }
 
 static void Task_NewGameBirchSpeech_WaitToShowBirch(u8 taskId)
@@ -1369,6 +1481,7 @@ static void Task_NewGameBirchSpeech_WaitForSpriteFadeInWelcome(u8 taskId)
             NewGameBirchSpeech_ClearWindow(0);
             StringExpandPlaceholders(gStringVar4, gText_Birch_Welcome);
             AddTextPrinterForMessage(TRUE);
+            DBGPRINTF("New game: Birch welcome text opened\n");
             gTasks[taskId].func = Task_NewGameBirchSpeech_ThisIsAPokemon;
         }
     }
@@ -2207,14 +2320,7 @@ static void MainMenu_FormatSavegamePokedex(void)
 static void MainMenu_FormatSavegameBadges(void)
 {
     u8 str[0x20];
-    u8 badgeCount = 0;
-    u32 i;
-
-    for (i = FLAG_BADGE01_GET; i < FLAG_BADGE01_GET + NUM_BADGES; i++)
-    {
-        if (FlagGet(i))
-            badgeCount++;
-    }
+    u8 badgeCount = Pgr_GetNarrativeBadgeCount();
     StringExpandPlaceholders(gStringVar4, gText_ContinueMenuBadges);
     AddTextPrinterParameterized3(2, FONT_NORMAL, 0x6C, 33, sTextColor_MenuInfo, TEXT_SKIP_DRAW, gStringVar4);
     ConvertIntToDecimalStringN(str, badgeCount, STR_CONV_MODE_LEADING_ZEROS, 1);

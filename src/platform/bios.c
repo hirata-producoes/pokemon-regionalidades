@@ -11,6 +11,15 @@ unsigned char OAM[OAM_SIZE] __attribute__ ((aligned (4)));
 unsigned char FLASH_BASE[131072] __attribute__ ((aligned (4)));
 struct SoundInfo *SOUND_INFO_PTR;
 
+#ifdef PLATFORM_SDL2
+// Preserve the most recent native CpuSet call so a Windows crash report can
+// identify the caller and the invalid transfer without reproducing the route.
+const void *gPlatformLastCpuSetSource;
+void *gPlatformLastCpuSetDestination;
+u32 gPlatformLastCpuSetControl;
+const void *gPlatformLastCpuSetCaller;
+#endif
+
 s32 Div(s32 numerator, s32 denominator)
 {
     return denominator != 0 ? numerator / denominator : 0;
@@ -48,6 +57,13 @@ static void CPUWriteByte(void *dest, uint8_t val)
 
 void CpuSet(const void *src, void *dst, u32 cnt)
 {
+#ifdef PLATFORM_SDL2
+    gPlatformLastCpuSetSource = src;
+    gPlatformLastCpuSetDestination = dst;
+    gPlatformLastCpuSetControl = cnt;
+    gPlatformLastCpuSetCaller = __builtin_return_address(0);
+#endif
+
     if(dst == NULL)
     {
         puts("Attempted to CpuSet to NULL\n");

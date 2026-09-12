@@ -2044,6 +2044,10 @@ static void VBlankCB_FlyMap(void)
 static void CB2_FlyMap(void)
 {
     sFlyMap->callback();
+    // CB_ExitFlyMap releases sFlyMap and changes the main callback. Do not run
+    // one more sprite frame after that; destination icons read sFlyMap.
+    if (sFlyMap == NULL)
+        return;
     AnimateSprites();
     BuildOamBuffer();
     DoScheduledBgTilemapCopiesToVram();

@@ -2,11 +2,15 @@
 .if ALLOCATE_SPECIAL_TABLE
 	.global SPECIAL_\ptr
 	.set SPECIAL_\ptr, __special__
+#ifdef PORTABLE
+		.4byte \ptr
+#else
 	.if \requests_effects == 0
 		.4byte \ptr
 	.else
 		.4byte \ptr + ROM_SIZE
 	.endif
+#endif
 .endif
 .set SPECIAL_WAITSTATE_\ptr, \waitstate
 .set __special__, __special__ + 1
@@ -643,3 +647,8 @@ gSpecials::
 	def_special Pgw_ScriptSetCurrentRegion
 	def_special Pgw_ScriptGetStartingRegion
 	def_special Pgw_ScriptGetSeason
+	def_special PgrProgress_ScriptCanStartStoryEvent
+	def_special PgrProgress_ScriptCompleteStoryEvent
+	def_special PgrProgress_ScriptTryGiveUniqueItem
+	def_special PgrProgress_ScriptCheckHoennPokedex
+	def_special PgrProgress_ScriptCheckHoennShoes

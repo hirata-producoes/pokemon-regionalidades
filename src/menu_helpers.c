@@ -246,6 +246,38 @@ bool8 AdjustQuantityAccordingToDPadInput(s16 *quantity, u16 max)
     return FALSE;
 }
 
+bool8 AdjustQuantityAccordingToDPadInputU32(u32 *quantity, u32 max)
+{
+    u32 valueBefore = *quantity;
+
+    if (JOY_REPEAT(DPAD_ANY) == DPAD_UP)
+    {
+        (*quantity)++;
+        if (*quantity > max)
+            *quantity = 1;
+    }
+    else if (JOY_REPEAT(DPAD_ANY) == DPAD_DOWN)
+    {
+        if (*quantity <= 1)
+            *quantity = max;
+        else
+            (*quantity)--;
+    }
+    else if (JOY_REPEAT(DPAD_ANY) == DPAD_RIGHT)
+    {
+        *quantity = min(*quantity + 10, max);
+    }
+    else if (JOY_REPEAT(DPAD_ANY) == DPAD_LEFT)
+    {
+        *quantity = *quantity <= 10 ? 1 : *quantity - 10;
+    }
+
+    if (*quantity == valueBefore)
+        return FALSE;
+    PlaySE(SE_SELECT);
+    return TRUE;
+}
+
 u8 GetLRKeysPressed(void)
 {
     if (gSaveBlock2Ptr->optionsButtonMode == OPTIONS_BUTTON_MODE_LR)
@@ -316,7 +348,7 @@ bool8 MenuHelpers_ShouldWaitForLinkRecv(void)
         return FALSE;
 }
 
-void SetItemListPerPageCount(struct ItemSlot *slots, u8 slotsCount, u8 *pageItems, u8 *totalItems, u8 maxPerPage)
+void SetItemListPerPageCount(struct LegacyItemSlot *slots, u8 slotsCount, u8 *pageItems, u8 *totalItems, u8 maxPerPage)
 {
     u16 i;
 

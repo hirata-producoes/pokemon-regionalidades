@@ -272,11 +272,16 @@
 	@ to be analyzed by 'RunScriptImmediatelyUntilEffect'.
 	.macro callnative func:req, requests_effects=0, waitstate=0
 	.byte SCR_OP_CALLNATIVE
+#ifdef PORTABLE
+	@ Native processes have no GBA cartridge ROM mirrors.
+	.4byte \func
+#else
 	.if \requests_effects == 0
 	.4byte \func
 	.else
 	.4byte \func + ROM_SIZE
 	.endif
+#endif
 	.if \waitstate
 	waitstate implicit=1
 	.endif
@@ -285,11 +290,15 @@
 	@ Replaces the script with the function stored at func. Execution returns to the bytecode script when func returns TRUE.
 	.macro gotonative func:req, requests_effects=0
 	.byte SCR_OP_GOTONATIVE
+#ifdef PORTABLE
+	.4byte \func
+#else
 	.if \requests_effects == 0
 	.4byte \func
 	.else
 	.4byte \func + ROM_SIZE
 	.endif
+#endif
 	.endm
 
 	@ Calls a function listed in the table in data/specials.inc.

@@ -91,7 +91,7 @@ struct ItemInfo
 
 struct ALIGNED(2) BagPocket
 {
-    struct ItemSlot *itemSlots;
+    struct LegacyItemSlot *itemSlots;
     u16 capacity:10;
     enum Pocket id:6;
 };
@@ -215,7 +215,7 @@ static inline enum Item BerryTypeToItemId(enum BerryId berryId)
 void BagPocket_SetSlotData(struct BagPocket *pocket, u32 pocketPos, struct ItemSlot newSlot);
 struct ItemSlot BagPocket_GetSlotData(struct BagPocket *pocket, u32 pocketPos);
 
-static inline void BagPocket_SetSlotItemIdAndCount(struct BagPocket *pocket, u32 pocketPos, enum Item itemId, u16 quantity)
+static inline void BagPocket_SetSlotItemIdAndCount(struct BagPocket *pocket, u32 pocketPos, enum Item itemId, u32 quantity)
 {
     BagPocket_SetSlotData(pocket, pocketPos, (struct ItemSlot) {itemId, quantity});
 }
@@ -225,7 +225,7 @@ static inline enum Item GetBagItemId(enum Pocket pocketId, u32 pocketPos)
     return BagPocket_GetSlotData(&gBagPockets[pocketId], pocketPos).itemId;
 }
 
-static inline u16 GetBagItemQuantity(enum Pocket pocketId, u32 pocketPos)
+static inline u32 GetBagItemQuantity(enum Pocket pocketId, u32 pocketPos)
 {
     return BagPocket_GetSlotData(&gBagPockets[pocketId], pocketPos).quantity;
 }
@@ -240,25 +240,26 @@ void SetBagItemsPointers(void);
 u8 *CopyItemName(enum Item itemId, u8 *dst);
 u8 *CopyItemNameHandlePlural(enum Item itemId, u8 *dst, u32 quantity);
 bool32 IsBagPocketNonEmpty(enum Pocket pocketId);
-bool32 CheckBagHasItem(enum Item itemId, u16 count);
+bool32 CheckBagHasItem(enum Item itemId, u32 count);
 bool32 HasAtLeastOneBerry(void);
 bool32 HasAtLeastOnePokeBall(void);
-bool32 CheckBagHasSpace(enum Item itemId, u16 count);
+bool32 CheckBagHasSpace(enum Item itemId, u32 count);
 u32 GetFreeSpaceForItemInBag(enum Item itemId);
-bool32 AddBagItem(enum Item itemId, u16 count);
-bool32 RemoveBagItem(enum Item itemId, u16 count);
-void RemoveBagItemFromSlot(struct BagPocket *pocket, u16 slotId, u16 count);
+bool32 AddBagItem(enum Item itemId, u32 count);
+bool32 RemoveBagItem(enum Item itemId, u32 count);
+void RemoveBagItemFromSlot(struct BagPocket *pocket, u16 slotId, u32 count);
 u8 CountUsedPCItemSlots(void);
-bool32 CheckPCHasItem(enum Item itemId, u16 count);
-bool32 AddPCItem(enum Item itemId, u16 count);
-void RemovePCItem(u8 index, u16 count);
+struct ItemSlot GetPCItemIdAndQuantity(u32 pocketPos);
+bool32 CheckPCHasItem(enum Item itemId, u32 count);
+bool32 AddPCItem(enum Item itemId, u32 count);
+void RemovePCItem(u8 index, u32 count);
 void CompactPCItems(void);
 void SwapRegisteredBike(void);
 void CompactItemsInBagPocket(enum Pocket pocketId);
 void MoveItemSlotInPocket(enum Pocket pocketId, u32 from, u32 to);
-void MoveItemSlotInPC(struct ItemSlot *itemSlots, u32 from, u32 to);
+void MoveItemSlotInPC(struct LegacyItemSlot *itemSlots, u32 from, u32 to);
 void ClearBag(void);
-u16 CountTotalItemQuantityInBag(enum Item itemId);
+u32 CountTotalItemQuantityInBag(enum Item itemId);
 bool32 AddPyramidBagItem(enum Item itemId, u16 count);
 bool32 RemovePyramidBagItem(enum Item itemId, u16 count);
 const u8 *GetItemName(enum Item itemId);

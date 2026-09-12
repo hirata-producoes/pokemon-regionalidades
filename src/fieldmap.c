@@ -233,12 +233,17 @@ static void InitBackupMapLayoutConnections(const struct MapHeader *mapHeader)
 static void FillConnection(s32 x, s32 y, const struct MapHeader *connectedMapHeader, s32 x2, s32 y2, s32 width, s32 height)
 {
     s32 i;
+    const struct MapLayout *connectedMapLayout;
     const u16 *src;
     u16 *dest;
     s32 mapWidth;
 
-    mapWidth = connectedMapHeader->mapLayout->width;
-    src = &connectedMapHeader->mapLayout->map[mapWidth * y2 + x2];
+    // PC map data lives in the external resource package. The static map
+    // header still points to a one-word compiled placeholder, so resolve the
+    // connected layout before copying its border strip into the current map.
+    connectedMapLayout = GetMapLayout(connectedMapHeader->mapLayoutId);
+    mapWidth = connectedMapLayout->width;
+    src = &connectedMapLayout->map[mapWidth * y2 + x2];
     dest = &gBackupMapLayout.map[gBackupMapLayout.width * y + x];
 
     for (i = 0; i < height; i++)
