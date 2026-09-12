@@ -34,6 +34,7 @@
 #include "pokedex.h"
 #include "save.h"
 #include "pokemon_go_world.h"
+#include "pokemon_regionalidades_regions.h"
 #include "link_rfu.h"
 #include "main.h"
 #include "contest.h"
@@ -57,7 +58,7 @@ extern const u8 EventScript_ResetAllMapFlags[];
 extern const u8 EventScript_ResetAllMapFlagsFrlg[];
 
 static void ClearFrontierRecord(void);
-static void WarpToTruck(void);
+static void WarpToStartingRegion(void);
 static void ResetMiniGamesRecords(void);
 static void ResetItemFlags(void);
 static void ResetDexNav(void);
@@ -134,12 +135,21 @@ static void ClearFrontierRecord(void)
     gSaveBlock2Ptr->frontier.opponentNames[1][0] = EOS;
 }
 
-static void WarpToTruck(void)
+static void WarpToStartingRegion(void)
 {
-    if (IS_FRLG)
-        SetWarpDestination(MAP_GROUP(MAP_PALLET_TOWN_PLAYERS_HOUSE_2F), MAP_NUM(MAP_PALLET_TOWN_PLAYERS_HOUSE_2F), WARP_ID_NONE, 6, 6);
-    else
-        SetWarpDestination(MAP_GROUP(MAP_INSIDE_OF_TRUCK), MAP_NUM(MAP_INSIDE_OF_TRUCK), WARP_ID_NONE, -1, -1);
+    enum PgwStartingRegion region = Pgw_GetSelectedStartingRegionForNewGame();
+    const struct PgrRegionEntryPoint *entryPoint = Pgr_GetRegionEntryPoint(region);
+
+    // An incomplete regional campaign must never become a new game's spawn.
+    // Fall back to the validated Hoenn entry if a development selection is invalid.
+    if (entryPoint == NULL)
+        entryPoint = Pgr_GetRegionEntryPoint(PGW_DEFAULT_STARTING_REGION);
+
+    SetWarpDestination(entryPoint->mapGroup,
+                       entryPoint->mapNum,
+                       entryPoint->warpId,
+                       entryPoint->x,
+                       entryPoint->y);
     WarpIntoMap();
 }
 
@@ -212,7 +222,7 @@ void NewGameInitData(void)
     ResetFanClub();
     ResetLotteryCorner();
     UpdateDailySeed();
-    WarpToTruck();
+    WarpToStartingRegion();
     if (IS_FRLG)
         RunScriptImmediately(EventScript_ResetAllMapFlagsFrlg);
     else

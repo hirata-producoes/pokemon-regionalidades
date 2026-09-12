@@ -490,9 +490,9 @@ enum BackAnim GetSpeciesBackAnimSet(enum Species species)
 // By dumb luck, this is not an issue in vanilla. However,
 // changing the link order revealed this bug.
 #if MODERN || defined(BUGFIX)
-#define ANIM_SPRITE(taskId)   ((struct Sprite *)((gTasks[taskId].tPtrHi << 16) | ((u16)gTasks[taskId].tPtrLo)))
+#define ANIM_SPRITE(taskId)   ((struct Sprite *)(((u32)(u16)gTasks[taskId].tPtrHi << 16) | ((u16)gTasks[taskId].tPtrLo)))
 #else
-#define ANIM_SPRITE(taskId)   ((struct Sprite *)((gTasks[taskId].tPtrHi << 16) | (gTasks[taskId].tPtrLo)))
+#define ANIM_SPRITE(taskId)   ((struct Sprite *)(((u32)(u16)gTasks[taskId].tPtrHi << 16) | (gTasks[taskId].tPtrLo)))
 #endif //MODERN || BUGFIX
 
 static void Task_HandleMonAnimation(u8 taskId)

@@ -559,8 +559,14 @@ struct ScriptEffectContext *gScriptEffectContext = NULL;
 
 static bool32 Script_IsEffectInstrumentedCommand(ScrCmdFunc func)
 {
+#ifdef PORTABLE
+    // Native addresses carry no effect metadata. Stop speculative execution
+    // conservatively instead of interpreting ASLR address bits as GBA tags.
+    return FALSE;
+#else
     // In ROM mirror 1.
     return (((uintptr_t)func) & 0xE000000) == 0xA000000;
+#endif
 }
 
 /* 'setjmp' and 'longjmp' cause link errors, so we use
@@ -662,8 +668,10 @@ bool32 Script_MatchesCallNative(const u8 *script, void *funcPtr, bool32 requestE
         return FALSE;
     u32 callnativeFunc = (((((script[4] << 8) + script[3]) << 8) + script[2]) << 8) + script[1];
     u32 targetFunc = (u32)funcPtr;
+#ifndef PORTABLE
     if (requestEffects)
         targetFunc |= 0xA000000;
+#endif
     if (callnativeFunc == targetFunc)
         return TRUE;
     return FALSE;

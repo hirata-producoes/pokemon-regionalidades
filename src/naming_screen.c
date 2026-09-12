@@ -706,9 +706,10 @@ static bool8 MainState_Exit(void)
         FreeAllWindowBuffers();
 #ifdef PORTABLE
         // CB2_NamingScreen still finishes the current host frame after the
-        // task changes callback. Prevent the remaining sprite/VBlank work
-        // from observing the freed naming-screen state on PC.
+        // task changes callback. Clear its sprite callbacks and VBlank work
+        // before freeing the state so the rest of this PC frame cannot read it.
         SetVBlankCallback(NULL);
+        ResetSpriteData();
 #endif
         FREE_AND_SET_NULL(sNamingScreen);
     }
@@ -2099,6 +2100,10 @@ static void SetVBlank(void)
 
 static void VBlankCB_NamingScreen(void)
 {
+#ifdef PORTABLE
+    if (sNamingScreen == NULL)
+        return;
+#endif
     LoadOam();
     ProcessSpriteCopyRequests();
     TransferPlttBuffer();

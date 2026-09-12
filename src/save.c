@@ -6,6 +6,9 @@
 #include "gba/flash_internal.h"
 #include "fieldmap.h"
 #include "save.h"
+#include "pokemon_regionalidades_dex.h"
+#include "pokemon_regionalidades_inventory.h"
+#include "pokemon_regionalidades_progress.h"
 #include "task.h"
 #include "decompress.h"
 #include "load_save.h"
@@ -81,6 +84,8 @@ struct
 
 // These will produce an error if a save struct is larger than the space
 // alloted for it in the flash.
+STATIC_ASSERT(sizeof(struct LegacyItemSlot) == 4, LegacyItemSlotLayoutChanged);
+STATIC_ASSERT(sizeof(struct Bag) == 0x2E8, LegacyBagLayoutChanged);
 #ifndef PORTABLE
 STATIC_ASSERT(sizeof(struct SaveBlock3) <= SAVE_BLOCK_3_CHUNK_SIZE * NUM_SECTORS_PER_SLOT, SaveBlock3FreeSpace);
 STATIC_ASSERT(sizeof(struct SaveBlock2) <= SECTOR_DATA_SIZE, SaveBlock2FreeSpace);
@@ -910,6 +915,11 @@ u8 LoadGameSave(u8 saveType)
     case SAVE_NORMAL:
     default:
         status = TryLoadSaveSlot(FULL_SAVE_SLOT, gRamSaveSectorLocations);
+        if (status == SAVE_STATUS_OK
+         && (!PgrProgress_OnSaveLoaded()
+          || !PgwDex_OnSaveLoaded()
+          || !PgrInventory_OnSaveLoaded()))
+            status = SAVE_STATUS_CORRUPT;
         CopyPartyAndObjectsFromSave();
         gSaveFileStatus = status;
         gGameContinueCallback = NULL;

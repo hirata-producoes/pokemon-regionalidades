@@ -13,6 +13,7 @@
 #include "main.h"
 #include "main_menu.h"
 #include "palette.h"
+#include "pokemon_regionalidades_dev_save.h"
 #include "reset_rtc_screen.h"
 #include "berry_fix_program.h"
 #include "sound.h"
@@ -919,7 +920,7 @@ static void Task_TitleScreenPhase3(u8 taskId)
     if (QUICKSTART && JOY_NEW(SELECT_BUTTON))
         Quickstart();
 
-    if (JOY_NEW(A_BUTTON) || JOY_NEW(START_BUTTON))
+    if (JOY_NEW(A_BUTTON) || JOY_NEW(START_BUTTON) || Pgr_IsMobilityProfileRequested())
     {
         FadeOutBGM(4);
         BeginNormalPaletteFade(PALETTES_ALL, 0, 0, 16, RGB_WHITEALPHA);

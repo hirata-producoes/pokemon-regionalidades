@@ -2,18 +2,20 @@
 #include "event_data.h"
 #include "fake_rtc.h"
 #include "pokemon_go_world.h"
+#include "pokemon_regionalidades_dex.h"
+#include "pokemon_regionalidades_progress.h"
 #include "rtc.h"
 
-static const u8 sText_SeasonSpring[] = _("SPRING");
-static const u8 sText_SeasonSummer[] = _("SUMMER");
-static const u8 sText_SeasonAutumn[] = _("AUTUMN");
-static const u8 sText_SeasonWinter[] = _("WINTER");
-static const u8 sText_ClimateClear[] = _("CLEAR");
-static const u8 sText_ClimateCloudy[] = _("CLOUDY");
-static const u8 sText_ClimateRain[] = _("RAIN");
-static const u8 sText_ClimateStorm[] = _("STORM");
-static const u8 sText_ClimateFog[] = _("FOG");
-static const u8 sText_ClimateWind[] = _("WIND");
+static const u8 sText_SeasonSpring[] = _("PRIMAVERA");
+static const u8 sText_SeasonSummer[] = _("VERAO");
+static const u8 sText_SeasonAutumn[] = _("OUTONO");
+static const u8 sText_SeasonWinter[] = _("INVERNO");
+static const u8 sText_ClimateClear[] = _("ABERTO");
+static const u8 sText_ClimateCloudy[] = _("NUBLADO");
+static const u8 sText_ClimateRain[] = _("CHUVA");
+static const u8 sText_ClimateStorm[] = _("TEMPESTADE");
+static const u8 sText_ClimateFog[] = _("NEBLINA");
+static const u8 sText_ClimateWind[] = _("VENTO");
 
 static const u8 *const sSeasonNames[PGW_SEASON_COUNT] =
 {
@@ -32,6 +34,10 @@ static const u8 *const sClimateNames[PGW_CLIMATE_COUNT] =
     [PGW_CLIMATE_FOG] = sText_ClimateFog,
     [PGW_CLIMATE_WIND] = sText_ClimateWind,
 };
+
+// Keep this zero-initialized so it lives in BSS on the GBA target.
+// Zero means no explicit selection; stored selections use region + 1.
+static u8 sNewGameStartingRegionPlusOne;
 
 static bool32 GetRealTimeSeconds(u32 *seconds)
 {
@@ -56,17 +62,38 @@ static void SetRealTimeAnchor(u32 seconds)
 void Pgw_InitWorldState(void)
 {
     u16 weatherSeed = gSaveBlock1Ptr->dailySeed ^ (gSaveBlock1Ptr->dailySeed >> 16);
+    enum PgwStartingRegion startingRegion = PGW_DEFAULT_STARTING_REGION;
 
     if (weatherSeed == 0)
         weatherSeed = 1;
 
-    VarSet(VAR_PGW_STARTING_REGION, PGW_DEFAULT_STARTING_REGION);
-    VarSet(VAR_PGW_CURRENT_REGION, PGW_DEFAULT_STARTING_REGION);
+    if (sNewGameStartingRegionPlusOne != 0)
+        startingRegion = sNewGameStartingRegionPlusOne - 1;
+
+    VarSet(VAR_PGW_STARTING_REGION, startingRegion);
+    VarSet(VAR_PGW_CURRENT_REGION, startingRegion);
+    sNewGameStartingRegionPlusOne = 0;
     VarSet(VAR_PGW_SEASON, PGW_DEFAULT_SEASON);
     VarSet(VAR_PGW_SEASON_DAY, 1);
     VarSet(VAR_PGW_WEATHER_SEED, weatherSeed);
     VarSet(VAR_PGW_WORLD_LEVEL, 0);
+    PgwDex_ResetResearch();
+    PgrProgress_Reset();
     Pgw_SnapshotWorldClockRealTime();
+}
+
+void Pgw_SelectStartingRegionForNewGame(enum PgwStartingRegion region)
+{
+    if (region >= PGW_START_REGION_COUNT)
+        region = PGW_DEFAULT_STARTING_REGION;
+    sNewGameStartingRegionPlusOne = region + 1;
+}
+
+enum PgwStartingRegion Pgw_GetSelectedStartingRegionForNewGame(void)
+{
+    if (sNewGameStartingRegionPlusOne == 0)
+        return PGW_DEFAULT_STARTING_REGION;
+    return sNewGameStartingRegionPlusOne - 1;
 }
 
 void Pgw_SnapshotWorldClockRealTime(void)

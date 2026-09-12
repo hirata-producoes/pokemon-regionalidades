@@ -41,6 +41,7 @@
 #include "malloc.h"
 #include "m4a.h"
 #include "map_name_popup.h"
+#include "pokemon_regionalidades_dev_save.h"
 #include "map_preview_screen.h"
 #include "match_call.h"
 #include "menu.h"
@@ -85,6 +86,7 @@
 #include "constants/abilities.h"
 #include "constants/event_object_movement.h"
 #include "constants/event_objects.h"
+#include "constants/heal_locations.h"
 #include "constants/layouts.h"
 #include "constants/region_map_sections.h"
 #include "constants/rgb.h"
@@ -2176,6 +2178,14 @@ void CB2_ContinueSavedGame(void)
     ResetSafariZoneFlag_();
     if (gSaveFileStatus == SAVE_STATUS_ERROR)
         ResetWinStreaks();
+
+#if defined(PORTABLE) && defined(PLATFORM_SDL2)
+    if (Pgr_ApplyMobilityProfileIfRequested())
+    {
+        // Preserve the authentic saved map, position and object-event state.
+        DBGPRINTF("Development save: TrySavingData=%u\n", TrySavingData(SAVE_NORMAL));
+    }
+#endif
 
     LoadSaveblockMapHeader();
     ClearDiveAndHoleWarps();

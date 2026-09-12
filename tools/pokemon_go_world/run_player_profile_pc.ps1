@@ -14,45 +14,7 @@
 
 $ErrorActionPreference = 'Stop'
 
-function Get-RegionalidadesSaveGeneration {
-    param(
-        [Parameter(Mandatory = $true)]
-        [string]$Path
-    )
-
-    $bytes = [IO.File]::ReadAllBytes($Path)
-    if ($bytes.Length -ne 131072) {
-        return $null
-    }
-
-    $sectors = for ($sector = 0; $sector -lt 28; $sector++) {
-        $offset = $sector * 4096
-        $id = [BitConverter]::ToUInt16($bytes, $offset + 4084)
-        $signature = [BitConverter]::ToUInt32($bytes, $offset + 4088)
-        if ($signature -eq 0x08012025 -and $id -lt 14) {
-            [pscustomobject]@{
-                Id = $id
-                Counter = [BitConverter]::ToUInt32($bytes, $offset + 4092)
-            }
-        }
-    }
-
-    [uint32]$latest = 0
-    $hasLatest = $false
-    foreach ($group in @($sectors | Group-Object Counter)) {
-        if (@($group.Group.Id | Sort-Object -Unique).Count -eq 14) {
-            $counter = [uint32]$group.Name
-            if (-not $hasLatest -or $counter -gt $latest) {
-                $latest = $counter
-                $hasLatest = $true
-            }
-        }
-    }
-    if ($hasLatest) {
-        return $latest
-    }
-    return $null
-}
+. (Join-Path $PSScriptRoot 'save_container_common_pc.ps1')
 
 $repoRoot = (Resolve-Path (Join-Path $PSScriptRoot '..\..')).Path
 $executable = Join-Path $repoRoot 'pokemon_regionalidades-pc.exe'
@@ -77,7 +39,8 @@ if ([string]::IsNullOrWhiteSpace($DataRoot)) {
 
 $profileDir = Join-Path $DataRoot ("profiles\profile-$Profile")
 $configDir = Join-Path $DataRoot 'config'
-$savePath = Join-Path $profileDir 'pokemon_regionalidades.sav'
+$savePath = Join-Path $profileDir 'pokemon_regionalidades.pgrsave'
+$legacySavePath = Join-Path $profileDir 'pokemon_regionalidades.sav'
 $configPath = Join-Path $configDir 'pokemon_regionalidades.cfg'
 $runtimeLog = Join-Path $profileDir 'runtime-last.log'
 $runtimeHistoryDir = Join-Path $profileDir 'runtime-history'
@@ -85,35 +48,56 @@ $runtimeHistoryDir = Join-Path $profileDir 'runtime-history'
 New-Item -ItemType Directory -Path $profileDir -Force | Out-Null
 New-Item -ItemType Directory -Path $configDir -Force | Out-Null
 
+function Resolve-ProfileSavePath {
+    param([int]$Recovery = 0)
+    $suffix = if ($Recovery -eq 0) { '' } else { ".recovery-$Recovery" }
+    $nativeCandidate = "$savePath$suffix"
+    $legacyCandidate = "$legacySavePath$suffix"
+    if (Test-RegionalidadesSave -Path $nativeCandidate) {
+        return $nativeCandidate
+    }
+    if (Test-RegionalidadesSave -Path $legacyCandidate) {
+        return $legacyCandidate
+    }
+    return $null
+}
+
 if (-not [string]::IsNullOrWhiteSpace($ImportSave)) {
     $sourceSave = (Resolve-Path -LiteralPath $ImportSave).Path
-    if ((Get-Item -LiteralPath $sourceSave).Length -ne 131072) {
-        throw "O save de origem nao tem o tamanho esperado de 128 KiB: $sourceSave"
+    if (-not (Test-RegionalidadesSave -Path $sourceSave)) {
+        throw "O save de origem nao e um .sav Emerald ou .pgrsave reconhecido: $sourceSave"
     }
-    if (Test-Path -LiteralPath $savePath -PathType Leaf) {
+    if ($null -ne (Resolve-ProfileSavePath)) {
         throw "O perfil $Profile ja possui um save. A importacao foi cancelada sem substituir o arquivo existente."
     }
 
-    $pendingImport = "$savePath.importing"
-    Copy-Item -LiteralPath $sourceSave -Destination $pendingImport -Force
+    $sourceDescriptor = Get-RegionalidadesSaveDescriptor -Path $sourceSave
+    $importDestination = $savePath
+    $pendingImport = "$importDestination.importing"
     $sourceHash = (Get-FileHash -LiteralPath $sourceSave -Algorithm SHA256).Hash
-    $importHash = (Get-FileHash -LiteralPath $pendingImport -Algorithm SHA256).Hash
-    if ($sourceHash -ne $importHash) {
-        Remove-Item -LiteralPath $pendingImport -Force
-        throw 'A copia importada nao corresponde ao save de origem.'
+    if ($sourceDescriptor.Kind -eq 'Native') {
+        Copy-Item -LiteralPath $sourceSave -Destination $pendingImport -Force
+    } else {
+        $nativeBytes = Convert-RegionalidadesLegacyToNativeBytes -LegacyBytes ([IO.File]::ReadAllBytes($sourceSave))
+        [IO.File]::WriteAllBytes($pendingImport, $nativeBytes)
     }
-    Move-Item -LiteralPath $pendingImport -Destination $savePath
+    if (-not (Test-RegionalidadesSave -Path $pendingImport) -or
+        (Get-FileHash -LiteralPath $sourceSave -Algorithm SHA256).Hash -ne $sourceHash) {
+        Remove-Item -LiteralPath $pendingImport -Force
+        throw 'A copia importada falhou na validacao ou alterou o save de origem.'
+    }
+    Move-Item -LiteralPath $pendingImport -Destination $importDestination
     Write-Host "Save copiado com seguranca para o perfil $Profile. O original foi preservado."
 }
 
 if (-not [string]::IsNullOrWhiteSpace($ExportSave)) {
-    if (-not (Test-Path -LiteralPath $savePath -PathType Leaf) -or
-        (Get-Item -LiteralPath $savePath).Length -ne 131072) {
+    $activeSavePath = Resolve-ProfileSavePath
+    if ($null -eq $activeSavePath) {
         throw "O perfil $Profile nao possui um save ativo valido para exportar."
     }
 
     $exportPath = [IO.Path]::GetFullPath($ExportSave)
-    if ($exportPath.Equals([IO.Path]::GetFullPath($savePath), [StringComparison]::OrdinalIgnoreCase)) {
+    if ($exportPath.Equals([IO.Path]::GetFullPath($activeSavePath), [StringComparison]::OrdinalIgnoreCase)) {
         throw 'O destino da exportacao nao pode ser o proprio save ativo.'
     }
     $exportDir = Split-Path $exportPath
@@ -124,13 +108,19 @@ if (-not [string]::IsNullOrWhiteSpace($ExportSave)) {
         throw 'O arquivo de destino ja existe. A exportacao foi cancelada sem substitui-lo.'
     }
 
-    $sourceHash = (Get-FileHash -LiteralPath $savePath -Algorithm SHA256).Hash
     $pendingExport = "$exportPath.exporting-$([guid]::NewGuid().ToString('N'))"
-    Copy-Item -LiteralPath $savePath -Destination $pendingExport
-    if ((Get-FileHash -LiteralPath $pendingExport -Algorithm SHA256).Hash -ne $sourceHash) {
-        Remove-Item -LiteralPath $pendingExport -Force
-        throw 'A copia preparada para exportacao nao corresponde ao save ativo.'
+    $activeDescriptor = Get-RegionalidadesSaveDescriptor -Path $activeSavePath
+    if ($activeDescriptor.Kind -eq 'Native') {
+        Copy-Item -LiteralPath $activeSavePath -Destination $pendingExport
+    } else {
+        $nativeBytes = Convert-RegionalidadesLegacyToNativeBytes -LegacyBytes ([IO.File]::ReadAllBytes($activeSavePath))
+        [IO.File]::WriteAllBytes($pendingExport, $nativeBytes)
     }
+    if (-not (Test-RegionalidadesSave -Path $pendingExport)) {
+        Remove-Item -LiteralPath $pendingExport -Force
+        throw 'A copia preparada para exportacao nao e um save nativo valido.'
+    }
+    $sourceHash = (Get-FileHash -LiteralPath $pendingExport -Algorithm SHA256).Hash
 
     $previousExportBackup = $null
     if (Test-Path -LiteralPath $exportPath -PathType Leaf) {
@@ -140,7 +130,7 @@ if (-not [string]::IsNullOrWhiteSpace($ExportSave)) {
         Move-Item -LiteralPath $pendingExport -Destination $exportPath
     }
 
-    if ((Get-Item -LiteralPath $exportPath).Length -ne 131072 -or
+    if (-not (Test-RegionalidadesSave -Path $exportPath) -or
         (Get-FileHash -LiteralPath $exportPath -Algorithm SHA256).Hash -ne $sourceHash) {
         throw 'A verificacao posterior da exportacao falhou.'
     }
@@ -157,22 +147,22 @@ if ($RestoreRecovery -ne 0) {
         throw 'Feche todas as instancias do jogo antes de restaurar uma recuperacao.'
     }
 
-    $recoveryPath = "$savePath.recovery-$RestoreRecovery"
-    if (-not (Test-Path -LiteralPath $savePath -PathType Leaf)) {
+    $activeSavePath = Resolve-ProfileSavePath
+    $recoveryPath = Resolve-ProfileSavePath -Recovery $RestoreRecovery
+    if ($null -eq $activeSavePath) {
         throw "O perfil $Profile ainda nao possui um save ativo."
     }
-    if ((Get-Item -LiteralPath $savePath).Length -ne 131072) {
-        throw "O save ativo do perfil $Profile nao tem o tamanho esperado de 128 KiB."
+    if (-not (Test-RegionalidadesSave -Path $activeSavePath)) {
+        throw "O save ativo do perfil $Profile nao tem um formato reconhecido."
     }
-    if (-not (Test-Path -LiteralPath $recoveryPath -PathType Leaf) -or
-        (Get-Item -LiteralPath $recoveryPath).Length -ne 131072) {
+    if ($null -eq $recoveryPath -or -not (Test-RegionalidadesSave -Path $recoveryPath)) {
         throw "A recuperacao $RestoreRecovery do perfil $Profile nao existe ou e invalida."
     }
 
-    $activeHash = (Get-FileHash -LiteralPath $savePath -Algorithm SHA256).Hash
+    $activeHash = (Get-FileHash -LiteralPath $activeSavePath -Algorithm SHA256).Hash
     $recoveryHash = (Get-FileHash -LiteralPath $recoveryPath -Algorithm SHA256).Hash
-    $pendingRestore = "$savePath.restoring"
-    $backupPath = "$savePath.before-restore-$(Get-Date -Format 'yyyyMMdd-HHmmssfff')"
+    $pendingRestore = "$activeSavePath.restoring"
+    $backupPath = "$activeSavePath.before-restore-$(Get-Date -Format 'yyyyMMdd-HHmmssfff')"
 
     Copy-Item -LiteralPath $recoveryPath -Destination $pendingRestore -Force
     if ((Get-FileHash -LiteralPath $pendingRestore -Algorithm SHA256).Hash -ne $recoveryHash) {
@@ -181,7 +171,7 @@ if ($RestoreRecovery -ne 0) {
     }
 
     try {
-        [IO.File]::Replace($pendingRestore, $savePath, $backupPath, $true)
+        [IO.File]::Replace($pendingRestore, $activeSavePath, $backupPath, $true)
     } catch {
         if (Test-Path -LiteralPath $pendingRestore -PathType Leaf) {
             Remove-Item -LiteralPath $pendingRestore -Force
@@ -189,7 +179,7 @@ if ($RestoreRecovery -ne 0) {
         throw
     }
 
-    if ((Get-FileHash -LiteralPath $savePath -Algorithm SHA256).Hash -ne $recoveryHash -or
+    if ((Get-FileHash -LiteralPath $activeSavePath -Algorithm SHA256).Hash -ne $recoveryHash -or
         (Get-FileHash -LiteralPath $backupPath -Algorithm SHA256).Hash -ne $activeHash) {
         throw 'A verificacao posterior da restauracao falhou. Nao abra o jogo antes de revisar os arquivos.'
     }
@@ -200,13 +190,13 @@ if ($RestoreRecovery -ne 0) {
 
 if ($ListRecoveries) {
     $entries = @(
-        [pscustomobject]@{ Estado = 'Ativo'; Caminho = $savePath },
-        [pscustomobject]@{ Estado = 'Recuperacao 1'; Caminho = "$savePath.recovery-1" },
-        [pscustomobject]@{ Estado = 'Recuperacao 2'; Caminho = "$savePath.recovery-2" },
-        [pscustomobject]@{ Estado = 'Recuperacao 3'; Caminho = "$savePath.recovery-3" }
+        [pscustomobject]@{ Estado = 'Ativo'; Caminho = (Resolve-ProfileSavePath) },
+        [pscustomobject]@{ Estado = 'Recuperacao 1'; Caminho = (Resolve-ProfileSavePath -Recovery 1) },
+        [pscustomobject]@{ Estado = 'Recuperacao 2'; Caminho = (Resolve-ProfileSavePath -Recovery 2) },
+        [pscustomobject]@{ Estado = 'Recuperacao 3'; Caminho = (Resolve-ProfileSavePath -Recovery 3) }
     )
     $available = foreach ($entry in $entries) {
-        if (Test-Path -LiteralPath $entry.Caminho -PathType Leaf) {
+        if ($null -ne $entry.Caminho -and (Test-Path -LiteralPath $entry.Caminho -PathType Leaf)) {
             $file = Get-Item -LiteralPath $entry.Caminho
             [pscustomobject]@{
                 Estado = $entry.Estado
@@ -256,6 +246,7 @@ $environmentNames = @(
     'POKEMON_REGIONALIDADES_SETTINGS_SCRIPT',
     'POKEMON_REGIONALIDADES_DEV_SESSION',
     'POKEMON_REGIONALIDADES_APPLY_MOBILITY_PROFILE',
+    'POKEMON_REGIONALIDADES_TECHNICAL_MOBILITY',
     'POKEMON_GO_WORLD_AUTOPLAY'
 )
 $oldEnvironment = @{}
@@ -272,6 +263,9 @@ try {
     [Environment]::SetEnvironmentVariable('POKEMON_REGIONALIDADES_PROFILE_RUNNER', $PSCommandPath, 'Process')
     [Environment]::SetEnvironmentVariable('POKEMON_REGIONALIDADES_PROFILE_ID', [string]$Profile, 'Process')
     [Environment]::SetEnvironmentVariable('POKEMON_REGIONALIDADES_SETTINGS_SCRIPT', (Join-Path $PSScriptRoot 'open_pc_settings.ps1'), 'Process')
+    if ($Profile -eq 1) {
+        [Environment]::SetEnvironmentVariable('POKEMON_REGIONALIDADES_TECHNICAL_MOBILITY', '1', 'Process')
+    }
 
     Start-Process -FilePath $executable -WorkingDirectory $repoRoot | Out-Null
 }

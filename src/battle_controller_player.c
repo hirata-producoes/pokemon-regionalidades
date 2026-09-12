@@ -1412,7 +1412,7 @@ static void DynamaxModifyHPLevelUp(struct Pokemon *mon, enum BattlerId battler, 
 
 static s32 GetTaskExpValue(u8 taskId)
 {
-    return (u16)(gTasks[taskId].tExpTask_gainedExp_1) | (gTasks[taskId].tExpTask_gainedExp_2 << 16);
+    return (u16)gTasks[taskId].tExpTask_gainedExp_1 | ((u32)(u16)gTasks[taskId].tExpTask_gainedExp_2 << 16);
 }
 
 static void Task_GiveExpToMon(u8 taskId)

@@ -2,6 +2,8 @@
 #define GUARD_POKEMON_GO_WORLD_H
 
 void Pgw_InitWorldState(void);
+void Pgw_SelectStartingRegionForNewGame(enum PgwStartingRegion region);
+enum PgwStartingRegion Pgw_GetSelectedStartingRegionForNewGame(void);
 void Pgw_AdvanceWorldDays(u16 days);
 void Pgw_CalculateInternalElapsed(u32 realSeconds, struct Time *internalElapsed);
 bool32 Pgw_TryConvertRealRtcToSeconds(const struct SiiRtcInfo *rtc, u32 *seconds);

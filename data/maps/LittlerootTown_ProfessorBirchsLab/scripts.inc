@@ -142,11 +142,23 @@ LittlerootTown_ProfessorBirchsLab_EventScript_DeclineSeeingRival::
 	end
 
 LittlerootTown_ProfessorBirchsLab_EventScript_GivePokedexEvent::
+	special PgrProgress_ScriptCheckHoennPokedex
+	goto_if_eq VAR_RESULT, FALSE, LittlerootTown_ProfessorBirchsLab_EventScript_SkipInvalidPokedexScene
 	lockall
 	applymovement LOCALID_PLAYER, LittlerootTown_ProfessorBirchsLab_Movement_PlayerEnterLabForPokedex
 	waitmovement 0
 	goto LittlerootTown_ProfessorBirchsLab_EventScript_GivePokedex
 	end
+
+LittlerootTown_ProfessorBirchsLab_EventScript_SkipInvalidPokedexScene::
+	@ Clear the frame trigger so a rejected scene cannot lock every frame.
+	setvar VAR_BIRCH_LAB_STATE, 3
+	call_if_set FLAG_RECEIVED_POKEDEX_FROM_BIRCH, LittlerootTown_ProfessorBirchsLab_EventScript_RestoreCompletedLab
+	end
+
+LittlerootTown_ProfessorBirchsLab_EventScript_RestoreCompletedLab::
+	setvar VAR_BIRCH_LAB_STATE, 5
+	return
 
 LittlerootTown_ProfessorBirchsLab_Movement_PlayerEnterLabForPokedex:
 	walk_up

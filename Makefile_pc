@@ -394,6 +394,7 @@ DATA_ASM_OBJS := $(patsubst $(DATA_ASM_SUBDIR)/%.s,$(DATA_ASM_BUILDDIR)/%.o,$(DA
 
 # event_scripts.s pulls this file in through an assembler .include, which the
 # generated dependency scanner cannot see reliably on the native toolchain.
+$(DATA_ASM_OBJS): asm/macros/event.inc $(DATA_ASM_SUBDIR)/specials.inc
 $(DATA_ASM_BUILDDIR)/event_scripts.o: $(DATA_ASM_SUBDIR)/script_cmd_table.inc Makefile_pc
 
 MID_SRCS := $(wildcard $(MID_SUBDIR)/*.mid)

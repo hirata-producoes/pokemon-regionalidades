@@ -102,7 +102,8 @@ struct ShopData
     u16 itemsShowed;
     u16 selectedRow;
     u16 scrollOffset;
-    u16 maxQuantity;
+    u32 maxQuantity;
+    u32 itemCount;
     u8 scrollIndicatorsTaskId;
     u8 iconSlot;
     u8 itemSpriteIds[2];
@@ -420,7 +421,7 @@ static void Task_ShopMenu(u8 taskId)
     }
 }
 
-#define tItemCount  data[1]
+#define tItemCount  sShopData->itemCount
 #define tItemId     data[5]
 #define tListTaskId data[7]
 #define tCallbackHi data[8]
@@ -1075,8 +1076,8 @@ static void Task_BuyHowManyDialogueInit(u8 taskId)
 {
     s16 *data = gTasks[taskId].data;
 
-    u16 quantityInBag = CountTotalItemQuantityInBag(tItemId);
-    u16 maxQuantity;
+    u32 quantityInBag = CountTotalItemQuantityInBag(tItemId);
+    u32 maxQuantity;
 
     DrawStdFrameWithCustomTileAndPalette(WIN_QUANTITY_IN_BAG, FALSE, 1, 13);
     ConvertIntToDecimalStringN(gStringVar1, quantityInBag, STR_CONV_MODE_RIGHT_ALIGN, MAX_ITEM_DIGITS + 1);
@@ -1105,7 +1106,7 @@ static void Task_BuyHowManyDialogueHandleInput(u8 taskId)
 {
     s16 *data = gTasks[taskId].data;
 
-    if (AdjustQuantityAccordingToDPadInput(&tItemCount, sShopData->maxQuantity) == TRUE)
+    if (AdjustQuantityAccordingToDPadInputU32(&tItemCount, sShopData->maxQuantity) == TRUE)
     {
         sShopData->totalCost = (GetItemPrice(tItemId) >> IsPokeNewsActive(POKENEWS_SLATEPORT)) * tItemCount;
         BuyMenuPrintItemQuantityAndPrice(taskId);
@@ -1196,7 +1197,7 @@ static void Task_ReturnToItemListAfterItemPurchase(u8 taskId)
 
     if (JOY_NEW(A_BUTTON | B_BUTTON))
     {
-        u16 premierBallsToAdd = tItemCount / 10;
+        u32 premierBallsToAdd = tItemCount / 10;
         if (premierBallsToAdd >= 1
          && ((I_PREMIER_BALL_BONUS <= GEN_7 && tItemId == ITEM_POKE_BALL)
           || (I_PREMIER_BALL_BONUS >= GEN_8 && (GetItemPocket(tItemId) == POCKET_POKE_BALLS))))
@@ -1249,8 +1250,6 @@ static void BuyMenuReturnToItemList(u8 taskId)
 
 static void BuyMenuPrintItemQuantityAndPrice(u8 taskId)
 {
-    s16 *data = gTasks[taskId].data;
-
     FillWindowPixelBuffer(WIN_QUANTITY_PRICE, PIXEL_FILL(1));
     PrintMoneyAmount(WIN_QUANTITY_PRICE, CalculateMoneyTextHorizontalPosition(sShopData->totalCost), 1, sShopData->totalCost, TEXT_SKIP_DRAW);
     ConvertIntToDecimalStringN(gStringVar1, tItemCount, STR_CONV_MODE_LEADING_ZEROS, MAX_ITEM_DIGITS);
@@ -1303,7 +1302,7 @@ static void RecordItemPurchase(u8 taskId)
     if (sPurchaseHistoryId < ARRAY_COUNT(gMartPurchaseHistory))
     {
         gMartPurchaseHistory[sPurchaseHistoryId].itemId = tItemId;
-        gMartPurchaseHistory[sPurchaseHistoryId].quantity = tItemCount;
+        gMartPurchaseHistory[sPurchaseHistoryId].quantity = min(tItemCount, 255);
         sPurchaseHistoryId++;
     }
 }

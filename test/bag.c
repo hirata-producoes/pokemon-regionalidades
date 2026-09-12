@@ -1,6 +1,7 @@
 #include "global.h"
 #include "battle.h"
 #include "event_data.h"
+#include "item.h"
 #include "item_menu.h"
 #include "pokemon.h"
 #include "test/overworld_script.h"
@@ -162,4 +163,21 @@ TEST("Items are correctly sorted and compacted in the bag")
     EXPECT_EQ(pocket->itemSlots[4].itemId, ITEM_NONE);
     EXPECT_EQ(pocket->itemSlots[5].itemId, ITEM_NONE);
     EXPECT_EQ(pocket->itemSlots[6].itemId, ITEM_NONE);
+}
+
+TEST("Removing a complete PC item stack compacts the remaining items")
+{
+    memset(gSaveBlock1Ptr->pcItems, 0, sizeof(gSaveBlock1Ptr->pcItems));
+
+    EXPECT(AddPCItem(ITEM_POTION, MAX_PC_ITEM_CAPACITY));
+    EXPECT(AddPCItem(ITEM_ANTIDOTE, 7));
+    EXPECT_EQ(CountUsedPCItemSlots(), 2);
+
+    RemovePCItem(0, MAX_PC_ITEM_CAPACITY);
+
+    EXPECT_EQ(CountUsedPCItemSlots(), 1);
+    EXPECT_EQ(GetPCItemIdAndQuantity(0).itemId, ITEM_ANTIDOTE);
+    EXPECT_EQ(GetPCItemIdAndQuantity(0).quantity, 7);
+    EXPECT_EQ(GetPCItemIdAndQuantity(1).itemId, ITEM_NONE);
+    EXPECT_EQ(GetPCItemIdAndQuantity(1).quantity, 0);
 }

@@ -1151,7 +1151,7 @@ static void SpriteCB_PokeballReleaseMon(struct Sprite *sprite)
         u8 subpriority;
         u8 spriteId = sprite->sMonSpriteId;
         u8 monPalNum = sprite->sMonPalNum;
-        u32 selectedPalettes = (u16)sprite->sFadePalsLo | ((u16)sprite->sFadePalsHi << 16);
+        u32 selectedPalettes = (u16)sprite->sFadePalsLo | ((u32)(u16)sprite->sFadePalsHi << 16);
 
         if (sprite->subpriority != 0)
             subpriority = sprite->subpriority - 1;
@@ -1254,7 +1254,7 @@ static void SpriteCB_TradePokeball(struct Sprite *sprite)
         u8 subpriority;
         u8 monSpriteId = sprite->sMonSpriteId;
         u8 monPalNum = sprite->sMonPalNum;
-        u32 selectedPalettes = (u16)sprite->sFadePalsLo | ((u16)sprite->sFadePalsHi << 16);
+        u32 selectedPalettes = (u16)sprite->sFadePalsLo | ((u32)(u16)sprite->sFadePalsHi << 16);
 
         if (sprite->subpriority != 0)
             subpriority = sprite->subpriority - 1;

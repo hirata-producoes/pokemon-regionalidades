@@ -2194,7 +2194,10 @@ static void CreatePokedexList(u8 dexMode, u8 order)
     {
     default:
     case DEX_MODE_HOENN:
-        temp_dexCount = REGIONAL_DEX_COUNT;
+        // The enum count includes DEX_NONE. Iterating through the count itself
+        // asks RegionalToNationalOrder for one entry past the regional dex and
+        // returns zero, which underflows the seen/caught bit index on PC.
+        temp_dexCount = REGIONAL_DEX_COUNT - 1;
         temp_isHoennDex = TRUE;
         break;
     case DEX_MODE_NATIONAL:
@@ -2205,7 +2208,7 @@ static void CreatePokedexList(u8 dexMode, u8 order)
         }
         else
         {
-            temp_dexCount = REGIONAL_DEX_COUNT;
+            temp_dexCount = REGIONAL_DEX_COUNT - 1;
             temp_isHoennDex = TRUE;
         }
         break;
@@ -2677,7 +2680,9 @@ static void UpdateSelectedMonSpriteId(void)
     {
         u16 spriteId = sPokedexView->monSpriteIds[i];
 
-        if (gSprites[spriteId].x2 == 0 && gSprites[spriteId].y2 == 0 && spriteId != 0xFFFF)
+        // Empty slots use 0xFFFF. Check the sentinel before indexing gSprites;
+        // native memory does not reproduce the GBA's forgiving address layout.
+        if (spriteId != 0xFFFF && gSprites[spriteId].x2 == 0 && gSprites[spriteId].y2 == 0)
             sPokedexView->selectedMonSpriteId = spriteId;
     }
 }

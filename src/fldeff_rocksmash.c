@@ -110,7 +110,7 @@ static void Task_DoFieldMove_WaitForMon(u8 taskId)
 static void Task_DoFieldMove_RunFunc(u8 taskId)
 {
     // The function for the field move to do is stored in halves across data[8] and data[9]
-    void (*fieldMoveFunc)(void) = (void (*)(void))(((u16)gTasks[taskId].data[8] << 16) | (u16)gTasks[taskId].data[9]);
+    void (*fieldMoveFunc)(void) = (void (*)(void))(((u32)(u16)gTasks[taskId].data[8] << 16) | (u16)gTasks[taskId].data[9]);
 
     fieldMoveFunc();
     gPlayerAvatar.preventStep = FALSE;

@@ -694,11 +694,26 @@ static u8 UNUSED InitMenuDefaultCursorHeight(u8 windowId, u8 fontId, u8 left, u8
 void RedrawMenuCursor(u8 oldPos, u8 newPos)
 {
     u8 width, height;
+    u8 newY;
 
     width = GetMenuCursorDimensionByFont(sMenu.fontId, 0);
     height = GetMenuCursorDimensionByFont(sMenu.fontId, 1);
     FillWindowPixelRect(sMenu.windowId, PIXEL_FILL(1), sMenu.left, sMenu.optionHeight * oldPos + sMenu.top, width, height);
-    AddTextPrinterParameterized(sMenu.windowId, sMenu.fontId, gText_SelectorArrow3, sMenu.left, sMenu.optionHeight * newPos + sMenu.top, 0, 0);
+    newY = sMenu.optionHeight * newPos + sMenu.top;
+#ifdef PLATFORM_SDL2
+    // Draw the PC selector directly in the window buffer. The original
+    // triangular text glyph is currently invisible in the native renderer,
+    // while normal text and sprite cursors work. This five-segment chevron
+    // avoids the font path and keeps every common choice menu readable.
+    FillWindowPixelRect(sMenu.windowId, PIXEL_FILL(2), sMenu.left + 1, newY + height / 2 - 3, 2, 2);
+    FillWindowPixelRect(sMenu.windowId, PIXEL_FILL(2), sMenu.left + 3, newY + height / 2 - 2, 2, 2);
+    FillWindowPixelRect(sMenu.windowId, PIXEL_FILL(2), sMenu.left + 5, newY + height / 2 - 1, 2, 2);
+    FillWindowPixelRect(sMenu.windowId, PIXEL_FILL(2), sMenu.left + 3, newY + height / 2, 2, 2);
+    FillWindowPixelRect(sMenu.windowId, PIXEL_FILL(2), sMenu.left + 1, newY + height / 2 + 1, 2, 2);
+    CopyWindowToVram(sMenu.windowId, COPYWIN_GFX);
+#else
+    AddTextPrinterParameterized(sMenu.windowId, sMenu.fontId, gText_SelectorArrow3, sMenu.left, newY, 0, 0);
+#endif
 }
 
 u8 Menu_MoveCursor(s8 cursorDelta)

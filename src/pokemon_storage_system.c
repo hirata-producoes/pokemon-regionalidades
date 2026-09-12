@@ -1962,6 +1962,11 @@ static void VBlankCB_PokeStorage(void)
 static void CB2_PokeStorage(void)
 {
     RunTasks();
+    // A storage task may change the main callback and free sStorage when the
+    // player exits or opens another screen. Do not animate cursor sprites for
+    // one additional native frame after their shared state has been released.
+    if (sStorage == NULL)
+        return;
     DoScheduledBgTilemapCopiesToVram();
     ScrollBackground();
     UpdateCloseBoxButtonFlash();
@@ -1973,7 +1978,9 @@ static void EnterPokeStorage(u8 boxOption)
 {
     ResetTasks();
     sCurrentBoxOption = boxOption;
-    sStorage = Alloc(sizeof(*sStorage));
+    // Several optional sprite and palette pointers are consulted during the
+    // staged setup before a non-empty slot necessarily assigns them.
+    sStorage = AllocZeroed(sizeof(*sStorage));
     if (sStorage == NULL)
     {
         if (boxOption == OPTION_SELECT_MON)
@@ -1996,10 +2003,10 @@ static void EnterPokeStorage(u8 boxOption)
 static void CB2_ReturnToPokeStorage(void)
 {
     ResetTasks();
-    sStorage = Alloc(sizeof(*sStorage));
+    sStorage = AllocZeroed(sizeof(*sStorage));
     if (sStorage == NULL)
     {
-        if (sStorage->boxOption == OPTION_SELECT_MON)
+        if (sCurrentBoxOption == OPTION_SELECT_MON)
             SetMainCallback2(CB2_ReturnToFieldContinueScript);
         else
             SetMainCallback2(CB2_ExitPokeStorage);
@@ -3958,7 +3965,13 @@ static void CreateDisplayMonSprite(void)
     u8 palSlot;
     u8 spriteId;
     struct SpriteSheet sheet = {sStorage->tileBuffer, MON_PIC_SIZE, GFXTAG_DISPLAY_MON};
-    struct SpritePalette palette = {sStorage->displayMonPalette, PALTAG_DISPLAY_MON};
+    // Empty boxes have no selected Pokémon and therefore no species palette.
+    // Use the neutral information-panel palette until a Pokémon is selected.
+    const u16 *displayPalette = sStorage->displayMonSpecies == SPECIES_NONE
+        || sStorage->displayMonPalette == NULL
+        ? sPkmnDataGray_Pal
+        : sStorage->displayMonPalette;
+    struct SpritePalette palette = {displayPalette, PALTAG_DISPLAY_MON};
     struct SpriteTemplate template = sSpriteTemplate_DisplayMon;
 
     for (i = 0; i < MON_PIC_SIZE; i++)
@@ -5126,7 +5139,9 @@ static bool8 ResetReleaseMonSpritePtr(void)
 
 static void SetMovingMonPriority(u8 priority)
 {
-    sStorage->movingMonSprite->oam.priority = priority;
+    // Cursor transitions call this helper even when no Pokémon is being held.
+    if (sStorage->movingMonSprite != NULL)
+        sStorage->movingMonSprite->oam.priority = priority;
 }
 
 static void SpriteCB_HeldMon(struct Sprite *sprite)
@@ -9544,6 +9559,8 @@ static void UNUSED RestorePokemonStorage(void/*struct PokemonStorage * src*/)
 // Functions here are general utility functions.
 u8 StorageGetCurrentBox(void)
 {
+    if (gPokemonStoragePtr->currentBox >= TOTAL_BOXES_COUNT)
+        return 0;
     return gPokemonStoragePtr->currentBox;
 }
 
@@ -9638,7 +9655,15 @@ u8 *GetBoxNamePtr(u8 boxId)
 static u8 GetBoxWallpaper(u8 boxId)
 {
     if (boxId < TOTAL_BOXES_COUNT)
-        return gPokemonStoragePtr->boxWallpapers[boxId];
+    {
+        u8 wallpaperId = gPokemonStoragePtr->boxWallpapers[boxId];
+
+        // An incomplete or development save must not turn a damaged byte
+        // into an out-of-bounds graphics pointer.
+        if (wallpaperId < WALLPAPER_COUNT)
+            return wallpaperId;
+        return boxId % (MAX_DEFAULT_WALLPAPER + 1);
+    }
     else
         return 0;
 }

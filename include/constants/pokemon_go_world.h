@@ -20,6 +20,18 @@ enum PgwStartingRegion
     PGW_START_REGION_COUNT,
 };
 
+// The first four identifiers form the connected world planned for V1.
+// Later identifiers remain available as content references, but do not own
+// regional story state until they are promoted into the playable world.
+#define PGR_WORLD_REGION_COUNT 4
+
+// Persistent progress capacity. Event and reward identifiers are deliberately
+// local to this project instead of consuming Emerald's shared flag namespace.
+#define PGR_STORY_EVENT_COUNT          128
+#define PGR_STORY_EVENT_WORD_COUNT     (PGR_STORY_EVENT_COUNT / 32)
+#define PGR_UNIQUE_REWARD_COUNT         64
+#define PGR_UNIQUE_REWARD_WORD_COUNT   (PGR_UNIQUE_REWARD_COUNT / 32)
+
 enum PgwSeason
 {
     PGW_SEASON_SPRING,

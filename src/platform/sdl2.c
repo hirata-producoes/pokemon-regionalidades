@@ -68,6 +68,10 @@ static LONG CALLBACK LogNativeException(EXCEPTION_POINTERS *exception)
 #include "gba/flash_internal.h"
 #include "platform/dma.h"
 #include "platform/framedraw.h"
+#include "platform/pc_save_container.h"
+#include "pokemon_regionalidades_dex.h"
+#include "pokemon_regionalidades_inventory.h"
+#include "pokemon_regionalidades_progress.h"
 #include "platform/save_file.h"
 #include "resource_pack.h"
 
@@ -98,7 +102,8 @@ double timeScale = 1.0;
 struct SiiRtcInfo internalClock;
 static time_t sRtcOffsetSeconds;
 
-static char sSavePath[1024] = "pokemon_regionalidades.sav";
+static char sSavePath[1024] = "pokemon_regionalidades.pgrsave";
+static char sLegacySavePath[1024] = "pokemon_regionalidades.sav";
 static char sConfigPath[1024] = "pokemon_regionalidades.cfg";
 static u8 sBorderBackground;
 static bool sHasBorderBackgroundConfig;
@@ -219,7 +224,7 @@ int DoMain(void *param);
 void ProcessEvents(void);
 void VDraw(SDL_Texture *texture);
 
-static void ReadSaveFile(const char *path);
+static bool ReadSaveFile(const char *path, const char *legacyPath);
 static void ReadConfigFile(void);
 static void StoreConfigFile(void);
 static void ApplyPlatformSettings(void);
@@ -227,6 +232,7 @@ static bool32 StoreSaveFile(void);
 static bool FileExists(const char *path);
 static void CopyLegacyFileIfNeeded(const char *legacyPath, const char *newPath);
 static bool ResolveConfiguredFilePath(const char *variableName, char *path, size_t pathCapacity, bool *wasConfigured);
+static bool SetLegacySavePath(const char *nativePath);
 static bool OpenRegionalidadesResourcePack(void);
 static bool ReadConfigTextValue(const char *line, const char *name, char *value, size_t valueCapacity);
 static bool ReadKeyboardMapping(const char *line, enum PcKeyAction action);
@@ -569,6 +575,41 @@ static bool ResolveConfiguredFilePath(const char *variableName, char *path, size
     return true;
 }
 
+static bool SetLegacySavePath(const char *nativePath)
+{
+    size_t nativeLength = strlen(nativePath);
+    const char *slash = strrchr(nativePath, '/');
+    const char *backslash = strrchr(nativePath, '\\');
+    const char *separator = slash;
+    int length;
+
+    // Older launchers passed the raw .sav path. Keep accepting it as the import
+    // source while directing all new writes to a sibling native container.
+    if (nativeLength >= 4 && SDL_strcasecmp(nativePath + nativeLength - 4, ".sav") == 0)
+    {
+        char configuredLegacyPath[sizeof(sLegacySavePath)];
+
+        if ((size_t)SDL_snprintf(configuredLegacyPath, sizeof(configuredLegacyPath), "%s", nativePath)
+            >= sizeof(configuredLegacyPath))
+            return false;
+        if ((size_t)SDL_snprintf(sLegacySavePath, sizeof(sLegacySavePath), "%s", configuredLegacyPath)
+            >= sizeof(sLegacySavePath)
+         || (size_t)SDL_snprintf(sSavePath, sizeof(sSavePath), "%.*s.pgrsave",
+                                 (int)(nativeLength - 4), configuredLegacyPath) >= sizeof(sSavePath))
+            return false;
+        return true;
+    }
+
+    if (separator == NULL || (backslash != NULL && backslash > separator))
+        separator = backslash;
+    if (separator == NULL)
+        length = SDL_snprintf(sLegacySavePath, sizeof(sLegacySavePath), "pokemon_regionalidades.sav");
+    else
+        length = SDL_snprintf(sLegacySavePath, sizeof(sLegacySavePath), "%.*spokemon_regionalidades.sav",
+                              (int)(separator - nativePath + 1), nativePath);
+    return length > 0 && (size_t)length < sizeof(sLegacySavePath);
+}
+
 #ifdef __ANDROID__
 static void HandleTouchEvent(const SDL_TouchFingerEvent *event);
 static void DrawTouchControls(void);
@@ -631,7 +672,8 @@ int main(int argc, char **argv)
     if (!ResolveConfiguredFilePath("POKEMON_REGIONALIDADES_SAVE_PATH",
                                    sSavePath, sizeof(sSavePath), &hasConfiguredSavePath)
      || !ResolveConfiguredFilePath("POKEMON_REGIONALIDADES_CONFIG_PATH",
-                                   sConfigPath, sizeof(sConfigPath), &hasConfiguredConfigPath))
+                                   sConfigPath, sizeof(sConfigPath), &hasConfiguredConfigPath)
+     || !SetLegacySavePath(sSavePath))
     {
         SDL_ShowSimpleMessageBox(
             SDL_MESSAGEBOX_ERROR,
@@ -655,30 +697,45 @@ int main(int argc, char **argv)
     char *prefPath = SDL_GetPrefPath("pokeemerald", "pokeemerald");
     if (prefPath != NULL)
     {
-        char legacySavePath[1024];
+        char obsoleteSavePath[1024];
         char legacyConfigPath[1024];
         if (!hasConfiguredSavePath)
-            SDL_snprintf(sSavePath, sizeof(sSavePath), "%spokemon_regionalidades.sav", prefPath);
+        {
+            SDL_snprintf(sSavePath, sizeof(sSavePath), "%spokemon_regionalidades.pgrsave", prefPath);
+            SDL_snprintf(sLegacySavePath, sizeof(sLegacySavePath), "%spokemon_regionalidades.sav", prefPath);
+        }
         if (!hasConfiguredConfigPath)
             SDL_snprintf(sConfigPath, sizeof(sConfigPath), "%spokemon_regionalidades.cfg", prefPath);
-        SDL_snprintf(legacySavePath, sizeof(legacySavePath), "%spokemon_go_world.sav", prefPath);
+        SDL_snprintf(obsoleteSavePath, sizeof(obsoleteSavePath), "%spokemon_go_world.sav", prefPath);
         SDL_snprintf(legacyConfigPath, sizeof(legacyConfigPath), "%spokemon_go_world.cfg", prefPath);
         if (!hasConfiguredSavePath)
-            CopyLegacyFileIfNeeded(legacySavePath, sSavePath);
+            CopyLegacyFileIfNeeded(obsoleteSavePath, sLegacySavePath);
         if (!hasConfiguredConfigPath)
             CopyLegacyFileIfNeeded(legacyConfigPath, sConfigPath);
         SDL_free(prefPath);
     }
 #else
     if (!hasConfiguredSavePath)
-        CopyLegacyFileIfNeeded("pokemon_go_world.sav", sSavePath);
+        CopyLegacyFileIfNeeded("pokemon_go_world.sav", sLegacySavePath);
     if (!hasConfiguredConfigPath)
         CopyLegacyFileIfNeeded("pokemon_go_world.cfg", sConfigPath);
 #endif
     DBGPRINTF("PC port: save path %s\n", sSavePath);
+    DBGPRINTF("PC port: legacy save path %s\n", sLegacySavePath);
     DBGPRINTF("PC port: config path %s\n", sConfigPath);
     DBGPRINTF("PC port: reading save\n");
-    ReadSaveFile(sSavePath);
+    if (!ReadSaveFile(sSavePath, sLegacySavePath))
+    {
+        SDL_ShowSimpleMessageBox(
+            SDL_MESSAGEBOX_ERROR,
+            "Pokemon Regionalidades",
+            "O save nativo esta corrompido, incompleto ou pertence a uma versao incompativel. "
+            "O arquivo nao foi substituido. Use a tela de perfis para restaurar uma recuperacao.",
+            NULL);
+        ResourcePack_Close();
+        SDL_Quit();
+        return 1;
+    }
     DBGPRINTF("PC port: save loaded\n");
     ReadConfigFile();
 #ifdef _WIN32
@@ -1018,10 +1075,47 @@ int main(int argc, char **argv)
     return 0;
 }
 
-static void ReadSaveFile(const char *path)
+static bool ReadSaveFile(const char *path, const char *legacyPath)
 {
-    if (!PlatformSave_Load(path, FLASH_BASE, sizeof(FLASH_BASE)))
-        SDL_Log("Unable to open save file: %s", path);
+    struct PcSaveLoadInfo info;
+
+    if (!PcSaveContainer_Load(path, FLASH_BASE, sizeof(FLASH_BASE), &info))
+    {
+        SDL_Log("Unable to validate native save file: %s", path);
+        return false;
+    }
+
+    if (info.kind == PC_SAVE_LOAD_LEGACY)
+    {
+        if (!PcSaveContainer_Commit(path, FLASH_BASE, sizeof(FLASH_BASE), 0))
+        {
+            SDL_Log("Unable to wrap legacy save at native path: %s", path);
+            return false;
+        }
+        DBGPRINTF("PC save: converted legacy image stored at native path\n");
+        return true;
+    }
+
+    if (info.kind == PC_SAVE_LOAD_NEW && FileExists(legacyPath))
+    {
+        if (!PcSaveContainer_Load(legacyPath, FLASH_BASE, sizeof(FLASH_BASE), &info)
+         || info.kind != PC_SAVE_LOAD_LEGACY)
+        {
+            SDL_Log("Unable to import legacy save file: %s", legacyPath);
+            return false;
+        }
+        if (!PcSaveContainer_Commit(path, FLASH_BASE, sizeof(FLASH_BASE), 0))
+        {
+            SDL_Log("Unable to create native save from legacy file: %s", path);
+            return false;
+        }
+        DBGPRINTF("PC save: imported legacy image into native container\n");
+        return true;
+    }
+
+    DBGPRINTF("PC save: kind=%u generation=%llu chunks=%u\n",
+              info.kind, (unsigned long long)info.generation, info.chunkCount);
+    return true;
 }
 
 static bool ReadConfigTextValue(const char *line, const char *name, char *value, size_t valueCapacity)
@@ -1187,7 +1281,10 @@ static void ApplyPlatformSettings(void)
 
 static bool32 StoreSaveFile(void)
 {
-    if (!PlatformSave_Commit(sSavePath, FLASH_BASE, sizeof(FLASH_BASE), 3))
+    if (!PgrProgress_StageNativeWorld()
+     || !PgwDex_StageNativeState()
+     || !PgrInventory_StageNativeSnapshot()
+     || !PcSaveContainer_Commit(sSavePath, FLASH_BASE, sizeof(FLASH_BASE), 3))
     {
         SDL_Log("Unable to store save file safely: %s", sSavePath);
         return FALSE;

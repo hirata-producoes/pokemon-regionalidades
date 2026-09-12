@@ -280,6 +280,27 @@ struct SaveBlock3
 #if APRICORN_TREE_COUNT > 0
     u8 apricornTrees[NUM_APRICORN_TREE_BYTES];
 #endif
+    // Keep extensions at the end so existing SaveBlock3 offsets remain valid.
+    // The marker lets saves created before this field initialize it safely.
+    struct
+    {
+        u16 magic;
+        u16 version;
+        u16 unlockedRegionMask;
+        u16 reserved;
+    } regionalidadesDex;
+    // Independent regional story flags prevent Hoenn, Kanto, Johto and
+    // Sinnoh from reusing the same legacy event identifiers. Reward ledgers
+    // make repeated regional deliveries safe and idempotent.
+    struct
+    {
+        u16 magic;
+        u8 version;
+        u8 reserved;
+        u32 storyEvents[PGR_WORLD_REGION_COUNT][PGR_STORY_EVENT_WORD_COUNT];
+        u32 globalRewards[PGR_UNIQUE_REWARD_WORD_COUNT];
+        u32 regionalRewards[PGR_WORLD_REGION_COUNT][PGR_UNIQUE_REWARD_WORD_COUNT];
+    } regionalidadesProgress;
 }; /* max size 1624 bytes */
 
 extern struct SaveBlock3 *gSaveBlock3Ptr;
@@ -681,10 +702,19 @@ struct WarpData
     s16 x, y;
 };
 
-struct ItemSlot
+// Fixed-width representation kept inside the legacy Emerald save image.
+struct LegacyItemSlot
 {
     enum Item itemId;
     u16 quantity;
+};
+
+// Runtime representation used by gameplay. Its quantity can grow without
+// changing the offsets of SaveBlock1 or invalidating existing saves.
+struct ItemSlot
+{
+    enum Item itemId;
+    u32 quantity;
 };
 
 struct Pokeblock
@@ -1093,11 +1123,11 @@ struct ExternalEventFlags
 
 struct Bag
 {
-    struct ItemSlot items[BAG_ITEMS_COUNT];
-    struct ItemSlot keyItems[BAG_KEYITEMS_COUNT];
-    struct ItemSlot pokeBalls[BAG_POKEBALLS_COUNT];
-    struct ItemSlot TMsHMs[BAG_TMHM_COUNT];
-    struct ItemSlot berries[BAG_BERRIES_COUNT];
+    struct LegacyItemSlot items[BAG_ITEMS_COUNT];
+    struct LegacyItemSlot keyItems[BAG_KEYITEMS_COUNT];
+    struct LegacyItemSlot pokeBalls[BAG_POKEBALLS_COUNT];
+    struct LegacyItemSlot TMsHMs[BAG_TMHM_COUNT];
+    struct LegacyItemSlot berries[BAG_BERRIES_COUNT];
 };
 
 struct SaveBlock1
@@ -1121,7 +1151,7 @@ struct SaveBlock1
     /*0x490*/ u32 money;
     /*0x494*/ u16 coins;
     /*0x496*/ u16 registeredItem; // registered for use with SELECT button
-    /*0x498*/ struct ItemSlot pcItems[PC_ITEMS_COUNT];
+    /*0x498*/ struct LegacyItemSlot pcItems[PC_ITEMS_COUNT];
     /*0x560 -> 0x848 is bag storage*/
     /*0x560*/ struct Bag bag;
     /*0x848*/ struct Pokeblock pokeblocks[POKEBLOCKS_COUNT];

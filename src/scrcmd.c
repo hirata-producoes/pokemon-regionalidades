@@ -1548,7 +1548,16 @@ bool8 ScrCmd_faceplayer(struct ScriptContext *ctx)
         return FALSE;
     }
     if (gObjectEvents[gSelectedObjectEvent].active)
-        ObjectEventFaceOppositeDirection(&gObjectEvents[gSelectedObjectEvent], GetPlayerFacingDirection());
+    {
+        struct ObjectEvent *object = &gObjectEvents[gSelectedObjectEvent];
+        struct ObjectEvent *player = &gObjectEvents[gPlayerAvatar.objectEventId];
+        // During a two-trainer approach the player can face the other trainer.
+        // Face the player's position, not the inverse of their current facing.
+        ObjectEventTurn(object, GetDirectionToFace(object->currentCoords.x,
+                                                  object->currentCoords.y,
+                                                  player->currentCoords.x,
+                                                  player->currentCoords.y));
+    }
     return FALSE;
 }
 

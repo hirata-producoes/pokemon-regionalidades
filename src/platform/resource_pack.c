@@ -349,6 +349,27 @@ const void *ResourcePack_GetByHash(u64 hash, u64 *sizeOut)
     return GetEntryData(FindFirstEntryByHash(hash), sizeOut);
 }
 
+bool32 ResourcePack_GetCachedSize(const void *data, u64 *sizeOut)
+{
+    u32 i;
+
+    if (sizeOut != NULL)
+        *sizeOut = 0;
+    if (data == NULL)
+        return FALSE;
+
+    for (i = 0; i < sResourcePackEntryCount; i++)
+    {
+        if (sResourcePackEntries[i].data == data)
+        {
+            if (sizeOut != NULL)
+                *sizeOut = sResourcePackEntries[i].size;
+            return TRUE;
+        }
+    }
+    return FALSE;
+}
+
 void *ResourcePack_Load(const char *name, u64 *sizeOut)
 {
     struct ResourcePackEntry *entry = FindEntry(name);

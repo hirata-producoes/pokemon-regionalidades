@@ -466,6 +466,8 @@ LittlerootTown_EventScript_GiveRunningShoesTrigger5::
 	end
 
 LittlerootTown_EventScript_GiveRunningShoesTrigger::
+	special PgrProgress_ScriptCheckHoennShoes
+	goto_if_eq VAR_RESULT, FALSE, LittlerootTown_EventScript_SkipShoes
 	checkplayergender
 	call_if_eq VAR_RESULT, MALE, LittlerootTown_EventScript_MomNoticePlayerMale
 	call_if_eq VAR_RESULT, FEMALE, LittlerootTown_EventScript_MomNoticePlayerFemale
@@ -869,6 +871,8 @@ LittlerootTown_Movement_MomExitThroughDoor:
 LittlerootTown_EventScript_Mom::
 	lock
 	faceplayer
+	special PgrProgress_ScriptCheckHoennShoes
+	goto_if_eq VAR_RESULT, FALSE, LittlerootTown_EventScript_SkipShoes
 	checkplayergender
 	call_if_eq VAR_RESULT, MALE, LittlerootTown_EventScript_SetHomeDoorCoordsMale
 	call_if_eq VAR_RESULT, FEMALE, LittlerootTown_EventScript_SetHomeDoorCoordsFemale
@@ -883,6 +887,10 @@ LittlerootTown_EventScript_Mom::
 	closedoor VAR_0x8009, VAR_0x800A
 	waitdooranim
 	goto LittlerootTown_EventScript_SetReceivedRunningShoes
+	end
+
+LittlerootTown_EventScript_SkipShoes::
+	releaseall
 	end
 
 LittlerootTown_EventScript_SetReceivedRunningShoes::
@@ -1013,4 +1021,3 @@ LittlerootTown_Text_BirchSomethingToShowYouAtLab:
 	.string "I gave you?\p"
 	.string "I have something to show you.\n"
 	.string "Let's go to my LAB.$"
-
