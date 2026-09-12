@@ -9,6 +9,9 @@
     [int]$RestoreRecovery = 0,
     [switch]$ListRecoveries,
     [switch]$PassThru,
+    [switch]$GetProfileInfo,
+    [string]$SetProfileName,
+    [switch]$ResetProfile,
     [switch]$PrepareOnly
 )
 
@@ -44,9 +47,58 @@ $legacySavePath = Join-Path $profileDir 'pokemon_regionalidades.sav'
 $configPath = Join-Path $configDir 'pokemon_regionalidades.cfg'
 $runtimeLog = Join-Path $profileDir 'runtime-last.log'
 $runtimeHistoryDir = Join-Path $profileDir 'runtime-history'
+$profileMetadataPath = Join-Path $profileDir 'profile.json'
 
 New-Item -ItemType Directory -Path $profileDir -Force | Out-Null
 New-Item -ItemType Directory -Path $configDir -Force | Out-Null
+
+function Get-ProfileMetadata {
+    $defaultName = "Perfil $Profile"
+    if (-not (Test-Path -LiteralPath $profileMetadataPath -PathType Leaf)) {
+        return [pscustomobject]@{ SchemaVersion = 1; DisplayName = $defaultName }
+    }
+    try {
+        $metadata = Get-Content -Raw -LiteralPath $profileMetadataPath | ConvertFrom-Json
+        if ($metadata.SchemaVersion -ne 1 -or
+            [string]::IsNullOrWhiteSpace([string]$metadata.DisplayName) -or
+            ([string]$metadata.DisplayName).Length -gt 32) {
+            throw 'Metadados invalidos.'
+        }
+        return [pscustomobject]@{
+            SchemaVersion = 1
+            DisplayName = ([string]$metadata.DisplayName).Trim()
+        }
+    } catch {
+        throw "Os metadados do perfil $Profile estao invalidos: $profileMetadataPath"
+    }
+}
+
+function Set-ProfileMetadataName {
+    param([Parameter(Mandatory = $true)][string]$Name)
+
+    $normalized = $Name.Trim()
+    if ([string]::IsNullOrWhiteSpace($normalized) -or $normalized.Length -gt 32 -or
+        $normalized.IndexOfAny([char[]]"`r`n`t") -ge 0) {
+        throw 'O nome do perfil deve ter entre 1 e 32 caracteres e ocupar uma unica linha.'
+    }
+    $metadata = [ordered]@{ SchemaVersion = 1; DisplayName = $normalized }
+    $pendingPath = "$profileMetadataPath.pending"
+    $json = $metadata | ConvertTo-Json
+    $utf8Bom = New-Object Text.UTF8Encoding($true)
+    [IO.File]::WriteAllText($pendingPath, $json, $utf8Bom)
+    try {
+        if (Test-Path -LiteralPath $profileMetadataPath -PathType Leaf) {
+            [IO.File]::Replace($pendingPath, $profileMetadataPath, $null, $true)
+        } else {
+            Move-Item -LiteralPath $pendingPath -Destination $profileMetadataPath
+        }
+    } finally {
+        if (Test-Path -LiteralPath $pendingPath -PathType Leaf) {
+            Remove-Item -LiteralPath $pendingPath -Force
+        }
+    }
+    return Get-ProfileMetadata
+}
 
 function Resolve-ProfileSavePath {
     param([int]$Recovery = 0)
@@ -60,6 +112,69 @@ function Resolve-ProfileSavePath {
         return $legacyCandidate
     }
     return $null
+}
+
+if ($GetProfileInfo) {
+    $metadata = Get-ProfileMetadata
+    $activePath = Resolve-ProfileSavePath
+    $result = [pscustomobject]@{
+        Profile = $Profile
+        DisplayName = $metadata.DisplayName
+        HasActiveSave = $null -ne $activePath
+        ActiveSavePath = $activePath
+    }
+    if ($PassThru) {
+        $result
+    } else {
+        $result | Format-List
+    }
+    return
+}
+
+if (-not [string]::IsNullOrWhiteSpace($SetProfileName)) {
+    $result = Set-ProfileMetadataName -Name $SetProfileName
+    if ($PassThru) {
+        $result
+    } else {
+        Write-Host "Perfil $Profile renomeado para: $($result.DisplayName)"
+    }
+    return
+}
+
+if ($ResetProfile) {
+    if (Get-Process -Name 'pokemon_regionalidades-pc' -ErrorAction SilentlyContinue) {
+        throw 'Feche todas as instancias do jogo antes de reiniciar um perfil.'
+    }
+    $activePath = Resolve-ProfileSavePath
+    if ($null -eq $activePath) {
+        throw "O perfil $Profile ainda nao possui uma campanha para reiniciar."
+    }
+
+    $metadata = Get-ProfileMetadata
+    $profilesRoot = Split-Path $profileDir
+    $resetPath = Join-Path $profilesRoot ("profile-$Profile-reset-{0}" -f (Get-Date -Format 'yyyyMMdd-HHmmssfff'))
+    Move-Item -LiteralPath $profileDir -Destination $resetPath
+    try {
+        New-Item -ItemType Directory -Path $profileDir -Force | Out-Null
+        [void](Set-ProfileMetadataName -Name $metadata.DisplayName)
+    } catch {
+        $resetFailurePath = "$resetPath.failed-new-profile"
+        if (Test-Path -LiteralPath $profileDir -PathType Container) {
+            Move-Item -LiteralPath $profileDir -Destination $resetFailurePath
+        }
+        Move-Item -LiteralPath $resetPath -Destination $profileDir
+        throw 'O reinicio falhou e a campanha original foi restaurada.'
+    }
+    if ($null -ne (Resolve-ProfileSavePath)) {
+        throw 'O reinicio nao conseguiu retirar todos os saves da campanha ativa.'
+    }
+    $result = [pscustomobject]@{ Profile = $Profile; BackupPath = $resetPath }
+    if ($PassThru) {
+        $result
+    } else {
+        Write-Host "Perfil $Profile reiniciado. A campanha anterior foi preservada em: $resetPath"
+    }
+    return
 }
 
 if (-not [string]::IsNullOrWhiteSpace($ImportSave)) {

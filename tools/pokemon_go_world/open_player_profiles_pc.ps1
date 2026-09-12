@@ -7,6 +7,7 @@ $ErrorActionPreference = 'Stop'
 
 Add-Type -AssemblyName System.Windows.Forms
 Add-Type -AssemblyName System.Drawing
+Add-Type -AssemblyName Microsoft.VisualBasic
 
 $repoRoot = (Resolve-Path (Join-Path $PSScriptRoot '..\..')).Path
 $profileRunner = Join-Path $PSScriptRoot 'run_player_profile_pc.ps1'
@@ -31,7 +32,7 @@ $colorMuted = [Drawing.Color]::FromArgb(184, 196, 210)
 
 $form = New-Object Windows.Forms.Form
 $form.Text = 'Pokémon Regionalidades — Perfis'
-$form.ClientSize = New-Object Drawing.Size(820, 500)
+$form.ClientSize = New-Object Drawing.Size(820, 545)
 $form.StartPosition = 'CenterScreen'
 $form.FormBorderStyle = 'FixedSingle'
 $form.MaximizeBox = $false
@@ -99,6 +100,11 @@ function Get-ProfileEntries {
     return @(& $profileRunner -Profile $Profile -DataRoot $DataRoot -ListRecoveries -PassThru)
 }
 
+function Get-ProfileInfo {
+    param([int]$Profile)
+    return & $profileRunner -Profile $Profile -DataRoot $DataRoot -GetProfileInfo -PassThru
+}
+
 function New-RegionalidadesShortcut {
     param(
         [Parameter(Mandatory = $true)]
@@ -141,10 +147,12 @@ function Refresh-ProfileCard {
     param([int]$Profile)
 
     $card = $cards[$Profile]
+    $profileInfo = Get-ProfileInfo -Profile $Profile
     $entries = @(Get-ProfileEntries -Profile $Profile)
     $active = @($entries | Where-Object Slot -eq 0)
     $recoveries = @($entries | Where-Object Slot -gt 0 | Sort-Object Slot)
 
+    $card.Heading.Text = $profileInfo.DisplayName
     if ($active.Count -eq 0) {
         $card.Status.Text = 'Novo perfil — nenhuma campanha iniciada'
         $card.Import.Enabled = $true
@@ -155,6 +163,7 @@ function Refresh-ProfileCard {
         $card.Import.Enabled = $false
         $card.Export.Enabled = $true
     }
+    $card.Reset.Enabled = $active.Count -gt 0
 
     $card.Recoveries.Items.Clear()
     foreach ($recovery in $recoveries) {
@@ -179,18 +188,18 @@ function New-ProfileCard {
 
     $panel = New-Object Windows.Forms.Panel
     $panel.Location = New-Object Drawing.Point($Left, 105)
-    $panel.Size = New-Object Drawing.Size(370, 310)
+    $panel.Size = New-Object Drawing.Size(370, 350)
     $panel.BackColor = $colorCard
     $panel.BorderStyle = 'FixedSingle'
     $form.Controls.Add($panel)
 
     $heading = New-Object Windows.Forms.Label
-    $profilePurpose = if ($Profile -eq 1) { 'Exploração e testes' } else { 'Campanha de Hoenn' }
-    $heading.Text = "Perfil $Profile — $profilePurpose"
+    $heading.Text = "Perfil $Profile"
     $heading.Font = New-Object Drawing.Font('Segoe UI Semibold', 16)
     $heading.ForeColor = $colorText
     $heading.Location = New-Object Drawing.Point(20, 18)
-    $heading.AutoSize = $true
+    $heading.Size = New-Object Drawing.Size(325, 32)
+    $heading.AutoEllipsis = $true
     $panel.Controls.Add($heading)
 
     $status = New-Object Windows.Forms.Label
@@ -250,14 +259,35 @@ function New-ProfileCard {
     $restoreButton.ForeColor = $colorText
     $panel.Controls.Add($restoreButton)
 
+    $renameButton = New-Object Windows.Forms.Button
+    $renameButton.Text = 'Renomear perfil'
+    $renameButton.Location = New-Object Drawing.Point(22, 292)
+    $renameButton.Size = New-Object Drawing.Size(155, 34)
+    $renameButton.FlatStyle = 'Flat'
+    $renameButton.BackColor = $colorSecondary
+    $renameButton.ForeColor = $colorText
+    $panel.Controls.Add($renameButton)
+
+    $resetButton = New-Object Windows.Forms.Button
+    $resetButton.Text = 'Reiniciar campanha'
+    $resetButton.Location = New-Object Drawing.Point(192, 292)
+    $resetButton.Size = New-Object Drawing.Size(155, 34)
+    $resetButton.FlatStyle = 'Flat'
+    $resetButton.BackColor = $colorSecondary
+    $resetButton.ForeColor = $colorText
+    $panel.Controls.Add($resetButton)
+
     $cards[$Profile] = [pscustomobject]@{
         Panel = $panel
+        Heading = $heading
         Status = $status
         Open = $openButton
         Import = $importButton
         Export = $exportButton
         Recoveries = $recoveries
         Restore = $restoreButton
+        Rename = $renameButton
+        Reset = $resetButton
     }
 
     $profileId = $Profile
@@ -342,6 +372,46 @@ function New-ProfileCard {
             Show-ProfileError -Message $_.Exception.Message
         }
     }.GetNewClosure())
+
+    $renameButton.Add_Click({
+        try {
+            $current = (Get-ProfileInfo -Profile $profileId).DisplayName
+            $name = [Microsoft.VisualBasic.Interaction]::InputBox(
+                'Digite um nome de até 32 caracteres para identificar este perfil.',
+                'Renomear perfil',
+                $current)
+            if (-not [string]::IsNullOrWhiteSpace($name)) {
+                & $profileRunner -Profile $profileId -DataRoot $DataRoot -SetProfileName $name -PrepareOnly
+                Refresh-ProfileCard -Profile $profileId
+            }
+        } catch {
+            Show-ProfileError -Message $_.Exception.Message
+        }
+    }.GetNewClosure())
+
+    $resetButton.Add_Click({
+        $answer = [Windows.Forms.MessageBox]::Show(
+            $form,
+            "Reiniciar somente este perfil?`r`n`r`nO save ativo e as recuperações sairão da campanha atual. Uma cópia de segurança será preservada.",
+            'Confirmar reinício da campanha',
+            [Windows.Forms.MessageBoxButtons]::YesNo,
+            [Windows.Forms.MessageBoxIcon]::Warning)
+        if ($answer -ne [Windows.Forms.DialogResult]::Yes) {
+            return
+        }
+        try {
+            $result = & $profileRunner -Profile $profileId -DataRoot $DataRoot -ResetProfile -PassThru
+            Refresh-ProfileCard -Profile $profileId
+            [void][Windows.Forms.MessageBox]::Show(
+                $form,
+                "O perfil está pronto para uma nova campanha.`r`n`r`nCópia de segurança:`r`n$($result.BackupPath)",
+                'Perfil reiniciado',
+                [Windows.Forms.MessageBoxButtons]::OK,
+                [Windows.Forms.MessageBoxIcon]::Information)
+        } catch {
+            Show-ProfileError -Message $_.Exception.Message
+        }
+    }.GetNewClosure())
 }
 
 New-ProfileCard -Profile 1 -Left 28
@@ -352,7 +422,7 @@ Refresh-ProfileCard -Profile 2
 $footer = New-Object Windows.Forms.Label
 $footer.Text = 'Cada perfil mantém sua própria campanha e até três recuperações. As configurações do programa são compartilhadas.'
 $footer.ForeColor = $colorMuted
-$footer.Location = New-Object Drawing.Point(30, 440)
+$footer.Location = New-Object Drawing.Point(30, 485)
 $footer.Size = New-Object Drawing.Size(755, 42)
 $footer.TextAlign = 'MiddleCenter'
 $form.Controls.Add($footer)
@@ -360,7 +430,9 @@ $form.Controls.Add($footer)
 if ($ValidateOnly) {
     if ($cards.Count -ne 2 -or $cards[1].Open.Text -ne 'Abrir perfil' -or
         $cards[2].Recoveries.DisplayMember -ne 'Text' -or $shortcutButton.Text -ne 'Criar atalho' -or
-        $settingsButton.Text -ne 'Configurações') {
+        $settingsButton.Text -ne 'Configurações' -or
+        $cards[1].Rename.Text -ne 'Renomear perfil' -or
+        $cards[2].Reset.Text -ne 'Reiniciar campanha') {
         throw 'A validacao estrutural da interface de perfis falhou.'
     }
     $profile1Save = Join-Path $DataRoot 'profiles\profile-1\pokemon_regionalidades.pgrsave'
