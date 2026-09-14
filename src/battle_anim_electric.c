@@ -790,7 +790,10 @@ static void AnimSparkElectricityFlashing_Step(struct Sprite *sprite)
     sprite->y2 = Cos(sprite->data[7], sprite->data[5]);
 
     sprite->data[7] = (sprite->data[7] + sprite->data[6]) & 0xFF;
-    if (sprite->data[7] % sprite->data[4] == 0)
+    // A zero interval means that this script variant does not toggle
+    // visibility. The GBA helper tolerated that value, but native x86 modulo
+    // by zero raises an exception (observed with a wild Minun using Spark).
+    if (sprite->data[4] != 0 && sprite->data[7] % sprite->data[4] == 0)
         sprite->invisible ^= TRUE;
 
     if (sprite->data[0]-- <= 0)
