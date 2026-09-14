@@ -1,11 +1,14 @@
 #include "global.h"
 #include "battle_setup.h"
 #include "event_data.h"
+#include "item.h"
+#include "money.h"
 #include "platform.h"
 #include "pokedex.h"
 #include "pokemon.h"
 #include "pokemon_regionalidades_dev_save.h"
 #include "constants/flags.h"
+#include "constants/items.h"
 #include "constants/moves.h"
 #include "constants/opponents.h"
 #include "constants/pokedex.h"
@@ -38,6 +41,30 @@ static const u16 sHoennGymLeaders[] =
     TRAINER_WINONA_1,
     TRAINER_TATE_AND_LIZA_1,
     TRAINER_JUAN_1,
+};
+
+#define PGR_TEST_BALL_MIN_QUANTITY 100
+
+// Ordinary capture balls that can be used from the normal Bag interface.
+// Safari, Sport, Park, Beast and Cherish Balls are deliberately excluded:
+// some require a special encounter context and the current gameplay view
+// still exposes the original 16 slots in the Poke Ball pocket.
+static const enum Item sTestProfilePokeBalls[] =
+{
+    ITEM_POKE_BALL,
+    ITEM_GREAT_BALL,
+    ITEM_ULTRA_BALL,
+    ITEM_MASTER_BALL,
+    ITEM_PREMIER_BALL,
+    ITEM_HEAL_BALL,
+    ITEM_NET_BALL,
+    ITEM_NEST_BALL,
+    ITEM_DIVE_BALL,
+    ITEM_DUSK_BALL,
+    ITEM_TIMER_BALL,
+    ITEM_QUICK_BALL,
+    ITEM_REPEAT_BALL,
+    ITEM_LUXURY_BALL,
 };
 
 bool32 Pgr_IsMobilityProfileRequested(void)
@@ -165,6 +192,40 @@ static bool32 PrepareMobilityParty(void)
     return TRUE;
 }
 
+static bool32 PrepareTestResources(void)
+{
+    bool32 changed = FALSE;
+    u32 i;
+
+    for (i = 0; i < ARRAY_COUNT(sTestProfilePokeBalls); i++)
+    {
+        enum Item itemId = sTestProfilePokeBalls[i];
+        u32 owned = CountTotalItemQuantityInBag(itemId);
+
+        if (owned >= PGR_TEST_BALL_MIN_QUANTITY)
+            continue;
+        if (AddBagItem(itemId, PGR_TEST_BALL_MIN_QUANTITY - owned))
+        {
+            changed = TRUE;
+        }
+        else
+        {
+            DBGPRINTF("Development save: no room for test ball item=%u\n", itemId);
+        }
+    }
+
+    if (GetMoney(&gSaveBlock1Ptr->money) < MAX_MONEY)
+    {
+        SetMoney(&gSaveBlock1Ptr->money, MAX_MONEY);
+        changed = TRUE;
+    }
+
+    if (changed)
+        DBGPRINTF("Development save: test resources prepared (14 ball types x100 minimum, money=%u)\n",
+            GetMoney(&gSaveBlock1Ptr->money));
+    return changed;
+}
+
 bool32 Pgr_ApplyMobilityProfileIfRequested(void)
 {
     static bool32 sAppliedThisProcess;
@@ -179,7 +240,10 @@ bool32 Pgr_ApplyMobilityProfileIfRequested(void)
 
     sAppliedThisProcess = TRUE;
     if (Pgr_IsTechnicalMobilityProfile())
+    {
         changed |= RestoreNarrativeBadges();
+        changed |= PrepareTestResources();
+    }
 
     if (!Pgr_IsMobilityProfileRequested())
         return changed;

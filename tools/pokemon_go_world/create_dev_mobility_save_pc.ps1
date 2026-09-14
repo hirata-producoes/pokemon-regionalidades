@@ -49,7 +49,7 @@ if ($Recreate -or -not (Test-Path -LiteralPath $targetSave)) {
 }
 
 Write-Host "Save de exploracao: $targetSave"
-Write-Host 'O perfil preserva o Mudkip, a posicao e o progresso e acrescenta cinco Pokemon.'
+Write-Host 'O perfil preserva o Mudkip, a posicao e o progresso, acrescenta cinco Pokemon e prepara recursos de teste.'
 
 if ($PrepareOnly) {
     Write-Host 'Arquivos preparados. O perfil ainda nao foi aplicado porque -PrepareOnly foi usado.'
