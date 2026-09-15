@@ -287,6 +287,15 @@ bool32 CheckBagHasSpace(enum Item itemId, u32 count)
     if (CurrentBattlePyramidLocation() != PYRAMID_LOCATION_NONE || FlagGet(FLAG_STORING_ITEMS_IN_PYRAMID_BAG) == TRUE)
         return count <= UINT16_MAX && CheckPyramidBagHasSpace(itemId, count);
 
+    if (GetItemTMHMIndex(itemId) != 0
+     && GetItemImportance(itemId) == 1
+     && (CheckBagHasItem(itemId, 1) || CheckPCHasItem(itemId, 1)))
+        return TRUE;
+
+    if (itemId == ITEM_EXP_SHARE
+     && (CheckBagHasItem(itemId, 1) || CheckPCHasItem(itemId, 1)))
+        return TRUE;
+
     return GetFreeSpaceForItemInBag(itemId) >= count;
 }
 
@@ -388,6 +397,16 @@ bool32 AddBagItem(enum Item itemId, u32 count)
     // check Battle Pyramid Bag
     if (CurrentBattlePyramidLocation() != PYRAMID_LOCATION_NONE || FlagGet(FLAG_STORING_ITEMS_IN_PYRAMID_BAG) == TRUE)
         return count <= UINT16_MAX && AddPyramidBagItem(itemId, count);
+
+    // Itens permanentes representam posse, não uma pilha escondida.
+    if (count != 0
+     && ((GetItemTMHMIndex(itemId) != 0 && GetItemImportance(itemId) == 1)
+      || itemId == ITEM_EXP_SHARE))
+    {
+        if (CheckBagHasItem(itemId, 1) || CheckPCHasItem(itemId, 1))
+            return TRUE;
+        count = 1;
+    }
 
     return BagPocket_AddItem(&gBagPockets[GetItemPocket(itemId)], itemId, count);
 }

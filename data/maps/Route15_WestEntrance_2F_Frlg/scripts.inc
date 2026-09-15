@@ -36,6 +36,7 @@ Route15_WestEntrance_2F_EventScript_Aide::
 	goto_if_eq VAR_RESULT, FALSE, Aide_EventScript_NoRoomForItem
 	giveitem_msg Route15_WestEntrance_2F_Text_ReceivedItemFromAide, ITEM_EXP_SHARE
 	setflag FLAG_GOT_EXP_SHARE_FROM_OAKS_AIDE
+	setflag FLAG_SYS_EXP_SHARE_ENABLED
 	msgbox Route15_WestEntrance_2F_Text_ExplainExpShare
 	release
 	end
@@ -90,4 +91,3 @@ Route15_WestEntrance_2F_Text_SmallIslandOnHorizon::
 	.string "to show…\p"
 	.string "It looks like a small island on\n"
 	.string "the horizon!$"
-
