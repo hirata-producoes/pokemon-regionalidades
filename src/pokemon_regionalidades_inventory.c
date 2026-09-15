@@ -1,6 +1,10 @@
 #include "global.h"
+#include "event_data.h"
 #include "item.h"
+#include "pokemon.h"
 #include "pokemon_regionalidades_inventory.h"
+#include "pokemon_storage_system.h"
+#include "constants/flags.h"
 #include "constants/items.h"
 #ifdef PORTABLE
 #include "platform/pc_inventory_state.h"
@@ -14,6 +18,146 @@ static struct PcInventoryState sTemporaryInventorySnapshot;
 static unsigned char sNativeInventoryEncoded[PC_INVENTORY_MAX_ENCODED_SIZE];
 static bool32 sNativeInventoryReady;
 static u32 sTemporaryInventoryDepth;
+
+static bool32 RemoveLegacyHeldExpShares(void)
+{
+    bool32 found = FALSE;
+    u16 noItem = ITEM_NONE;
+
+    for (u32 slot = 0; slot < PARTY_SIZE; slot++)
+    {
+        if (GetMonData(&gSaveBlock1Ptr->playerParty[slot], MON_DATA_HELD_ITEM) == ITEM_EXP_SHARE)
+        {
+            SetMonData(&gSaveBlock1Ptr->playerParty[slot], MON_DATA_HELD_ITEM, &noItem);
+            found = TRUE;
+        }
+    }
+
+    if (gPokemonStoragePtr != NULL)
+    {
+        for (u32 box = 0; box < TOTAL_BOXES_COUNT; box++)
+        {
+            for (u32 slot = 0; slot < IN_BOX_COUNT; slot++)
+            {
+                struct BoxPokemon *mon = &gPokemonStoragePtr->boxes[box][slot];
+
+                if (GetBoxMonData(mon, MON_DATA_HELD_ITEM) == ITEM_EXP_SHARE)
+                {
+                    SetBoxMonData(mon, MON_DATA_HELD_ITEM, &noItem);
+                    found = TRUE;
+                }
+            }
+        }
+    }
+
+    for (u32 slot = 0; slot < ARRAY_COUNT(gSaveBlock1Ptr->daycare.mons); slot++)
+    {
+        struct BoxPokemon *mon = &gSaveBlock1Ptr->daycare.mons[slot].mon;
+
+        if (GetBoxMonData(mon, MON_DATA_HELD_ITEM) == ITEM_EXP_SHARE)
+        {
+            SetBoxMonData(mon, MON_DATA_HELD_ITEM, &noItem);
+            found = TRUE;
+        }
+    }
+
+    return found;
+}
+
+static void NormalizePermanentInventory(struct PcInventoryState *inventory, bool32 foundHeldExpShare)
+{
+    bool8 machines[NUM_ALL_MACHINES + 1] = {0};
+    bool32 foundExpShare = foundHeldExpShare || FlagGet(FLAG_RECEIVED_EXP_SHARE);
+    bool32 expShareWasKeyItem = FALSE;
+    bool32 expShareInserted = FALSE;
+    u32 expShareFallbackLocation = PC_INVENTORY_LOCATION_COUNT;
+    u32 expShareFallbackSlot = PC_INVENTORY_MAX_SLOTS_PER_LOCATION;
+
+    for (u32 location = 0; location < PC_INVENTORY_LOCATION_COUNT; location++)
+    {
+        for (u32 slot = 0; slot < PC_INVENTORY_MAX_SLOTS_PER_LOCATION; slot++)
+        {
+            struct PcInventorySlot *item = &inventory->slots[location][slot];
+            enum TMHMIndex machine;
+
+            if (item->itemId == ITEM_EXP_SHARE && item->quantity != 0)
+            {
+                foundExpShare = TRUE;
+                expShareWasKeyItem |= location == POCKET_KEY_ITEMS;
+                if (expShareFallbackLocation == PC_INVENTORY_LOCATION_COUNT)
+                {
+                    expShareFallbackLocation = location;
+                    expShareFallbackSlot = slot;
+                }
+                item->itemId = ITEM_NONE;
+                item->quantity = 0;
+                continue;
+            }
+
+            if (item->itemId >= ITEMS_COUNT || item->quantity == 0)
+                continue;
+            machine = GetItemTMHMIndex(item->itemId);
+            if (machine == 0 || GetItemImportance(item->itemId) != 1)
+                continue;
+
+            if (machines[machine])
+            {
+                item->itemId = ITEM_NONE;
+                item->quantity = 0;
+            }
+            else
+            {
+                machines[machine] = TRUE;
+                item->quantity = 1;
+            }
+        }
+    }
+
+    if (foundExpShare)
+    {
+        u32 locations[] = {POCKET_KEY_ITEMS, POCKETS_COUNT};
+
+        for (u32 i = 0; i < ARRAY_COUNT(locations); i++)
+        {
+            u32 location = locations[i];
+            u32 capacity = location < POCKETS_COUNT
+                         ? gBagPockets[location].capacity
+                         : PC_ITEMS_COUNT;
+
+            for (u32 slot = 0; slot < capacity; slot++)
+            {
+                struct PcInventorySlot *item = &inventory->slots[location][slot];
+
+                if (item->itemId == ITEM_NONE || item->quantity == 0)
+                {
+                    item->itemId = ITEM_EXP_SHARE;
+                    item->quantity = 1;
+                    expShareInserted = TRUE;
+                    break;
+                }
+            }
+
+            if (expShareInserted)
+                break;
+        }
+
+        // Uma migração nunca pode apagar o item quando os destinos estão cheios.
+        // Nesse caso raro, preserva-se a primeira posição original para tentar
+        // novamente em uma versão futura, sem perda de dados do jogador.
+        if (!expShareInserted
+         && expShareFallbackLocation < PC_INVENTORY_LOCATION_COUNT
+         && expShareFallbackSlot < PC_INVENTORY_MAX_SLOTS_PER_LOCATION)
+        {
+            inventory->slots[expShareFallbackLocation][expShareFallbackSlot].itemId = ITEM_EXP_SHARE;
+            inventory->slots[expShareFallbackLocation][expShareFallbackSlot].quantity = 1;
+        }
+
+        // Saves antigos usavam o Exp. Share como item equipado e começam com
+        // a distribuição moderna ligada. Depois disso, a escolha é preservada.
+        if (!expShareWasKeyItem)
+            FlagSet(FLAG_SYS_EXP_SHARE_ENABLED);
+    }
+}
 
 static bool32 BuildLegacyInventory(struct PcInventoryState *inventory)
 {
@@ -251,13 +395,19 @@ bool32 PgrInventory_OnSaveLoaded(void)
     size_t size;
     u32 schemaVersion;
     u32 flags;
+    bool32 foundHeldExpShare;
 
     sNativeInventoryReady = FALSE;
     sTemporaryInventoryDepth = 0;
+    foundHeldExpShare = RemoveLegacyHeldExpShares();
+
     if (!CopyLegacyInventory())
         return FALSE;
     if (!PcSaveContainer_GetChunk("INVENT", &data, &size, &schemaVersion, &flags))
     {
+        NormalizePermanentInventory(&sNativeInventorySnapshot, foundHeldExpShare);
+        if (!ProjectNativeInventoryToLegacy(&sNativeInventorySnapshot))
+            return FALSE;
         sNativeInventorySnapshot.authority = PC_INVENTORY_AUTHORITY_NATIVE;
         return TRUE;
     }
@@ -270,10 +420,16 @@ bool32 PgrInventory_OnSaveLoaded(void)
         if (memcmp(sLoadedInventorySnapshot.slots, sNativeInventorySnapshot.slots,
                    sizeof(sLoadedInventorySnapshot.slots)) != 0)
             return FALSE;
-        sNativeInventorySnapshot.authority = PC_INVENTORY_AUTHORITY_NATIVE;
+        NormalizePermanentInventory(&sNativeInventorySnapshot, foundHeldExpShare);
+        if (!ProjectNativeInventoryToLegacy(&sNativeInventorySnapshot))
+            return FALSE;
     }
-    else if (!ProjectNativeInventoryToLegacy(&sLoadedInventorySnapshot))
+    else
     {
+        NormalizePermanentInventory(&sLoadedInventorySnapshot, foundHeldExpShare);
+        if (ProjectNativeInventoryToLegacy(&sLoadedInventorySnapshot))
+            return TRUE;
+
         // A newer inventory that no longer fits the current gameplay projection
         // must never be truncated into the legacy arrays.
         return FALSE;
