@@ -7821,11 +7821,41 @@ u8 GetPartyIdFromBattlePartyId(u8 battlePartyId)
 static const u8 sMultiBattlePartyIdToMenuId_Left[PARTY_SIZE] = { 0, 2, 3, 1, 4, 5};
 static const u8 sMultiBattlePartyIdToMenuId_Right[PARTY_SIZE] = { 1, 4, 5, 0, 2, 3};
 
+bool32 IsBattlePartyOrderValid(const u8 *partyOrder)
+{
+    u32 usedPartyIds = 0;
+
+    for (u32 slot = 0; slot < PARTY_SIZE; slot++)
+    {
+        u8 packedOrder = partyOrder[slot / 2];
+        u8 partyId = (slot & 1) ? packedOrder & 0xF : packedOrder >> 4;
+
+        if (partyId >= PARTY_SIZE || (usedPartyIds & (1u << partyId)))
+            return FALSE;
+        usedPartyIds |= 1u << partyId;
+    }
+
+    return usedPartyIds == (1u << PARTY_SIZE) - 1;
+}
+
 static void UpdatePartyToBattleOrder(void)
 {
     struct Pokemon *partyBuffer = Alloc(sizeof(gParties[B_TRAINER_PLAYER]));
     u8 i;
     const u8 *multiBattlePartyIdToMenuId = sMultiBattlePartyIdToMenuId_Left;
+
+    // Uma ordem corrompida transformava os seis espaços em cópias do primeiro
+    // Pokémon. Reconstruí-la antes das cópias protege a equipe e mantém a luta
+    // recuperável, inclusive na substituição forçada de batalhas em dupla.
+    if (!IsBattlePartyOrderValid(gBattlePartyCurrentOrder))
+    {
+        BufferBattlePartyOrder(gBattlePartyCurrentOrder, GetPlayerFlankId());
+        if (gMain.inBattle && gBattlerInMenuId < gBattlersCount)
+        {
+            memcpy(gBattleStruct->battlerPartyOrders[gBattlerInMenuId],
+                   gBattlePartyCurrentOrder, sizeof(gBattlePartyCurrentOrder));
+        }
+    }
 
     if ((gBattleTypeFlags & BATTLE_TYPE_LINK) && ((gBattlerInMenuId & BIT_FLANK) != B_FLANK_LEFT))
         multiBattlePartyIdToMenuId = sMultiBattlePartyIdToMenuId_Right;

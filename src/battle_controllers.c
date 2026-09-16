@@ -1107,6 +1107,15 @@ void BtlController_EmitChoosePokemon(enum BattlerId battler, u32 bufferId, u8 ca
 {
     s32 i;
 
+    // O menu não pode receber identificadores repetidos: além de desenhar
+    // cópias, ele reorganizaria a equipe real com dados inválidos.
+    if (!IsBattlePartyOrderValid(data))
+    {
+        BufferBattlePartyCurrentOrderBySide(
+            battler, (GetBattlerPosition(battler) & BIT_FLANK) != 0);
+        data = gBattleStruct->battlerPartyOrders[battler];
+    }
+
     gBattleResources->transferBuffer[0] = CONTROLLER_CHOOSEPOKEMON;
     gBattleResources->transferBuffer[1] = caseId;
     gBattleResources->transferBuffer[2] = slotId;
