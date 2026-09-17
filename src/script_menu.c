@@ -6,6 +6,7 @@
 #include "item.h"
 #include "menu.h"
 #include "palette.h"
+#include "pokemon_regionalidades_progress.h"
 #include "script.h"
 #include "script_menu.h"
 #include "sound.h"
@@ -811,7 +812,8 @@ static void CreateLilycoveSSTidalMultichoice(void)
         sLilycoveSSTidalSelections[selectionCount] = SSTIDAL_SELECTION_SLATEPORT;
         selectionCount++;
 
-        if (FlagGet(FLAG_MET_SCOTT_ON_SS_TIDAL) == TRUE)
+        if (PgrProgress_IsStoryEventComplete(
+                PGW_START_HOENN, PGR_HOENN_STORY_MET_SCOTT_SS_TIDAL))
         {
             sLilycoveSSTidalSelections[selectionCount] = SSTIDAL_SELECTION_BATTLE_FRONTIER;
             selectionCount++;
@@ -885,7 +887,9 @@ static void CreateLilycoveSSTidalMultichoice(void)
     sLilycoveSSTidalSelections[selectionCount] = SSTIDAL_SELECTION_EXIT;
     selectionCount++;
 
-    if (gSpecialVar_0x8004 == 0 && FlagGet(FLAG_MET_SCOTT_ON_SS_TIDAL) == TRUE)
+    if (gSpecialVar_0x8004 == 0
+     && PgrProgress_IsStoryEventComplete(
+            PGW_START_HOENN, PGR_HOENN_STORY_MET_SCOTT_SS_TIDAL))
     {
         count = selectionCount;
     }

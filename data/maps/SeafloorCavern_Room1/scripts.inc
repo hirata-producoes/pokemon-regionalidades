@@ -1,5 +1,10 @@
 SeafloorCavern_Room1_MapScripts::
+	map_script MAP_SCRIPT_ON_TRANSITION, SeafloorCavern_Room1_OnTransition
 	.byte 0
+
+SeafloorCavern_Room1_OnTransition:
+	call SeafloorCavern_EventScript_SyncAquaVisibility
+	end
 
 SeafloorCavern_Room1_EventScript_Grunt1::
 	trainerbattle_single TRAINER_GRUNT_SEAFLOOR_CAVERN_1, SeafloorCavern_Room1_Text_Grunt1Intro, SeafloorCavern_Room1_Text_Grunt1Defeat
@@ -33,4 +38,3 @@ SeafloorCavern_Room1_Text_Grunt2PostBattle:
 	.string "That submarine we jacked, man,\n"
 	.string "it's brutal as a ride.\l"
 	.string "It's way too tight in there!$"
-

@@ -7,6 +7,8 @@ SlateportCity_SternsShipyard_1F_EventScript_Dock::
 	goto_if_set FLAG_BADGE07_GET, SlateportCity_SternsShipyard_1F_EventScript_BrineyJoined
 	goto_if_set FLAG_DELIVERED_DEVON_GOODS, SlateportCity_SternsShipyard_1F_EventScript_NeedVeteran
 	goto_if_set FLAG_DOCK_REJECTED_DEVON_GOODS, SlateportCity_SternsShipyard_1F_EventScript_GoFindStern
+	special PgrProgress_ScriptCheckHoennDock
+	goto_if_eq VAR_RESULT, FALSE, SlateportCity_SternsShipyard_1F_EventScript_SkipInvalidDockScene
 	msgbox SlateportCity_SternsShipyard_1F_Text_CantMakeHeadsOrTails, MSGBOX_DEFAULT
 	applymovement LOCALID_DOCK, Common_Movement_FacePlayer
 	waitmovement 0
@@ -16,6 +18,10 @@ SlateportCity_SternsShipyard_1F_EventScript_Dock::
 	waitmovement 0
 	setflag FLAG_DOCK_REJECTED_DEVON_GOODS
 	setflag FLAG_HIDE_SLATEPORT_CITY_TEAM_AQUA
+	releaseall
+	end
+
+SlateportCity_SternsShipyard_1F_EventScript_SkipInvalidDockScene::
 	releaseall
 	end
 
@@ -138,4 +144,3 @@ SlateportCity_SternsShipyard_1F_Text_SeaIsLikeLivingThing:
 SlateportCity_SternsShipyard_1F_Text_GetSeasickEasily:
 	.string "I get seasick real easily.\n"
 	.string "So I get to help out here instead.$"
-

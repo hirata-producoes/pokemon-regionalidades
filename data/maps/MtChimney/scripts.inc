@@ -5,6 +5,19 @@ MtChimney_MapScripts::
 
 MtChimney_OnTransition:
 	setvar VAR_JAGGED_PASS_ASH_WEATHER, 1
+	goto_if_set FLAG_DEFEATED_EVIL_TEAM_MT_CHIMNEY, MtChimney_EventScript_KeepCanonicalVisibility
+	special PgrProgress_ScriptCheckHoennMaxieMtChimney
+	goto_if_eq VAR_RESULT, TRUE, MtChimney_EventScript_ShowTeams
+	setflag FLAG_HIDE_MT_CHIMNEY_TEAM_MAGMA
+	setflag FLAG_HIDE_MT_CHIMNEY_TEAM_AQUA
+	end
+
+MtChimney_EventScript_ShowTeams::
+	clearflag FLAG_HIDE_MT_CHIMNEY_TEAM_MAGMA
+	clearflag FLAG_HIDE_MT_CHIMNEY_TEAM_AQUA
+	end
+
+MtChimney_EventScript_KeepCanonicalVisibility::
 	end
 
 MtChimney_OnResume:
@@ -33,6 +46,8 @@ MtChimney_EventScript_ArchieBusyFighting::
 
 MtChimney_EventScript_Maxie::
 	lockall
+	special PgrProgress_ScriptCheckHoennMaxieMtChimney
+	goto_if_eq VAR_RESULT, FALSE, MtChimney_EventScript_SkipInvalidMaxieBattle
 	playbgm MUS_ENCOUNTER_MAGMA, FALSE
 	msgbox MtChimney_Text_MeteoriteWillActivateVolcano, MSGBOX_DEFAULT
 	applymovement LOCALID_MT_CHIMNEY_MAXIE, Common_Movement_FacePlayer
@@ -70,6 +85,10 @@ MtChimney_EventScript_Maxie::
 	clearflag FLAG_HIDE_FALLARBOR_HOUSE_PROF_COZMO
 	setflag FLAG_HIDE_METEOR_FALLS_1F_1R_COZMO
 	clearflag FLAG_HIDE_MT_CHIMNEY_LAVA_COOKIE_LADY
+	releaseall
+	end
+
+MtChimney_EventScript_SkipInvalidMaxieBattle::
 	releaseall
 	end
 

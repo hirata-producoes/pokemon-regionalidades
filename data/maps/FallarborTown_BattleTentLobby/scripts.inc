@@ -1,7 +1,18 @@
 FallarborTown_BattleTentLobby_MapScripts::
 	map_script MAP_SCRIPT_ON_FRAME_TABLE, FallarborTown_BattleTentLobby_OnFrame
 	map_script MAP_SCRIPT_ON_WARP_INTO_MAP_TABLE, FallarborTown_BattleTentLobby_OnWarp
+	map_script MAP_SCRIPT_ON_TRANSITION, FallarborTown_BattleTentLobby_OnTransition
 	.byte 0
+
+FallarborTown_BattleTentLobby_OnTransition:
+	special PgrProgress_ScriptShouldShowHoennFallarborScott
+	goto_if_eq VAR_RESULT, TRUE, FallarborTown_BattleTentLobby_EventScript_ShowScott
+	setflag FLAG_HIDE_FALLARBOR_TOWN_BATTLE_TENT_SCOTT
+	end
+
+FallarborTown_BattleTentLobby_EventScript_ShowScott::
+	clearflag FLAG_HIDE_FALLARBOR_TOWN_BATTLE_TENT_SCOTT
+	end
 
 FallarborTown_BattleTentLobby_OnWarp:
 	map_script_2 VAR_TEMP_1, 0, FallarborTown_BattleTentLobby_EventScript_TurnPlayerNorth
@@ -238,10 +249,18 @@ FallarborTown_BattleTentLobby_EventScript_Lass::
 FallarborTown_BattleTentLobby_EventScript_Scott::
 	lock
 	faceplayer
+	special PgrProgress_ScriptShouldShowHoennFallarborScott
+	goto_if_eq VAR_RESULT, FALSE, FallarborTown_BattleTentLobby_EventScript_HideInvalidScott
 	goto_if_set FLAG_MET_SCOTT_IN_FALLARBOR, FallarborTown_BattleTentLobby_EventScript_ScottAlreadySpokenTo
 	msgbox FallarborTown_BattleTentLobby_Text_ScottLookingForSomeone, MSGBOX_DEFAULT
 	addvar VAR_SCOTT_STATE, 1
 	setflag FLAG_MET_SCOTT_IN_FALLARBOR
+	release
+	end
+
+FallarborTown_BattleTentLobby_EventScript_HideInvalidScott::
+	setflag FLAG_HIDE_FALLARBOR_TOWN_BATTLE_TENT_SCOTT
+	removeobject VAR_LAST_TALKED
 	release
 	end
 
@@ -342,4 +361,3 @@ FallarborTown_BattleTentLobby_Text_ScottMakeChallenge:
 	.string "SCOTT: Instead of wasting your\n"
 	.string "time with the likes of me, why not\l"
 	.string "make a challenge?$"
-

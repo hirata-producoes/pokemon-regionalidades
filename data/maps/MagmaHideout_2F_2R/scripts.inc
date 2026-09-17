@@ -1,5 +1,10 @@
 MagmaHideout_2F_2R_MapScripts::
+	map_script MAP_SCRIPT_ON_TRANSITION, MagmaHideout_2F_2R_OnTransition
 	.byte 0
+
+MagmaHideout_2F_2R_OnTransition:
+	call MagmaHideout_EventScript_SyncTeamVisibility
+	end
 
 MagmaHideout_2F_2R_EventScript_Grunt15::
 	trainerbattle_single TRAINER_GRUNT_MAGMA_HIDEOUT_15, MagmaHideout_2F_2R_Text_Grunt15Intro, MagmaHideout_2F_2R_Text_Grunt15Defeat
@@ -75,4 +80,3 @@ MagmaHideout_2F_2R_Text_Grunt8Defeat:
 MagmaHideout_2F_2R_Text_Grunt8PostBattle:
 	.string "I'm getting this feeling that our plan\n"
 	.string "is going to end in failure…$"
-

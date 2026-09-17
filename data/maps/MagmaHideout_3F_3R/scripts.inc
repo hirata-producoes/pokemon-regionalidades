@@ -1,3 +1,7 @@
 MagmaHideout_3F_3R_MapScripts::
+	map_script MAP_SCRIPT_ON_TRANSITION, MagmaHideout_3F_3R_OnTransition
 	.byte 0
 
+MagmaHideout_3F_3R_OnTransition:
+	call MagmaHideout_EventScript_SyncTeamVisibility
+	end

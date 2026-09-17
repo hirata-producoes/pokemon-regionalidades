@@ -4,12 +4,20 @@ LilycoveCity_Harbor_MapScripts::
 
 LilycoveCity_Harbor_OnTransition:
 	setescapewarp MAP_LILYCOVE_CITY, 12, 33
+	special PgrProgress_ScriptCanUseHoennSSTidal
+	goto_if_eq VAR_RESULT, TRUE, LilycoveCity_Harbor_EventScript_ShowSSTidal
+	setflag FLAG_HIDE_LILYCOVE_HARBOR_SSTIDAL
+	end
+
+LilycoveCity_Harbor_EventScript_ShowSSTidal::
+	clearflag FLAG_HIDE_LILYCOVE_HARBOR_SSTIDAL
 	end
 
 LilycoveCity_Harbor_EventScript_FerryAttendant::
 	lock
 	faceplayer
-	goto_if_unset FLAG_SYS_GAME_CLEAR, LilycoveCity_Harbor_EventScript_FerryUnavailable
+	special PgrProgress_ScriptCanUseHoennSSTidal
+	goto_if_eq VAR_RESULT, FALSE, LilycoveCity_Harbor_EventScript_FerryUnavailable
 	call LilycoveCity_Harbor_EventScript_GetEonTicketState
 	call LilycoveCity_Harbor_EventScript_GetAuroraTicketState
 	call LilycoveCity_Harbor_EventScript_GetOldSeaMapState
@@ -427,7 +435,8 @@ LilycoveCity_Harbor_Movement_UnusedBoardFerry:
 LilycoveCity_Harbor_EventScript_Sailor::
 	lock
 	faceplayer
-	goto_if_set FLAG_SYS_GAME_CLEAR, LilycoveCity_Harbor_EventScript_SailorFerryAvailable
+	special PgrProgress_ScriptCanUseHoennSSTidal
+	goto_if_eq VAR_RESULT, TRUE, LilycoveCity_Harbor_EventScript_SailorFerryAvailable
 	msgbox LilycoveCity_Harbor_Text_SailorFerryUnavailable, MSGBOX_DEFAULT
 	release
 	end

@@ -5,6 +5,21 @@ BattleFrontier_ReceptionGate_MapScripts::
 
 BattleFrontier_ReceptionGate_OnTransition:
 	setflag FLAG_LANDMARK_BATTLE_FRONTIER
+	special PgrProgress_ScriptCanStartHoennBattleFrontierReception
+	goto_if_eq VAR_RESULT, TRUE, BattleFrontier_ReceptionGate_EventScript_ReadyFirstEntry
+	goto_if_ne VAR_HAS_ENTERED_BATTLE_FRONTIER, 1, BattleFrontier_ReceptionGate_EventScript_BlockFirstEntryScene
+	end
+
+BattleFrontier_ReceptionGate_EventScript_ReadyFirstEntry::
+	goto_if_eq VAR_HAS_ENTERED_BATTLE_FRONTIER, 2, BattleFrontier_ReceptionGate_EventScript_ResetFirstEntryScene
+	end
+
+BattleFrontier_ReceptionGate_EventScript_ResetFirstEntryScene::
+	setvar VAR_HAS_ENTERED_BATTLE_FRONTIER, 0
+	end
+
+BattleFrontier_ReceptionGate_EventScript_BlockFirstEntryScene::
+	setvar VAR_HAS_ENTERED_BATTLE_FRONTIER, 2
 	end
 
 BattleFrontier_ReceptionGate_OnFrame:
@@ -13,6 +28,8 @@ BattleFrontier_ReceptionGate_OnFrame:
 
 BattleFrontier_ReceptionGate_EventScript_FirstTimeEntering::
 	lockall
+	special PgrProgress_ScriptCanStartHoennBattleFrontierReception
+	goto_if_eq VAR_RESULT, FALSE, BattleFrontier_ReceptionGate_EventScript_SkipInvalidFirstEntry
 	setvar VAR_HAS_ENTERED_BATTLE_FRONTIER, 1
 	playse SE_PIN
 	applymovement LOCALID_FRONTIER_RECEPTION_GREETER, Common_Movement_ExclamationMark
@@ -26,6 +43,11 @@ BattleFrontier_ReceptionGate_EventScript_FirstTimeEntering::
 	goto BattleFrontier_ReceptionGate_EventScript_ScottScene
 	end
 
+BattleFrontier_ReceptionGate_EventScript_SkipInvalidFirstEntry::
+	setvar VAR_HAS_ENTERED_BATTLE_FRONTIER, 2
+	releaseall
+	end
+
 BattleFrontier_ReceptionGate_EventScript_ScottScene::
 	msgbox BattleFrontier_ReceptionGate_Text_WelcomeToBattleFrontier, MSGBOX_DEFAULT
 	msgbox BattleFrontier_ReceptionGate_Text_IssueFrontierPass, MSGBOX_DEFAULT
@@ -35,6 +57,7 @@ BattleFrontier_ReceptionGate_EventScript_ScottScene::
 	waitmessage
 	msgbox BattleFrontier_ReceptionGate_Text_PlacedTrainerCardInFrontierPass, MSGBOX_DEFAULT
 	setflag FLAG_SYS_FRONTIER_PASS
+	special PgrProgress_ScriptCompleteHoennBattleFrontierReception
 	msgbox BattleFrontier_ReceptionGate_Text_EnjoyBattleFrontier, MSGBOX_DEFAULT
 	msgbox BattleFrontier_ReceptionGate_Text_IfItIsntPlayerYouCame, MSGBOX_DEFAULT
 	closemessage
@@ -502,4 +525,3 @@ BattleFrontier_ReceptionGate_Text_BattlePointsInfo:
 	.string "You may trade in your Battle Points\n"
 	.string "for prizes at the EXCHANGE SERVICE\l"
 	.string "CORNER.$"
-

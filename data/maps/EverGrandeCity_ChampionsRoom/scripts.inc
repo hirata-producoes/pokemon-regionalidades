@@ -22,6 +22,8 @@ EverGrandeCity_ChampionsRoom_OnFrame:
 
 EverGrandeCity_ChampionsRoom_EventScript_EnterRoom::
 	lockall
+	special PgrProgress_ScriptCheckHoennChampion
+	goto_if_eq VAR_RESULT, FALSE, EverGrandeCity_ChampionsRoom_EventScript_SkipInvalidChallenge
 	applymovement LOCALID_PLAYER, Common_Movement_WalkUp4
 	waitmovement 0
 	delay 40
@@ -29,6 +31,11 @@ EverGrandeCity_ChampionsRoom_EventScript_EnterRoom::
 	waitmovement 0
 	setvar VAR_TEMP_1, 1
 	goto EverGrandeCity_ChampionsRoom_EventScript_Wallace
+	releaseall
+	end
+
+EverGrandeCity_ChampionsRoom_EventScript_SkipInvalidChallenge::
+	setvar VAR_TEMP_1, 1
 	releaseall
 	end
 
@@ -337,4 +344,3 @@ EverGrandeCity_ChampionsRoom_Text_BrendanCongratulations:
 	.string "It can't be helped if that's the rule.\p"
 	.string "{PLAYER}, way to go!\n"
 	.string "Congratulations!$"
-

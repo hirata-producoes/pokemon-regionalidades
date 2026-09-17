@@ -47,7 +47,16 @@ SootopolisCity_OnTransition:
 	call_if_eq VAR_SOOTOPOLIS_CITY_STATE, 4, SootopolisCity_EventScript_SetExitCaveOfOriginObjPos
 	call_if_eq VAR_SOOTOPOLIS_CITY_STATE, 5, SootopolisCity_EventScript_SetOutsideGymObjPos
 	call_if_eq VAR_SOOTOPOLIS_CITY_STATE, 6, SootopolisCity_EventScript_SetExpertBlockCaveEntrance
+	special PgrProgress_ScriptCheckHoennWallaceRayquaza
+	goto_if_eq VAR_RESULT, TRUE, SootopolisCity_OnTransitionEnd
+	call_if_ne VAR_SOOTOPOLIS_CITY_STATE, 1, SootopolisCity_EventScript_KeepCavePathOpen
+
+SootopolisCity_OnTransitionEnd:
 	end
+
+SootopolisCity_EventScript_KeepCavePathOpen:
+	setobjectxyperm LOCALID_SOOTOPOLIS_EXPERT, 30, 18
+	return
 
 SootopolisCity_EventScript_HideMapNamePopup::
 	setflag FLAG_HIDE_MAP_NAME_POPUP
@@ -170,6 +179,8 @@ SootopolisCity_OnFrame:
 @ If not at PokeCenter, assumed to have arrived via Dive
 SootopolisCity_EventScript_StartLegendariesScene::
 	lockall
+	special PgrProgress_ScriptCheckHoennSootopolisCrisis
+	goto_if_eq VAR_RESULT, FALSE, SootopolisCity_EventScript_SkipInvalidLegendariesScene
 	special StorePlayerCoordsInVars
 	goto_if_ne VAR_0x8004, 43, SootopolisCity_EventScript_LegendariesSceneFromDive
 	goto_if_ne VAR_0x8005, 32, SootopolisCity_EventScript_LegendariesSceneFromDive
@@ -241,6 +252,7 @@ SootopolisCity_EventScript_LegendariesSceneFromPokeCenter::
 	waitmovement 0
 	special RemoveCameraObject
 	setvar VAR_SOOTOPOLIS_CITY_STATE, 2
+	special PgrProgress_ScriptCompleteHoennSootopolisCrisis
 	clearflag FLAG_HIDE_MAP_NAME_POPUP
 	releaseall
 	end
@@ -340,7 +352,14 @@ SootopolisCity_EventScript_LegendariesSceneFromDive::
 	waitmovement 0
 	special RemoveCameraObject
 	setvar VAR_SOOTOPOLIS_CITY_STATE, 2
+	special PgrProgress_ScriptCompleteHoennSootopolisCrisis
 	clearflag FLAG_HIDE_MAP_NAME_POPUP
+	releaseall
+	end
+
+SootopolisCity_EventScript_SkipInvalidLegendariesScene:
+	setvar VAR_SOOTOPOLIS_CITY_STATE, 0
+	setobjectxyperm LOCALID_SOOTOPOLIS_EXPERT, 30, 18
 	releaseall
 	end
 
@@ -457,6 +476,8 @@ SootopolisCity_Movement_GroudonIdle:
 @ If not at PokeCenter, assumed to have arrived via Dive
 SootopolisCity_EventScript_StartRayquazaScene::
 	lockall
+	special PgrProgress_ScriptCheckHoennSootopolisResolution
+	goto_if_eq VAR_RESULT, FALSE, SootopolisCity_EventScript_SkipInvalidRayquazaScene
 	special StorePlayerCoordsInVars
 	goto_if_ne VAR_0x8004, 43, SootopolisCity_EventScript_RayquazaSceneFromDive
 	goto_if_ne VAR_0x8005, 32, SootopolisCity_EventScript_RayquazaSceneFromDive
@@ -507,6 +528,7 @@ SootopolisCity_EventScript_RayquazaSceneFromPokeCenter::
 	special WaitWeather
 	clearflag FLAG_SYS_WEATHER_CTRL
 	setvar VAR_SKY_PILLAR_STATE, 3
+	special PgrProgress_ScriptCompleteHoennSootopolisResolution
 	clearflag FLAG_LEGENDARIES_IN_SOOTOPOLIS
 	fadenewbgm MUS_SOOTOPOLIS
 	delay 120
@@ -558,12 +580,18 @@ SootopolisCity_EventScript_RayquazaSceneFromDive::
 	special WaitWeather
 	clearflag FLAG_SYS_WEATHER_CTRL
 	setvar VAR_SKY_PILLAR_STATE, 2
+	special PgrProgress_ScriptCompleteHoennSootopolisResolution
 	clearflag FLAG_LEGENDARIES_IN_SOOTOPOLIS
 	fadenewbgm MUS_SURF
 	delay 120
 	clearflag FLAG_HIDE_MAP_NAME_POPUP
 	warpwhitefade MAP_SOOTOPOLIS_CITY, 29, 53
 	waitstate
+	end
+
+SootopolisCity_EventScript_SkipInvalidRayquazaScene:
+	setvar VAR_SKY_PILLAR_STATE, 0
+	releaseall
 	end
 
 SootopolisCity_EventScript_SetRoughWater::
@@ -896,6 +924,8 @@ SootopolisCity_EventScript_StevenHelpedWallace::
 	end
 
 SootopolisCity_EventScript_StevenLeadPlayerCaveOfOrigin::
+	special PgrProgress_ScriptCheckHoennWallaceRayquaza
+	goto_if_eq VAR_RESULT, FALSE, SootopolisCity_EventScript_SkipInvalidStevenLead
 	msgbox SootopolisCity_Text_InvolvedWithCrisisComeWithMe, MSGBOX_DEFAULT
 	closemessage
 	call_if_eq VAR_FACING, DIR_WEST, SootopolisCity_EventScript_StartWalkToCaveOfOriginWest
@@ -918,6 +948,10 @@ SootopolisCity_EventScript_StevenLeadPlayerCaveOfOrigin::
 	waitmovement 0
 	warp MAP_CAVE_OF_ORIGIN_ENTRANCE, 9, 20
 	waitstate
+	end
+
+SootopolisCity_EventScript_SkipInvalidStevenLead:
+	releaseall
 	end
 
 SootopolisCity_EventScript_StartWalkToCaveOfOriginWest::
@@ -1274,16 +1308,26 @@ SootopolisCity_EventScript_Wallace::
 	lock
 	faceplayer
 	goto_if_eq VAR_SOOTOPOLIS_CITY_STATE, 4, SootopolisCity_EventScript_GoToSkyPillar
-	goto_if_set FLAG_RECEIVED_HM_WATERFALL, SootopolisCity_EventScript_GoToGym
-	goto_if_set FLAG_SOOTOPOLIS_ARCHIE_MAXIE_LEAVE, SootopolisCity_EventScript_GiveWaterfall
+	goto_if_unset FLAG_SOOTOPOLIS_ARCHIE_MAXIE_LEAVE, SootopolisCity_EventScript_WallaceBeforeTeamsLeave
+	special PgrProgress_ScriptCheckHoennWaterfallFromWallace
+	goto_if_eq VAR_RESULT, TRUE, SootopolisCity_EventScript_GiveWaterfall
+	goto SootopolisCity_EventScript_GoToGym
+
+SootopolisCity_EventScript_WallaceBeforeTeamsLeave::
 	msgbox SootopolisCity_Text_AquaMagmaDidntMeanHarm, MSGBOX_DEFAULT
 	release
 	end
 
 SootopolisCity_EventScript_GiveWaterfall::
 	msgbox SootopolisCity_Text_ThankYouForHelpAcceptThis, MSGBOX_DEFAULT
+	checkitem ITEM_HM_WATERFALL
+	goto_if_eq VAR_RESULT, TRUE, SootopolisCity_EventScript_RecordWaterfallReward
 	giveitem ITEM_HM_WATERFALL
+	goto_if_eq VAR_RESULT, FALSE, Common_EventScript_ShowBagIsFull
+
+SootopolisCity_EventScript_RecordWaterfallReward::
 	setflag FLAG_RECEIVED_HM_WATERFALL
+	special PgrProgress_ScriptCompleteHoennWaterfallFromWallace
 	msgbox SootopolisCity_Text_ExplainWaterfallGoToGym, MSGBOX_DEFAULT
 	closemessage
 	call_if_eq VAR_FACING, DIR_NORTH, SootopolisCity_EventScript_WallaceMoveFromGym
@@ -1684,13 +1728,10 @@ SootopolisCity_Text_ThankYouForHelpAcceptThis:
 SootopolisCity_Text_ExplainWaterfallGoToGym:
 	.string "That HIDDEN MACHINE contains\n"
 	.string "WATERFALL.\p"
-	.string "If you have the RAIN BADGE, a POKéMON\n"
-	.string "that has learned that HM move can\l"
-	.string "force its way up waterfalls.\p"
-	.string "And where does one get the RAIN BADGE?\n"
-	.string "You know, don't you?\p"
-	.string "That's right! You have to beat\n"
-	.string "the SOOTOPOLIS GYM LEADER.\p"
+	.string "A POKéMON that has learned that move\n"
+	.string "can force its way up waterfalls.\p"
+	.string "The SOOTOPOLIS GYM LEADER is waiting\n"
+	.string "to test everything you have learned.\p"
 	.string "When you're all set to go, step through\n"
 	.string "that door.$"
 

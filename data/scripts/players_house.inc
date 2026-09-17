@@ -444,6 +444,7 @@ PlayersHouse_1F_EventScript_GetSSTicketAndSeeLatiTV::
 	playse SE_DOOR
 	removeobject VAR_0x8009
 	setflag FLAG_RECEIVED_SS_TICKET
+	special PgrProgress_ScriptCompleteHoennSSTicket
 	delay 30
 	call_if_eq VAR_0x8008, MALE, PlayersHouse_1F_EventScript_MomApproachPlayerMale
 	call_if_eq VAR_0x8008, FEMALE, PlayersHouse_1F_EventScript_MomApproachPlayerFemale

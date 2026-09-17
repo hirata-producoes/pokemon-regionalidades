@@ -1,5 +1,10 @@
 SeafloorCavern_Room4_MapScripts::
+	map_script MAP_SCRIPT_ON_TRANSITION, SeafloorCavern_Room4_OnTransition
 	.byte 0
+
+SeafloorCavern_Room4_OnTransition:
+	call SeafloorCavern_EventScript_SyncAquaVisibility
+	end
 
 SeafloorCavern_Room4_EventScript_Grunt3::
 	trainerbattle_single TRAINER_GRUNT_SEAFLOOR_CAVERN_3, SeafloorCavern_Room4_Text_Grunt3Intro, SeafloorCavern_Room4_Text_Grunt3Defeat
@@ -33,4 +38,3 @@ SeafloorCavern_Room4_Text_Grunt4PostBattle:
 	.string "My partner forgot the map in that\n"
 	.string "submarine!\p"
 	.string "How's that for being useless?$"
-

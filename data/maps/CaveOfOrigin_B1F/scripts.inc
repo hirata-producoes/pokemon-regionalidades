@@ -1,9 +1,22 @@
 CaveOfOrigin_B1F_MapScripts::
+	map_script MAP_SCRIPT_ON_TRANSITION, CaveOfOrigin_B1F_OnTransition
 	.byte 0
+
+CaveOfOrigin_B1F_OnTransition:
+	special PgrProgress_ScriptCheckHoennWallaceRayquaza
+	goto_if_eq VAR_RESULT, TRUE, CaveOfOrigin_B1F_EventScript_ShowWallace
+	setflag FLAG_HIDE_CAVE_OF_ORIGIN_B1F_WALLACE
+	end
+
+CaveOfOrigin_B1F_EventScript_ShowWallace:
+	clearflag FLAG_HIDE_CAVE_OF_ORIGIN_B1F_WALLACE
+	end
 
 CaveOfOrigin_B1F_EventScript_Wallace::
 	lock
 	faceplayer
+	special PgrProgress_ScriptCheckHoennWallaceRayquaza
+	goto_if_eq VAR_RESULT, FALSE, CaveOfOrigin_B1F_EventScript_SkipInvalidWallace
 	msgbox CaveOfOrigin_B1F_Text_WallaceStory, MSGBOX_DEFAULT
 	closemessage
 	applymovement LOCALID_CAVE_OF_ORIGIN_WALLACE, Common_Movement_WalkInPlaceFasterUp
@@ -53,9 +66,14 @@ CaveOfOrigin_B1F_EventScript_AtSkyPillar::
 	fadescreenspeed FADE_TO_BLACK, 4
 	setflag FLAG_WALLACE_GOES_TO_SKY_PILLAR
 	setvar VAR_SOOTOPOLIS_CITY_STATE, 3
+	special PgrProgress_ScriptCompleteHoennWallaceRayquaza
 	removeobject LOCALID_CAVE_OF_ORIGIN_WALLACE
 	clearflag FLAG_HIDE_SKY_PILLAR_WALLACE
 	fadescreen FADE_FROM_BLACK
+	release
+	end
+
+CaveOfOrigin_B1F_EventScript_SkipInvalidWallace:
 	release
 	end
 
@@ -115,4 +133,3 @@ CaveOfOrigin_B1F_Text_WellHeadToSkyPillar:
 	.string "It must be the SKY PILLAR!\p"
 	.string "{PLAYER}{KUN}, there's not a moment to lose!\n"
 	.string "We'll head to the SKY PILLAR right away!$"
-

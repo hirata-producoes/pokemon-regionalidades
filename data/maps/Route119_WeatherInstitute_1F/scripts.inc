@@ -3,8 +3,22 @@ Route119_WeatherInstitute_1F_MapScripts::
 	.byte 0
 
 Route119_WeatherInstitute_1F_OnTransition:
+	call Route119_WeatherInstitute_1F_EventScript_SyncAquaVisibility
 	call_if_eq VAR_WEATHER_INSTITUTE_STATE, 0, Route119_WeatherInstitute_1F_EventScript_SetLittleBoyPos
 	end
+
+Route119_WeatherInstitute_1F_EventScript_SyncAquaVisibility::
+	goto_if_ne VAR_WEATHER_INSTITUTE_STATE, 0, Route119_WeatherInstitute_1F_EventScript_HideAqua
+	special PgrProgress_ScriptCheckHoennWeatherInstitute
+	goto_if_eq VAR_RESULT, TRUE, Route119_WeatherInstitute_1F_EventScript_ShowAqua
+
+Route119_WeatherInstitute_1F_EventScript_HideAqua::
+	setflag FLAG_HIDE_ROUTE_119_TEAM_AQUA
+	return
+
+Route119_WeatherInstitute_1F_EventScript_ShowAqua::
+	clearflag FLAG_HIDE_ROUTE_119_TEAM_AQUA
+	return
 
 Route119_WeatherInstitute_1F_EventScript_SetLittleBoyPos::
 	setobjectxyperm LOCALID_WEATHER_INSTITUTE_LITTLE_BOY, 0, 5
@@ -130,4 +144,3 @@ Route119_WeatherInstitute_1F_Text_WhatWereAquasUpTo:
 Route119_WeatherInstitute_1F_Text_TakeRestInBed:
 	.string "There's a bed…\n"
 	.string "Let's take a rest.$"
-

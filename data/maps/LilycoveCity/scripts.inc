@@ -9,7 +9,18 @@ LilycoveCity_OnTransition:
 	setflag FLAG_HIDE_LILYCOVE_CONTEST_HALL_REPORTER
 	call_if_set FLAG_SYS_WEATHER_CTRL, Common_EventScript_SetAbnormalWeather
 	call Common_EventScript_SetupRivalGfxId
+	call LilycoveCity_EventScript_SyncRivalVisibility
 	end
+
+LilycoveCity_EventScript_SyncRivalVisibility::
+	special PgrProgress_ScriptShouldShowHoennLilycoveRival
+	goto_if_eq VAR_RESULT, TRUE, LilycoveCity_EventScript_ShowRival
+	setflag FLAG_HIDE_LILYCOVE_CITY_RIVAL
+	return
+
+LilycoveCity_EventScript_ShowRival::
+	clearflag FLAG_HIDE_LILYCOVE_CITY_RIVAL
+	return
 
 LilycoveCity_OnLoad:
 	call_if_unset FLAG_TEAM_AQUA_ESCAPED_IN_SUBMARINE, LilycoveCity_EventScript_SetWailmerMetatiles
@@ -226,10 +237,16 @@ LilycoveCity_EventScript_AquaGrunt4::
 
 LilycoveCity_EventScript_Rival::
 	lock
+	special PgrProgress_ScriptShouldShowHoennLilycoveRival
+	goto_if_eq VAR_RESULT, FALSE, LilycoveCity_EventScript_SkipInvalidRival
 	faceplayer
 	checkplayergender
 	goto_if_eq VAR_RESULT, MALE, LilycoveCity_EventScript_May
 	goto_if_eq VAR_RESULT, FEMALE, LilycoveCity_EventScript_Brendan
+	end
+
+LilycoveCity_EventScript_SkipInvalidRival:
+	release
 	end
 
 LilycoveCity_EventScript_May::
@@ -753,4 +770,3 @@ LilycoveCity_Text_HoneymoonVowToSeeRarePokemon:
 	.string "So we were delighted to see a rare\n"
 	.string "POKéMON as soon as we arrived.\p"
 	.string "I mean, we are totally happy!$"
-

@@ -10,6 +10,8 @@ JaggedPass_OnResume:
 	end
 
 JaggedPass_EventScript_CheckHasMagmaEmblem::
+	special PgrProgress_ScriptCheckHoennMagmaHideout
+	goto_if_eq VAR_RESULT, FALSE, Common_EventScript_NopReturn
 	checkitem ITEM_MAGMA_EMBLEM
 	goto_if_eq VAR_RESULT, TRUE, JaggedPass_EventScript_SetReadyToOpenHideout
 	return
@@ -263,4 +265,3 @@ JaggedPass_Text_AutumnDefeat:
 JaggedPass_Text_AutumnPostBattle:
 	.string "What is that odd rock protrusion\n"
 	.string "a little up the hill from here?$"
-

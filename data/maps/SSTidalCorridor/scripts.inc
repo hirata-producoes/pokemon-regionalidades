@@ -1,6 +1,25 @@
 SSTidalCorridor_MapScripts::
 	map_script MAP_SCRIPT_ON_FRAME_TABLE, SSTidalCorridor_OnFrame
+	map_script MAP_SCRIPT_ON_TRANSITION, SSTidalCorridor_OnTransition
 	.byte 0
+
+SSTidalCorridor_OnTransition:
+	special PgrProgress_ScriptGetHoennSSTidalScottOpportunity
+	goto_if_eq VAR_RESULT, 1, SSTidalCorridor_EventScript_ReadyScott
+	goto_if_eq VAR_RESULT, 2, SSTidalCorridor_EventScript_ScottComplete
+	setflag FLAG_HIDE_SS_TIDAL_CORRIDOR_SCOTT
+	setvar VAR_SS_TIDAL_SCOTT_STATE, 2
+	end
+
+SSTidalCorridor_EventScript_ReadyScott::
+	clearflag FLAG_HIDE_SS_TIDAL_CORRIDOR_SCOTT
+	setvar VAR_SS_TIDAL_SCOTT_STATE, 0
+	end
+
+SSTidalCorridor_EventScript_ScottComplete::
+	setflag FLAG_HIDE_SS_TIDAL_CORRIDOR_SCOTT
+	setvar VAR_SS_TIDAL_SCOTT_STATE, 1
+	end
 
 SSTidalCorridor_OnFrame:
 	map_script_2 VAR_SS_TIDAL_SCOTT_STATE, 0, SSTidalCorridor_EventScript_ScottScene
@@ -184,6 +203,8 @@ SSTidalCorridor_EventScript_TrainerNotDefeated::
 
 SSTidalCorridor_EventScript_ScottScene::
 	lockall
+	special PgrProgress_ScriptGetHoennSSTidalScottOpportunity
+	goto_if_ne VAR_RESULT, 1, SSTidalCorridor_EventScript_SkipInvalidScottScene
 	applymovement LOCALID_SS_TIDAL_SCOTT, SSTidalCorridor_Movement_ScottApproachPlayer
 	waitmovement 0
 	applymovement LOCALID_PLAYER, Common_Movement_WalkInPlaceFasterRight
@@ -201,7 +222,15 @@ SSTidalCorridor_EventScript_ScottScene::
 	waitmovement 0
 	delay 30
 	setflag FLAG_MET_SCOTT_ON_SS_TIDAL
+	special PgrProgress_ScriptCompleteHoennSSTidalScott
 	setvar VAR_SS_TIDAL_SCOTT_STATE, 1
+	releaseall
+	end
+
+SSTidalCorridor_EventScript_SkipInvalidScottScene::
+	setflag FLAG_HIDE_SS_TIDAL_CORRIDOR_SCOTT
+	setvar VAR_SS_TIDAL_SCOTT_STATE, 2
+	removeobject LOCALID_SS_TIDAL_SCOTT
 	releaseall
 	end
 

@@ -5,11 +5,25 @@ Route118_MapScripts::
 	.byte 0
 
 Route118_OnTransition:
+	call Route118_EventScript_SyncStevenVisibility
 	call GabbyAndTy_EventScript_UpdateLocation
 	call_if_eq VAR_SHOULD_END_ABNORMAL_WEATHER, 1, AbnormalWeather_EventScript_HideMapNamePopup
 	call_if_eq VAR_ABNORMAL_WEATHER_LOCATION, ABNORMAL_WEATHER_ROUTE_118_EAST, AbnormalWeather_StartGroudonWeather
 	call_if_eq VAR_ABNORMAL_WEATHER_LOCATION, ABNORMAL_WEATHER_ROUTE_118_WEST, AbnormalWeather_StartGroudonWeather
 	end
+
+Route118_EventScript_SyncStevenVisibility::
+	goto_if_ne VAR_ROUTE118_STATE, 0, Route118_EventScript_HideSteven
+	special PgrProgress_ScriptCheckHoennStevenRoute118
+	goto_if_eq VAR_RESULT, TRUE, Route118_EventScript_ShowSteven
+
+Route118_EventScript_HideSteven::
+	setflag FLAG_HIDE_ROUTE_118_STEVEN
+	return
+
+Route118_EventScript_ShowSteven::
+	clearflag FLAG_HIDE_ROUTE_118_STEVEN
+	return
 
 Route118_OnLoad:
 	call_if_eq VAR_ABNORMAL_WEATHER_LOCATION, ABNORMAL_WEATHER_ROUTE_118_EAST, AbnormalWeather_EventScript_PlaceTilesRoute118East
@@ -63,6 +77,8 @@ Route118_EventScript_RouteSign119::
 Route118_EventScript_StevenTrigger0::
 	lockall
 	setvar VAR_0x8008, 0
+	special PgrProgress_ScriptCheckHoennStevenRoute118
+	goto_if_eq VAR_RESULT, FALSE, Route118_EventScript_SkipInvalidStevenScene
 	applymovement LOCALID_PLAYER, Common_Movement_FaceUp
 	waitmovement 0
 	applymovement LOCALID_ROUTE118_STEVEN, Route118_Movement_StevenApproachLedge0
@@ -73,6 +89,8 @@ Route118_EventScript_StevenTrigger0::
 Route118_EventScript_StevenTrigger1::
 	lockall
 	setvar VAR_0x8008, 1
+	special PgrProgress_ScriptCheckHoennStevenRoute118
+	goto_if_eq VAR_RESULT, FALSE, Route118_EventScript_SkipInvalidStevenScene
 	applymovement LOCALID_PLAYER, Common_Movement_FaceUp
 	waitmovement 0
 	goto Route118_EventScript_StevenTrigger
@@ -81,6 +99,8 @@ Route118_EventScript_StevenTrigger1::
 Route118_EventScript_StevenTrigger2::
 	lockall
 	setvar VAR_0x8008, 2
+	special PgrProgress_ScriptCheckHoennStevenRoute118
+	goto_if_eq VAR_RESULT, FALSE, Route118_EventScript_SkipInvalidStevenScene
 	applymovement LOCALID_PLAYER, Common_Movement_FaceUp
 	waitmovement 0
 	applymovement LOCALID_ROUTE118_STEVEN, Route118_Movement_StevenApproachLedge2
@@ -99,7 +119,12 @@ Route118_EventScript_StevenTrigger::
 	call_if_eq VAR_0x8008, 1, Route118_EventScript_StevenExit1
 	call_if_eq VAR_0x8008, 2, Route118_EventScript_StevenExit2
 	setvar VAR_ROUTE118_STATE, 1
+	special PgrProgress_ScriptCompleteHoennStevenRoute118
 	removeobject LOCALID_ROUTE118_STEVEN
+	releaseall
+	end
+
+Route118_EventScript_SkipInvalidStevenScene::
 	releaseall
 	end
 
@@ -297,4 +322,3 @@ Route118_Text_RouteSignMauville:
 Route118_Text_RouteSign119:
 	.string "ROUTE 118\n"
 	.string "{UP_ARROW} ROUTE 119$"
-

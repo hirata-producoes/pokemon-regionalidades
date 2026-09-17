@@ -1,5 +1,10 @@
 MagmaHideout_3F_1R_MapScripts::
+	map_script MAP_SCRIPT_ON_TRANSITION, MagmaHideout_3F_1R_OnTransition
 	.byte 0
+
+MagmaHideout_3F_1R_OnTransition:
+	call MagmaHideout_EventScript_SyncTeamVisibility
+	end
 
 MagmaHideout_3F_1R_EventScript_Grunt9::
 	trainerbattle_single TRAINER_GRUNT_MAGMA_HIDEOUT_9, MagmaHideout_3F_1R_Text_Grunt9Intro, MagmaHideout_3F_1R_Text_Grunt9Defeat
@@ -40,4 +45,3 @@ MagmaHideout_3F_1R_Text_Grunt16PostBattle:
 	.string "TEAM MAGMA is right!\p"
 	.string "Don't listen to TEAM AQUA.\n"
 	.string "Don't believe their lies!$"
-

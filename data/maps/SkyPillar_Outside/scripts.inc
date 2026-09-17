@@ -5,9 +5,20 @@ SkyPillar_Outside_MapScripts::
 	.byte 0
 
 SkyPillar_Outside_OnTransition:
+	special PgrProgress_ScriptCheckHoennSkyPillarOpening
+	call_if_eq VAR_RESULT, TRUE, SkyPillar_Outside_EventScript_ShowWallace
+	call_if_eq VAR_RESULT, FALSE, SkyPillar_Outside_EventScript_HideWallace
 	call_if_eq VAR_SOOTOPOLIS_CITY_STATE, 3, SkyPillar_Outside_EventScript_HideMapNamePopup
 	call_if_ge VAR_SOOTOPOLIS_CITY_STATE, 4, SkyPillar_Outside_EventScript_CheckSetAbnormalWeather
 	end
+
+SkyPillar_Outside_EventScript_ShowWallace:
+	clearflag FLAG_HIDE_SKY_PILLAR_WALLACE
+	return
+
+SkyPillar_Outside_EventScript_HideWallace:
+	setflag FLAG_HIDE_SKY_PILLAR_WALLACE
+	return
 
 SkyPillar_Outside_EventScript_HideMapNamePopup::
 	setflag FLAG_HIDE_MAP_NAME_POPUP
@@ -18,7 +29,7 @@ SkyPillar_Outside_EventScript_CheckSetAbnormalWeather::
 	return
 
 SkyPillar_Outside_OnLoad:
-	call_if_set FLAG_WALLACE_GOES_TO_SKY_PILLAR, SkyPillar_Outside_EventScript_OpenDoor
+	call SkyPillar_Outside_EventScript_OpenDoor
 	end
 
 SkyPillar_Outside_EventScript_OpenDoor::
@@ -32,6 +43,8 @@ SkyPillar_Outside_OnFrame:
 
 SkyPillar_Outside_EventScript_WallaceScene::
 	lockall
+	special PgrProgress_ScriptCheckHoennSkyPillarOpening
+	goto_if_eq VAR_RESULT, FALSE, SkyPillar_Outside_EventScript_SkipInvalidWallaceScene
 	applymovement LOCALID_SKY_PILLAR_WALLACE, SkyPillar_Outside_Movement_WallaceApproachPlayer
 	waitmovement 0
 	applymovement LOCALID_PLAYER, Common_Movement_WalkInPlaceFasterLeft
@@ -80,9 +93,15 @@ SkyPillar_Outside_EventScript_WallaceScene::
 	fadescreenswapbuffers FADE_TO_BLACK
 	clearflag FLAG_HIDE_MAP_NAME_POPUP
 	setvar VAR_SOOTOPOLIS_CITY_STATE, 4
+	special PgrProgress_ScriptCompleteHoennSkyPillarOpening
 	removeobject LOCALID_SKY_PILLAR_WALLACE
 	clearflag FLAG_HIDE_SOOTOPOLIS_CITY_WALLACE
 	fadescreenswapbuffers FADE_FROM_BLACK
+	releaseall
+	end
+
+SkyPillar_Outside_EventScript_SkipInvalidWallaceScene:
+	setvar VAR_SOOTOPOLIS_CITY_STATE, 0
 	releaseall
 	end
 

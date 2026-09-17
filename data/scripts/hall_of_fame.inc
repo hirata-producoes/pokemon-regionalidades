@@ -47,5 +47,9 @@ EverGrandeCity_HallOfFame_EventScript_ReadyReceiveSSTicketEvent::
 	return
 
 EverGrandeCity_HallOfFame_EventScript_ReadyDexUpgradeEvent::
+	special PgrProgress_ScriptGetHoennPostgameResearchOpportunity
+	goto_if_ne VAR_RESULT, 1, EverGrandeCity_HallOfFame_EventScript_KeepDexUpgradeState
 	setvar VAR_DEX_UPGRADE_JOHTO_STARTER_STATE, 1
+
+EverGrandeCity_HallOfFame_EventScript_KeepDexUpgradeState::
 	return

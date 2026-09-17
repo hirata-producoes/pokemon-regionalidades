@@ -3,12 +3,14 @@ FieryPath_MapScripts::
 	.byte 0
 
 FieryPath_OnTransition:
-	call_if_unset FLAG_LANDMARK_FIERY_PATH, FieryPath_EventScript_MoveScottToFallarbor
 	setflag FLAG_LANDMARK_FIERY_PATH
+	special PgrProgress_ScriptCanMoveHoennScottToFallarbor
+	goto_if_eq VAR_RESULT, TRUE, FieryPath_EventScript_MoveScottToFallarbor
+	setflag FLAG_HIDE_VERDANTURF_TOWN_SCOTT
+	setflag FLAG_HIDE_FALLARBOR_TOWN_BATTLE_TENT_SCOTT
 	end
 
 FieryPath_EventScript_MoveScottToFallarbor::
 	setflag FLAG_HIDE_VERDANTURF_TOWN_SCOTT
 	clearflag FLAG_HIDE_FALLARBOR_TOWN_BATTLE_TENT_SCOTT
-	return
-
+	end

@@ -1,5 +1,15 @@
 BattleFrontier_ScottsHouse_MapScripts::
+	map_script MAP_SCRIPT_ON_TRANSITION, BattleFrontier_ScottsHouse_OnTransition
 	.byte 0
+
+BattleFrontier_ScottsHouse_OnTransition:
+	special PgrProgress_ScriptHasEnteredHoennBattleFrontier
+	goto_if_eq VAR_RESULT, TRUE, BattleFrontier_ScottsHouse_EventScript_KeepScott
+	removeobject LOCALID_SCOTTS_HOUSE_SCOTT
+	end
+
+BattleFrontier_ScottsHouse_EventScript_KeepScott::
+	end
 
 BattleFrontier_ScottsHouse_EventScript_Scott::
 	lock
@@ -11,10 +21,16 @@ BattleFrontier_ScottsHouse_EventScript_Scott::
 	end
 
 BattleFrontier_ScottsHouse_EventScript_CheckGiveItems::
-	goto_if_unset FLAG_SCOTT_GIVES_BATTLE_POINTS, BattleFrontier_ScottsHouse_EventScript_WelcomeToFrontier
+	special PgrProgress_ScriptGetHoennScottHouseOpportunity
+	goto_if_eq VAR_RESULT, 0, BattleFrontier_ScottsHouse_EventScript_NotReady
+	goto_if_eq VAR_RESULT, 1, BattleFrontier_ScottsHouse_EventScript_WelcomeToFrontier
 	goto_if_unset FLAG_COLLECTED_ALL_SILVER_SYMBOLS, BattleFrontier_ScottsHouse_EventScript_CheckSilverSymbols
 	goto_if_unset FLAG_COLLECTED_ALL_GOLD_SYMBOLS, BattleFrontier_ScottsHouse_EventScript_CheckGoldSymbols
 	goto BattleFrontier_ScottsHouse_EventScript_CheckGiveShield
+	end
+
+BattleFrontier_ScottsHouse_EventScript_NotReady::
+	release
 	end
 
 BattleFrontier_ScottsHouse_EventScript_CheckGiveShield::
@@ -185,6 +201,7 @@ BattleFrontier_ScottsHouse_EventScript_GiveBattlePoints::
 	msgbox BattleFrontier_ScottsHouse_Text_ObtainedXBattlePoints, MSGBOX_GETPOINTS
 	msgbox BattleFrontier_ScottsHouse_Text_ExplainBattlePoints, MSGBOX_DEFAULT
 	setflag FLAG_SCOTT_GIVES_BATTLE_POINTS
+	special PgrProgress_ScriptCompleteHoennScottHouseWelcome
 	setflag FLAG_TEMP_2
 	release
 	end
@@ -344,4 +361,3 @@ BattleFrontier_ScottsHouse_Text_ExpectingToHearEvenGreaterThings:
 BattleFrontier_ScottsHouse_Text_ComeBackForThisLater:
 	.string "Oops, well, if you have too much\n"
 	.string "stuff, come back for this later.$"
-
