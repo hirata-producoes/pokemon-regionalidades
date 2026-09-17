@@ -1,5 +1,16 @@
 LilycoveCity_CoveLilyMotel_2F_MapScripts::
+	map_script MAP_SCRIPT_ON_TRANSITION, LilycoveCity_CoveLilyMotel_2F_OnTransition
 	.byte 0
+
+LilycoveCity_CoveLilyMotel_2F_OnTransition:
+	special PgrProgress_ScriptShouldShowHoennLilycoveScott
+	goto_if_eq VAR_RESULT, TRUE, LilycoveCity_CoveLilyMotel_2F_EventScript_ShowScott
+	setflag FLAG_HIDE_LILYCOVE_MOTEL_SCOTT
+	end
+
+LilycoveCity_CoveLilyMotel_2F_EventScript_ShowScott::
+	clearflag FLAG_HIDE_LILYCOVE_MOTEL_SCOTT
+	end
 
 LilycoveCity_CoveLilyMotel_2F_EventScript_GameDesigner::
 	lock
@@ -53,10 +64,18 @@ LilycoveCity_CoveLilyMotel_2F_EventScript_GameBoyKid::
 LilycoveCity_CoveLilyMotel_2F_EventScript_Scott::
 	lock
 	faceplayer
+	special PgrProgress_ScriptShouldShowHoennLilycoveScott
+	goto_if_eq VAR_RESULT, FALSE, LilycoveCity_CoveLilyMotel_2F_EventScript_HideInvalidScott
 	goto_if_set FLAG_MET_SCOTT_IN_LILYCOVE, LilycoveCity_CoveLilyMotel_2F_EventScript_MetScott
 	msgbox LilycoveCity_CoveLilyMotel_2F_Text_SnoozingPreferBattles, MSGBOX_DEFAULT
 	addvar VAR_SCOTT_STATE, 1
 	setflag FLAG_MET_SCOTT_IN_LILYCOVE
+	release
+	end
+
+LilycoveCity_CoveLilyMotel_2F_EventScript_HideInvalidScott::
+	setflag FLAG_HIDE_LILYCOVE_MOTEL_SCOTT
+	removeobject VAR_LAST_TALKED
 	release
 	end
 
@@ -132,4 +151,3 @@ LilycoveCity_CoveLilyMotel_2F_Text_ContestsDoTakeStrategy:
 	.string "to win a CONTEST.\p"
 	.string "Devising CONTEST strategies is one way\n"
 	.string "of becoming a better TRAINER, I'd say.$"
-

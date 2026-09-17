@@ -44,9 +44,19 @@ LittlerootTown_OnTransition:
 	call_if_eq VAR_LITTLEROOT_HOUSES_STATE_BRENDAN, 4, LittlerootTown_EventScript_SetExitedHouseAfterLatiSSTicketEvent
 	call_if_eq VAR_OLDALE_RIVAL_STATE, 1, LittlerootTown_EventScript_MoveRivalFromOldale
 	call_if_eq VAR_LITTLEROOT_RIVAL_STATE, 3, LittlerootTown_EventScript_SetRivalLeftForRoute103
+	call_if_eq VAR_DEX_UPGRADE_JOHTO_STARTER_STATE, 1, LittlerootTown_EventScript_ValidatePostgameResearchScene
 	call_if_eq VAR_DEX_UPGRADE_JOHTO_STARTER_STATE, 1, LittlerootTown_EventScript_HideMapNamePopup
 	call_if_eq VAR_DEX_UPGRADE_JOHTO_STARTER_STATE, 2, LittlerootTown_EventScript_LeftLabAfterDexUpgrade
 	end
+
+LittlerootTown_EventScript_ValidatePostgameResearchScene::
+	special PgrProgress_ScriptGetHoennPostgameResearchOpportunity
+	goto_if_eq VAR_RESULT, 1, LittlerootTown_EventScript_KeepPostgameResearchScene
+	setvar VAR_DEX_UPGRADE_JOHTO_STARTER_STATE, 0
+	return
+
+LittlerootTown_EventScript_KeepPostgameResearchScene::
+	return
 
 LittlerootTown_EventScript_LeftLabAfterDexUpgrade::
 	setvar VAR_DEX_UPGRADE_JOHTO_STARTER_STATE, 3

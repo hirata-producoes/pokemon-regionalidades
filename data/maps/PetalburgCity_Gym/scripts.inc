@@ -89,6 +89,7 @@ PetalburgCity_Gym_EventScript_ReturnFromWallyTutorial::
 	waitmovement 0
 	msgbox PetalburgCity_Gym_Text_DadGoCollectBadges, MSGBOX_DEFAULT
 	setvar VAR_PETALBURG_GYM_STATE, 2
+	special PgrProgress_ScriptCompleteHoennWallyCatchingTutorial
 	releaseall
 	end
 
@@ -111,6 +112,8 @@ PetalburgCity_Gym_EventScript_Norman::
 	case 6, PetalburgCity_Gym_EventScript_NormanBattle
 	case 7, PetalburgCity_Gym_EventScript_NormanPostBattle
 	case 8, PetalburgCity_Gym_EventScript_NormanRematch
+	special PgrProgress_ScriptCheckHoennWallyCatchingTutorial
+	goto_if_eq VAR_RESULT, FALSE, PetalburgCity_Gym_EventScript_SkipInvalidWallyTutorial
 	msgbox PetalburgCity_Gym_Text_DadYoureHereWithYourPokemon, MSGBOX_DEFAULT
 	closemessage
 	switch VAR_FACING
@@ -118,6 +121,10 @@ PetalburgCity_Gym_EventScript_Norman::
 	case DIR_NORTH, PetalburgCity_Gym_EventScript_BeginWallyTutorialNorth
 	case DIR_WEST, PetalburgCity_Gym_EventScript_BeginWallyTutorialWest
 	case DIR_EAST, PetalburgCity_Gym_EventScript_BeginWallyTutorialEast
+	end
+
+PetalburgCity_Gym_EventScript_SkipInvalidWallyTutorial:
+	release
 	end
 
 PetalburgCity_Gym_EventScript_BeginWallyTutorialSouth::
@@ -369,6 +376,8 @@ PetalburgCity_Gym_EventScript_GiveEnigmaBerry::
 	end
 
 PetalburgCity_Gym_EventScript_NormanBattle::
+	special PgrProgress_ScriptCheckHoennNorman
+	goto_if_eq VAR_RESULT, FALSE, PetalburgCity_Gym_EventScript_SkipInvalidNormanBattle
 	msgbox PetalburgCity_Gym_Text_NormanIntro, MSGBOX_DEFAULT
 	trainerbattle_no_intro TRAINER_NORMAN_1, PetalburgCity_Gym_Text_NormanDefeat
 	message PetalburgCity_Gym_Text_ReceivedBalanceBadge
@@ -399,6 +408,10 @@ PetalburgCity_Gym_EventScript_NormanBattle::
 	case DIR_NORTH, PetalburgCity_Gym_EventScript_WallysDadArrivesNorth
 	case DIR_WEST, PetalburgCity_Gym_EventScript_WallysDadArrivesWest
 	case DIR_EAST, PetalburgCity_Gym_EventScript_WallysDadArrivesEast
+	end
+
+PetalburgCity_Gym_EventScript_SkipInvalidNormanBattle::
+	release
 	end
 
 PetalburgCity_Gym_EventScript_GiveFacade::
@@ -1282,7 +1295,7 @@ PetalburgCity_Gym_Text_ExplainBalanceBadgeTakeThis:
 	.string "DAD: With that BADGE, the DEFENSE\n"
 	.string "of all your POKéMON will increase.\p"
 	.string "POKéMON that know the HM move SURF\n"
-	.string "will be able to travel over water.\p"
+	.string "can travel over water at any time.\p"
 	.string "This is my gift to you. {PLAYER}, I'm\n"
 	.string "sure you can use it correctly.$"
 
@@ -1588,4 +1601,3 @@ PetalburgCity_Gym_Text_NormanRematchNeedTwoMons:
 	.string "capable of battle?\p"
 	.string "Sorry, but you'll have to come back\n"
 	.string "with at least two POKéMON.$"
-

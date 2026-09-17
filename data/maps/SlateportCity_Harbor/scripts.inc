@@ -5,15 +5,51 @@ SlateportCity_Harbor_MapScripts::
 SlateportCity_Harbor_OnTransition:
 	setescapewarp MAP_SLATEPORT_CITY, 28, 13
 	setvar VAR_TEMP_1, 0
+	call SlateportCity_Harbor_EventScript_SyncSubmarineTheftActors
 	call_if_eq VAR_SLATEPORT_HARBOR_STATE, 1, SlateportCity_Harbor_EventScript_ReadyAquaEscapeScene
-	call_if_set FLAG_SYS_GAME_CLEAR, SlateportCity_Harbor_EventScript_ShowSSTidal
+	special PgrProgress_ScriptCanUseHoennSSTidal
+	call_if_eq VAR_RESULT, TRUE, SlateportCity_Harbor_EventScript_ShowSSTidal
+	call_if_eq VAR_RESULT, FALSE, SlateportCity_Harbor_EventScript_HideSSTidal
 	end
+
+SlateportCity_Harbor_EventScript_SyncSubmarineTheftActors::
+	goto_if_ge VAR_SLATEPORT_HARBOR_STATE, 2, SlateportCity_Harbor_EventScript_ShowSternAfterTheft
+	goto_if_ne VAR_SLATEPORT_HARBOR_STATE, 1, SlateportCity_Harbor_EventScript_HideSubmarineTheftActors
+	special PgrProgress_ScriptCheckHoennSubmarineTheft
+	goto_if_eq VAR_RESULT, TRUE, SlateportCity_Harbor_EventScript_ShowSubmarineTheftActors
+
+SlateportCity_Harbor_EventScript_HideSubmarineTheftActors::
+	setflag FLAG_HIDE_SLATEPORT_CITY_HARBOR_CAPTAIN_STERN
+	setflag FLAG_HIDE_SLATEPORT_CITY_HARBOR_AQUA_GRUNT
+	setflag FLAG_HIDE_SLATEPORT_CITY_HARBOR_ARCHIE
+	setflag FLAG_HIDE_SLATEPORT_CITY_HARBOR_SUBMARINE_SHADOW
+	return
+
+SlateportCity_Harbor_EventScript_ShowSubmarineTheftActors::
+	clearflag FLAG_HIDE_SLATEPORT_CITY_HARBOR_CAPTAIN_STERN
+	clearflag FLAG_HIDE_SLATEPORT_CITY_HARBOR_AQUA_GRUNT
+	clearflag FLAG_HIDE_SLATEPORT_CITY_HARBOR_ARCHIE
+	clearflag FLAG_HIDE_SLATEPORT_CITY_HARBOR_SUBMARINE_SHADOW
+	return
+
+SlateportCity_Harbor_EventScript_ShowSternAfterTheft::
+	clearflag FLAG_HIDE_SLATEPORT_CITY_HARBOR_CAPTAIN_STERN
+	setflag FLAG_HIDE_SLATEPORT_CITY_HARBOR_AQUA_GRUNT
+	setflag FLAG_HIDE_SLATEPORT_CITY_HARBOR_ARCHIE
+	setflag FLAG_HIDE_SLATEPORT_CITY_HARBOR_SUBMARINE_SHADOW
+	return
 
 SlateportCity_Harbor_EventScript_ShowSSTidal::
 	clearflag FLAG_HIDE_SLATEPORT_CITY_HARBOR_SS_TIDAL
 	return
 
+SlateportCity_Harbor_EventScript_HideSSTidal::
+	setflag FLAG_HIDE_SLATEPORT_CITY_HARBOR_SS_TIDAL
+	return
+
 SlateportCity_Harbor_EventScript_ReadyAquaEscapeScene::
+	special PgrProgress_ScriptCheckHoennSubmarineTheft
+	goto_if_eq VAR_RESULT, FALSE, Common_EventScript_NopReturn
 	savebgm MUS_ENCOUNTER_AQUA
 	setobjectxyperm LOCALID_SLATEPORT_HARBOR_CAPT_STERN, 12, 13
 	setobjectmovementtype LOCALID_SLATEPORT_HARBOR_CAPT_STERN, MOVEMENT_TYPE_FACE_LEFT
@@ -47,6 +83,8 @@ SlateportCity_Harbor_EventScript_AquaEscapeTrigger3::
 	end
 
 SlateportCity_Harbor_EventScript_AquaEscapeScene::
+	special PgrProgress_ScriptCheckHoennSubmarineTheft
+	goto_if_eq VAR_RESULT, FALSE, SlateportCity_Harbor_EventScript_SkipInvalidAquaEscape
 	applymovement LOCALID_SLATEPORT_HARBOR_ARCHIE, Common_Movement_WalkInPlaceFasterDown
 	waitmovement 0
 	applymovement LOCALID_SLATEPORT_HARBOR_GRUNT, Common_Movement_WalkInPlaceFasterDown
@@ -63,6 +101,10 @@ SlateportCity_Harbor_EventScript_AquaEscapeScene::
 	removeobject LOCALID_SLATEPORT_HARBOR_SUBMARINE
 	setvar VAR_SLATEPORT_HARBOR_STATE, 2
 	setflag FLAG_MET_TEAM_AQUA_HARBOR
+	special PgrProgress_ScriptCompleteHoennSubmarineTheft
+	setflag FLAG_HIDE_SLATEPORT_CITY_HARBOR_AQUA_GRUNT
+	setflag FLAG_HIDE_SLATEPORT_CITY_HARBOR_ARCHIE
+	setflag FLAG_HIDE_SLATEPORT_CITY_HARBOR_SUBMARINE_SHADOW
 	setflag FLAG_HIDE_LILYCOVE_MOTEL_SCOTT
 	call_if_eq VAR_0x8008, 0, SlateportCity_Harbor_EventScript_SternApproachPlayer0
 	call_if_eq VAR_0x8008, 1, SlateportCity_Harbor_EventScript_SternApproachPlayer1
@@ -74,6 +116,10 @@ SlateportCity_Harbor_EventScript_AquaEscapeScene::
 	setflag FLAG_HIDE_AQUA_HIDEOUT_1F_GRUNT_2_BLOCKING_ENTRANCE
 	copyobjectxytoperm LOCALID_SLATEPORT_HARBOR_CAPT_STERN
 	setobjectmovementtype LOCALID_SLATEPORT_HARBOR_CAPT_STERN, MOVEMENT_TYPE_FACE_RIGHT
+	releaseall
+	end
+
+SlateportCity_Harbor_EventScript_SkipInvalidAquaEscape::
 	releaseall
 	end
 
@@ -157,7 +203,8 @@ SlateportCity_Harbor_Movement_PlayerWalkUp:
 SlateportCity_Harbor_EventScript_FerryAttendant::
 	lock
 	faceplayer
-	goto_if_set FLAG_SYS_GAME_CLEAR, SlateportCity_Harbor_EventScript_AskForTicket
+	special PgrProgress_ScriptCanUseHoennSSTidal
+	goto_if_eq VAR_RESULT, TRUE, SlateportCity_Harbor_EventScript_AskForTicket
 	msgbox SlateportCity_Harbor_Text_FerryServiceUnavailable, MSGBOX_DEFAULT
 	release
 	end
@@ -170,7 +217,8 @@ SlateportCity_Harbor_EventScript_AskForTicket::
 	end
 
 SlateportCity_Harbor_EventScript_ChooseDestination::
-	goto_if_set FLAG_MET_SCOTT_ON_SS_TIDAL, SlateportCity_Harbor_EventScript_ChooseDestinationWithBattleFrontier
+	special PgrProgress_ScriptGetHoennSSTidalScottOpportunity
+	goto_if_eq VAR_RESULT, 2, SlateportCity_Harbor_EventScript_ChooseDestinationWithBattleFrontier
 	multichoicedefault 18, 8, MULTI_SSTIDAL_SLATEPORT_NO_BF, 2, FALSE
 	switch VAR_RESULT
 	case 0, SlateportCity_Harbor_EventScript_Lilycove

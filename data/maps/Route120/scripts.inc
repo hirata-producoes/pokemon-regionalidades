@@ -54,9 +54,27 @@ Route120_EventScript_SetBridgeKecleonMovement::
 	return
 
 Route120_OnTransition:
+	call Route120_EventScript_SyncStevenEvent
 	call GabbyAndTy_EventScript_UpdateLocation
 	call Route120_EventScript_SetWeather
 	end
+
+Route120_EventScript_SyncStevenEvent::
+	goto_if_set FLAG_RECEIVED_DEVON_SCOPE, Route120_EventScript_HideStevenEvent
+	special PgrProgress_ScriptCheckHoennDevonScope
+	goto_if_eq VAR_RESULT, TRUE, Route120_EventScript_ShowStevenEvent
+
+Route120_EventScript_HideStevenEvent::
+	setflag FLAG_HIDE_ROUTE_120_STEVEN
+	setflag FLAG_HIDE_ROUTE_120_KECLEON_BRIDGE
+	setflag FLAG_HIDE_ROUTE_120_KECLEON_BRIDGE_SHADOW
+	return
+
+Route120_EventScript_ShowStevenEvent::
+	clearflag FLAG_HIDE_ROUTE_120_STEVEN
+	clearflag FLAG_HIDE_ROUTE_120_KECLEON_BRIDGE
+	clearflag FLAG_HIDE_ROUTE_120_KECLEON_BRIDGE_SHADOW
+	return
 
 Route120_EventScript_SetWeather::
 	getplayerxy VAR_TEMP_0, VAR_TEMP_1
@@ -154,6 +172,8 @@ Route120_EventScript_BerryNotLove::
 Route120_EventScript_Steven::
 	lock
 	faceplayer
+	special PgrProgress_ScriptCheckHoennDevonScope
+	goto_if_eq VAR_RESULT, FALSE, Route120_EventScript_SkipInvalidStevenEvent
 	goto_if_set FLAG_NOT_READY_FOR_BATTLE_ROUTE_120, Route120_EventScript_StevenAskReadyForBattle
 	msgbox Route120_Text_StevenGreeting, MSGBOX_YESNO
 	goto_if_eq VAR_RESULT, NO, Route120_EventScript_StevenNotReady
@@ -217,6 +237,10 @@ Route120_EventScript_StevenGiveDeconScope::
 	msgbox Route120_Text_StevenGiveDevonScope, MSGBOX_DEFAULT
 	giveitem ITEM_DEVON_SCOPE
 	setflag FLAG_RECEIVED_DEVON_SCOPE
+	special PgrProgress_ScriptCompleteHoennDevonScope
+	setflag FLAG_HIDE_ROUTE_120_STEVEN
+	setflag FLAG_HIDE_ROUTE_120_KECLEON_BRIDGE
+	setflag FLAG_HIDE_ROUTE_120_KECLEON_BRIDGE_SHADOW
 	msgbox Route120_Text_StevenGoodbye, MSGBOX_DEFAULT
 	closemessage
 	applymovement LOCALID_ROUTE120_STEVEN, Common_Movement_WalkInPlaceFasterDown
@@ -232,6 +256,10 @@ Route120_EventScript_StevenGiveDeconScope::
 	setmetatile 12, 17, METATILE_General_ReflectiveWater, FALSE
 	setmetatile 13, 17, METATILE_General_ReflectiveWater, FALSE
 	special DrawWholeMapView
+	release
+	end
+
+Route120_EventScript_SkipInvalidStevenEvent::
 	release
 	end
 

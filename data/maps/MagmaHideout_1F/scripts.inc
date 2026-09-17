@@ -3,8 +3,22 @@ MagmaHideout_1F_MapScripts::
 	.byte 0
 
 MagmaHideout_1F_OnTransition:
+	call MagmaHideout_EventScript_SyncTeamVisibility
 	setvar VAR_JAGGED_PASS_ASH_WEATHER, 0
 	end
+
+MagmaHideout_EventScript_SyncTeamVisibility::
+	goto_if_set FLAG_GROUDON_AWAKENED_MAGMA_HIDEOUT, MagmaHideout_EventScript_HideTeam
+	special PgrProgress_ScriptCheckHoennMagmaHideout
+	goto_if_eq VAR_RESULT, TRUE, MagmaHideout_EventScript_ShowTeam
+
+MagmaHideout_EventScript_HideTeam::
+	setflag FLAG_HIDE_MAGMA_HIDEOUT_GRUNTS
+	return
+
+MagmaHideout_EventScript_ShowTeam::
+	clearflag FLAG_HIDE_MAGMA_HIDEOUT_GRUNTS
+	return
 
 MagmaHideout_1F_EventScript_Grunt1::
 	trainerbattle_single TRAINER_GRUNT_MAGMA_HIDEOUT_1, MagmaHideout_1F_Text_Grunt1Intro, MagmaHideout_1F_Text_Grunt1Defeat
@@ -50,4 +64,3 @@ MagmaHideout_1F_Text_Grunt2PostBattle:
 	.string "You'll find out when you get there!\p"
 	.string "It'd be better if you saved surprises\n"
 	.string "to the end, don't you think?$"
-

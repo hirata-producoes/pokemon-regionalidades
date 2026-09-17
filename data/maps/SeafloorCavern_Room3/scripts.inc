@@ -1,5 +1,10 @@
 SeafloorCavern_Room3_MapScripts::
+	map_script MAP_SCRIPT_ON_TRANSITION, SeafloorCavern_Room3_OnTransition
 	.byte 0
+
+SeafloorCavern_Room3_OnTransition:
+	call SeafloorCavern_EventScript_SyncAquaVisibility
+	end
 
 SeafloorCavern_Room3_EventScript_Shelly::
 	trainerbattle_single TRAINER_SHELLY_SEAFLOOR_CAVERN, SeafloorCavern_Room3_Text_ShellyIntro, SeafloorCavern_Room3_Text_ShellyDefeat
@@ -55,4 +60,3 @@ SeafloorCavern_Room3_Text_Grunt5PostBattle:
 	.string "going up against our BOSS.\p"
 	.string "Maybe…\n"
 	.string "You must be something…$"
-

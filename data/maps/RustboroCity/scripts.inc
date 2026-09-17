@@ -6,10 +6,21 @@ RustboroCity_MapScripts::
 RustboroCity_OnTransition:
 	setflag FLAG_VISITED_RUSTBORO_CITY
 	call Common_EventScript_SetupRivalGfxId
+	call RustboroCity_EventScript_SyncRivalVisibility
 	call_if_eq VAR_RUSTBORO_CITY_STATE, 6, RustboroCity_EventScript_HideMapNamePopup
 	getplayerxy VAR_TEMP_0, VAR_TEMP_1
 	goto_if_eq VAR_RUSTBORO_CITY_STATE, 6, RustboroCity_EventScript_PositionScientistForExit
 	end
+
+RustboroCity_EventScript_SyncRivalVisibility::
+	special PgrProgress_ScriptShouldShowHoennRustboroRival
+	goto_if_eq VAR_RESULT, TRUE, RustboroCity_EventScript_ShowRival
+	setflag FLAG_HIDE_RUSTBORO_CITY_RIVAL
+	return
+
+RustboroCity_EventScript_ShowRival::
+	clearflag FLAG_HIDE_RUSTBORO_CITY_RIVAL
+	return
 
 RustboroCity_EventScript_PositionScientistForExit::
 	goto_if_eq VAR_TEMP_0, 11, RustboroCity_EventScript_PositionScientistLeftExit
@@ -280,6 +291,8 @@ RustboroCity_EventScript_StolenGoodsTrigger4::
 	end
 
 RustboroCity_EventScript_StolenGoodsScene::
+	special PgrProgress_ScriptCheckHoennDevonGoodsTheft
+	goto_if_eq VAR_RESULT, FALSE, RustboroCity_EventScript_SkipInvalidStolenGoodsScene
 	msgbox RustboroCity_Text_OutOfTheWay, MSGBOX_DEFAULT
 	closemessage
 	playbgm MUS_ENCOUNTER_AQUA, FALSE
@@ -307,6 +320,10 @@ RustboroCity_EventScript_StolenGoodsScene::
 	clearflag FLAG_HIDE_RUSTURF_TUNNEL_AQUA_GRUNT
 	setflag FLAG_HIDE_BRINEYS_HOUSE_MR_BRINEY
 	setflag FLAG_HIDE_BRINEYS_HOUSE_PEEKO
+	releaseall
+	end
+
+RustboroCity_EventScript_SkipInvalidStolenGoodsScene::
 	releaseall
 	end
 
@@ -585,6 +602,8 @@ RustboroCity_EventScript_ReturnGoodsTrigger3::
 	end
 
 RustboroCity_EventScript_ReturnGoods::
+	special PgrProgress_ScriptCheckHoennDevonGoodsReturn
+	goto_if_eq VAR_RESULT, FALSE, RustboroCity_EventScript_SkipInvalidReturnGoodsScene
 	call_if_eq VAR_TEMP_1, 0, RustboroCity_EventScript_EmployeeFacePlayerUp2
 	call_if_eq VAR_TEMP_1, 1, RustboroCity_EventScript_EmployeeFacePlayerLeft2
 	call_if_eq VAR_TEMP_1, 2, RustboroCity_EventScript_EmployeeFacePlayerDown2
@@ -601,6 +620,10 @@ RustboroCity_EventScript_ReturnGoods::
 	delay 30
 	warp MAP_RUSTBORO_CITY_DEVON_CORP_3F, 2, 2
 	waitstate
+	releaseall
+	end
+
+RustboroCity_EventScript_SkipInvalidReturnGoodsScene::
 	releaseall
 	end
 
@@ -670,10 +693,18 @@ RustboroCity_EventScript_EmployeeFacePlayerRight::
 
 RustboroCity_EventScript_Rival::
 	lockall
+	special PgrProgress_ScriptShouldShowHoennRustboroRival
+	goto_if_eq VAR_RESULT, FALSE, RustboroCity_EventScript_SkipInvalidRival
 	call_if_unset FLAG_MET_RIVAL_RUSTBORO, RustboroCity_EventScript_PlayRivalMusic
 	applymovement LOCALID_RUSTBORO_RIVAL, Common_Movement_FacePlayer
 	waitmovement 0
 	goto RustboroCity_EventScript_RivalEncounter
+
+RustboroCity_EventScript_SkipInvalidRival::
+	setflag FLAG_HIDE_RUSTBORO_CITY_RIVAL
+	removeobject LOCALID_RUSTBORO_RIVAL
+	releaseall
+	end
 
 RustboroCity_EventScript_PlayRivalMusic::
 	checkplayergender

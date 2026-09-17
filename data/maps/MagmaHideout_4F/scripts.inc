@@ -1,8 +1,25 @@
 MagmaHideout_4F_MapScripts::
+	map_script MAP_SCRIPT_ON_TRANSITION, MagmaHideout_4F_OnTransition
 	.byte 0
+
+MagmaHideout_4F_OnTransition:
+	call MagmaHideout_EventScript_SyncTeamVisibility
+	goto_if_set FLAG_GROUDON_AWAKENED_MAGMA_HIDEOUT, MagmaHideout_4F_EventScript_HideGroudon
+	special PgrProgress_ScriptCheckHoennMagmaHideout
+	goto_if_eq VAR_RESULT, FALSE, MagmaHideout_4F_EventScript_HideGroudon
+	setflag FLAG_HIDE_MAGMA_HIDEOUT_4F_GROUDON
+	clearflag FLAG_HIDE_MAGMA_HIDEOUT_4F_GROUDON_ASLEEP
+	end
+
+MagmaHideout_4F_EventScript_HideGroudon::
+	setflag FLAG_HIDE_MAGMA_HIDEOUT_4F_GROUDON
+	setflag FLAG_HIDE_MAGMA_HIDEOUT_4F_GROUDON_ASLEEP
+	end
 
 MagmaHideout_4F_EventScript_Maxie::
 	lockall
+	special PgrProgress_ScriptCheckHoennMagmaHideout
+	goto_if_eq VAR_RESULT, FALSE, MagmaHideout_4F_EventScript_SkipInvalidMaxieScene
 	playbgm MUS_ENCOUNTER_MAGMA, FALSE
 	msgbox MagmaHideout_4F_Text_MaxieAwakenGroudon, MSGBOX_DEFAULT
 	closemessage
@@ -60,6 +77,7 @@ MagmaHideout_4F_EventScript_Maxie::
 	clearflag FLAG_HIDE_SLATEPORT_CITY_GABBY_AND_TY
 	setvar VAR_SLATEPORT_CITY_STATE, 1
 	setflag FLAG_GROUDON_AWAKENED_MAGMA_HIDEOUT
+	special PgrProgress_ScriptCompleteHoennMagmaHideout
 	setvar VAR_SLATEPORT_HARBOR_STATE, 1
 	fadescreen FADE_TO_BLACK
 	removeobject LOCALID_MAGMA_HIDEOUT_4F_MAXIE
@@ -69,6 +87,10 @@ MagmaHideout_4F_EventScript_Maxie::
 	removeobject LOCALID_MAGMA_HIDEOUT_4F_TABITHA
 	setflag FLAG_HIDE_MAGMA_HIDEOUT_GRUNTS
 	fadescreen FADE_FROM_BLACK
+	releaseall
+	end
+
+MagmaHideout_4F_EventScript_SkipInvalidMaxieScene::
 	releaseall
 	end
 

@@ -299,6 +299,8 @@ RusturfTunnel_EventScript_Peeko::
 RusturfTunnel_EventScript_Grunt::
 	lock
 	faceplayer
+	special PgrProgress_ScriptCheckHoennDevonGoodsRecovery
+	goto_if_eq VAR_RESULT, FALSE, RusturfTunnel_EventScript_SkipInvalidDevonGoodsRecovery
 	playbgm MUS_ENCOUNTER_AQUA, FALSE
 	msgbox RusturfTunnel_Text_GruntIntro, MSGBOX_DEFAULT
 	trainerbattle_no_intro TRAINER_GRUNT_RUSTURF_TUNNEL, RusturfTunnel_Text_GruntDefeat
@@ -337,6 +339,10 @@ RusturfTunnel_EventScript_Grunt::
 	setvar VAR_RUSTBORO_CITY_STATE, 4
 	setvar VAR_BRINEY_HOUSE_STATE, 1
 	setflag FLAG_HIDE_ROUTE_116_MR_BRINEY
+	release
+	end
+
+RusturfTunnel_EventScript_SkipInvalidDevonGoodsRecovery::
 	release
 	end
 
@@ -524,4 +530,3 @@ RusturfTunnel_Text_MikePostBattle:
 	.string "They halted development here to\n"
 	.string "protect POKéMON, right?\l"
 	.string "There's a feel-good story!$"
-

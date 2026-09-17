@@ -1,8 +1,30 @@
 SeafloorCavern_Room9_MapScripts::
+	map_script MAP_SCRIPT_ON_TRANSITION, SeafloorCavern_Room9_OnTransition
 	.byte 0
+
+SeafloorCavern_Room9_OnTransition:
+	call SeafloorCavern_EventScript_SyncAquaVisibility
+	special PgrProgress_ScriptCheckHoennSeafloorCavern
+	goto_if_eq VAR_RESULT, TRUE, SeafloorCavern_Room9_EventScript_PrepareFinalScene
+	setflag FLAG_HIDE_SEAFLOOR_CAVERN_ROOM_9_KYOGRE_ASLEEP
+	setflag FLAG_HIDE_SEAFLOOR_CAVERN_ROOM_9_KYOGRE
+	setflag FLAG_HIDE_SEAFLOOR_CAVERN_ROOM_9_ARCHIE
+	setflag FLAG_HIDE_SEAFLOOR_CAVERN_ROOM_9_MAXIE
+	setflag FLAG_HIDE_SEAFLOOR_CAVERN_ROOM_9_MAGMA_GRUNTS
+	end
+
+SeafloorCavern_Room9_EventScript_PrepareFinalScene:
+	clearflag FLAG_HIDE_SEAFLOOR_CAVERN_ROOM_9_KYOGRE_ASLEEP
+	setflag FLAG_HIDE_SEAFLOOR_CAVERN_ROOM_9_KYOGRE
+	setflag FLAG_HIDE_SEAFLOOR_CAVERN_ROOM_9_ARCHIE
+	setflag FLAG_HIDE_SEAFLOOR_CAVERN_ROOM_9_MAXIE
+	setflag FLAG_HIDE_SEAFLOOR_CAVERN_ROOM_9_MAGMA_GRUNTS
+	end
 
 SeafloorCavern_Room9_EventScript_ArchieAwakenKyogre::
 	lockall
+	special PgrProgress_ScriptCheckHoennSeafloorCavern
+	goto_if_eq VAR_RESULT, FALSE, SeafloorCavern_Room9_EventScript_SkipInvalidFinalScene
 	setvar VAR_0x8004, LOCALID_SEAFLOOR_CAVERN_ARCHIE
 	setvar VAR_0x8005, LOCALID_SEAFLOOR_CAVERN_MAXIE
 	setvar VAR_0x8006, LOCALID_SEAFLOOR_CAVERN_GRUNT_1
@@ -129,6 +151,7 @@ SeafloorCavern_Room9_EventScript_ArchieAwakenKyogre::
 	setflag FLAG_HIDE_MOSSDEEP_CITY_STEVENS_HOUSE_STEVEN
 	setvar VAR_STEVENS_HOUSE_STATE, 2
 	setvar VAR_SEAFLOOR_CAVERN_STATE, 1
+	special PgrProgress_ScriptCompleteHoennSeafloorCavern
 	setflag FLAG_HIDE_SEAFLOOR_CAVERN_ROOM_9_ARCHIE
 	setflag FLAG_HIDE_SEAFLOOR_CAVERN_ROOM_9_MAXIE
 	setflag FLAG_HIDE_SEAFLOOR_CAVERN_ROOM_9_MAGMA_GRUNTS
@@ -137,6 +160,10 @@ SeafloorCavern_Room9_EventScript_ArchieAwakenKyogre::
 	setflag FLAG_HIDE_MAP_NAME_POPUP
 	warp MAP_ROUTE128, 38, 22
 	waitstate
+	releaseall
+	end
+
+SeafloorCavern_Room9_EventScript_SkipInvalidFinalScene:
 	releaseall
 	end
 

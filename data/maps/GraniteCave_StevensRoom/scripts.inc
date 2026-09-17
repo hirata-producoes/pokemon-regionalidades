@@ -4,6 +4,8 @@ GraniteCave_StevensRoom_MapScripts::
 GraniteCave_StevensRoom_EventScript_Steven::
 	lock
 	faceplayer
+	special PgrProgress_ScriptCheckHoennStevenLetter
+	goto_if_eq VAR_RESULT, FALSE, GraniteCave_StevensRoom_EventScript_SkipInvalidLetterDelivery
 	msgbox GraniteCave_StevensRoom_Text_ImStevenLetterForMe, MSGBOX_DEFAULT
 	setvar VAR_0x8004, ITEM_LETTER
 	call Common_EventScript_PlayerHandedOverTheItem
@@ -28,6 +30,10 @@ GraniteCave_StevensRoom_EventScript_Steven::
 	call_if_eq VAR_FACING, DIR_EAST, GraniteCave_StevensRoom_EventScript_StevenExitWestEast
 	playse SE_EXIT
 	removeobject LOCALID_GRANITE_CAVE_STEVEN
+	release
+	end
+
+GraniteCave_StevensRoom_EventScript_SkipInvalidLetterDelivery::
 	release
 	end
 
@@ -116,4 +122,3 @@ GraniteCave_StevensRoom_Text_IveGotToHurryAlong:
 GraniteCave_StevensRoom_Text_OhBagIsFull:
 	.string "Oh, your BAG is full…\n"
 	.string "That's too bad, then.$"
-

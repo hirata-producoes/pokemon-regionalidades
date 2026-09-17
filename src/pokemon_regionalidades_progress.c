@@ -9,7 +9,7 @@
 #endif
 
 #define PGR_PROGRESS_MAGIC   0xB47E
-#define PGR_PROGRESS_VERSION 2
+#define PGR_PROGRESS_VERSION 24
 
 #ifdef PORTABLE
 STATIC_ASSERT(PGR_WORLD_REGION_COUNT == PC_WORLD_STATE_REGION_COUNT, NativeWorldRegionCountMismatch);
@@ -87,9 +87,233 @@ static void ImportLegacyHoennProgress(void)
         gSaveBlock3Ptr->regionalidadesProgress.globalRewards[0] |= 1u << PGR_REWARD_ROTOMDEX_DEVICE;
     }
 
+    if (FlagGet(FLAG_RECEIVED_EXP_SHARE))
+        gSaveBlock3Ptr->regionalidadesProgress.globalRewards[0] |= 1u << PGR_REWARD_EXP_SHARE;
+
     if (FlagGet(FLAG_RECEIVED_RUNNING_SHOES) && VarGet(VAR_LITTLEROOT_TOWN_STATE) >= 4)
         SetLegacyStoryEvent(PGW_START_HOENN, PGR_HOENN_STORY_RECEIVED_RUNNING_SHOES);
 
+    if (VarGet(VAR_PETALBURG_GYM_STATE) >= 2
+     || FlagGet(FLAG_DEFEATED_RUSTBORO_GYM)
+     || FlagGet(FLAG_DEFEATED_DEWFORD_GYM)
+     || FlagGet(FLAG_DEVON_GOODS_STOLEN))
+        SetLegacyStoryEvent(PGW_START_HOENN, PGR_HOENN_STORY_COMPLETED_WALLY_CATCHING_TUTORIAL);
+
+    if (FlagGet(FLAG_DEFEATED_RUSTBORO_GYM)
+     || FlagGet(FLAG_DEVON_GOODS_STOLEN)
+     || FlagGet(FLAG_RECOVERED_DEVON_GOODS)
+     || FlagGet(FLAG_RETURNED_DEVON_GOODS)
+     || FlagGet(FLAG_DELIVERED_DEVON_GOODS))
+        SetLegacyStoryEvent(PGW_START_HOENN, PGR_HOENN_STORY_DEFEATED_ROXANNE);
+
+    if (FlagGet(FLAG_DEVON_GOODS_STOLEN)
+     || FlagGet(FLAG_RECOVERED_DEVON_GOODS)
+     || FlagGet(FLAG_RETURNED_DEVON_GOODS)
+     || FlagGet(FLAG_DELIVERED_DEVON_GOODS))
+        SetLegacyStoryEvent(PGW_START_HOENN, PGR_HOENN_STORY_DEVON_GOODS_STOLEN);
+
+    if (FlagGet(FLAG_RECOVERED_DEVON_GOODS)
+     || FlagGet(FLAG_RETURNED_DEVON_GOODS)
+     || FlagGet(FLAG_DELIVERED_DEVON_GOODS))
+        SetLegacyStoryEvent(PGW_START_HOENN, PGR_HOENN_STORY_RECOVERED_DEVON_GOODS);
+
+    if (FlagGet(FLAG_RETURNED_DEVON_GOODS) || FlagGet(FLAG_DELIVERED_DEVON_GOODS))
+        SetLegacyStoryEvent(PGW_START_HOENN, PGR_HOENN_STORY_RETURNED_DEVON_GOODS);
+
+    if (FlagGet(FLAG_RECEIVED_POKENAV)
+     || FlagGet(FLAG_DELIVERED_STEVEN_LETTER)
+     || FlagGet(FLAG_DOCK_REJECTED_DEVON_GOODS)
+     || FlagGet(FLAG_DELIVERED_DEVON_GOODS))
+        SetLegacyStoryEvent(PGW_START_HOENN, PGR_HOENN_STORY_RECEIVED_DEVON_COMMISSIONS);
+
+    if (FlagGet(FLAG_DELIVERED_STEVEN_LETTER)
+     || FlagGet(FLAG_DOCK_REJECTED_DEVON_GOODS)
+     || FlagGet(FLAG_DELIVERED_DEVON_GOODS))
+        SetLegacyStoryEvent(PGW_START_HOENN, PGR_HOENN_STORY_DELIVERED_STEVEN_LETTER);
+
+    if (FlagGet(FLAG_DOCK_REJECTED_DEVON_GOODS) || FlagGet(FLAG_DELIVERED_DEVON_GOODS))
+        SetLegacyStoryEvent(PGW_START_HOENN, PGR_HOENN_STORY_DOCK_DIRECTED_TO_STERN);
+
+    if (FlagGet(FLAG_DELIVERED_DEVON_GOODS))
+        SetLegacyStoryEvent(PGW_START_HOENN, PGR_HOENN_STORY_DELIVERED_DEVON_GOODS);
+
+    if (VarGet(VAR_ROUTE110_STATE) >= 1)
+        SetLegacyStoryEvent(PGW_START_HOENN, PGR_HOENN_STORY_DEFEATED_RIVAL_ROUTE_110);
+
+    if (FlagGet(FLAG_DEFEATED_WALLY_MAUVILLE) || FlagGet(FLAG_DEFEATED_MAUVILLE_GYM))
+        SetLegacyStoryEvent(PGW_START_HOENN, PGR_HOENN_STORY_DEFEATED_WALLY_MAUVILLE);
+
+    if (FlagGet(FLAG_DEFEATED_MAUVILLE_GYM))
+        SetLegacyStoryEvent(PGW_START_HOENN, PGR_HOENN_STORY_DEFEATED_WATTSON);
+
+    if (FlagGet(FLAG_MET_ARCHIE_METEOR_FALLS)
+     || FlagGet(FLAG_DEFEATED_EVIL_TEAM_MT_CHIMNEY)
+     || FlagGet(FLAG_DEFEATED_LAVARIDGE_GYM))
+        SetLegacyStoryEvent(PGW_START_HOENN, PGR_HOENN_STORY_WITNESSED_METEORITE_THEFT);
+
+    if (FlagGet(FLAG_DEFEATED_EVIL_TEAM_MT_CHIMNEY) || FlagGet(FLAG_DEFEATED_LAVARIDGE_GYM))
+        SetLegacyStoryEvent(PGW_START_HOENN, PGR_HOENN_STORY_DEFEATED_MAXIE_MT_CHIMNEY);
+
+    if (FlagGet(FLAG_DEFEATED_LAVARIDGE_GYM))
+        SetLegacyStoryEvent(PGW_START_HOENN, PGR_HOENN_STORY_DEFEATED_FLANNERY);
+
+    if (FlagGet(FLAG_DEFEATED_DEWFORD_GYM))
+        SetLegacyStoryEvent(PGW_START_HOENN, PGR_HOENN_STORY_DEFEATED_BRAWLY);
+
+    if (FlagGet(FLAG_RECEIVED_GO_GOGGLES) || FlagGet(FLAG_DEFEATED_PETALBURG_GYM))
+        SetLegacyStoryEvent(PGW_START_HOENN, PGR_HOENN_STORY_RECEIVED_GO_GOGGLES);
+
+    if (FlagGet(FLAG_DEFEATED_PETALBURG_GYM))
+        SetLegacyStoryEvent(PGW_START_HOENN, PGR_HOENN_STORY_DEFEATED_NORMAN);
+
+    if (VarGet(VAR_ROUTE118_STATE) >= 1
+     || VarGet(VAR_WEATHER_INSTITUTE_STATE) >= 1
+     || FlagGet(FLAG_RECEIVED_CASTFORM))
+        SetLegacyStoryEvent(PGW_START_HOENN, PGR_HOENN_STORY_MET_STEVEN_ROUTE_118);
+
+    if (VarGet(VAR_WEATHER_INSTITUTE_STATE) >= 1 || FlagGet(FLAG_RECEIVED_CASTFORM))
+        SetLegacyStoryEvent(PGW_START_HOENN, PGR_HOENN_STORY_CLEARED_WEATHER_INSTITUTE);
+
+    if (VarGet(VAR_ROUTE119_STATE) >= 1)
+        SetLegacyStoryEvent(PGW_START_HOENN, PGR_HOENN_STORY_DEFEATED_RIVAL_ROUTE_119);
+
+    if (FlagGet(FLAG_RECEIVED_DEVON_SCOPE))
+        SetLegacyStoryEvent(PGW_START_HOENN, PGR_HOENN_STORY_RECEIVED_DEVON_SCOPE);
+
+    if (FlagGet(FLAG_KECLEON_FLED_FORTREE) || FlagGet(FLAG_DEFEATED_FORTREE_GYM))
+        SetLegacyStoryEvent(PGW_START_HOENN, PGR_HOENN_STORY_CLEARED_FORTREE_GYM_PATH);
+
+    if (FlagGet(FLAG_DEFEATED_FORTREE_GYM))
+        SetLegacyStoryEvent(PGW_START_HOENN, PGR_HOENN_STORY_DEFEATED_WINONA);
+
+    if (VarGet(VAR_MT_PYRE_STATE) >= 1 || FlagGet(FLAG_RECEIVED_RED_OR_BLUE_ORB))
+        SetLegacyStoryEvent(PGW_START_HOENN, PGR_HOENN_STORY_WITNESSED_MT_PYRE_ORB_THEFT);
+
+    if (FlagGet(FLAG_GROUDON_AWAKENED_MAGMA_HIDEOUT))
+        SetLegacyStoryEvent(PGW_START_HOENN, PGR_HOENN_STORY_AWAKENED_GROUDON_MAGMA_HIDEOUT);
+
+    if (FlagGet(FLAG_MET_TEAM_AQUA_HARBOR) || VarGet(VAR_SLATEPORT_HARBOR_STATE) >= 2)
+        SetLegacyStoryEvent(PGW_START_HOENN, PGR_HOENN_STORY_WITNESSED_SUBMARINE_THEFT);
+
+    if (FlagGet(FLAG_TEAM_AQUA_ESCAPED_IN_SUBMARINE))
+        SetLegacyStoryEvent(PGW_START_HOENN, PGR_HOENN_STORY_CLEARED_AQUA_HIDEOUT);
+
+    if (FlagGet(FLAG_DEFEATED_MOSSDEEP_GYM)
+     || FlagGet(FLAG_DEFEATED_MAGMA_SPACE_CENTER)
+     || (FlagGet(FLAG_RECEIVED_HM_DIVE) && VarGet(VAR_STEVENS_HOUSE_STATE) >= 2)
+     || FlagGet(FLAG_KYOGRE_ESCAPED_SEAFLOOR_CAVERN)
+     || VarGet(VAR_SEAFLOOR_CAVERN_STATE) >= 1)
+        SetLegacyStoryEvent(PGW_START_HOENN, PGR_HOENN_STORY_DEFEATED_TATE_LIZA);
+
+    if (FlagGet(FLAG_DEFEATED_MAGMA_SPACE_CENTER)
+     || (FlagGet(FLAG_RECEIVED_HM_DIVE) && VarGet(VAR_STEVENS_HOUSE_STATE) >= 2)
+     || FlagGet(FLAG_KYOGRE_ESCAPED_SEAFLOOR_CAVERN)
+     || VarGet(VAR_SEAFLOOR_CAVERN_STATE) >= 1)
+        SetLegacyStoryEvent(PGW_START_HOENN, PGR_HOENN_STORY_CLEARED_MOSSDEEP_SPACE_CENTER);
+
+    if ((FlagGet(FLAG_RECEIVED_HM_DIVE) && VarGet(VAR_STEVENS_HOUSE_STATE) >= 2)
+     || FlagGet(FLAG_KYOGRE_ESCAPED_SEAFLOOR_CAVERN)
+     || VarGet(VAR_SEAFLOOR_CAVERN_STATE) >= 1)
+        SetLegacyStoryEvent(PGW_START_HOENN, PGR_HOENN_STORY_RECEIVED_DIVE_FROM_STEVEN);
+
+    if (FlagGet(FLAG_KYOGRE_ESCAPED_SEAFLOOR_CAVERN) || VarGet(VAR_SEAFLOOR_CAVERN_STATE) >= 1)
+        SetLegacyStoryEvent(PGW_START_HOENN, PGR_HOENN_STORY_AWAKENED_KYOGRE_SEAFLOOR_CAVERN);
+
+    if (VarGet(VAR_SOOTOPOLIS_CITY_STATE) >= 2
+     || FlagGet(FLAG_STEVEN_GUIDES_TO_CAVE_OF_ORIGIN)
+     || FlagGet(FLAG_WALLACE_GOES_TO_SKY_PILLAR))
+        SetLegacyStoryEvent(PGW_START_HOENN, PGR_HOENN_STORY_WITNESSED_SOOTOPOLIS_CRISIS);
+
+    if (FlagGet(FLAG_WALLACE_GOES_TO_SKY_PILLAR) || VarGet(VAR_SOOTOPOLIS_CITY_STATE) >= 3)
+        SetLegacyStoryEvent(PGW_START_HOENN, PGR_HOENN_STORY_SENT_WALLACE_TO_SKY_PILLAR);
+
+    if (VarGet(VAR_SOOTOPOLIS_CITY_STATE) >= 4)
+        SetLegacyStoryEvent(PGW_START_HOENN, PGR_HOENN_STORY_OPENED_SKY_PILLAR);
+
+    if (VarGet(VAR_SOOTOPOLIS_CITY_STATE) >= 5 || VarGet(VAR_SKY_PILLAR_STATE) >= 1)
+        SetLegacyStoryEvent(PGW_START_HOENN, PGR_HOENN_STORY_AWAKENED_RAYQUAZA);
+
+    if (VarGet(VAR_SKY_PILLAR_STATE) >= 2)
+        SetLegacyStoryEvent(PGW_START_HOENN, PGR_HOENN_STORY_RESOLVED_SOOTOPOLIS_CRISIS);
+
+    if ((FlagGet(FLAG_RECEIVED_HM_WATERFALL) && FlagGet(FLAG_SOOTOPOLIS_ARCHIE_MAXIE_LEAVE))
+     || FlagGet(FLAG_DEFEATED_SOOTOPOLIS_GYM)
+     || FlagGet(FLAG_DEFEATED_WALLY_VICTORY_ROAD)
+     || FlagGet(FLAG_ENTERED_ELITE_FOUR)
+     || FlagGet(FLAG_IS_CHAMPION)
+     || FlagGet(FLAG_SYS_GAME_CLEAR))
+        SetLegacyStoryEvent(PGW_START_HOENN, PGR_HOENN_STORY_RECEIVED_WATERFALL_FROM_WALLACE);
+
+    if (FlagGet(FLAG_DEFEATED_SOOTOPOLIS_GYM)
+     || FlagGet(FLAG_DEFEATED_WALLY_VICTORY_ROAD)
+     || FlagGet(FLAG_ENTERED_ELITE_FOUR)
+     || FlagGet(FLAG_IS_CHAMPION)
+     || FlagGet(FLAG_SYS_GAME_CLEAR))
+        SetLegacyStoryEvent(PGW_START_HOENN, PGR_HOENN_STORY_DEFEATED_JUAN);
+
+    if (FlagGet(FLAG_DEFEATED_WALLY_VICTORY_ROAD)
+     || FlagGet(FLAG_ENTERED_ELITE_FOUR)
+     || FlagGet(FLAG_IS_CHAMPION)
+     || FlagGet(FLAG_SYS_GAME_CLEAR))
+        SetLegacyStoryEvent(PGW_START_HOENN, PGR_HOENN_STORY_DEFEATED_WALLY_VICTORY_ROAD);
+
+    if (FlagGet(FLAG_ENTERED_ELITE_FOUR)
+     || FlagGet(FLAG_DEFEATED_ELITE_4_SIDNEY)
+     || FlagGet(FLAG_DEFEATED_ELITE_4_PHOEBE)
+     || FlagGet(FLAG_DEFEATED_ELITE_4_GLACIA)
+     || FlagGet(FLAG_DEFEATED_ELITE_4_DRAKE)
+     || FlagGet(FLAG_IS_CHAMPION)
+     || FlagGet(FLAG_SYS_GAME_CLEAR))
+        SetLegacyStoryEvent(PGW_START_HOENN, PGR_HOENN_STORY_ENTERED_POKEMON_LEAGUE);
+
+    if (FlagGet(FLAG_DEFEATED_ELITE_4_SIDNEY)
+     || FlagGet(FLAG_DEFEATED_ELITE_4_PHOEBE)
+     || FlagGet(FLAG_DEFEATED_ELITE_4_GLACIA)
+     || FlagGet(FLAG_DEFEATED_ELITE_4_DRAKE)
+     || FlagGet(FLAG_IS_CHAMPION)
+     || FlagGet(FLAG_SYS_GAME_CLEAR))
+        SetLegacyStoryEvent(PGW_START_HOENN, PGR_HOENN_STORY_DEFEATED_SIDNEY);
+
+    if (FlagGet(FLAG_DEFEATED_ELITE_4_PHOEBE)
+     || FlagGet(FLAG_DEFEATED_ELITE_4_GLACIA)
+     || FlagGet(FLAG_DEFEATED_ELITE_4_DRAKE)
+     || FlagGet(FLAG_IS_CHAMPION)
+     || FlagGet(FLAG_SYS_GAME_CLEAR))
+        SetLegacyStoryEvent(PGW_START_HOENN, PGR_HOENN_STORY_DEFEATED_PHOEBE);
+
+    if (FlagGet(FLAG_DEFEATED_ELITE_4_GLACIA)
+     || FlagGet(FLAG_DEFEATED_ELITE_4_DRAKE)
+     || FlagGet(FLAG_IS_CHAMPION)
+     || FlagGet(FLAG_SYS_GAME_CLEAR))
+        SetLegacyStoryEvent(PGW_START_HOENN, PGR_HOENN_STORY_DEFEATED_GLACIA);
+
+    if (FlagGet(FLAG_DEFEATED_ELITE_4_DRAKE)
+     || FlagGet(FLAG_IS_CHAMPION)
+     || FlagGet(FLAG_SYS_GAME_CLEAR))
+        SetLegacyStoryEvent(PGW_START_HOENN, PGR_HOENN_STORY_DEFEATED_DRAKE);
+
+    if (FlagGet(FLAG_IS_CHAMPION) || FlagGet(FLAG_SYS_GAME_CLEAR))
+        SetLegacyStoryEvent(PGW_START_HOENN, PGR_HOENN_STORY_BECAME_CHAMPION);
+
+    if ((VarGet(VAR_DEX_UPGRADE_JOHTO_STARTER_STATE) >= 2
+      || FlagGet(FLAG_SYS_NATIONAL_DEX))
+     && (FlagGet(FLAG_IS_CHAMPION) || FlagGet(FLAG_SYS_GAME_CLEAR)))
+        SetLegacyStoryEvent(PGW_START_HOENN, PGR_HOENN_STORY_COMPLETED_POSTGAME_RESEARCH_UPDATE);
+
+    if (FlagGet(FLAG_RECEIVED_SS_TICKET))
+        SetLegacyStoryEvent(PGW_START_HOENN, PGR_HOENN_STORY_RECEIVED_SS_TICKET);
+
+    if (FlagGet(FLAG_MET_SCOTT_ON_SS_TIDAL))
+        SetLegacyStoryEvent(PGW_START_HOENN, PGR_HOENN_STORY_MET_SCOTT_SS_TIDAL);
+
+    if (FlagGet(FLAG_SYS_FRONTIER_PASS))
+        SetLegacyStoryEvent(PGW_START_HOENN, PGR_HOENN_STORY_ENTERED_BATTLE_FRONTIER);
+
+    if (FlagGet(FLAG_SCOTT_GIVES_BATTLE_POINTS))
+        SetLegacyStoryEvent(PGW_START_HOENN, PGR_HOENN_STORY_RECEIVED_SCOTT_FRONTIER_WELCOME);
+
+    if (FlagGet(FLAG_DEFEATED_METEOR_FALLS_STEVEN))
+        SetLegacyStoryEvent(PGW_START_HOENN, PGR_HOENN_STORY_DEFEATED_STEVEN_METEOR_FALLS);
 }
 
 static void EnsureLegacyProgressValid(void)
@@ -102,6 +326,17 @@ static void EnsureLegacyProgressValid(void)
         gSaveBlock3Ptr->regionalidadesProgress.version = PGR_PROGRESS_VERSION;
         memset(gSaveBlock3Ptr->regionalidadesProgress.storyEvents[PGW_START_HOENN], 0,
                sizeof(gSaveBlock3Ptr->regionalidadesProgress.storyEvents[PGW_START_HOENN]));
+        ImportLegacyHoennProgress();
+        return;
+    }
+    if (gSaveBlock3Ptr->regionalidadesProgress.magic == PGR_PROGRESS_MAGIC
+     && gSaveBlock3Ptr->regionalidadesProgress.version >= 2
+     && gSaveBlock3Ptr->regionalidadesProgress.version < PGR_PROGRESS_VERSION)
+    {
+        // Later versions add Hoenn arcs without changing the bitset layout.
+        // Preserve every bit already owned by all regions and merge only
+        // canonical Hoenn state.
+        gSaveBlock3Ptr->regionalidadesProgress.version = PGR_PROGRESS_VERSION;
         ImportLegacyHoennProgress();
         return;
     }
@@ -287,6 +522,220 @@ static bool32 GetRegisteredRequirements(enum PgwStartingRegion region, u16 event
     {
         { PGW_START_HOENN, PGR_HOENN_STORY_RECEIVED_POKEDEX },
     };
+    static const struct PgrStoryRequirement sHoennRoxanne[] =
+    {
+        { PGW_START_HOENN, PGR_HOENN_STORY_COMPLETED_WALLY_CATCHING_TUTORIAL },
+    };
+    static const struct PgrStoryRequirement sHoennBrawly[] =
+    {
+        { PGW_START_HOENN, PGR_HOENN_STORY_COMPLETED_WALLY_CATCHING_TUTORIAL },
+    };
+    static const struct PgrStoryRequirement sHoennWallyCatchingTutorial[] =
+    {
+        { PGW_START_HOENN, PGR_HOENN_STORY_RECEIVED_RUNNING_SHOES },
+    };
+    static const struct PgrStoryRequirement sHoennDevonTheft[] =
+    {
+        { PGW_START_HOENN, PGR_HOENN_STORY_DEFEATED_ROXANNE },
+    };
+    static const struct PgrStoryRequirement sHoennDevonRecovery[] =
+    {
+        { PGW_START_HOENN, PGR_HOENN_STORY_DEVON_GOODS_STOLEN },
+    };
+    static const struct PgrStoryRequirement sHoennDevonReturn[] =
+    {
+        { PGW_START_HOENN, PGR_HOENN_STORY_RECOVERED_DEVON_GOODS },
+    };
+    static const struct PgrStoryRequirement sHoennDevonCommissions[] =
+    {
+        { PGW_START_HOENN, PGR_HOENN_STORY_RETURNED_DEVON_GOODS },
+    };
+    static const struct PgrStoryRequirement sHoennStevenLetter[] =
+    {
+        { PGW_START_HOENN, PGR_HOENN_STORY_RECEIVED_DEVON_COMMISSIONS },
+    };
+    static const struct PgrStoryRequirement sHoennDock[] =
+    {
+        { PGW_START_HOENN, PGR_HOENN_STORY_DELIVERED_STEVEN_LETTER },
+    };
+    static const struct PgrStoryRequirement sHoennStern[] =
+    {
+        { PGW_START_HOENN, PGR_HOENN_STORY_DOCK_DIRECTED_TO_STERN },
+    };
+    static const struct PgrStoryRequirement sHoennRoute110Rival[] =
+    {
+        { PGW_START_HOENN, PGR_HOENN_STORY_DELIVERED_DEVON_GOODS },
+    };
+    static const struct PgrStoryRequirement sHoennWallyMauville[] =
+    {
+        { PGW_START_HOENN, PGR_HOENN_STORY_DEFEATED_RIVAL_ROUTE_110 },
+    };
+    static const struct PgrStoryRequirement sHoennWattson[] =
+    {
+        { PGW_START_HOENN, PGR_HOENN_STORY_DEFEATED_WALLY_MAUVILLE },
+    };
+    static const struct PgrStoryRequirement sHoennMeteoriteTheft[] =
+    {
+        { PGW_START_HOENN, PGR_HOENN_STORY_DEFEATED_WATTSON },
+    };
+    static const struct PgrStoryRequirement sHoennMaxieMtChimney[] =
+    {
+        { PGW_START_HOENN, PGR_HOENN_STORY_WITNESSED_METEORITE_THEFT },
+    };
+    static const struct PgrStoryRequirement sHoennFlannery[] =
+    {
+        { PGW_START_HOENN, PGR_HOENN_STORY_DEFEATED_MAXIE_MT_CHIMNEY },
+    };
+    static const struct PgrStoryRequirement sHoennGoGoggles[] =
+    {
+        { PGW_START_HOENN, PGR_HOENN_STORY_DEFEATED_FLANNERY },
+    };
+    static const struct PgrStoryRequirement sHoennNorman[] =
+    {
+        { PGW_START_HOENN, PGR_HOENN_STORY_RECEIVED_GO_GOGGLES },
+    };
+    static const struct PgrStoryRequirement sHoennStevenRoute118[] =
+    {
+        { PGW_START_HOENN, PGR_HOENN_STORY_DEFEATED_NORMAN },
+    };
+    static const struct PgrStoryRequirement sHoennWeatherInstitute[] =
+    {
+        { PGW_START_HOENN, PGR_HOENN_STORY_MET_STEVEN_ROUTE_118 },
+    };
+    static const struct PgrStoryRequirement sHoennRoute119Rival[] =
+    {
+        { PGW_START_HOENN, PGR_HOENN_STORY_CLEARED_WEATHER_INSTITUTE },
+    };
+    static const struct PgrStoryRequirement sHoennDevonScope[] =
+    {
+        { PGW_START_HOENN, PGR_HOENN_STORY_DEFEATED_RIVAL_ROUTE_119 },
+    };
+    static const struct PgrStoryRequirement sHoennFortreeGymPath[] =
+    {
+        { PGW_START_HOENN, PGR_HOENN_STORY_RECEIVED_DEVON_SCOPE },
+    };
+    static const struct PgrStoryRequirement sHoennWinona[] =
+    {
+        { PGW_START_HOENN, PGR_HOENN_STORY_CLEARED_FORTREE_GYM_PATH },
+    };
+    static const struct PgrStoryRequirement sHoennMtPyreOrbTheft[] =
+    {
+        { PGW_START_HOENN, PGR_HOENN_STORY_DEFEATED_WINONA },
+    };
+    static const struct PgrStoryRequirement sHoennMagmaHideout[] =
+    {
+        { PGW_START_HOENN, PGR_HOENN_STORY_WITNESSED_MT_PYRE_ORB_THEFT },
+    };
+    static const struct PgrStoryRequirement sHoennSubmarineTheft[] =
+    {
+        { PGW_START_HOENN, PGR_HOENN_STORY_AWAKENED_GROUDON_MAGMA_HIDEOUT },
+    };
+    static const struct PgrStoryRequirement sHoennAquaHideout[] =
+    {
+        { PGW_START_HOENN, PGR_HOENN_STORY_WITNESSED_SUBMARINE_THEFT },
+    };
+    static const struct PgrStoryRequirement sHoennTateLiza[] =
+    {
+        { PGW_START_HOENN, PGR_HOENN_STORY_CLEARED_AQUA_HIDEOUT },
+    };
+    static const struct PgrStoryRequirement sHoennMossdeepSpaceCenter[] =
+    {
+        { PGW_START_HOENN, PGR_HOENN_STORY_DEFEATED_TATE_LIZA },
+    };
+    static const struct PgrStoryRequirement sHoennMossdeepScott[] =
+    {
+        { PGW_START_HOENN, PGR_HOENN_STORY_DEFEATED_TATE_LIZA },
+    };
+    static const struct PgrStoryRequirement sHoennDiveFromSteven[] =
+    {
+        { PGW_START_HOENN, PGR_HOENN_STORY_CLEARED_MOSSDEEP_SPACE_CENTER },
+    };
+    static const struct PgrStoryRequirement sHoennSeafloorCavern[] =
+    {
+        { PGW_START_HOENN, PGR_HOENN_STORY_RECEIVED_DIVE_FROM_STEVEN },
+    };
+    static const struct PgrStoryRequirement sHoennSootopolisCrisis[] =
+    {
+        { PGW_START_HOENN, PGR_HOENN_STORY_AWAKENED_KYOGRE_SEAFLOOR_CAVERN },
+    };
+    static const struct PgrStoryRequirement sHoennWallaceRayquaza[] =
+    {
+        { PGW_START_HOENN, PGR_HOENN_STORY_WITNESSED_SOOTOPOLIS_CRISIS },
+    };
+    static const struct PgrStoryRequirement sHoennSkyPillarOpening[] =
+    {
+        { PGW_START_HOENN, PGR_HOENN_STORY_SENT_WALLACE_TO_SKY_PILLAR },
+    };
+    static const struct PgrStoryRequirement sHoennRayquazaAwakening[] =
+    {
+        { PGW_START_HOENN, PGR_HOENN_STORY_OPENED_SKY_PILLAR },
+    };
+    static const struct PgrStoryRequirement sHoennSootopolisResolution[] =
+    {
+        { PGW_START_HOENN, PGR_HOENN_STORY_AWAKENED_RAYQUAZA },
+    };
+    static const struct PgrStoryRequirement sHoennWaterfallFromWallace[] =
+    {
+        { PGW_START_HOENN, PGR_HOENN_STORY_RESOLVED_SOOTOPOLIS_CRISIS },
+    };
+    static const struct PgrStoryRequirement sHoennJuan[] =
+    {
+        { PGW_START_HOENN, PGR_HOENN_STORY_RECEIVED_WATERFALL_FROM_WALLACE },
+    };
+    static const struct PgrStoryRequirement sHoennWallyVictoryRoad[] =
+    {
+        { PGW_START_HOENN, PGR_HOENN_STORY_DEFEATED_JUAN },
+    };
+    static const struct PgrStoryRequirement sHoennLeagueEntry[] =
+    {
+        { PGW_START_HOENN, PGR_HOENN_STORY_DEFEATED_WALLY_VICTORY_ROAD },
+        { PGW_START_HOENN, PGR_HOENN_STORY_DEFEATED_BRAWLY },
+    };
+    static const struct PgrStoryRequirement sHoennSidney[] =
+    {
+        { PGW_START_HOENN, PGR_HOENN_STORY_ENTERED_POKEMON_LEAGUE },
+    };
+    static const struct PgrStoryRequirement sHoennPhoebe[] =
+    {
+        { PGW_START_HOENN, PGR_HOENN_STORY_DEFEATED_SIDNEY },
+    };
+    static const struct PgrStoryRequirement sHoennGlacia[] =
+    {
+        { PGW_START_HOENN, PGR_HOENN_STORY_DEFEATED_PHOEBE },
+    };
+    static const struct PgrStoryRequirement sHoennDrake[] =
+    {
+        { PGW_START_HOENN, PGR_HOENN_STORY_DEFEATED_GLACIA },
+    };
+    static const struct PgrStoryRequirement sHoennChampion[] =
+    {
+        { PGW_START_HOENN, PGR_HOENN_STORY_DEFEATED_DRAKE },
+    };
+    static const struct PgrStoryRequirement sHoennPostgameResearchUpdate[] =
+    {
+        { PGW_START_HOENN, PGR_HOENN_STORY_BECAME_CHAMPION },
+    };
+    static const struct PgrStoryRequirement sHoennSSTicket[] =
+    {
+        { PGW_START_HOENN, PGR_HOENN_STORY_BECAME_CHAMPION },
+    };
+    static const struct PgrStoryRequirement sHoennSSTidalScott[] =
+    {
+        { PGW_START_HOENN, PGR_HOENN_STORY_COMPLETED_POSTGAME_RESEARCH_UPDATE },
+        { PGW_START_HOENN, PGR_HOENN_STORY_RECEIVED_SS_TICKET },
+    };
+    static const struct PgrStoryRequirement sHoennBattleFrontierReception[] =
+    {
+        { PGW_START_HOENN, PGR_HOENN_STORY_MET_SCOTT_SS_TIDAL },
+    };
+    static const struct PgrStoryRequirement sHoennScottFrontierWelcome[] =
+    {
+        { PGW_START_HOENN, PGR_HOENN_STORY_ENTERED_BATTLE_FRONTIER },
+    };
+    static const struct PgrStoryRequirement sHoennMeteorFallsSteven[] =
+    {
+        { PGW_START_HOENN, PGR_HOENN_STORY_BECAME_CHAMPION },
+    };
 
     *requirements = NULL;
     *count = 0;
@@ -312,6 +761,218 @@ static bool32 GetRegisteredRequirements(enum PgwStartingRegion region, u16 event
     case PGR_HOENN_STORY_RECEIVED_RUNNING_SHOES:
         *requirements = sHoennShoes;
         *count = ARRAY_COUNT(sHoennShoes);
+        return TRUE;
+    case PGR_HOENN_STORY_COMPLETED_WALLY_CATCHING_TUTORIAL:
+        *requirements = sHoennWallyCatchingTutorial;
+        *count = ARRAY_COUNT(sHoennWallyCatchingTutorial);
+        return TRUE;
+    case PGR_HOENN_STORY_DEFEATED_ROXANNE:
+        *requirements = sHoennRoxanne;
+        *count = ARRAY_COUNT(sHoennRoxanne);
+        return TRUE;
+    case PGR_HOENN_STORY_DEFEATED_BRAWLY:
+        *requirements = sHoennBrawly;
+        *count = ARRAY_COUNT(sHoennBrawly);
+        return TRUE;
+    case PGR_HOENN_STORY_DEVON_GOODS_STOLEN:
+        *requirements = sHoennDevonTheft;
+        *count = ARRAY_COUNT(sHoennDevonTheft);
+        return TRUE;
+    case PGR_HOENN_STORY_RECOVERED_DEVON_GOODS:
+        *requirements = sHoennDevonRecovery;
+        *count = ARRAY_COUNT(sHoennDevonRecovery);
+        return TRUE;
+    case PGR_HOENN_STORY_RETURNED_DEVON_GOODS:
+        *requirements = sHoennDevonReturn;
+        *count = ARRAY_COUNT(sHoennDevonReturn);
+        return TRUE;
+    case PGR_HOENN_STORY_RECEIVED_DEVON_COMMISSIONS:
+        *requirements = sHoennDevonCommissions;
+        *count = ARRAY_COUNT(sHoennDevonCommissions);
+        return TRUE;
+    case PGR_HOENN_STORY_DELIVERED_STEVEN_LETTER:
+        *requirements = sHoennStevenLetter;
+        *count = ARRAY_COUNT(sHoennStevenLetter);
+        return TRUE;
+    case PGR_HOENN_STORY_DOCK_DIRECTED_TO_STERN:
+        *requirements = sHoennDock;
+        *count = ARRAY_COUNT(sHoennDock);
+        return TRUE;
+    case PGR_HOENN_STORY_DELIVERED_DEVON_GOODS:
+        *requirements = sHoennStern;
+        *count = ARRAY_COUNT(sHoennStern);
+        return TRUE;
+    case PGR_HOENN_STORY_DEFEATED_RIVAL_ROUTE_110:
+        *requirements = sHoennRoute110Rival;
+        *count = ARRAY_COUNT(sHoennRoute110Rival);
+        return TRUE;
+    case PGR_HOENN_STORY_DEFEATED_WALLY_MAUVILLE:
+        *requirements = sHoennWallyMauville;
+        *count = ARRAY_COUNT(sHoennWallyMauville);
+        return TRUE;
+    case PGR_HOENN_STORY_DEFEATED_WATTSON:
+        *requirements = sHoennWattson;
+        *count = ARRAY_COUNT(sHoennWattson);
+        return TRUE;
+    case PGR_HOENN_STORY_WITNESSED_METEORITE_THEFT:
+        *requirements = sHoennMeteoriteTheft;
+        *count = ARRAY_COUNT(sHoennMeteoriteTheft);
+        return TRUE;
+    case PGR_HOENN_STORY_DEFEATED_MAXIE_MT_CHIMNEY:
+        *requirements = sHoennMaxieMtChimney;
+        *count = ARRAY_COUNT(sHoennMaxieMtChimney);
+        return TRUE;
+    case PGR_HOENN_STORY_DEFEATED_FLANNERY:
+        *requirements = sHoennFlannery;
+        *count = ARRAY_COUNT(sHoennFlannery);
+        return TRUE;
+    case PGR_HOENN_STORY_RECEIVED_GO_GOGGLES:
+        *requirements = sHoennGoGoggles;
+        *count = ARRAY_COUNT(sHoennGoGoggles);
+        return TRUE;
+    case PGR_HOENN_STORY_DEFEATED_NORMAN:
+        *requirements = sHoennNorman;
+        *count = ARRAY_COUNT(sHoennNorman);
+        return TRUE;
+    case PGR_HOENN_STORY_MET_STEVEN_ROUTE_118:
+        *requirements = sHoennStevenRoute118;
+        *count = ARRAY_COUNT(sHoennStevenRoute118);
+        return TRUE;
+    case PGR_HOENN_STORY_CLEARED_WEATHER_INSTITUTE:
+        *requirements = sHoennWeatherInstitute;
+        *count = ARRAY_COUNT(sHoennWeatherInstitute);
+        return TRUE;
+    case PGR_HOENN_STORY_DEFEATED_RIVAL_ROUTE_119:
+        *requirements = sHoennRoute119Rival;
+        *count = ARRAY_COUNT(sHoennRoute119Rival);
+        return TRUE;
+    case PGR_HOENN_STORY_RECEIVED_DEVON_SCOPE:
+        *requirements = sHoennDevonScope;
+        *count = ARRAY_COUNT(sHoennDevonScope);
+        return TRUE;
+    case PGR_HOENN_STORY_CLEARED_FORTREE_GYM_PATH:
+        *requirements = sHoennFortreeGymPath;
+        *count = ARRAY_COUNT(sHoennFortreeGymPath);
+        return TRUE;
+    case PGR_HOENN_STORY_DEFEATED_WINONA:
+        *requirements = sHoennWinona;
+        *count = ARRAY_COUNT(sHoennWinona);
+        return TRUE;
+    case PGR_HOENN_STORY_WITNESSED_MT_PYRE_ORB_THEFT:
+        *requirements = sHoennMtPyreOrbTheft;
+        *count = ARRAY_COUNT(sHoennMtPyreOrbTheft);
+        return TRUE;
+    case PGR_HOENN_STORY_AWAKENED_GROUDON_MAGMA_HIDEOUT:
+        *requirements = sHoennMagmaHideout;
+        *count = ARRAY_COUNT(sHoennMagmaHideout);
+        return TRUE;
+    case PGR_HOENN_STORY_WITNESSED_SUBMARINE_THEFT:
+        *requirements = sHoennSubmarineTheft;
+        *count = ARRAY_COUNT(sHoennSubmarineTheft);
+        return TRUE;
+    case PGR_HOENN_STORY_CLEARED_AQUA_HIDEOUT:
+        *requirements = sHoennAquaHideout;
+        *count = ARRAY_COUNT(sHoennAquaHideout);
+        return TRUE;
+    case PGR_HOENN_STORY_DEFEATED_TATE_LIZA:
+        *requirements = sHoennTateLiza;
+        *count = ARRAY_COUNT(sHoennTateLiza);
+        return TRUE;
+    case PGR_HOENN_STORY_CLEARED_MOSSDEEP_SPACE_CENTER:
+        *requirements = sHoennMossdeepSpaceCenter;
+        *count = ARRAY_COUNT(sHoennMossdeepSpaceCenter);
+        return TRUE;
+    case PGR_HOENN_STORY_MET_SCOTT_MOSSDEEP:
+        *requirements = sHoennMossdeepScott;
+        *count = ARRAY_COUNT(sHoennMossdeepScott);
+        return TRUE;
+    case PGR_HOENN_STORY_RECEIVED_DIVE_FROM_STEVEN:
+        *requirements = sHoennDiveFromSteven;
+        *count = ARRAY_COUNT(sHoennDiveFromSteven);
+        return TRUE;
+    case PGR_HOENN_STORY_AWAKENED_KYOGRE_SEAFLOOR_CAVERN:
+        *requirements = sHoennSeafloorCavern;
+        *count = ARRAY_COUNT(sHoennSeafloorCavern);
+        return TRUE;
+    case PGR_HOENN_STORY_WITNESSED_SOOTOPOLIS_CRISIS:
+        *requirements = sHoennSootopolisCrisis;
+        *count = ARRAY_COUNT(sHoennSootopolisCrisis);
+        return TRUE;
+    case PGR_HOENN_STORY_SENT_WALLACE_TO_SKY_PILLAR:
+        *requirements = sHoennWallaceRayquaza;
+        *count = ARRAY_COUNT(sHoennWallaceRayquaza);
+        return TRUE;
+    case PGR_HOENN_STORY_OPENED_SKY_PILLAR:
+        *requirements = sHoennSkyPillarOpening;
+        *count = ARRAY_COUNT(sHoennSkyPillarOpening);
+        return TRUE;
+    case PGR_HOENN_STORY_AWAKENED_RAYQUAZA:
+        *requirements = sHoennRayquazaAwakening;
+        *count = ARRAY_COUNT(sHoennRayquazaAwakening);
+        return TRUE;
+    case PGR_HOENN_STORY_RESOLVED_SOOTOPOLIS_CRISIS:
+        *requirements = sHoennSootopolisResolution;
+        *count = ARRAY_COUNT(sHoennSootopolisResolution);
+        return TRUE;
+    case PGR_HOENN_STORY_RECEIVED_WATERFALL_FROM_WALLACE:
+        *requirements = sHoennWaterfallFromWallace;
+        *count = ARRAY_COUNT(sHoennWaterfallFromWallace);
+        return TRUE;
+    case PGR_HOENN_STORY_DEFEATED_JUAN:
+        *requirements = sHoennJuan;
+        *count = ARRAY_COUNT(sHoennJuan);
+        return TRUE;
+    case PGR_HOENN_STORY_DEFEATED_WALLY_VICTORY_ROAD:
+        *requirements = sHoennWallyVictoryRoad;
+        *count = ARRAY_COUNT(sHoennWallyVictoryRoad);
+        return TRUE;
+    case PGR_HOENN_STORY_ENTERED_POKEMON_LEAGUE:
+        *requirements = sHoennLeagueEntry;
+        *count = ARRAY_COUNT(sHoennLeagueEntry);
+        return TRUE;
+    case PGR_HOENN_STORY_DEFEATED_SIDNEY:
+        *requirements = sHoennSidney;
+        *count = ARRAY_COUNT(sHoennSidney);
+        return TRUE;
+    case PGR_HOENN_STORY_DEFEATED_PHOEBE:
+        *requirements = sHoennPhoebe;
+        *count = ARRAY_COUNT(sHoennPhoebe);
+        return TRUE;
+    case PGR_HOENN_STORY_DEFEATED_GLACIA:
+        *requirements = sHoennGlacia;
+        *count = ARRAY_COUNT(sHoennGlacia);
+        return TRUE;
+    case PGR_HOENN_STORY_DEFEATED_DRAKE:
+        *requirements = sHoennDrake;
+        *count = ARRAY_COUNT(sHoennDrake);
+        return TRUE;
+    case PGR_HOENN_STORY_BECAME_CHAMPION:
+        *requirements = sHoennChampion;
+        *count = ARRAY_COUNT(sHoennChampion);
+        return TRUE;
+    case PGR_HOENN_STORY_COMPLETED_POSTGAME_RESEARCH_UPDATE:
+        *requirements = sHoennPostgameResearchUpdate;
+        *count = ARRAY_COUNT(sHoennPostgameResearchUpdate);
+        return TRUE;
+    case PGR_HOENN_STORY_RECEIVED_SS_TICKET:
+        *requirements = sHoennSSTicket;
+        *count = ARRAY_COUNT(sHoennSSTicket);
+        return TRUE;
+    case PGR_HOENN_STORY_MET_SCOTT_SS_TIDAL:
+        *requirements = sHoennSSTidalScott;
+        *count = ARRAY_COUNT(sHoennSSTidalScott);
+        return TRUE;
+    case PGR_HOENN_STORY_ENTERED_BATTLE_FRONTIER:
+        *requirements = sHoennBattleFrontierReception;
+        *count = ARRAY_COUNT(sHoennBattleFrontierReception);
+        return TRUE;
+    case PGR_HOENN_STORY_RECEIVED_SCOTT_FRONTIER_WELCOME:
+        *requirements = sHoennScottFrontierWelcome;
+        *count = ARRAY_COUNT(sHoennScottFrontierWelcome);
+        return TRUE;
+    case PGR_HOENN_STORY_DEFEATED_STEVEN_METEOR_FALLS:
+        *requirements = sHoennMeteorFallsSteven;
+        *count = ARRAY_COUNT(sHoennMeteorFallsSteven);
         return TRUE;
     default:
         return FALSE;
@@ -432,6 +1093,127 @@ void PgrProgress_OnLegacyFlagSet(u16 flagId)
     case FLAG_RECEIVED_RUNNING_SHOES:
         PgrProgress_TryCompleteRegisteredStoryEvent(PGW_START_HOENN, PGR_HOENN_STORY_RECEIVED_RUNNING_SHOES);
         break;
+    case FLAG_RECEIVED_EXP_SHARE:
+        PgrProgress_MarkRewardClaimed(PGR_REWARD_GLOBAL, PGW_START_HOENN, PGR_REWARD_EXP_SHARE);
+        break;
+    case FLAG_DEFEATED_RUSTBORO_GYM:
+        PgrProgress_TryCompleteRegisteredStoryEvent(PGW_START_HOENN, PGR_HOENN_STORY_DEFEATED_ROXANNE);
+        break;
+    case FLAG_DEFEATED_DEWFORD_GYM:
+        PgrProgress_TryCompleteRegisteredStoryEvent(PGW_START_HOENN, PGR_HOENN_STORY_DEFEATED_BRAWLY);
+        break;
+    case FLAG_DEVON_GOODS_STOLEN:
+        PgrProgress_TryCompleteRegisteredStoryEvent(PGW_START_HOENN, PGR_HOENN_STORY_DEVON_GOODS_STOLEN);
+        break;
+    case FLAG_RECOVERED_DEVON_GOODS:
+        PgrProgress_TryCompleteRegisteredStoryEvent(PGW_START_HOENN, PGR_HOENN_STORY_RECOVERED_DEVON_GOODS);
+        break;
+    case FLAG_RETURNED_DEVON_GOODS:
+        PgrProgress_TryCompleteRegisteredStoryEvent(PGW_START_HOENN, PGR_HOENN_STORY_RETURNED_DEVON_GOODS);
+        break;
+    case FLAG_RECEIVED_POKENAV:
+        PgrProgress_TryCompleteRegisteredStoryEvent(PGW_START_HOENN, PGR_HOENN_STORY_RECEIVED_DEVON_COMMISSIONS);
+        break;
+    case FLAG_DELIVERED_STEVEN_LETTER:
+        PgrProgress_TryCompleteRegisteredStoryEvent(PGW_START_HOENN, PGR_HOENN_STORY_DELIVERED_STEVEN_LETTER);
+        break;
+    case FLAG_DOCK_REJECTED_DEVON_GOODS:
+        PgrProgress_TryCompleteRegisteredStoryEvent(PGW_START_HOENN, PGR_HOENN_STORY_DOCK_DIRECTED_TO_STERN);
+        break;
+    case FLAG_DELIVERED_DEVON_GOODS:
+        PgrProgress_TryCompleteRegisteredStoryEvent(PGW_START_HOENN, PGR_HOENN_STORY_DELIVERED_DEVON_GOODS);
+        break;
+    case FLAG_DEFEATED_WALLY_MAUVILLE:
+        PgrProgress_TryCompleteRegisteredStoryEvent(PGW_START_HOENN, PGR_HOENN_STORY_DEFEATED_WALLY_MAUVILLE);
+        break;
+    case FLAG_DEFEATED_MAUVILLE_GYM:
+        PgrProgress_TryCompleteRegisteredStoryEvent(PGW_START_HOENN, PGR_HOENN_STORY_DEFEATED_WATTSON);
+        break;
+    case FLAG_MET_ARCHIE_METEOR_FALLS:
+        PgrProgress_TryCompleteRegisteredStoryEvent(PGW_START_HOENN, PGR_HOENN_STORY_WITNESSED_METEORITE_THEFT);
+        break;
+    case FLAG_DEFEATED_EVIL_TEAM_MT_CHIMNEY:
+        PgrProgress_TryCompleteRegisteredStoryEvent(PGW_START_HOENN, PGR_HOENN_STORY_DEFEATED_MAXIE_MT_CHIMNEY);
+        break;
+    case FLAG_DEFEATED_LAVARIDGE_GYM:
+        PgrProgress_TryCompleteRegisteredStoryEvent(PGW_START_HOENN, PGR_HOENN_STORY_DEFEATED_FLANNERY);
+        break;
+    case FLAG_RECEIVED_GO_GOGGLES:
+        PgrProgress_TryCompleteRegisteredStoryEvent(PGW_START_HOENN, PGR_HOENN_STORY_RECEIVED_GO_GOGGLES);
+        break;
+    case FLAG_DEFEATED_PETALBURG_GYM:
+        PgrProgress_TryCompleteRegisteredStoryEvent(PGW_START_HOENN, PGR_HOENN_STORY_DEFEATED_NORMAN);
+        break;
+    case FLAG_RECEIVED_DEVON_SCOPE:
+        PgrProgress_TryCompleteRegisteredStoryEvent(PGW_START_HOENN, PGR_HOENN_STORY_RECEIVED_DEVON_SCOPE);
+        break;
+    case FLAG_KECLEON_FLED_FORTREE:
+        PgrProgress_TryCompleteRegisteredStoryEvent(PGW_START_HOENN, PGR_HOENN_STORY_CLEARED_FORTREE_GYM_PATH);
+        break;
+    case FLAG_DEFEATED_FORTREE_GYM:
+        PgrProgress_TryCompleteRegisteredStoryEvent(PGW_START_HOENN, PGR_HOENN_STORY_DEFEATED_WINONA);
+        break;
+    case FLAG_RECEIVED_RED_OR_BLUE_ORB:
+        PgrProgress_TryCompleteRegisteredStoryEvent(PGW_START_HOENN, PGR_HOENN_STORY_WITNESSED_MT_PYRE_ORB_THEFT);
+        break;
+    case FLAG_GROUDON_AWAKENED_MAGMA_HIDEOUT:
+        PgrProgress_TryCompleteRegisteredStoryEvent(PGW_START_HOENN, PGR_HOENN_STORY_AWAKENED_GROUDON_MAGMA_HIDEOUT);
+        break;
+    case FLAG_MET_TEAM_AQUA_HARBOR:
+        PgrProgress_TryCompleteRegisteredStoryEvent(PGW_START_HOENN, PGR_HOENN_STORY_WITNESSED_SUBMARINE_THEFT);
+        break;
+    case FLAG_TEAM_AQUA_ESCAPED_IN_SUBMARINE:
+        PgrProgress_TryCompleteRegisteredStoryEvent(PGW_START_HOENN, PGR_HOENN_STORY_CLEARED_AQUA_HIDEOUT);
+        break;
+    case FLAG_DEFEATED_MOSSDEEP_GYM:
+        PgrProgress_TryCompleteRegisteredStoryEvent(PGW_START_HOENN, PGR_HOENN_STORY_DEFEATED_TATE_LIZA);
+        break;
+    case FLAG_DEFEATED_MAGMA_SPACE_CENTER:
+        PgrProgress_TryCompleteRegisteredStoryEvent(PGW_START_HOENN, PGR_HOENN_STORY_CLEARED_MOSSDEEP_SPACE_CENTER);
+        break;
+    case FLAG_KYOGRE_ESCAPED_SEAFLOOR_CAVERN:
+        PgrProgress_TryCompleteRegisteredStoryEvent(PGW_START_HOENN, PGR_HOENN_STORY_AWAKENED_KYOGRE_SEAFLOOR_CAVERN);
+        break;
+    case FLAG_DEFEATED_SOOTOPOLIS_GYM:
+        PgrProgress_TryCompleteRegisteredStoryEvent(PGW_START_HOENN, PGR_HOENN_STORY_DEFEATED_JUAN);
+        break;
+    case FLAG_DEFEATED_WALLY_VICTORY_ROAD:
+        PgrProgress_TryCompleteRegisteredStoryEvent(PGW_START_HOENN, PGR_HOENN_STORY_DEFEATED_WALLY_VICTORY_ROAD);
+        break;
+    case FLAG_ENTERED_ELITE_FOUR:
+        PgrProgress_TryCompleteRegisteredStoryEvent(PGW_START_HOENN, PGR_HOENN_STORY_ENTERED_POKEMON_LEAGUE);
+        break;
+    case FLAG_DEFEATED_ELITE_4_SIDNEY:
+        PgrProgress_TryCompleteRegisteredStoryEvent(PGW_START_HOENN, PGR_HOENN_STORY_DEFEATED_SIDNEY);
+        break;
+    case FLAG_DEFEATED_ELITE_4_PHOEBE:
+        PgrProgress_TryCompleteRegisteredStoryEvent(PGW_START_HOENN, PGR_HOENN_STORY_DEFEATED_PHOEBE);
+        break;
+    case FLAG_DEFEATED_ELITE_4_GLACIA:
+        PgrProgress_TryCompleteRegisteredStoryEvent(PGW_START_HOENN, PGR_HOENN_STORY_DEFEATED_GLACIA);
+        break;
+    case FLAG_DEFEATED_ELITE_4_DRAKE:
+        PgrProgress_TryCompleteRegisteredStoryEvent(PGW_START_HOENN, PGR_HOENN_STORY_DEFEATED_DRAKE);
+        break;
+    case FLAG_IS_CHAMPION:
+    case FLAG_SYS_GAME_CLEAR:
+        PgrProgress_TryCompleteRegisteredStoryEvent(PGW_START_HOENN, PGR_HOENN_STORY_BECAME_CHAMPION);
+        break;
+    case FLAG_RECEIVED_SS_TICKET:
+        PgrProgress_TryCompleteRegisteredStoryEvent(PGW_START_HOENN, PGR_HOENN_STORY_RECEIVED_SS_TICKET);
+        break;
+    case FLAG_MET_SCOTT_ON_SS_TIDAL:
+        PgrProgress_TryCompleteRegisteredStoryEvent(PGW_START_HOENN, PGR_HOENN_STORY_MET_SCOTT_SS_TIDAL);
+        break;
+    case FLAG_SYS_FRONTIER_PASS:
+        PgrProgress_TryCompleteRegisteredStoryEvent(PGW_START_HOENN, PGR_HOENN_STORY_ENTERED_BATTLE_FRONTIER);
+        break;
+    case FLAG_SCOTT_GIVES_BATTLE_POINTS:
+        PgrProgress_TryCompleteRegisteredStoryEvent(PGW_START_HOENN, PGR_HOENN_STORY_RECEIVED_SCOTT_FRONTIER_WELCOME);
+        break;
+    case FLAG_DEFEATED_METEOR_FALLS_STEVEN:
+        PgrProgress_TryCompleteRegisteredStoryEvent(PGW_START_HOENN, PGR_HOENN_STORY_DEFEATED_STEVEN_METEOR_FALLS);
+        break;
     }
 }
 
@@ -446,6 +1228,677 @@ void PgrProgress_ScriptCheckHoennShoes(void)
 {
     gSpecialVar_Result = FlagGet(FLAG_RECEIVED_POKEDEX_FROM_BIRCH)
         && PgrProgress_CanStartRegisteredStoryEvent(PGW_START_HOENN, PGR_HOENN_STORY_RECEIVED_RUNNING_SHOES);
+}
+
+void PgrProgress_ScriptCheckHoennWallyCatchingTutorial(void)
+{
+    gSpecialVar_Result = PgrProgress_CanStartRegisteredStoryEvent(
+        PGW_START_HOENN, PGR_HOENN_STORY_COMPLETED_WALLY_CATCHING_TUTORIAL);
+}
+
+void PgrProgress_ScriptCompleteHoennWallyCatchingTutorial(void)
+{
+    gSpecialVar_Result = PgrProgress_TryCompleteRegisteredStoryEvent(
+        PGW_START_HOENN, PGR_HOENN_STORY_COMPLETED_WALLY_CATCHING_TUTORIAL);
+}
+
+void PgrProgress_ScriptGetHoennPetalburgScottOpportunity(void)
+{
+    if (VarGet(VAR_SCOTT_PETALBURG_ENCOUNTER) != 0
+     || PgrProgress_IsStoryEventComplete(
+            PGW_START_HOENN, PGR_HOENN_STORY_DEFEATED_ROXANNE))
+        gSpecialVar_Result = 2; // Expired or already completed.
+    else if (PgrProgress_IsStoryEventComplete(
+            PGW_START_HOENN, PGR_HOENN_STORY_COMPLETED_WALLY_CATCHING_TUTORIAL))
+        gSpecialVar_Result = 1; // Available.
+    else
+        gSpecialVar_Result = 0; // Not available yet.
+}
+
+void PgrProgress_ScriptShouldShowHoennRustboroSchoolScott(void)
+{
+    gSpecialVar_Result = VarGet(VAR_SCOTT_PETALBURG_ENCOUNTER) != 0
+        && !PgrProgress_IsStoryEventComplete(
+            PGW_START_HOENN, PGR_HOENN_STORY_RECEIVED_DEVON_COMMISSIONS);
+}
+
+void PgrProgress_ScriptCheckHoennRoxanne(void)
+{
+    gSpecialVar_Result = PgrProgress_CanStartRegisteredStoryEvent(
+        PGW_START_HOENN, PGR_HOENN_STORY_DEFEATED_ROXANNE);
+}
+
+void PgrProgress_ScriptCheckHoennBrawly(void)
+{
+    gSpecialVar_Result = PgrProgress_CanStartRegisteredStoryEvent(
+        PGW_START_HOENN, PGR_HOENN_STORY_DEFEATED_BRAWLY);
+}
+
+void PgrProgress_ScriptCheckHoennDevonGoodsTheft(void)
+{
+    gSpecialVar_Result = PgrProgress_CanStartRegisteredStoryEvent(
+        PGW_START_HOENN, PGR_HOENN_STORY_DEVON_GOODS_STOLEN);
+}
+
+void PgrProgress_ScriptCheckHoennDevonGoodsRecovery(void)
+{
+    gSpecialVar_Result = PgrProgress_CanStartRegisteredStoryEvent(
+        PGW_START_HOENN, PGR_HOENN_STORY_RECOVERED_DEVON_GOODS);
+}
+
+void PgrProgress_ScriptCheckHoennDevonGoodsReturn(void)
+{
+    gSpecialVar_Result = PgrProgress_CanStartRegisteredStoryEvent(
+        PGW_START_HOENN, PGR_HOENN_STORY_RETURNED_DEVON_GOODS);
+}
+
+void PgrProgress_ScriptShouldShowHoennRustboroRival(void)
+{
+    gSpecialVar_Result = PgrProgress_IsStoryEventComplete(
+            PGW_START_HOENN, PGR_HOENN_STORY_RECEIVED_DEVON_COMMISSIONS)
+        && !PgrProgress_IsStoryEventComplete(
+            PGW_START_HOENN, PGR_HOENN_STORY_DELIVERED_STEVEN_LETTER)
+        && !PgrProgress_IsStoryEventComplete(
+            PGW_START_HOENN, PGR_HOENN_STORY_DELIVERED_DEVON_GOODS)
+        && VarGet(VAR_ROUTE104_STATE) < 2
+        && VarGet(VAR_BOARD_BRINEY_BOAT_STATE) < 1;
+}
+
+void PgrProgress_ScriptCanMeetHoennRoute104Rival(void)
+{
+    gSpecialVar_Result = PgrProgress_IsStoryEventComplete(
+            PGW_START_HOENN, PGR_HOENN_STORY_RECEIVED_DEVON_COMMISSIONS)
+        && !PgrProgress_IsStoryEventComplete(
+            PGW_START_HOENN, PGR_HOENN_STORY_DELIVERED_STEVEN_LETTER)
+        && !PgrProgress_IsStoryEventComplete(
+            PGW_START_HOENN, PGR_HOENN_STORY_DELIVERED_DEVON_GOODS)
+        && VarGet(VAR_BOARD_BRINEY_BOAT_STATE) < 1;
+}
+
+void PgrProgress_ScriptCheckHoennStevenLetter(void)
+{
+    gSpecialVar_Result = CheckBagHasItem(ITEM_LETTER, 1)
+        && PgrProgress_CanStartRegisteredStoryEvent(
+            PGW_START_HOENN, PGR_HOENN_STORY_DELIVERED_STEVEN_LETTER);
+}
+
+void PgrProgress_ScriptCheckHoennDock(void)
+{
+    gSpecialVar_Result = CheckBagHasItem(ITEM_DEVON_PARTS, 1)
+        && PgrProgress_CanStartRegisteredStoryEvent(
+            PGW_START_HOENN, PGR_HOENN_STORY_DOCK_DIRECTED_TO_STERN);
+}
+
+void PgrProgress_ScriptCheckHoennStern(void)
+{
+    gSpecialVar_Result = CheckBagHasItem(ITEM_DEVON_PARTS, 1)
+        && PgrProgress_CanStartRegisteredStoryEvent(
+            PGW_START_HOENN, PGR_HOENN_STORY_DELIVERED_DEVON_GOODS);
+}
+
+void PgrProgress_ScriptGetHoennSlateportScottOpportunity(void)
+{
+    u16 state = VarGet(VAR_SLATEPORT_OUTSIDE_MUSEUM_STATE);
+
+    if (state >= 3)
+    {
+        gSpecialVar_Result = 3; // Completed or expired.
+    }
+    else if (!PgrProgress_IsStoryEventComplete(
+                 PGW_START_HOENN, PGR_HOENN_STORY_DELIVERED_DEVON_GOODS))
+    {
+        gSpecialVar_Result = 0; // Not available yet.
+    }
+    else if (state == 1)
+    {
+        gSpecialVar_Result = PgrProgress_IsStoryEventComplete(
+                PGW_START_HOENN, PGR_HOENN_STORY_DEFEATED_RIVAL_ROUTE_110)
+            ? 3 : 1; // Museum scene.
+    }
+    else if (state == 2)
+    {
+        gSpecialVar_Result = PgrProgress_IsStoryEventComplete(
+                PGW_START_HOENN, PGR_HOENN_STORY_DEFEATED_WALLY_MAUVILLE)
+            ? 3 : 2; // Battle Tent scene.
+    }
+    else
+    {
+        gSpecialVar_Result = 0;
+    }
+}
+
+void PgrProgress_ScriptCheckHoennRoute110Rival(void)
+{
+    gSpecialVar_Result = PgrProgress_CanStartRegisteredStoryEvent(
+        PGW_START_HOENN, PGR_HOENN_STORY_DEFEATED_RIVAL_ROUTE_110);
+}
+
+void PgrProgress_ScriptCompleteHoennRoute110Rival(void)
+{
+    gSpecialVar_Result = PgrProgress_TryCompleteRegisteredStoryEvent(
+        PGW_START_HOENN, PGR_HOENN_STORY_DEFEATED_RIVAL_ROUTE_110);
+}
+
+void PgrProgress_ScriptCheckHoennWallyMauville(void)
+{
+    gSpecialVar_Result = PgrProgress_CanStartRegisteredStoryEvent(
+        PGW_START_HOENN, PGR_HOENN_STORY_DEFEATED_WALLY_MAUVILLE);
+}
+
+void PgrProgress_ScriptCheckHoennWattson(void)
+{
+    gSpecialVar_Result = PgrProgress_CanStartRegisteredStoryEvent(
+        PGW_START_HOENN, PGR_HOENN_STORY_DEFEATED_WATTSON);
+}
+
+void PgrProgress_ScriptShouldShowHoennVerdanturfScott(void)
+{
+    gSpecialVar_Result = PgrProgress_IsStoryEventComplete(
+            PGW_START_HOENN, PGR_HOENN_STORY_DEFEATED_WATTSON)
+        && !PgrProgress_IsStoryEventComplete(
+            PGW_START_HOENN, PGR_HOENN_STORY_WITNESSED_METEORITE_THEFT)
+        && FlagGet(FLAG_HIDE_FALLARBOR_TOWN_BATTLE_TENT_SCOTT);
+}
+
+void PgrProgress_ScriptCanMoveHoennScottToFallarbor(void)
+{
+    gSpecialVar_Result = PgrProgress_IsStoryEventComplete(
+            PGW_START_HOENN, PGR_HOENN_STORY_DEFEATED_WATTSON)
+        && !PgrProgress_IsStoryEventComplete(
+            PGW_START_HOENN, PGR_HOENN_STORY_WITNESSED_METEORITE_THEFT);
+}
+
+void PgrProgress_ScriptShouldShowHoennFallarborScott(void)
+{
+    gSpecialVar_Result = PgrProgress_IsStoryEventComplete(
+            PGW_START_HOENN, PGR_HOENN_STORY_DEFEATED_WATTSON)
+        && !PgrProgress_IsStoryEventComplete(
+            PGW_START_HOENN, PGR_HOENN_STORY_WITNESSED_METEORITE_THEFT)
+        && !FlagGet(FLAG_HIDE_FALLARBOR_TOWN_BATTLE_TENT_SCOTT);
+}
+
+void PgrProgress_ScriptCheckHoennMeteoriteTheft(void)
+{
+    gSpecialVar_Result = PgrProgress_CanStartRegisteredStoryEvent(
+        PGW_START_HOENN, PGR_HOENN_STORY_WITNESSED_METEORITE_THEFT);
+}
+
+void PgrProgress_ScriptCheckHoennMaxieMtChimney(void)
+{
+    gSpecialVar_Result = PgrProgress_CanStartRegisteredStoryEvent(
+        PGW_START_HOENN, PGR_HOENN_STORY_DEFEATED_MAXIE_MT_CHIMNEY);
+}
+
+void PgrProgress_ScriptCheckHoennFlannery(void)
+{
+    gSpecialVar_Result = PgrProgress_CanStartRegisteredStoryEvent(
+        PGW_START_HOENN, PGR_HOENN_STORY_DEFEATED_FLANNERY);
+}
+
+void PgrProgress_ScriptCheckHoennGoGoggles(void)
+{
+    gSpecialVar_Result = PgrProgress_CanStartRegisteredStoryEvent(
+        PGW_START_HOENN, PGR_HOENN_STORY_RECEIVED_GO_GOGGLES);
+}
+
+void PgrProgress_ScriptCheckHoennNorman(void)
+{
+    gSpecialVar_Result = PgrProgress_CanStartRegisteredStoryEvent(
+        PGW_START_HOENN, PGR_HOENN_STORY_DEFEATED_NORMAN);
+}
+
+void PgrProgress_ScriptCheckHoennStevenRoute118(void)
+{
+    gSpecialVar_Result = PgrProgress_CanStartRegisteredStoryEvent(
+        PGW_START_HOENN, PGR_HOENN_STORY_MET_STEVEN_ROUTE_118);
+}
+
+void PgrProgress_ScriptCompleteHoennStevenRoute118(void)
+{
+    gSpecialVar_Result = PgrProgress_TryCompleteRegisteredStoryEvent(
+        PGW_START_HOENN, PGR_HOENN_STORY_MET_STEVEN_ROUTE_118);
+}
+
+void PgrProgress_ScriptCheckHoennWeatherInstitute(void)
+{
+    gSpecialVar_Result = PgrProgress_CanStartRegisteredStoryEvent(
+        PGW_START_HOENN, PGR_HOENN_STORY_CLEARED_WEATHER_INSTITUTE);
+}
+
+void PgrProgress_ScriptCompleteHoennWeatherInstitute(void)
+{
+    gSpecialVar_Result = PgrProgress_TryCompleteRegisteredStoryEvent(
+        PGW_START_HOENN, PGR_HOENN_STORY_CLEARED_WEATHER_INSTITUTE);
+}
+
+void PgrProgress_ScriptCheckHoennRoute119Rival(void)
+{
+    gSpecialVar_Result = PgrProgress_CanStartRegisteredStoryEvent(
+        PGW_START_HOENN, PGR_HOENN_STORY_DEFEATED_RIVAL_ROUTE_119);
+}
+
+void PgrProgress_ScriptCompleteHoennRoute119Rival(void)
+{
+    gSpecialVar_Result = PgrProgress_TryCompleteRegisteredStoryEvent(
+        PGW_START_HOENN, PGR_HOENN_STORY_DEFEATED_RIVAL_ROUTE_119);
+}
+
+void PgrProgress_ScriptShouldShowHoennLilycoveRival(void)
+{
+    gSpecialVar_Result = !FlagGet(FLAG_MET_RIVAL_LILYCOVE)
+        && PgrProgress_IsStoryEventComplete(
+            PGW_START_HOENN, PGR_HOENN_STORY_DEFEATED_RIVAL_ROUTE_119)
+        && !PgrProgress_IsStoryEventComplete(
+            PGW_START_HOENN, PGR_HOENN_STORY_WITNESSED_MT_PYRE_ORB_THEFT);
+}
+
+void PgrProgress_ScriptShouldShowHoennLilycoveScott(void)
+{
+    gSpecialVar_Result = !FlagGet(FLAG_MET_SCOTT_IN_LILYCOVE)
+        && PgrProgress_IsStoryEventComplete(
+            PGW_START_HOENN, PGR_HOENN_STORY_DEFEATED_RIVAL_ROUTE_119)
+        && !PgrProgress_IsStoryEventComplete(
+            PGW_START_HOENN, PGR_HOENN_STORY_WITNESSED_SUBMARINE_THEFT);
+}
+
+void PgrProgress_ScriptCheckHoennDevonScope(void)
+{
+    gSpecialVar_Result = PgrProgress_CanStartRegisteredStoryEvent(
+        PGW_START_HOENN, PGR_HOENN_STORY_RECEIVED_DEVON_SCOPE);
+}
+
+void PgrProgress_ScriptCompleteHoennDevonScope(void)
+{
+    gSpecialVar_Result = PgrProgress_TryCompleteRegisteredStoryEvent(
+        PGW_START_HOENN, PGR_HOENN_STORY_RECEIVED_DEVON_SCOPE);
+}
+
+void PgrProgress_ScriptCheckHoennFortreeGymPath(void)
+{
+    gSpecialVar_Result = PgrProgress_CanStartRegisteredStoryEvent(
+        PGW_START_HOENN, PGR_HOENN_STORY_CLEARED_FORTREE_GYM_PATH);
+}
+
+void PgrProgress_ScriptCheckHoennWinona(void)
+{
+    gSpecialVar_Result = PgrProgress_CanStartRegisteredStoryEvent(
+        PGW_START_HOENN, PGR_HOENN_STORY_DEFEATED_WINONA);
+}
+
+void PgrProgress_ScriptCheckHoennMtPyreOrbTheft(void)
+{
+    gSpecialVar_Result = PgrProgress_CanStartRegisteredStoryEvent(
+        PGW_START_HOENN, PGR_HOENN_STORY_WITNESSED_MT_PYRE_ORB_THEFT);
+}
+
+void PgrProgress_ScriptCompleteHoennMtPyreOrbTheft(void)
+{
+    gSpecialVar_Result = PgrProgress_TryCompleteRegisteredStoryEvent(
+        PGW_START_HOENN, PGR_HOENN_STORY_WITNESSED_MT_PYRE_ORB_THEFT);
+}
+
+void PgrProgress_ScriptCheckHoennMagmaHideout(void)
+{
+    gSpecialVar_Result = PgrProgress_CanStartRegisteredStoryEvent(
+        PGW_START_HOENN, PGR_HOENN_STORY_AWAKENED_GROUDON_MAGMA_HIDEOUT);
+}
+
+void PgrProgress_ScriptCompleteHoennMagmaHideout(void)
+{
+    gSpecialVar_Result = PgrProgress_TryCompleteRegisteredStoryEvent(
+        PGW_START_HOENN, PGR_HOENN_STORY_AWAKENED_GROUDON_MAGMA_HIDEOUT);
+}
+
+void PgrProgress_ScriptCheckHoennSubmarineTheft(void)
+{
+    gSpecialVar_Result = PgrProgress_CanStartRegisteredStoryEvent(
+        PGW_START_HOENN, PGR_HOENN_STORY_WITNESSED_SUBMARINE_THEFT);
+}
+
+void PgrProgress_ScriptCompleteHoennSubmarineTheft(void)
+{
+    gSpecialVar_Result = PgrProgress_TryCompleteRegisteredStoryEvent(
+        PGW_START_HOENN, PGR_HOENN_STORY_WITNESSED_SUBMARINE_THEFT);
+}
+
+void PgrProgress_ScriptCheckHoennAquaHideout(void)
+{
+    gSpecialVar_Result = PgrProgress_CanStartRegisteredStoryEvent(
+        PGW_START_HOENN, PGR_HOENN_STORY_CLEARED_AQUA_HIDEOUT);
+}
+
+void PgrProgress_ScriptCompleteHoennAquaHideout(void)
+{
+    gSpecialVar_Result = PgrProgress_TryCompleteRegisteredStoryEvent(
+        PGW_START_HOENN, PGR_HOENN_STORY_CLEARED_AQUA_HIDEOUT);
+}
+
+void PgrProgress_ScriptCheckHoennTateLiza(void)
+{
+    gSpecialVar_Result = PgrProgress_CanStartRegisteredStoryEvent(
+        PGW_START_HOENN, PGR_HOENN_STORY_DEFEATED_TATE_LIZA);
+}
+
+void PgrProgress_ScriptShouldShowHoennMossdeepScott(void)
+{
+    gSpecialVar_Result = PgrProgress_CanStartRegisteredStoryEvent(
+            PGW_START_HOENN, PGR_HOENN_STORY_MET_SCOTT_MOSSDEEP)
+        && !PgrProgress_IsStoryEventComplete(
+            PGW_START_HOENN, PGR_HOENN_STORY_CLEARED_MOSSDEEP_SPACE_CENTER);
+}
+
+void PgrProgress_ScriptCompleteHoennMossdeepScott(void)
+{
+    gSpecialVar_Result = PgrProgress_TryCompleteRegisteredStoryEvent(
+        PGW_START_HOENN, PGR_HOENN_STORY_MET_SCOTT_MOSSDEEP);
+}
+
+void PgrProgress_ScriptCheckHoennMossdeepSpaceCenter(void)
+{
+    gSpecialVar_Result = PgrProgress_CanStartRegisteredStoryEvent(
+        PGW_START_HOENN, PGR_HOENN_STORY_CLEARED_MOSSDEEP_SPACE_CENTER);
+}
+
+void PgrProgress_ScriptCompleteHoennMossdeepSpaceCenter(void)
+{
+    gSpecialVar_Result = PgrProgress_TryCompleteRegisteredStoryEvent(
+        PGW_START_HOENN, PGR_HOENN_STORY_CLEARED_MOSSDEEP_SPACE_CENTER);
+}
+
+void PgrProgress_ScriptCheckHoennDiveFromSteven(void)
+{
+    gSpecialVar_Result = PgrProgress_CanStartRegisteredStoryEvent(
+        PGW_START_HOENN, PGR_HOENN_STORY_RECEIVED_DIVE_FROM_STEVEN);
+}
+
+void PgrProgress_ScriptCompleteHoennDiveFromSteven(void)
+{
+    gSpecialVar_Result = PgrProgress_TryCompleteRegisteredStoryEvent(
+        PGW_START_HOENN, PGR_HOENN_STORY_RECEIVED_DIVE_FROM_STEVEN);
+}
+
+void PgrProgress_ScriptCheckHoennSeafloorCavern(void)
+{
+    gSpecialVar_Result = PgrProgress_CanStartRegisteredStoryEvent(
+        PGW_START_HOENN, PGR_HOENN_STORY_AWAKENED_KYOGRE_SEAFLOOR_CAVERN);
+}
+
+void PgrProgress_ScriptCompleteHoennSeafloorCavern(void)
+{
+    gSpecialVar_Result = PgrProgress_TryCompleteRegisteredStoryEvent(
+        PGW_START_HOENN, PGR_HOENN_STORY_AWAKENED_KYOGRE_SEAFLOOR_CAVERN);
+}
+
+void PgrProgress_ScriptCheckHoennSootopolisCrisis(void)
+{
+    gSpecialVar_Result = PgrProgress_CanStartRegisteredStoryEvent(
+        PGW_START_HOENN, PGR_HOENN_STORY_WITNESSED_SOOTOPOLIS_CRISIS);
+}
+
+void PgrProgress_ScriptCompleteHoennSootopolisCrisis(void)
+{
+    gSpecialVar_Result = PgrProgress_TryCompleteRegisteredStoryEvent(
+        PGW_START_HOENN, PGR_HOENN_STORY_WITNESSED_SOOTOPOLIS_CRISIS);
+}
+
+void PgrProgress_ScriptCheckHoennWallaceRayquaza(void)
+{
+    gSpecialVar_Result = PgrProgress_CanStartRegisteredStoryEvent(
+        PGW_START_HOENN, PGR_HOENN_STORY_SENT_WALLACE_TO_SKY_PILLAR);
+}
+
+void PgrProgress_ScriptCompleteHoennWallaceRayquaza(void)
+{
+    gSpecialVar_Result = PgrProgress_TryCompleteRegisteredStoryEvent(
+        PGW_START_HOENN, PGR_HOENN_STORY_SENT_WALLACE_TO_SKY_PILLAR);
+}
+
+void PgrProgress_ScriptCheckHoennSkyPillarOpening(void)
+{
+    gSpecialVar_Result = PgrProgress_CanStartRegisteredStoryEvent(
+        PGW_START_HOENN, PGR_HOENN_STORY_OPENED_SKY_PILLAR);
+}
+
+void PgrProgress_ScriptCompleteHoennSkyPillarOpening(void)
+{
+    gSpecialVar_Result = PgrProgress_TryCompleteRegisteredStoryEvent(
+        PGW_START_HOENN, PGR_HOENN_STORY_OPENED_SKY_PILLAR);
+}
+
+void PgrProgress_ScriptCheckHoennRayquazaAwakening(void)
+{
+    gSpecialVar_Result = PgrProgress_CanStartRegisteredStoryEvent(
+        PGW_START_HOENN, PGR_HOENN_STORY_AWAKENED_RAYQUAZA);
+}
+
+void PgrProgress_ScriptCompleteHoennRayquazaAwakening(void)
+{
+    gSpecialVar_Result = PgrProgress_TryCompleteRegisteredStoryEvent(
+        PGW_START_HOENN, PGR_HOENN_STORY_AWAKENED_RAYQUAZA);
+}
+
+void PgrProgress_ScriptCheckHoennSootopolisResolution(void)
+{
+    gSpecialVar_Result = PgrProgress_CanStartRegisteredStoryEvent(
+        PGW_START_HOENN, PGR_HOENN_STORY_RESOLVED_SOOTOPOLIS_CRISIS);
+}
+
+void PgrProgress_ScriptCompleteHoennSootopolisResolution(void)
+{
+    gSpecialVar_Result = PgrProgress_TryCompleteRegisteredStoryEvent(
+        PGW_START_HOENN, PGR_HOENN_STORY_RESOLVED_SOOTOPOLIS_CRISIS);
+}
+
+void PgrProgress_ScriptCheckHoennWaterfallFromWallace(void)
+{
+    gSpecialVar_Result = FlagGet(FLAG_SOOTOPOLIS_ARCHIE_MAXIE_LEAVE)
+        && PgrProgress_CanStartRegisteredStoryEvent(
+            PGW_START_HOENN, PGR_HOENN_STORY_RECEIVED_WATERFALL_FROM_WALLACE);
+}
+
+void PgrProgress_ScriptCompleteHoennWaterfallFromWallace(void)
+{
+    gSpecialVar_Result = PgrProgress_TryCompleteRegisteredStoryEvent(
+        PGW_START_HOENN, PGR_HOENN_STORY_RECEIVED_WATERFALL_FROM_WALLACE);
+}
+
+void PgrProgress_ScriptCheckHoennJuan(void)
+{
+    gSpecialVar_Result = PgrProgress_CanStartRegisteredStoryEvent(
+        PGW_START_HOENN, PGR_HOENN_STORY_DEFEATED_JUAN);
+}
+
+void PgrProgress_ScriptCheckHoennWallyVictoryRoad(void)
+{
+    gSpecialVar_Result = PgrProgress_CanStartRegisteredStoryEvent(
+        PGW_START_HOENN, PGR_HOENN_STORY_DEFEATED_WALLY_VICTORY_ROAD);
+}
+
+void PgrProgress_ScriptShouldShowHoennEverGrandeScott(void)
+{
+    gSpecialVar_Result = !FlagGet(FLAG_MET_SCOTT_IN_EVERGRANDE)
+        && PgrProgress_IsStoryEventComplete(
+            PGW_START_HOENN, PGR_HOENN_STORY_DEFEATED_JUAN)
+        && !PgrProgress_IsStoryEventComplete(
+            PGW_START_HOENN, PGR_HOENN_STORY_ENTERED_POKEMON_LEAGUE);
+}
+
+void PgrProgress_ScriptCheckHoennLeagueAccess(void)
+{
+    gSpecialVar_Result = PgrProgress_IsStoryEventComplete(
+            PGW_START_HOENN, PGR_HOENN_STORY_DEFEATED_WALLY_VICTORY_ROAD)
+        && PgrProgress_IsStoryEventComplete(
+            PGW_START_HOENN, PGR_HOENN_STORY_DEFEATED_BRAWLY);
+}
+
+void PgrProgress_ScriptCompleteHoennLeagueEntry(void)
+{
+    gSpecialVar_Result = PgrProgress_TryCompleteRegisteredStoryEvent(
+        PGW_START_HOENN, PGR_HOENN_STORY_ENTERED_POKEMON_LEAGUE);
+}
+
+void PgrProgress_ScriptCheckHoennSidney(void)
+{
+    gSpecialVar_Result = PgrProgress_IsStoryEventComplete(
+        PGW_START_HOENN, PGR_HOENN_STORY_ENTERED_POKEMON_LEAGUE);
+}
+
+void PgrProgress_ScriptCheckHoennPhoebe(void)
+{
+    gSpecialVar_Result = PgrProgress_IsStoryEventComplete(
+        PGW_START_HOENN, PGR_HOENN_STORY_DEFEATED_SIDNEY);
+}
+
+void PgrProgress_ScriptCheckHoennGlacia(void)
+{
+    gSpecialVar_Result = PgrProgress_IsStoryEventComplete(
+        PGW_START_HOENN, PGR_HOENN_STORY_DEFEATED_PHOEBE);
+}
+
+void PgrProgress_ScriptCheckHoennDrake(void)
+{
+    gSpecialVar_Result = PgrProgress_IsStoryEventComplete(
+        PGW_START_HOENN, PGR_HOENN_STORY_DEFEATED_GLACIA);
+}
+
+void PgrProgress_ScriptCheckHoennChampion(void)
+{
+    gSpecialVar_Result = PgrProgress_IsStoryEventComplete(
+        PGW_START_HOENN, PGR_HOENN_STORY_DEFEATED_DRAKE);
+}
+
+void PgrProgress_ScriptGetHoennPostgameResearchOpportunity(void)
+{
+    if (PgrProgress_IsStoryEventComplete(
+            PGW_START_HOENN, PGR_HOENN_STORY_COMPLETED_POSTGAME_RESEARCH_UPDATE))
+    {
+        gSpecialVar_Result = 2; // Already completed.
+    }
+    else if (PgrProgress_CanStartRegisteredStoryEvent(
+                 PGW_START_HOENN, PGR_HOENN_STORY_COMPLETED_POSTGAME_RESEARCH_UPDATE))
+    {
+        gSpecialVar_Result = 1; // Available after becoming Hoenn Champion.
+    }
+    else
+    {
+        gSpecialVar_Result = 0; // Not available yet.
+    }
+}
+
+void PgrProgress_ScriptCompleteHoennPostgameResearchUpdate(void)
+{
+    gSpecialVar_Result = PgrProgress_TryCompleteRegisteredStoryEvent(
+        PGW_START_HOENN, PGR_HOENN_STORY_COMPLETED_POSTGAME_RESEARCH_UPDATE);
+}
+
+void PgrProgress_ScriptCompleteHoennSSTicket(void)
+{
+    gSpecialVar_Result = PgrProgress_TryCompleteRegisteredStoryEvent(
+        PGW_START_HOENN, PGR_HOENN_STORY_RECEIVED_SS_TICKET);
+}
+
+void PgrProgress_ScriptCanUseHoennSSTidal(void)
+{
+    gSpecialVar_Result = PgrProgress_IsStoryEventComplete(
+            PGW_START_HOENN, PGR_HOENN_STORY_RECEIVED_SS_TICKET)
+        && PgrProgress_IsStoryEventComplete(
+            PGW_START_HOENN, PGR_HOENN_STORY_BECAME_CHAMPION)
+        && FlagGet(FLAG_RECEIVED_SS_TICKET)
+        && CheckBagHasItem(ITEM_SS_TICKET, 1);
+}
+
+void PgrProgress_ScriptGetHoennSSTidalScottOpportunity(void)
+{
+    if (PgrProgress_IsStoryEventComplete(
+            PGW_START_HOENN, PGR_HOENN_STORY_MET_SCOTT_SS_TIDAL))
+    {
+        gSpecialVar_Result = 2; // Already completed.
+    }
+    else if (PgrProgress_CanStartRegisteredStoryEvent(
+                 PGW_START_HOENN, PGR_HOENN_STORY_MET_SCOTT_SS_TIDAL)
+          && FlagGet(FLAG_RECEIVED_SS_TICKET)
+          && CheckBagHasItem(ITEM_SS_TICKET, 1))
+    {
+        gSpecialVar_Result = 1; // Available.
+    }
+    else
+    {
+        gSpecialVar_Result = 0; // Not available yet.
+    }
+}
+
+void PgrProgress_ScriptCompleteHoennSSTidalScott(void)
+{
+    gSpecialVar_Result = PgrProgress_TryCompleteRegisteredStoryEvent(
+        PGW_START_HOENN, PGR_HOENN_STORY_MET_SCOTT_SS_TIDAL);
+}
+
+void PgrProgress_ScriptCanStartHoennBattleFrontierReception(void)
+{
+    gSpecialVar_Result = PgrProgress_IsStoryEventComplete(
+            PGW_START_HOENN, PGR_HOENN_STORY_ENTERED_BATTLE_FRONTIER)
+        || PgrProgress_CanStartRegisteredStoryEvent(
+            PGW_START_HOENN, PGR_HOENN_STORY_ENTERED_BATTLE_FRONTIER);
+}
+
+void PgrProgress_ScriptCompleteHoennBattleFrontierReception(void)
+{
+    gSpecialVar_Result = PgrProgress_TryCompleteRegisteredStoryEvent(
+        PGW_START_HOENN, PGR_HOENN_STORY_ENTERED_BATTLE_FRONTIER);
+}
+
+void PgrProgress_ScriptHasEnteredHoennBattleFrontier(void)
+{
+    gSpecialVar_Result = PgrProgress_IsStoryEventComplete(
+        PGW_START_HOENN, PGR_HOENN_STORY_ENTERED_BATTLE_FRONTIER);
+}
+
+void PgrProgress_ScriptGetHoennScottHouseOpportunity(void)
+{
+    if (PgrProgress_IsStoryEventComplete(
+            PGW_START_HOENN, PGR_HOENN_STORY_RECEIVED_SCOTT_FRONTIER_WELCOME))
+    {
+        gSpecialVar_Result = 2; // Initial Battle Points already received.
+    }
+    else if (PgrProgress_CanStartRegisteredStoryEvent(
+                 PGW_START_HOENN, PGR_HOENN_STORY_RECEIVED_SCOTT_FRONTIER_WELCOME))
+    {
+        gSpecialVar_Result = 1; // First house conversation is available.
+    }
+    else
+    {
+        gSpecialVar_Result = 0; // Reception has not been completed.
+    }
+}
+
+void PgrProgress_ScriptCompleteHoennScottHouseWelcome(void)
+{
+    gSpecialVar_Result = PgrProgress_TryCompleteRegisteredStoryEvent(
+        PGW_START_HOENN, PGR_HOENN_STORY_RECEIVED_SCOTT_FRONTIER_WELCOME);
+}
+
+void PgrProgress_ScriptGetHoennMeteorFallsStevenOpportunity(void)
+{
+    if (PgrProgress_IsStoryEventComplete(
+            PGW_START_HOENN, PGR_HOENN_STORY_DEFEATED_STEVEN_METEOR_FALLS))
+    {
+        gSpecialVar_Result = 2; // Battle already won.
+    }
+    else if (PgrProgress_CanStartRegisteredStoryEvent(
+                 PGW_START_HOENN, PGR_HOENN_STORY_DEFEATED_STEVEN_METEOR_FALLS))
+    {
+        gSpecialVar_Result = 1; // Postgame challenge is available.
+    }
+    else
+    {
+        gSpecialVar_Result = 0; // Not Hoenn Champion yet.
+    }
+}
+
+void PgrProgress_ScriptCompleteHoennMeteorFallsSteven(void)
+{
+    gSpecialVar_Result = PgrProgress_TryCompleteRegisteredStoryEvent(
+        PGW_START_HOENN, PGR_HOENN_STORY_DEFEATED_STEVEN_METEOR_FALLS);
 }
 
 void PgrProgress_ScriptCanStartStoryEvent(void)

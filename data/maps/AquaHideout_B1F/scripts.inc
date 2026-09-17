@@ -14,6 +14,7 @@ AquaHideout_B1F_EventScript_TryRemoveElectrode::
 	return
 
 AquaHideout_B1F_OnTransition:
+	call AquaHideout_EventScript_SyncTeamVisibility
 	call_if_unset FLAG_DEFEATED_ELECTRODE_1_AQUA_HIDEOUT, AquaHideout_B1F_EventScript_ShowElectrode1
 	call_if_unset FLAG_DEFEATED_ELECTRODE_2_AQUA_HIDEOUT, AquaHideout_B1F_EventScript_ShowElectrode2
 	end

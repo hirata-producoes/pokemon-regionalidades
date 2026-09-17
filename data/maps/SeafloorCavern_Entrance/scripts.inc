@@ -1,6 +1,28 @@
 SeafloorCavern_Entrance_MapScripts::
 	map_script MAP_SCRIPT_ON_RESUME, SeafloorCavern_Entrance_OnResume
+	map_script MAP_SCRIPT_ON_TRANSITION, SeafloorCavern_Entrance_OnTransition
 	.byte 0
+
+SeafloorCavern_Entrance_OnTransition:
+	call SeafloorCavern_EventScript_SyncAquaVisibility
+	end
+
+SeafloorCavern_EventScript_SyncAquaVisibility::
+	special PgrProgress_ScriptCheckHoennSeafloorCavern
+	goto_if_eq VAR_RESULT, TRUE, SeafloorCavern_EventScript_ShowAqua
+	setflag FLAG_HIDE_SEAFLOOR_CAVERN_ENTRANCE_AQUA_GRUNT
+	setflag FLAG_HIDE_SEAFLOOR_CAVERN_AQUA_GRUNTS
+	return
+
+SeafloorCavern_EventScript_ShowAqua:
+	clearflag FLAG_HIDE_SEAFLOOR_CAVERN_AQUA_GRUNTS
+	goto_if_set FLAG_RECEIVED_HM_DIVE, SeafloorCavern_EventScript_HideEntranceGrunt
+	clearflag FLAG_HIDE_SEAFLOOR_CAVERN_ENTRANCE_AQUA_GRUNT
+	return
+
+SeafloorCavern_EventScript_HideEntranceGrunt:
+	setflag FLAG_HIDE_SEAFLOOR_CAVERN_ENTRANCE_AQUA_GRUNT
+	return
 
 SeafloorCavern_Entrance_OnResume:
 	setdivewarp MAP_UNDERWATER_SEAFLOOR_CAVERN, 6, 5
@@ -83,4 +105,3 @@ SeafloorCavern_Entrance_Text_HearMagmaNearMossdeepShort:
 	.string "were spotted near MOSSDEEP.\p"
 	.string "That bunch of goons, they sure don't\n"
 	.string "look good near the sea!$"
-

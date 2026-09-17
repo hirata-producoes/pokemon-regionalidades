@@ -15,9 +15,20 @@ SkyPillar_Top_EventScript_TryRemoveRayquaza::
 	return
 
 SkyPillar_Top_OnTransition:
+	special PgrProgress_ScriptCheckHoennRayquazaAwakening
+	call_if_eq VAR_RESULT, TRUE, SkyPillar_Top_EventScript_ShowSleepingRayquaza
+	call_if_eq VAR_RESULT, FALSE, SkyPillar_Top_EventScript_HideSleepingRayquaza
 	call_if_lt VAR_SKY_PILLAR_STATE, 2, SkyPillar_Top_EventScript_SetCleanLayout
 	call_if_ge VAR_SKY_PILLAR_STATE, 2, SkyPillar_Top_EventScript_TryShowRayquaza
 	end
+
+SkyPillar_Top_EventScript_ShowSleepingRayquaza:
+	clearflag FLAG_HIDE_SKY_PILLAR_TOP_RAYQUAZA
+	return
+
+SkyPillar_Top_EventScript_HideSleepingRayquaza:
+	setflag FLAG_HIDE_SKY_PILLAR_TOP_RAYQUAZA
+	return
 
 SkyPillar_Top_EventScript_SetCleanLayout::
 	setmaplayoutindex LAYOUT_SKY_PILLAR_TOP_CLEAN
@@ -86,6 +97,8 @@ SkyPillar_Top_EventScript_RanFromRayquaza2::
 
 SkyPillar_Top_EventScript_AwakenRayquaza::
 	lockall
+	special PgrProgress_ScriptCheckHoennRayquazaAwakening
+	goto_if_eq VAR_RESULT, FALSE, SkyPillar_Top_EventScript_SkipInvalidAwakening
 	fadeoutbgm 1
 	applymovement LOCALID_PLAYER, Common_Movement_FaceUp
 	waitmovement 0
@@ -126,6 +139,11 @@ SkyPillar_Top_EventScript_AwakenRayquaza::
 	setvar VAR_SOOTOPOLIS_CITY_STATE, 5
 	setvar VAR_SKY_PILLAR_STATE, 1
 	setvar VAR_SKY_PILLAR_RAYQUAZA_CRY_DONE, 1
+	special PgrProgress_ScriptCompleteHoennRayquazaAwakening
+	releaseall
+	end
+
+SkyPillar_Top_EventScript_SkipInvalidAwakening:
 	releaseall
 	end
 
@@ -179,4 +197,3 @@ SkyPillar_Top_Movement_CameraPanDown:
 
 SkyPillar_Top_Text_RayquazaFlewOff:
 	.string "The awakened RAYQUAZA flew off…$"
-

@@ -7,8 +7,33 @@ MossdeepCity_OnTransition:
 	clearflag FLAG_MOSSDEEP_GYM_SWITCH_2
 	clearflag FLAG_MOSSDEEP_GYM_SWITCH_3
 	clearflag FLAG_MOSSDEEP_GYM_SWITCH_4
+	call MossdeepCity_EventScript_SyncTeamMagma
+	call MossdeepCity_EventScript_SyncScott
 	call_if_set FLAG_SYS_WEATHER_CTRL, Common_EventScript_SetAbnormalWeather
 	end
+
+MossdeepCity_EventScript_SyncScott::
+	special PgrProgress_ScriptShouldShowHoennMossdeepScott
+	goto_if_eq VAR_RESULT, TRUE, MossdeepCity_EventScript_ShowScott
+	setflag FLAG_HIDE_MOSSDEEP_CITY_SCOTT
+	return
+
+MossdeepCity_EventScript_ShowScott::
+	clearflag FLAG_HIDE_MOSSDEEP_CITY_SCOTT
+	return
+
+MossdeepCity_EventScript_SyncTeamMagma::
+	special PgrProgress_ScriptCheckHoennMossdeepSpaceCenter
+	goto_if_eq VAR_RESULT, FALSE, MossdeepCity_EventScript_HideTeamMagma
+	goto_if_eq VAR_MOSSDEEP_CITY_STATE, 1, MossdeepCity_EventScript_ShowTeamMagma
+
+MossdeepCity_EventScript_HideTeamMagma::
+	setflag FLAG_HIDE_MOSSDEEP_CITY_TEAM_MAGMA
+	return
+
+MossdeepCity_EventScript_ShowTeamMagma::
+	clearflag FLAG_HIDE_MOSSDEEP_CITY_TEAM_MAGMA
+	return
 
 MossdeepCity_EventScript_PokefanF::
 	lock
@@ -75,6 +100,8 @@ MossdeepCity_EventScript_VisitedMossdeep::
 
 MossdeepCity_EventScript_TeamMagmaEnterSpaceCenter::
 	lockall
+	special PgrProgress_ScriptCheckHoennMossdeepSpaceCenter
+	goto_if_eq VAR_RESULT, FALSE, MossdeepCity_EventScript_SkipInvalidTeamMagmaScene
 	applymovement LOCALID_MOSSDEEP_MAXIE, MossdeepCity_Movement_MaxieGestureToSpaceCenter
 	waitmovement 0
 	applymovement LOCALID_MOSSDEEP_GRUNT_1, MossdeepCity_Movement_GruntFaceSpaceCenter
@@ -96,6 +123,17 @@ MossdeepCity_EventScript_TeamMagmaEnterSpaceCenter::
 	delay 30
 	setvar VAR_MOSSDEEP_CITY_STATE, 2
 	setflag FLAG_HIDE_MOSSDEEP_CITY_TEAM_MAGMA
+	releaseall
+	end
+
+MossdeepCity_EventScript_SkipInvalidTeamMagmaScene::
+	setflag FLAG_HIDE_MOSSDEEP_CITY_TEAM_MAGMA
+	removeobject LOCALID_MOSSDEEP_MAXIE
+	removeobject LOCALID_MOSSDEEP_GRUNT_1
+	removeobject LOCALID_MOSSDEEP_GRUNT_2
+	removeobject LOCALID_MOSSDEEP_GRUNT_3
+	removeobject LOCALID_MOSSDEEP_GRUNT_4
+	setvar VAR_MOSSDEEP_CITY_STATE, 0
 	releaseall
 	end
 
@@ -251,12 +289,22 @@ MossdeepCity_EventScript_BlackBelt::
 MossdeepCity_EventScript_Scott::
 	lock
 	faceplayer
+	special PgrProgress_ScriptShouldShowHoennMossdeepScott
+	goto_if_eq VAR_RESULT, FALSE, MossdeepCity_EventScript_HideInvalidScott
 	msgbox MossdeepCity_Text_ScottSomethingWrongWithTown, MSGBOX_DEFAULT
 	closemessage
 	call_if_eq VAR_FACING, DIR_NORTH, MossdeepCity_EventScript_ScottExitNorth
 	call_if_eq VAR_FACING, DIR_EAST, MossdeepCity_EventScript_ScottExitEast
 	addvar VAR_SCOTT_STATE, 1
+	special PgrProgress_ScriptCompleteHoennMossdeepScott
+	setflag FLAG_HIDE_MOSSDEEP_CITY_SCOTT
 	removeobject LOCALID_MOSSDEEP_SCOTT
+	release
+	end
+
+MossdeepCity_EventScript_HideInvalidScott::
+	setflag FLAG_HIDE_MOSSDEEP_CITY_SCOTT
+	removeobject VAR_LAST_TALKED
 	release
 	end
 
@@ -425,4 +473,3 @@ MossdeepCity_Text_SootopolisNewGymLeader:
 	.string "LEADER come in.\p"
 	.string "People tell me the new LEADER once\n"
 	.string "mentored WALLACE.$"
-

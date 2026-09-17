@@ -3,10 +3,24 @@ Route119_WeatherInstitute_2F_MapScripts::
 	.byte 0
 
 Route119_WeatherInstitute_2F_OnTransition:
+	call Route119_WeatherInstitute_2F_EventScript_SyncAquaVisibility
 	call_if_eq VAR_WEATHER_INSTITUTE_STATE, 0, Route119_WeatherInstitute_2F_EventScript_SetScientistPosAquaHere
 	call_if_eq VAR_WEATHER_INSTITUTE_STATE, 1, Route119_WeatherInstitute_2F_EventScript_SetScientistPosAquaGone
 	call_if_set FLAG_SYS_GAME_CLEAR, Route119_WeatherInstitute_2F_EventScript_SetScientistPosGameClear
 	end
+
+Route119_WeatherInstitute_2F_EventScript_SyncAquaVisibility::
+	goto_if_ne VAR_WEATHER_INSTITUTE_STATE, 0, Route119_WeatherInstitute_2F_EventScript_HideAqua
+	special PgrProgress_ScriptCheckHoennWeatherInstitute
+	goto_if_eq VAR_RESULT, TRUE, Route119_WeatherInstitute_2F_EventScript_ShowAqua
+
+Route119_WeatherInstitute_2F_EventScript_HideAqua::
+	setflag FLAG_HIDE_ROUTE_119_TEAM_AQUA
+	return
+
+Route119_WeatherInstitute_2F_EventScript_ShowAqua::
+	clearflag FLAG_HIDE_ROUTE_119_TEAM_AQUA
+	return
 
 Route119_WeatherInstitute_2F_EventScript_SetScientistPosAquaHere::
 	setobjectxyperm LOCALID_WEATHER_INSTITUTE_2F_SCIENTIST, 1, 6
@@ -39,8 +53,14 @@ Route119_WeatherInstitute_2F_EventScript_Grunt3::
 	end
 
 Route119_WeatherInstitute_2F_EventScript_Shelly::
+	special PgrProgress_ScriptCheckHoennWeatherInstitute
+	goto_if_eq VAR_RESULT, FALSE, Route119_WeatherInstitute_2F_EventScript_SkipInvalidShellyBattle
 	trainerbattle_single TRAINER_SHELLY_WEATHER_INSTITUTE, Route119_WeatherInstitute_2F_Text_ShellyIntro, Route119_WeatherInstitute_2F_Text_ShellyDefeat, Route119_WeatherInstitute_2F_EventScript_ShellyDefeated
 	msgbox Route119_WeatherInstitute_2F_Text_ShellyPostBattle, MSGBOX_AUTOCLOSE
+	end
+
+Route119_WeatherInstitute_2F_EventScript_SkipInvalidShellyBattle::
+	release
 	end
 
 Route119_WeatherInstitute_2F_EventScript_ShellyDefeated::
@@ -60,6 +80,7 @@ Route119_WeatherInstitute_2F_EventScript_ShellyDefeated::
 	msgbox Route119_WeatherInstitute_2F_Text_WeHaveToHurryToMtPyre, MSGBOX_DEFAULT
 	closemessage
 	setvar VAR_WEATHER_INSTITUTE_STATE, 1
+	special PgrProgress_ScriptCompleteHoennWeatherInstitute
 	clearflag FLAG_HIDE_WEATHER_INSTITUTE_2F_WORKERS
 	fadedefaultbgm
 	fadescreen FADE_TO_BLACK
@@ -323,4 +344,3 @@ Route119_WeatherInstitute_2F_Text_NoAbnormalWeather:
 	.string "no longer being reported.\p"
 	.string "The occasional rainfall is a blessing,\n"
 	.string "really.$"
-

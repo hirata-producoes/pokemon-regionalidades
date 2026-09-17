@@ -1,7 +1,18 @@
 VerdanturfTown_BattleTentLobby_MapScripts::
 	map_script MAP_SCRIPT_ON_FRAME_TABLE, VerdanturfTown_BattleTentLobby_OnFrame
 	map_script MAP_SCRIPT_ON_WARP_INTO_MAP_TABLE, VerdanturfTown_BattleTentLobby_OnWarp
+	map_script MAP_SCRIPT_ON_TRANSITION, VerdanturfTown_BattleTentLobby_OnTransition
 	.byte 0
+
+VerdanturfTown_BattleTentLobby_OnTransition:
+	special PgrProgress_ScriptShouldShowHoennVerdanturfScott
+	goto_if_eq VAR_RESULT, TRUE, VerdanturfTown_BattleTentLobby_EventScript_ShowScott
+	setflag FLAG_HIDE_VERDANTURF_TOWN_SCOTT
+	end
+
+VerdanturfTown_BattleTentLobby_EventScript_ShowScott::
+	clearflag FLAG_HIDE_VERDANTURF_TOWN_SCOTT
+	end
 
 VerdanturfTown_BattleTentLobby_OnWarp:
 	map_script_2 VAR_TEMP_1, 0, VerdanturfTown_BattleTentLobby_EventScript_TurnPlayerNorth
@@ -249,10 +260,18 @@ VerdanturfTown_BattleTentLobby_EventScript_Boy2::
 VerdanturfTown_BattleTentLobby_EventScript_Scott::
 	lock
 	faceplayer
+	special PgrProgress_ScriptShouldShowHoennVerdanturfScott
+	goto_if_eq VAR_RESULT, FALSE, VerdanturfTown_BattleTentLobby_EventScript_HideInvalidScott
 	goto_if_set FLAG_MET_SCOTT_IN_VERDANTURF, VerdanturfTown_BattleTentLobby_EventScript_ScottAlreadySpokenTo
 	msgbox VerdanturfTown_BattleTentLobby_Text_ScottCanMeetToughTrainers, MSGBOX_DEFAULT
 	addvar VAR_SCOTT_STATE, 1
 	setflag FLAG_MET_SCOTT_IN_VERDANTURF
+	release
+	end
+
+VerdanturfTown_BattleTentLobby_EventScript_HideInvalidScott::
+	setflag FLAG_HIDE_VERDANTURF_TOWN_SCOTT
+	removeobject VAR_LAST_TALKED
 	release
 	end
 

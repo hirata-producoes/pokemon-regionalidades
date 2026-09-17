@@ -5,11 +5,16 @@ EverGrandeCity_PokemonCenter_1F_MapScripts::
 
 EverGrandeCity_PokemonCenter_1F_OnTransition:
 	setrespawn HEAL_LOCATION_EVER_GRANDE_CITY
-	call_if_unset FLAG_MET_SCOTT_IN_EVERGRANDE, EverGrandeCity_PokemonCenter_1F_EventScript_TryShowScott
+	call EverGrandeCity_PokemonCenter_1F_EventScript_SyncScottVisibility
 	end
 
-EverGrandeCity_PokemonCenter_1F_EventScript_TryShowScott::
-	goto_if_unset FLAG_BADGE06_GET, Common_EventScript_NopReturn
+EverGrandeCity_PokemonCenter_1F_EventScript_SyncScottVisibility::
+	special PgrProgress_ScriptShouldShowHoennEverGrandeScott
+	goto_if_eq VAR_RESULT, TRUE, EverGrandeCity_PokemonCenter_1F_EventScript_ShowScott
+	setflag FLAG_HIDE_EVER_GRANDE_POKEMON_CENTER_1F_SCOTT
+	return
+
+EverGrandeCity_PokemonCenter_1F_EventScript_ShowScott::
 	clearflag FLAG_HIDE_EVER_GRANDE_POKEMON_CENTER_1F_SCOTT
 	return
 
@@ -31,6 +36,8 @@ EverGrandeCity_PokemonCenter_1F_EventScript_ExpertM::
 
 EverGrandeCity_PokemonCenter_1F_EventScript_Scott::
 	lock
+	special PgrProgress_ScriptShouldShowHoennEverGrandeScott
+	goto_if_eq VAR_RESULT, FALSE, EverGrandeCity_PokemonCenter_1F_EventScript_SkipInvalidScott
 	faceplayer
 	msgbox EverGrandeCity_PokemonCenter_1F_Text_ScottHappyForYou, MSGBOX_DEFAULT
 	closemessage
@@ -42,6 +49,10 @@ EverGrandeCity_PokemonCenter_1F_EventScript_Scott::
 	playse SE_EXIT
 	waitse
 	removeobject LOCALID_EVER_GRANDE_SCOTT
+	release
+	end
+
+EverGrandeCity_PokemonCenter_1F_EventScript_SkipInvalidScott:
 	release
 	end
 
@@ -96,4 +107,3 @@ EverGrandeCity_PokemonCenter_1F_Text_ScottHappyForYou:
 	.string "I'll get in touch with you then.\p"
 	.string "Okay, {PLAYER}{KUN}.\n"
 	.string "Go for greatness!$"
-

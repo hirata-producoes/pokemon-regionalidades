@@ -370,6 +370,8 @@ Route110_EventScript_RivalTrigger3::
 
 Route110_EventScript_RivalScene::
 	lockall
+	special PgrProgress_ScriptCheckHoennRoute110Rival
+	goto_if_eq VAR_RESULT, FALSE, Route110_EventScript_SkipInvalidRivalScene
 	checkplayergender
 	call_if_eq VAR_RESULT, MALE, Route110_EventScript_PlayMayMusic
 	call_if_eq VAR_RESULT, FEMALE, Route110_EventScript_PlayBrendanMusic
@@ -386,6 +388,10 @@ Route110_EventScript_RivalScene::
 	checkplayergender
 	goto_if_eq VAR_RESULT, MALE, Route110_EventScript_MayBattle
 	goto_if_eq VAR_RESULT, FEMALE, Route110_EventScript_BrendanBattle
+	releaseall
+	end
+
+Route110_EventScript_SkipInvalidRivalScene::
 	releaseall
 	end
 
@@ -476,6 +482,7 @@ Route110_EventScript_RivalExit::
 	call_if_eq VAR_0x8008, 3, Route110_EventScript_RivalExit3
 	removeobject LOCALID_ROUTE110_RIVAL_ON_BIKE
 	setvar VAR_ROUTE110_STATE, 1
+	special PgrProgress_ScriptCompleteHoennRoute110Rival
 	savebgm MUS_DUMMY
 	fadedefaultbgm
 	releaseall
@@ -986,4 +993,3 @@ Route110_Text_KeepAnEyeOutForRival:
 	.string "… … … … … …\p"
 	.string "Well, I had better get going.\n"
 	.string "See you again, {PLAYER}{KUN}!$"
-

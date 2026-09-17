@@ -4,8 +4,20 @@ MossdeepCity_SpaceCenter_2F_MapScripts::
 	.byte 0
 
 MossdeepCity_SpaceCenter_2F_OnTransition:
+	setvar VAR_TEMP_1, 0
+	special PgrProgress_ScriptCheckHoennMossdeepSpaceCenter
+	goto_if_eq VAR_RESULT, FALSE, MossdeepCity_SpaceCenter_2F_EventScript_HideTeamMagma
+	goto_if_ne VAR_MOSSDEEP_CITY_STATE, 2, MossdeepCity_SpaceCenter_2F_EventScript_HideTeamMagma
+	clearflag FLAG_HIDE_MOSSDEEP_CITY_SPACE_CENTER_2F_TEAM_MAGMA
+	clearflag FLAG_HIDE_MOSSDEEP_CITY_SPACE_CENTER_2F_STEVEN
 	call_if_eq VAR_MOSSDEEP_CITY_STATE, 2, MossdeepCity_SpaceCenter_2F_EventScript_MoveCivilians
 	call_if_eq VAR_MOSSDEEP_SPACE_CENTER_STATE, 2, MossdeepCity_SpaceCenter_2F_EventScript_MoveDefeatedGrunts
+	copyvar VAR_TEMP_1, VAR_MOSSDEEP_SPACE_CENTER_STATE
+	end
+
+MossdeepCity_SpaceCenter_2F_EventScript_HideTeamMagma::
+	setflag FLAG_HIDE_MOSSDEEP_CITY_SPACE_CENTER_2F_TEAM_MAGMA
+	setflag FLAG_HIDE_MOSSDEEP_CITY_SPACE_CENTER_2F_STEVEN
 	end
 
 MossdeepCity_SpaceCenter_2F_EventScript_MoveCivilians::
@@ -25,7 +37,7 @@ MossdeepCity_SpaceCenter_2F_EventScript_MoveDefeatedGrunts::
 	return
 
 MossdeepCity_SpaceCenter_2F_OnFrame:
-	map_script_2 VAR_MOSSDEEP_SPACE_CENTER_STATE, 1, MossdeepCity_SpaceCenter_2F_EventScript_ThreeMagmaGrunts
+	map_script_2 VAR_TEMP_1, 1, MossdeepCity_SpaceCenter_2F_EventScript_ThreeMagmaGrunts
 	.2byte 0
 
 MossdeepCity_SpaceCenter_2F_EventScript_ThreeMagmaGrunts::
@@ -67,6 +79,7 @@ MossdeepCity_SpaceCenter_2F_EventScript_BattleThreeMagmaGrunts::
 	applymovement LOCALID_SPACE_CENTER_GRUNT_7, MossdeepCity_SpaceCenter_2F_Movement_Grunt7Defeated
 	waitmovement 0
 	setvar VAR_MOSSDEEP_SPACE_CENTER_STATE, 2
+	setvar VAR_TEMP_1, 0
 	copyobjectxytoperm LOCALID_SPACE_CENTER_GRUNT_6
 	copyobjectxytoperm LOCALID_SPACE_CENTER_GRUNT_7
 	copyobjectxytoperm LOCALID_SPACE_CENTER_GRUNT_5
@@ -178,6 +191,8 @@ MossdeepCity_SpaceCenter_2F_EventScript_Maxie::
 
 MossdeepCity_SpaceCenter_2F_EventScript_Steven::
 	lockall
+	special PgrProgress_ScriptCheckHoennMossdeepSpaceCenter
+	goto_if_eq VAR_RESULT, FALSE, MossdeepCity_SpaceCenter_2F_EventScript_SkipInvalidSteven
 	goto_if_set FLAG_INTERACTED_WITH_STEVEN_SPACE_CENTER, MossdeepCity_SpaceCenter_2F_EventScript_ReadyForBattlePrompt
 	setflag FLAG_INTERACTED_WITH_STEVEN_SPACE_CENTER
 	msgbox MossdeepCity_SpaceCenter_2F_Text_StevenWhyStealRocketFuel, MSGBOX_DEFAULT
@@ -189,6 +204,10 @@ MossdeepCity_SpaceCenter_2F_EventScript_Steven::
 	case DIR_SOUTH, MossdeepCity_SpaceCenter_2F_EventScript_StevenFightMovementSouth
 	applymovement LOCALID_SPACE_CENTER_2F_STEVEN, MossdeepCity_SpaceCenter_2F_Movement_StevenFight
 	waitmovement 0
+	releaseall
+	end
+
+MossdeepCity_SpaceCenter_2F_EventScript_SkipInvalidSteven::
 	releaseall
 	end
 
@@ -289,6 +308,7 @@ MossdeepCity_SpaceCenter_2F_EventScript_DefeatedMaxieTabitha::
 	closemessage
 	fadescreen FADE_TO_BLACK
 	setflag FLAG_DEFEATED_MAGMA_SPACE_CENTER
+	special PgrProgress_ScriptCompleteHoennMossdeepSpaceCenter
 	setflag FLAG_HIDE_MOSSDEEP_CITY_STEVENS_HOUSE_STEVEN
 	removeobject LOCALID_SPACE_CENTER_2F_STEVEN
 	setflag FLAG_HIDE_MOSSDEEP_CITY_SPACE_CENTER_MAGMA_NOTE

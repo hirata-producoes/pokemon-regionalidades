@@ -6,9 +6,37 @@ SlateportCity_MapScripts::
 SlateportCity_OnTransition:
 	setvar VAR_SLATEPORT_MUSEUM_1F_STATE, 0
 	call SlateportCity_EventScript_EnterSlateport
+	call SlateportCity_EventScript_SyncSubmarineInterview
+	call SlateportCity_EventScript_SyncScottOpportunity
 	call_if_eq VAR_SLATEPORT_CITY_STATE, 1, SlateportCity_EventScript_MovePeopleForSternInterview
 	call_if_eq VAR_SLATEPORT_OUTSIDE_MUSEUM_STATE, 1, SlateportCity_EventScript_SetReadyForScottScene
 	end
+
+SlateportCity_EventScript_SyncScottOpportunity::
+	special PgrProgress_ScriptGetHoennSlateportScottOpportunity
+	goto_if_ne VAR_RESULT, 3, SlateportCity_EventScript_KeepScottOpportunity
+	setvar VAR_SLATEPORT_OUTSIDE_MUSEUM_STATE, 3
+	setflag FLAG_HIDE_SLATEPORT_CITY_SCOTT
+	clearflag FLAG_HIDE_MAP_NAME_POPUP
+	return
+
+SlateportCity_EventScript_KeepScottOpportunity::
+	return
+
+SlateportCity_EventScript_SyncSubmarineInterview::
+	goto_if_ne VAR_SLATEPORT_CITY_STATE, 1, SlateportCity_EventScript_HideSubmarineInterview
+	special PgrProgress_ScriptCheckHoennSubmarineTheft
+	goto_if_eq VAR_RESULT, TRUE, SlateportCity_EventScript_ShowSubmarineInterview
+
+SlateportCity_EventScript_HideSubmarineInterview::
+	setflag FLAG_HIDE_SLATEPORT_CITY_CAPTAIN_STERN
+	setflag FLAG_HIDE_SLATEPORT_CITY_GABBY_AND_TY
+	return
+
+SlateportCity_EventScript_ShowSubmarineInterview::
+	clearflag FLAG_HIDE_SLATEPORT_CITY_CAPTAIN_STERN
+	clearflag FLAG_HIDE_SLATEPORT_CITY_GABBY_AND_TY
+	return
 
 SlateportCity_EventScript_EnterSlateport::
 	setflag FLAG_VISITED_SLATEPORT_CITY
@@ -17,6 +45,8 @@ SlateportCity_EventScript_EnterSlateport::
 	return
 
 SlateportCity_EventScript_MovePeopleForSternInterview::
+	special PgrProgress_ScriptCheckHoennSubmarineTheft
+	goto_if_eq VAR_RESULT, FALSE, Common_EventScript_NopReturn
 	setobjectxyperm LOCALID_SLATEPORT_CAPT_STERN, 28, 13
 	setobjectxyperm LOCALID_SLATEPORT_OLD_WOMAN, 25, 13
 	setobjectxyperm LOCALID_SLATEPORT_RICH_BOY, 25, 14
@@ -52,6 +82,8 @@ SlateportCity_OnFrame:
 
 SlateportCity_EventScript_ScottScene::
 	lockall
+	special PgrProgress_ScriptGetHoennSlateportScottOpportunity
+	goto_if_ne VAR_RESULT, 1, SlateportCity_EventScript_SkipInvalidScottScene
 	addobject LOCALID_SLATEPORT_SCOTT
 	applymovement LOCALID_PLAYER, SlateportCity_Movement_PlayerFaceScott
 	applymovement LOCALID_SLATEPORT_SCOTT, SlateportCity_Movement_ScottApproachPlayer
@@ -83,6 +115,14 @@ SlateportCity_EventScript_ScottScene::
 	clearflag FLAG_HIDE_MAP_NAME_POPUP
 	setvar VAR_SLATEPORT_OUTSIDE_MUSEUM_STATE, 2
 	addvar VAR_SCOTT_STATE, 1
+	releaseall
+	end
+
+SlateportCity_EventScript_SkipInvalidScottScene::
+	setvar VAR_SLATEPORT_OUTSIDE_MUSEUM_STATE, 3
+	setflag FLAG_HIDE_SLATEPORT_CITY_SCOTT
+	removeobject LOCALID_SLATEPORT_SCOTT
+	clearflag FLAG_HIDE_MAP_NAME_POPUP
 	releaseall
 	end
 
@@ -544,6 +584,8 @@ SlateportCity_Pokemart_PowerTMs:
 @ Scene with Capt Sterns interview and Team Aqua announcing plans to steal Submarine
 SlateportCity_EventScript_CaptStern::
 	lockall
+	special PgrProgress_ScriptCheckHoennSubmarineTheft
+	goto_if_eq VAR_RESULT, FALSE, SlateportCity_EventScript_SkipInvalidSubmarineInterview
 	msgbox SlateportCity_Text_SternMoveAheadWithExploration, MSGBOX_DEFAULT
 	msgbox SlateportCity_Text_GabbyWonderfulThanksForInterview, MSGBOX_DEFAULT
 	closemessage
@@ -596,6 +638,10 @@ SlateportCity_EventScript_CaptStern::
 	setvar VAR_SLATEPORT_CITY_STATE, 2
 	warp MAP_SLATEPORT_CITY_HARBOR, 11, 14
 	waitstate
+	releaseall
+	end
+
+SlateportCity_EventScript_SkipInvalidSubmarineInterview::
 	releaseall
 	end
 
@@ -863,6 +909,8 @@ SlateportCity_EventScript_NotEnoughBerryPowder::
 
 SlateportCity_EventScript_ScottBattleTentScene::
 	lockall
+	special PgrProgress_ScriptGetHoennSlateportScottOpportunity
+	goto_if_ne VAR_RESULT, 2, SlateportCity_EventScript_SkipInvalidBattleTentScott
 	applymovement LOCALID_PLAYER, Common_Movement_FaceUp
 	waitmovement 0
 	opendoor 10, 12
@@ -881,6 +929,13 @@ SlateportCity_EventScript_ScottBattleTentScene::
 	removeobject LOCALID_SLATEPORT_SCOTT
 	addvar VAR_SCOTT_STATE, 1
 	setvar VAR_SLATEPORT_OUTSIDE_MUSEUM_STATE, 3
+	releaseall
+	end
+
+SlateportCity_EventScript_SkipInvalidBattleTentScott::
+	setvar VAR_SLATEPORT_OUTSIDE_MUSEUM_STATE, 3
+	setflag FLAG_HIDE_SLATEPORT_CITY_SCOTT
+	removeobject LOCALID_SLATEPORT_SCOTT
 	releaseall
 	end
 

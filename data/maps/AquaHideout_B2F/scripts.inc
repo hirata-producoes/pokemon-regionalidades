@@ -3,6 +3,9 @@ AquaHideout_B2F_MapScripts::
 	.byte 0
 
 AquaHideout_B2F_OnTransition:
+	call AquaHideout_EventScript_SyncTeamVisibility
+	special PgrProgress_ScriptCheckHoennAquaHideout
+	call_if_eq VAR_RESULT, FALSE, AquaHideout_B2F_EventScript_PreventMattNoticing
 	call_if_set FLAG_TEAM_AQUA_ESCAPED_IN_SUBMARINE, AquaHideout_B2F_EventScript_PreventMattNoticing
 	end
 
@@ -23,6 +26,8 @@ AquaHideout_B2F_EventScript_MattNoticePlayer::
 	end
 
 AquaHideout_B2F_EventScript_Matt::
+	special PgrProgress_ScriptCheckHoennAquaHideout
+	goto_if_eq VAR_RESULT, FALSE, AquaHideout_B2F_EventScript_SkipInvalidMattBattle
 	trainerbattle_single TRAINER_MATT, AquaHideout_B2F_Text_MattIntro, AquaHideout_B2F_Text_MattDefeat, AquaHideout_B2F_EventScript_SubmarineEscape
 	msgbox AquaHideout_B2F_Text_MattPostBattle, MSGBOX_DEFAULT
 	release
@@ -47,7 +52,14 @@ AquaHideout_B2F_EventScript_SubmarineEscape::
 	waitmovement 0
 	msgbox AquaHideout_B2F_Text_MattPostBattle, MSGBOX_DEFAULT
 	setflag FLAG_TEAM_AQUA_ESCAPED_IN_SUBMARINE
+	special PgrProgress_ScriptCompleteHoennAquaHideout
+	setflag FLAG_HIDE_AQUA_HIDEOUT_GRUNTS
+	setflag FLAG_HIDE_AQUA_HIDEOUT_B2F_SUBMARINE_SHADOW
 	setflag FLAG_HIDE_LILYCOVE_CITY_AQUA_GRUNTS
+	release
+	end
+
+AquaHideout_B2F_EventScript_SkipInvalidMattBattle::
 	release
 	end
 

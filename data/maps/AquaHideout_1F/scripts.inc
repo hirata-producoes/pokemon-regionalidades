@@ -1,5 +1,25 @@
 AquaHideout_1F_MapScripts::
+	map_script MAP_SCRIPT_ON_TRANSITION, AquaHideout_1F_OnTransition
 	.byte 0
+
+AquaHideout_1F_OnTransition:
+	call AquaHideout_EventScript_SyncTeamVisibility
+	end
+
+AquaHideout_EventScript_SyncTeamVisibility::
+	goto_if_set FLAG_TEAM_AQUA_ESCAPED_IN_SUBMARINE, AquaHideout_EventScript_HideTeam
+	special PgrProgress_ScriptCheckHoennAquaHideout
+	goto_if_eq VAR_RESULT, TRUE, AquaHideout_EventScript_ShowTeam
+
+AquaHideout_EventScript_HideTeam::
+	setflag FLAG_HIDE_AQUA_HIDEOUT_GRUNTS
+	setflag FLAG_HIDE_AQUA_HIDEOUT_B2F_SUBMARINE_SHADOW
+	return
+
+AquaHideout_EventScript_ShowTeam::
+	clearflag FLAG_HIDE_AQUA_HIDEOUT_GRUNTS
+	clearflag FLAG_HIDE_AQUA_HIDEOUT_B2F_SUBMARINE_SHADOW
+	return
 
 @ The below two entrance guards give hints about what to do to progress the story
 AquaHideout_1F_EventScript_HideoutEntranceGrunt1::
@@ -116,4 +136,3 @@ AquaHideout_1F_Text_Grunt1Defeat:
 AquaHideout_1F_Text_Grunt1PostBattle:
 	.string "I took the loss for the TEAM,\n"
 	.string "but I did my job…$"
-

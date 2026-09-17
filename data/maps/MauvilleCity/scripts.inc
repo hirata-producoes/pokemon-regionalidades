@@ -85,6 +85,8 @@ MauvilleCity_EventScript_UncleAskPlayerToBattleWally::
 
 MauvilleCity_EventScript_Wally::
 	lockall
+	special PgrProgress_ScriptCheckHoennWallyMauville
+	goto_if_eq VAR_RESULT, FALSE, MauvilleCity_EventScript_SkipInvalidWallyBattle
 	goto_if_set FLAG_DECLINED_WALLY_BATTLE_MAUVILLE, MauvilleCity_EventScript_WallyRequestBattleAgain
 	applymovement LOCALID_MAUVILLE_WALLY, Common_Movement_WalkInPlaceFasterRight
 	waitmovement 0
@@ -100,6 +102,10 @@ MauvilleCity_EventScript_Wally::
 	waitmovement 0
 	msgbox MauvilleCity_Text_WallyWillYouBattleMe, MSGBOX_YESNO
 	goto MauvilleCity_EventScript_BattleWallyPrompt
+	end
+
+MauvilleCity_EventScript_SkipInvalidWallyBattle::
+	releaseall
 	end
 
 MauvilleCity_EventScript_BattleWallyPrompt::

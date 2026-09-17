@@ -1,5 +1,16 @@
 RustboroCity_PokemonSchool_MapScripts::
+	map_script MAP_SCRIPT_ON_TRANSITION, RustboroCity_PokemonSchool_OnTransition
 	.byte 0
+
+RustboroCity_PokemonSchool_OnTransition:
+	special PgrProgress_ScriptShouldShowHoennRustboroSchoolScott
+	goto_if_eq VAR_RESULT, TRUE, RustboroCity_PokemonSchool_EventScript_ShowScott
+	setflag FLAG_HIDE_RUSTBORO_CITY_POKEMON_SCHOOL_SCOTT
+	end
+
+RustboroCity_PokemonSchool_EventScript_ShowScott::
+	clearflag FLAG_HIDE_RUSTBORO_CITY_POKEMON_SCHOOL_SCOTT
+	end
 
 RustboroCity_PokemonSchool_EventScript_Blackboard::
 	lockall
@@ -163,12 +174,20 @@ RustboroCity_PokemonSchool_Movement_TeacherCheckOnStudentsEast:
 RustboroCity_PokemonSchool_EventScript_Scott::
 	lock
 	faceplayer
+	special PgrProgress_ScriptShouldShowHoennRustboroSchoolScott
+	goto_if_eq VAR_RESULT, FALSE, RustboroCity_PokemonSchool_EventScript_HideInvalidScott
 	goto_if_set FLAG_MET_SCOTT_AFTER_OBTAINING_STONE_BADGE, RustboroCity_PokemonSchool_EventScript_ScottWatchStudents
 	goto_if_set FLAG_MET_SCOTT_RUSTBORO, RustboroCity_PokemonSchool_EventScript_ScottSpokeAlready
 	goto_if_set FLAG_BADGE01_GET, RustboroCity_PokemonSchool_EventScript_ScottGreetHasBadge
 	msgbox RustboroCity_PokemonSchool_Text_ScottMetAlreadyCut, MSGBOX_DEFAULT
 	addvar VAR_SCOTT_STATE, 1
 	setflag FLAG_MET_SCOTT_RUSTBORO
+	release
+	end
+
+RustboroCity_PokemonSchool_EventScript_HideInvalidScott::
+	setflag FLAG_HIDE_RUSTBORO_CITY_POKEMON_SCHOOL_SCOTT
+	removeobject VAR_LAST_TALKED
 	release
 	end
 
@@ -348,4 +367,3 @@ RustboroCity_PokemonSchool_Text_ScottMetAlreadyStoneBadge:
 	.string "you in battle.\p"
 	.string "It's hard to tell what you're like as\n"
 	.string "a TRAINER from a LEAGUE BADGE.$"
-

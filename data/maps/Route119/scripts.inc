@@ -14,11 +14,25 @@ Route119_EventScript_TryRemoveKecleon::
 	return
 
 Route119_OnTransition:
+	call Route119_EventScript_SyncAquaVisibility
 	call Common_EventScript_SetupRivalGfxId
 	call Common_EventScript_SetupRivalOnBikeGfxId
 	call_if_eq VAR_WEATHER_INSTITUTE_STATE, 1, Route119_EventScript_MoveInstituteWorkersDownstairs
 	special SetRoute119Weather
 	end
+
+Route119_EventScript_SyncAquaVisibility::
+	goto_if_ne VAR_WEATHER_INSTITUTE_STATE, 0, Route119_EventScript_HideAqua
+	special PgrProgress_ScriptCheckHoennWeatherInstitute
+	goto_if_eq VAR_RESULT, TRUE, Route119_EventScript_ShowAqua
+
+Route119_EventScript_HideAqua::
+	setflag FLAG_HIDE_ROUTE_119_TEAM_AQUA
+	return
+
+Route119_EventScript_ShowAqua::
+	clearflag FLAG_HIDE_ROUTE_119_TEAM_AQUA
+	return
 
 Route119_EventScript_MoveInstituteWorkersDownstairs::
 	setflag FLAG_HIDE_WEATHER_INSTITUTE_2F_WORKERS
@@ -38,6 +52,8 @@ Route119_EventScript_RivalTrigger2::
 
 Route119_EventScript_RivalEncounter::
 	lockall
+	special PgrProgress_ScriptCheckHoennRoute119Rival
+	goto_if_eq VAR_RESULT, FALSE, Route119_EventScript_SkipInvalidRivalEncounter
 	addobject LOCALID_ROUTE119_RIVAL_ON_BIKE
 	checkplayergender
 	call_if_eq VAR_RESULT, MALE, Route119_EventScript_PlayMayMusic
@@ -143,6 +159,7 @@ Route119_EventScript_RivalExitScottArrive::
 	call_if_eq VAR_TEMP_1, 2, Route119_EventScript_RivalExit2
 	removeobject LOCALID_ROUTE119_RIVAL_ON_BIKE
 	setvar VAR_ROUTE119_STATE, 1
+	special PgrProgress_ScriptCompleteHoennRoute119Rival
 	savebgm MUS_DUMMY
 	fadedefaultbgm
 	delay 60
@@ -157,6 +174,10 @@ Route119_EventScript_RivalExitScottArrive::
 	call_if_eq VAR_TEMP_1, 1, Route119_EventScript_ScottExit1
 	call_if_eq VAR_TEMP_1, 2, Route119_EventScript_ScottExit2
 	removeobject LOCALID_ROUTE119_SCOTT
+	releaseall
+	end
+
+Route119_EventScript_SkipInvalidRivalEncounter::
 	releaseall
 	end
 

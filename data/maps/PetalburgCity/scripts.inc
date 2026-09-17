@@ -528,6 +528,9 @@ PetalburgCity_EventScript_Scott3::
 	end
 
 PetalburgCity_EventScript_Scott::
+	special PgrProgress_ScriptGetHoennPetalburgScottOpportunity
+	goto_if_eq VAR_RESULT, 0, PetalburgCity_EventScript_ScottNotAvailable
+	goto_if_eq VAR_RESULT, 2, PetalburgCity_EventScript_ScottExpired
 	applymovement LOCALID_PETALBURG_SCOTT, PetalburgCity_Movement_ScottStartWalkLeft
 	waitmovement 0
 	playse SE_PIN
@@ -556,6 +559,17 @@ PetalburgCity_EventScript_Scott::
 	call_if_eq VAR_0x8008, 1, PetalburgCity_EventScript_ScottExit1
 	call_if_eq VAR_0x8008, 2, PetalburgCity_EventScript_ScottExit2
 	call_if_eq VAR_0x8008, 3, PetalburgCity_EventScript_ScottExit3
+	setvar VAR_SCOTT_PETALBURG_ENCOUNTER, 1
+	removeobject LOCALID_PETALBURG_SCOTT
+	releaseall
+	end
+
+PetalburgCity_EventScript_ScottNotAvailable::
+	removeobject LOCALID_PETALBURG_SCOTT
+	releaseall
+	end
+
+PetalburgCity_EventScript_ScottExpired::
 	setvar VAR_SCOTT_PETALBURG_ENCOUNTER, 1
 	removeobject LOCALID_PETALBURG_SCOTT
 	releaseall

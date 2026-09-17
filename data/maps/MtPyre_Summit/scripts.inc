@@ -3,8 +3,37 @@ MtPyre_Summit_MapScripts::
 	.byte 0
 
 MtPyre_Summit_OnTransition:
+	call MtPyre_Summit_EventScript_SyncStoryActors
 	call_if_eq VAR_MT_PYRE_STATE, 2, MtPyre_Summit_EventScript_SetArchieMaxiePositions
 	end
+
+MtPyre_Summit_EventScript_SyncStoryActors::
+	goto_if_eq VAR_MT_PYRE_STATE, 0, MtPyre_Summit_EventScript_SyncOrbTheftActors
+	goto_if_eq VAR_MT_PYRE_STATE, 2, MtPyre_Summit_EventScript_ShowReturningLeaders
+	goto MtPyre_Summit_EventScript_HideStoryActors
+
+MtPyre_Summit_EventScript_SyncOrbTheftActors::
+	special PgrProgress_ScriptCheckHoennMtPyreOrbTheft
+	goto_if_eq VAR_RESULT, TRUE, MtPyre_Summit_EventScript_ShowOrbTheftActors
+	goto MtPyre_Summit_EventScript_HideStoryActors
+
+MtPyre_Summit_EventScript_ShowOrbTheftActors::
+	clearflag FLAG_HIDE_MT_PYRE_SUMMIT_ARCHIE
+	clearflag FLAG_HIDE_MT_PYRE_SUMMIT_TEAM_AQUA
+	setflag FLAG_HIDE_MT_PYRE_SUMMIT_MAXIE
+	return
+
+MtPyre_Summit_EventScript_ShowReturningLeaders::
+	clearflag FLAG_HIDE_MT_PYRE_SUMMIT_ARCHIE
+	clearflag FLAG_HIDE_MT_PYRE_SUMMIT_MAXIE
+	setflag FLAG_HIDE_MT_PYRE_SUMMIT_TEAM_AQUA
+	return
+
+MtPyre_Summit_EventScript_HideStoryActors::
+	setflag FLAG_HIDE_MT_PYRE_SUMMIT_ARCHIE
+	setflag FLAG_HIDE_MT_PYRE_SUMMIT_MAXIE
+	setflag FLAG_HIDE_MT_PYRE_SUMMIT_TEAM_AQUA
+	return
 
 MtPyre_Summit_EventScript_SetArchieMaxiePositions::
 	setobjectxyperm LOCALID_MT_PYRE_SUMMIT_MAXIE, 23, 6
@@ -30,6 +59,8 @@ MtPyre_Summit_EventScript_TeamAquaTrigger2::
 	end
 
 MtPyre_Summit_EventScript_TeamAquaExits::
+	special PgrProgress_ScriptCheckHoennMtPyreOrbTheft
+	goto_if_eq VAR_RESULT, FALSE, MtPyre_Summit_EventScript_SkipInvalidOrbTheft
 	playbgm MUS_ENCOUNTER_AQUA, FALSE
 	applymovement LOCALID_PLAYER, Common_Movement_FaceUp
 	waitmovement 0
@@ -59,7 +90,12 @@ MtPyre_Summit_EventScript_TeamAquaExits::
 	msgbox MtPyre_Summit_Text_BothOrbsTakenMagmaLeftThis, MSGBOX_DEFAULT
 	giveitem ITEM_MAGMA_EMBLEM
 	setflag FLAG_RECEIVED_RED_OR_BLUE_ORB
+	special PgrProgress_ScriptCompleteHoennMtPyreOrbTheft
 	setflag FLAG_HIDE_JAGGED_PASS_MAGMA_GUARD
+	releaseall
+	end
+
+MtPyre_Summit_EventScript_SkipInvalidOrbTheft::
 	releaseall
 	end
 
@@ -614,4 +650,3 @@ MtPyre_Summit_Text_HoennTrioTale:
 	.string "becalmed the two enraged POKéMON.\p"
 	.string "Then, its duty done, the green POKéMON\n"
 	.string "flew off into the wild blue yonder…$"
-

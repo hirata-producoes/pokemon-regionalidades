@@ -5,7 +5,21 @@ FortreeCity_MapScripts::
 
 FortreeCity_OnTransition:
 	setflag FLAG_VISITED_FORTREE_CITY
+	call FortreeCity_EventScript_SyncKecleonVisibility
 	end
+
+FortreeCity_EventScript_SyncKecleonVisibility::
+	goto_if_set FLAG_KECLEON_FLED_FORTREE, FortreeCity_EventScript_HideKecleon
+	special PgrProgress_ScriptCheckHoennFortreeGymPath
+	goto_if_eq VAR_RESULT, TRUE, FortreeCity_EventScript_ShowKecleon
+
+FortreeCity_EventScript_HideKecleon::
+	setflag FLAG_HIDE_FORTREE_CITY_KECLEON
+	return
+
+FortreeCity_EventScript_ShowKecleon::
+	clearflag FLAG_HIDE_FORTREE_CITY_KECLEON
+	return
 
 FortreeCity_OnResume:
 	setstepcallback STEP_CB_FORTREE_BRIDGE
@@ -80,6 +94,7 @@ FortreeCity_EventScript_UseDevonScope::
 	waitmovement 0
 	removeobject VAR_LAST_TALKED
 	setflag FLAG_KECLEON_FLED_FORTREE
+	setflag FLAG_HIDE_FORTREE_CITY_KECLEON
 	release
 	end
 
@@ -153,4 +168,3 @@ FortreeCity_Text_GymSign:
 	.string "LEADER: WINONA\p"
 	.string "“The bird user taking flight into\n"
 	.string "the world.”$"
-

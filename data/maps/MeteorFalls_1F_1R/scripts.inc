@@ -1,6 +1,26 @@
 MeteorFalls_1F_1R_MapScripts::
 	map_script MAP_SCRIPT_ON_LOAD, MeteorFalls_1F_1R_OnLoad
+	map_script MAP_SCRIPT_ON_TRANSITION, MeteorFalls_1F_1R_OnTransition
 	.byte 0
+
+MeteorFalls_1F_1R_OnTransition:
+	goto_if_set FLAG_MET_ARCHIE_METEOR_FALLS, MeteorFalls_1F_1R_EventScript_KeepCanonicalVisibility
+	goto_if_ne VAR_METEOR_FALLS_STATE, 0, MeteorFalls_1F_1R_EventScript_KeepCanonicalVisibility
+	special PgrProgress_ScriptCheckHoennMeteoriteTheft
+	goto_if_eq VAR_RESULT, TRUE, MeteorFalls_1F_1R_EventScript_ShowMeteoriteTheftActors
+	setflag FLAG_HIDE_METEOR_FALLS_TEAM_MAGMA
+	setflag FLAG_HIDE_METEOR_FALLS_TEAM_AQUA
+	setflag FLAG_HIDE_METEOR_FALLS_1F_1R_COZMO
+	end
+
+MeteorFalls_1F_1R_EventScript_ShowMeteoriteTheftActors::
+	clearflag FLAG_HIDE_METEOR_FALLS_TEAM_MAGMA
+	setflag FLAG_HIDE_METEOR_FALLS_TEAM_AQUA
+	clearflag FLAG_HIDE_METEOR_FALLS_1F_1R_COZMO
+	end
+
+MeteorFalls_1F_1R_EventScript_KeepCanonicalVisibility::
+	end
 
 MeteorFalls_1F_1R_OnLoad:
 	call_if_set FLAG_SYS_GAME_CLEAR, MeteorFalls_1F_1R_EventScript_OpenStevensCave
@@ -15,6 +35,8 @@ MeteorFalls_1F_1R_EventScript_OpenStevensCave::
 
 MeteorFalls_1F_1R_EventScript_MagmaStealsMeteoriteScene::
 	lockall
+	special PgrProgress_ScriptCheckHoennMeteoriteTheft
+	goto_if_eq VAR_RESULT, FALSE, MeteorFalls_1F_1R_EventScript_SkipInvalidMeteoriteTheft
 	playbgm MUS_ENCOUNTER_MAGMA, FALSE
 	applymovement LOCALID_PLAYER, Common_Movement_FaceDown
 	waitmovement 0
@@ -87,6 +109,10 @@ MeteorFalls_1F_1R_EventScript_MagmaStealsMeteoriteScene::
 	setflag FLAG_MET_ARCHIE_METEOR_FALLS
 	setflag FLAG_HIDE_FALLARBOR_TOWN_BATTLE_TENT_SCOTT
 	setvar VAR_METEOR_FALLS_STATE, 1
+	releaseall
+	end
+
+MeteorFalls_1F_1R_EventScript_SkipInvalidMeteoriteTheft::
 	releaseall
 	end
 

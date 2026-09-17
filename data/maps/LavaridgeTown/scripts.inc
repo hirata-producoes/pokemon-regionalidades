@@ -5,6 +5,7 @@ LavaridgeTown_MapScripts::
 
 LavaridgeTown_OnTransition:
 	setflag FLAG_VISITED_LAVARIDGE_TOWN
+	call LavaridgeTown_EventScript_SyncGoGogglesScene
 	call_if_set FLAG_WHITEOUT_TO_LAVARIDGE, LavaridgeTown_EventScript_ClearLavaridgeWhiteOut
 	call_if_set FLAG_DEFEATED_EVIL_TEAM_MT_CHIMNEY, LavaridgeTown_EventScript_ShowMtChimneyTrainers
 	call Common_EventScript_SetupRivalGfxId
@@ -12,6 +13,22 @@ LavaridgeTown_OnTransition:
 	call_if_eq VAR_LAVARIDGE_TOWN_STATE, 1, LavaridgeTown_EventScript_CheckSetRivalPos
 	call_if_eq VAR_LAVARIDGE_TOWN_STATE, 1, LavaridgeTown_EventScript_HideMapNamePopup
 	end
+
+LavaridgeTown_EventScript_SyncGoGogglesScene::
+	goto_if_eq VAR_LAVARIDGE_TOWN_STATE, 2, LavaridgeTown_EventScript_KeepGoGogglesSceneState
+	special PgrProgress_ScriptCheckHoennGoGoggles
+	goto_if_eq VAR_RESULT, TRUE, LavaridgeTown_EventScript_EnableGoGogglesScene
+	setvar VAR_LAVARIDGE_TOWN_STATE, 0
+	setflag FLAG_HIDE_LAVARIDGE_TOWN_RIVAL
+	setflag FLAG_HIDE_LAVARIDGE_TOWN_RIVAL_ON_BIKE
+	return
+
+LavaridgeTown_EventScript_EnableGoGogglesScene::
+	setvar VAR_LAVARIDGE_TOWN_STATE, 1
+	return
+
+LavaridgeTown_EventScript_KeepGoGogglesSceneState::
+	return
 
 LavaridgeTown_EventScript_ClearLavaridgeWhiteOut::
 	clearflag FLAG_WHITEOUT_TO_LAVARIDGE
@@ -43,6 +60,8 @@ LavaridgeTown_OnFrame:
 
 LavaridgeTown_EventScript_RivalGiveGoGoggles::
 	lockall
+	special PgrProgress_ScriptCheckHoennGoGoggles
+	goto_if_eq VAR_RESULT, FALSE, LavaridgeTown_EventScript_SkipInvalidGoGogglesScene
 	getplayerxy VAR_0x8008, VAR_0x8009
 	call_if_eq VAR_0x8008, 9, LavaridgeTown_EventScript_RivalNoticePlayer
 	call_if_ne VAR_0x8008, 9, LavaridgeTown_EventScript_RivalExitHerbShop
@@ -55,6 +74,11 @@ LavaridgeTown_EventScript_RivalGiveGoGoggles::
 	checkplayergender
 	goto_if_eq VAR_RESULT, MALE, LavaridgeTown_EventScript_MayGiveGoGoggles
 	goto_if_eq VAR_RESULT, FEMALE, LavaridgeTown_EventScript_BrendanGiveGoGoggles
+	end
+
+LavaridgeTown_EventScript_SkipInvalidGoGogglesScene::
+	setvar VAR_LAVARIDGE_TOWN_STATE, 0
+	releaseall
 	end
 
 LavaridgeTown_EventScript_MayGiveGoGoggles::
@@ -403,4 +427,3 @@ LavaridgeTown_Text_GymSign:
 LavaridgeTown_Text_HerbShopSign:
 	.string "POKéMON HERB SHOP\n"
 	.string "“Bitter taste--better cure!”$"
-

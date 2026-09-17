@@ -14,9 +14,19 @@ Route104_EventScript_StartSailToDewford::
 
 Route104_OnTransition:
 	call Common_EventScript_SetupRivalGfxId
+	call Route104_EventScript_ProtectRivalVisibility
 	call Route104_EventScript_TrySetRivalPos
 	call Route104_EventScript_ShowOrHideWhiteHerbFlorist
 	end
+
+Route104_EventScript_ProtectRivalVisibility::
+	special PgrProgress_ScriptCanMeetHoennRoute104Rival
+	goto_if_eq VAR_RESULT, TRUE, Route104_EventScript_KeepRivalVisibility
+	setflag FLAG_HIDE_ROUTE_104_RIVAL
+	return
+
+Route104_EventScript_KeepRivalVisibility::
+	return
 
 Route104_EventScript_ShowOrHideWhiteHerbFlorist::
 	goto_if_unset FLAG_MET_PRETTY_PETAL_SHOP_OWNER, Route104_EventScript_HideWhiteHerbFlorist
@@ -40,6 +50,8 @@ Route104_EventScript_DontSetRivalPos::
 
 Route104_EventScript_Rival::
 	lockall
+	special PgrProgress_ScriptCanMeetHoennRoute104Rival
+	goto_if_eq VAR_RESULT, FALSE, Route104_EventScript_SkipInvalidRival
 	setvar VAR_0x8008, 1
 	applymovement LOCALID_ROUTE104_RIVAL, Common_Movement_FacePlayer
 	waitmovement 0
@@ -47,6 +59,8 @@ Route104_EventScript_Rival::
 
 Route104_EventScript_RivalTrigger::
 	lockall
+	special PgrProgress_ScriptCanMeetHoennRoute104Rival
+	goto_if_eq VAR_RESULT, FALSE, Route104_EventScript_SkipInvalidRival
 	setflag FLAG_HIDE_RUSTBORO_CITY_RIVAL
 	setvar VAR_RUSTBORO_CITY_STATE, 8
 	setvar VAR_ROUTE104_STATE, 2
@@ -68,6 +82,12 @@ Route104_EventScript_RivalTrigger::
 	applymovement LOCALID_ROUTE104_RIVAL, Common_Movement_Delay48
 	waitmovement 0
 	goto Route104_EventScript_RivalEncounter
+
+Route104_EventScript_SkipInvalidRival::
+	setflag FLAG_HIDE_ROUTE_104_RIVAL
+	removeobject LOCALID_ROUTE104_RIVAL
+	releaseall
+	end
 
 @ Unused, shares script with Rustboro encounter instead
 Route104_EventScript_PlayRivalMusic::

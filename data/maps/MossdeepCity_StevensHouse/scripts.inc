@@ -13,8 +13,22 @@ MossdeepCity_StevensHouse_EventScript_HideStevensNote::
 	return
 
 MossdeepCity_StevensHouse_OnTransition:
+	setvar VAR_TEMP_1, 0
+	call MossdeepCity_StevensHouse_EventScript_SyncDiveScene
 	call_if_eq VAR_STEVENS_HOUSE_STATE, 2, MossdeepCity_StevensHouse_EventScript_SetStevenPos
 	end
+
+MossdeepCity_StevensHouse_EventScript_SyncDiveScene::
+	goto_if_ne VAR_STEVENS_HOUSE_STATE, 1, Common_EventScript_NopReturn
+	special PgrProgress_ScriptCheckHoennDiveFromSteven
+	goto_if_eq VAR_RESULT, FALSE, MossdeepCity_StevensHouse_EventScript_HideInvalidSteven
+	clearflag FLAG_HIDE_MOSSDEEP_CITY_STEVENS_HOUSE_STEVEN
+	setvar VAR_TEMP_1, 1
+	return
+
+MossdeepCity_StevensHouse_EventScript_HideInvalidSteven::
+	setflag FLAG_HIDE_MOSSDEEP_CITY_STEVENS_HOUSE_STEVEN
+	return
 
 MossdeepCity_StevensHouse_EventScript_SetStevenPos::
 	setobjectxyperm LOCALID_STEVENS_HOUSE_STEVEN, 6, 5
@@ -22,7 +36,7 @@ MossdeepCity_StevensHouse_EventScript_SetStevenPos::
 	return
 
 MossdeepCity_StevensHouse_OnFrame:
-	map_script_2 VAR_STEVENS_HOUSE_STATE, 1, MossdeepCity_StevensHouse_EventScript_StevenGivesDive
+	map_script_2 VAR_TEMP_1, 1, MossdeepCity_StevensHouse_EventScript_StevenGivesDive
 	.2byte 0
 
 MossdeepCity_StevensHouse_EventScript_StevenGivesDive::
@@ -48,6 +62,8 @@ MossdeepCity_StevensHouse_EventScript_StevenGivesDive::
 	setflag FLAG_HIDE_MOSSDEEP_CITY_SCOTT
 	setflag FLAG_HIDE_SEAFLOOR_CAVERN_ENTRANCE_AQUA_GRUNT
 	setvar VAR_STEVENS_HOUSE_STATE, 2
+	setvar VAR_TEMP_1, 0
+	special PgrProgress_ScriptCompleteHoennDiveFromSteven
 	releaseall
 	end
 
@@ -211,4 +227,3 @@ MossdeepCity_StevensHouse_Text_LetterFromSteven:
 MossdeepCity_StevensHouse_Text_CollectionOfRareRocks:
 	.string "It's a collection of rare rocks and\n"
 	.string "stones assembled by STEVEN.$"
-
