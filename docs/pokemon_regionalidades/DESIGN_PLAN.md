@@ -24,6 +24,42 @@ Cada decisão passa por quatro estados de engenharia:
 
 O status de design (`DECIDIDO`, `PARCIALMENTE DECIDIDO` ou `EM DISCUSSÃO`) não é igual ao status de implementação. Uma regra pode estar decidida e ainda não ter sido programada.
 
+## Baseline antes da expansão
+
+O projeto primeiro reproduz e valida as campanhas-base no PC. Clima, ecologia, expansão espacial e progressão mundial podem ter contratos e metadados preparados, mas não devem impedir o comportamento original nem ser considerados validados antes dos mapas e eventos de referência.
+
+Mapas externos usam como direção inicial aproximadamente 2× por eixo, sem aumentar tiles, árvores, casas, personagens ou objetos. Essa etapa acontece depois do checkpoint original de cada mapa e redistribui pontos de interesse, preenchendo as novas distâncias com conteúdo real. Consulte [Estratégia da versão-base](BASELINE_STRATEGY.md).
+
+## Entrada multirregional e recursos de produto
+
+`New Game` já abre uma primeira seleção de região antes da introdução. Hoenn é a
+única campanha habilitada; Kanto aparece como conteúdo em preparação, e Johto e
+Sinnoh como planejadas. Essa tela também servirá como instrumento de teste quando
+uma segunda campanha possuir introdução, ponto inicial e continuidade suficientes
+para ser ativada sem confundir mapas importados com uma região jogável.
+
+A escolha inicial não significa criar motores separados. Movimento, batalha, menus, inventário e regras compartilhadas continuam em um núcleo comum; cada campanha fornece mapas, scripts, eventos, progresso regional e ponto inicial próprios.
+
+Português do Brasil é o idioma principal, o padrão de autoria e a primeira interface completa. Também ficam planejados, para depois da baseline:
+
+- interface multilíngue com textos separados da lógica e idioma armazenado na configuração do PC; os demais idiomas serão traduções da interface principal em português do Brasil;
+- dois perfis pessoais independentes, cada um com um save ativo e os três últimos saves confirmados para recuperação; a fundação, a importação, a exportação, os nomes personalizados e o reinício recuperável já estão implementados;
+- separação entre perfis pessoais, save técnico de exploração e saves narrativos de referência;
+- gravação transacional para que uma falha nunca substitua o último save válido;
+- save e carregamento rápidos baseados no serializador oficial e permitidos somente em estados seguros;
+- Soft Reset sem gravação automática e sem encerrar o programa;
+- menu externo para remapeamento de teclado e controle, vídeo, tela cheia, escala, áudio e aceleração;
+- importação e exportação de save por uma tela segura, com cópia de backup;
+- validação da versão e integridade do save antes de substituir o arquivo ativo;
+- migração documentada quando uma versão futura alterar o formato persistente;
+- nomes de arquivos claros para que o jogador transporte o progresso entre computadores.
+
+Exportar e importar não deve ser apenas um botão de copiar silenciosamente. O fluxo precisa mostrar qual arquivo será usado, impedir substituição acidental e preservar o save anterior quando uma operação falhar.
+
+Perfis e recuperação serão antecipados para logo depois da primeira vertical
+slice estável de Hoenn, antes de testes pessoais prolongados. O restante do menu
+externo entra sobre essa camada. Consulte [Perfis, saves e recuperação no PC](SAVE_PROFILES.md).
+
 ## Primeiro sistema: tempo e estações
 
 As decisões D-023, D-029 e D-052 formam a base ambiental:
@@ -71,6 +107,9 @@ O clima lógico usa blocos de seis horas e uma janela determinística de 24 hora
 - D-023: World Clock 3× e calendário sazonal de 30 dias;
 - D-027: top-down em grid 16×16, áreas maiores e chunks invisíveis;
 - D-028: travessia clássica ampliada, Field Abilities, bicicleta, Surf e Dive;
+- D-067: movimentos de campo não exigem insígnias nem progresso narrativo;
+  funcionam desde o início quando um Pokémon não ovo da equipe conhece o
+  movimento e existe um alvo ou destino válido;
 - D-029: ambiente continua evoluindo fora da tela;
 - D-036: recursos regeneráveis, crafting em instalações e camp contextual;
 - D-037: equipamentos ambientais funcionais, sem durabilidade nem bônus de batalha;
@@ -83,6 +122,8 @@ O clima lógico usa blocos de seis horas e uma janela determinística de 24 hora
 - D-053: migração sazonal controlada por calendário;
 - D-054: cálculo contextual de encounters com base oficial e modificadores ambientais;
 - D-055: travessia contínua e fast travel apenas por pontos descobertos.
+
+As hipóteses atuais para aproximar Kanto, Sinnoh, Hoenn, Johto e as Ilhas Sevii, junto com dimensões e critérios de protótipo, estão em [Planejamento da geografia mundial](WORLD_GEOGRAPHY_PLAN.md). Essas posições continuam provisórias enquanto D-049, D-051 e D-055 estiverem parcialmente decididas.
 
 ### Pokémon, pesquisa e treinamento
 
@@ -111,14 +152,54 @@ O clima lógico usa blocos de seis horas e uma janela determinística de 24 hora
 - D-035 e D-065: economia global acessível, mochila ampla e proteção contra grind dominante;
 - D-046: mesmo protagonista oficial nas quatro regiões, com customização inicial simples;
 - D-047: Rotom Phone como interface de mapa, pesquisa, missões e avisos;
+- D-066: RotomDex com pesquisa por nome e filtros combináveis por tipo e por
+  estado de captura;
+- haverá um único RotomDex por campanha mundial: o professor inicial entrega o
+  aparelho e os professores seguintes instalam módulos regionais cumulativos;
+- consumíveis comuns não usam o registro de recompensas únicas; equipamentos
+  repetidos poderão seguir para o armazenamento ou guarda-roupa quando esse
+  sistema existir;
+- no PC, o inventário nativo usa `u32` e limite de gameplay de 99.999 por
+  posição; o espelho Emerald continua limitado a 999 sem reduzir o valor
+  nativo. Captura, descarte, depósito e retirada já foram validados com cinco
+  dígitos, enquanto compra e venda acima de 999 ainda aguardam teste manual;
 - D-048 e D-064: 100% regional e 100% global/Platina finitos e verificáveis;
 - D-061: turnos tradicionais, mais Double Battles e IA por perfis sem leitura do turno;
+- ajustes de nível de Pokémon selvagens e treinadores serão orientados por dados e medidos somente depois que a campanha-base de Hoenn estiver percorrível;
+- treinadores individuais poderão iniciar Double Battles quando o encontro e a composição da equipe forem projetados para isso, sem depender de haver dois NPCs;
 - D-062: Terastal entra; outras transformações seguem decisões específicas;
 - D-063: facilities oficiais preservadas com regras regionais;
 - D-070: Mega Evolution global com introdução narrativa regional;
 - D-071: Team Rocket inter-regional e Project M ligado a Mega e Mewtwo;
 - D-072: Forma Reavivada ligada a Ho-Oh, Celebi e Rainbow Wing;
 - D-073: uma transformação especial principal por lado em cada batalha.
+- D-074: TMs e HMs são aquisições permanentes, sem consumo nem quantidade
+  exibida; recebimentos repetidos concluem a cena sem duplicar o disco;
+- D-075: Exp. Share é uma capacidade global ativável no modelo moderno: cada
+  participante recebe 100% e cada integrante elegível que não participou recebe
+  50%, sem dividir a parcela dos participantes nem premiá-los duas vezes;
+- D-076: bicicletas conservam origem e comportamento próprios; uma variante fica
+  ativa na mochila e as demais ficam no PC pessoal para troca segura;
+- D-077: Itemfinder e Dowsing Machine tornam-se módulos cumulativos do RotomDex;
+- D-078: bilhetes identificam navio, cidade de partida e destino, além de
+  liberarem internamente serviços e rotas específicos para impedir acesso
+  cruzado indevido;
+- D-079: equipamentos ambientais não têm durabilidade; cada área decide se a
+  proteção facilita ou é necessária, sempre com obtenção coerente e sem prisão.
+
+Os cálculos, escopos e pendências dessas decisões estão na
+[Política de itens e equipamentos entre regiões](CROSS_REGION_ITEM_POLICY.md).
+
+### Plataforma, acesso e portabilidade
+
+- a região inicial já é escolhida depois de `New Game` e antes da introdução regional; somente campanhas validadas podem ser abertas;
+- a seleção regional servirá também para testar campanhas além de Hoenn;
+- idiomas adicionais serão carregados por uma camada de localização, sem duplicar a lógica do jogo;
+- saves poderão ser exportados e importados entre computadores com validação, backup e migração;
+- o PC já possui dois perfis pessoais, três recuperações por perfil e saves técnicos fora da seleção normal; nomes personalizados e reinício recuperável já integram a interface local;
+- controles, tamanhos de janela, vídeo, áudio e aceleração serão configuráveis sem entrar no save da campanha;
+- save rápido, carregamento rápido e Soft Reset serão funções distintas e testadas separadamente;
+- esses recursos de produto entram depois que a campanha-base estiver estável.
 
 ## Fontes e política de pesquisa
 

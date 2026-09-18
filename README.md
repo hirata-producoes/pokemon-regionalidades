@@ -18,17 +18,44 @@ Não é necessário dominar emulação ou programação de baixo nível para com
 
 ## Estado atual
 
-O porte para Windows já compila o jogo nativamente, renderiza por SDL2, aceita teclado e controle, salva, usa RTC, reproduz áudio MP2K e executa mapas, menus e batalhas. Milhares de recursos são lidos de `pokemon_regionalidades.pak` sob demanda.
+O porte para Windows já compila o jogo nativamente, renderiza por SDL2, aceita teclado e controle, salva, usa RTC e reproduz áudio MP2K. Milhares de recursos são lidos de `pokemon_regionalidades.pak` sob demanda. A interface externa oferece dois perfis independentes, recuperações, importação e exportação, além de configurações de controles, vídeo, áudio e aceleração.
 
-O primeiro sistema importado do planejamento atualizado já entrou na base de gameplay: World Clock 3×, estações de 30 dias, fases de transição e reconciliação do tempo transcorrido com o jogo fechado.
+O World Clock 3×, as estações de 30 dias, as fases de transição e a reconciliação do tempo transcorrido com o jogo fechado já estão na base de gameplay. O PC também possui um contêiner de save extensível: progresso mundial, módulos do RotomDex e inventário ficam em blocos versionados, enquanto a imagem Emerald permanece como camada de compatibilidade.
 
-Layouts de mapas já foram preparados para o pacote externo e compilam, mas sua validação completa em execução ainda está em andamento. Consulte [Estado do projeto](docs/pokemon_regionalidades/STATUS.md) para diferenciar protótipo, implementação e planejamento.
+Layouts de mapas já foram preparados para o pacote externo. Depois da correção da procura por esse pacote, o caminhão, Littleroot, a casa inicial e suas transições foram validados manualmente no PC. A fundação multirregional já registra Kanto, Johto, Hoenn e Sinnoh e apresenta a escolha inicial, mas somente Hoenn está liberada como campanha. A campanha original continua em validação progressiva antes de ser considerada uma baseline completa. Um save separado de exploração reduz repetições sem falsificar cenas narrativas. Consulte [Estado do projeto](docs/pokemon_regionalidades/STATUS.md) para diferenciar protótipo, implementação e planejamento.
 
 ## Regiões
 
 Hoenn é a base jogável atual. Kanto possui dados de FireRed/LeafGreen e uma primeira integração própria em Pallet Town. Johto, Sinnoh, Hisui, Unova, Kalos, Alola, Galar, Paldea e Ilhas Laranja fazem parte do planejamento, com definições de região e iniciais já preparadas, mas ainda não são campanhas completas.
 
 Veja [Regiões e jogos de referência](docs/pokemon_regionalidades/REGIONS.md).
+
+| Parte | Situação atual |
+|---|---|
+| Hoenn | campanha-base jogável, em validação progressiva |
+| Kanto | dados de mapas presentes; campanha bloqueada |
+| Johto e Sinnoh | fundação registrada; campanhas planejadas |
+| Porte Windows | executável nativo funcional, ainda em desenvolvimento |
+| Alvo GBA | preservado como referência de regressão |
+| Mundo contínuo e mapas ampliados | arquitetura e geografia em planejamento |
+
+## Como acompanhar e ajudar
+
+O projeto ainda não é uma versão final e não possui quatro campanhas prontas.
+Contribuições úteis nesta fase incluem:
+
+- relatos reproduzíveis de falhas no porte PC ou no alvo GBA;
+- experiência com `pokeemerald-expansion`, SDL2, saves versionados e ferramentas
+  de mapas;
+- revisão de arquitetura para áreas contínuas, carregamento por partes e
+  progressão narrativa fora de ordem;
+- testes graduais da campanha original de Hoenn;
+- revisão de português do Brasil, documentação, créditos e licenças.
+
+Antes de relatar um problema, consulte [Como contribuir](docs/pokemon_regionalidades/CONTRIBUTING.md)
+e [Estado do projeto](docs/pokemon_regionalidades/STATUS.md). Informe o commit
+testado, os passos para reproduzir e se o resultado veio do PC ou do GBA. Não
+publique ROMs, saves pessoais ou conteúdo sem autorização.
 
 ## Duas formas de executar
 
@@ -53,9 +80,14 @@ O alvo GBA continua disponível para estudo e compatibilidade. Ele produz `pokem
 ## Começando
 
 - [Compilar no Windows](docs/pokemon_regionalidades/BUILDING_WINDOWS.md)
+- [Consultar os controles atuais](docs/pokemon_regionalidades/CONTROLS.md)
 - [Compilar o alvo GBA](docs/pokemon_regionalidades/BUILDING_GBA.md)
 - [Entender a arquitetura](docs/pokemon_regionalidades/ARCHITECTURE.md)
 - [Consultar o planejamento de design](docs/pokemon_regionalidades/DESIGN_PLAN.md)
+- [Entender o save nativo do PC](docs/pokemon_regionalidades/PC_SAVE_ARCHITECTURE.md)
+- [Entender a progressão narrativa multirregional](docs/pokemon_regionalidades/STORY_PROGRESS_ARCHITECTURE.md)
+- [Entender a estratégia da versão-base](docs/pokemon_regionalidades/BASELINE_STRATEGY.md)
+- [Usar o save de exploração e testar sem reiniciar a campanha](docs/pokemon_regionalidades/TESTING_STRATEGY.md)
 - [Consultar o roteiro](docs/pokemon_regionalidades/ROADMAP.md)
 - [Aprender como contribuir](docs/pokemon_regionalidades/CONTRIBUTING.md)
 - [Consultar créditos e referências](docs/pokemon_regionalidades/CREDITS_AND_REFERENCES.md)

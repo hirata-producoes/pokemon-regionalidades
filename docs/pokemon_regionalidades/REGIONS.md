@@ -8,7 +8,7 @@ Ter uma espécie, um inicial ou uma constante de região no código não signifi
 
 | Região | Jogos de referência | Estado |
 |---|---|---|
-| Hoenn | Ruby, Sapphire, Emerald e referências de ORAS | Base atual. O início de Emerald e o primeiro mapa foram validados no PC. |
+| Hoenn | Emerald como baseline; Ruby, Sapphire e ORAS como referências classificadas | Base atual. A campanha principal possui proteção estrutural até a Liga; validação manual completa está pendente. |
 | Kanto | Red, Green, Blue, Yellow, FireRed, LeafGreen e referências de Let's Go | Dados de FRLG presentes. Pallet Town possui uma integração inicial; a campanha completa ainda não foi validada. |
 | Ilhas Sevii | FireRed e LeafGreen | Mapas registrados com os dados FRLG; progressão mundial não implementada. |
 | Johto | Gold, Silver, Crystal e HGSS | Planejada; iniciais e identificador preparados. |
@@ -34,6 +34,9 @@ Vários mapas compartilham layouts, por isso quantidade de mapas e quantidade de
 ## Gerações
 
 `include/config/species_enabled.h` habilita Pokémon das gerações I a IX. Isso amplia espécies e mecânicas, mas não importa automaticamente histórias, cidades ou campanhas dos jogos modernos.
+
+As regras para combinar conteúdo de jogos diferentes sem criar cronologias
+contraditórias estão em [Política para versões, remakes e conteúdo exclusivo](VERSION_VARIANTS_POLICY.md).
 
 ## Critério para considerar uma região pronta
 
