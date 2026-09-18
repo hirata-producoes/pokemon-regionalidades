@@ -2,6 +2,19 @@
 
 Contribuições podem ser técnicas, artísticas, documentais ou de testes. Pessoas iniciantes são bem-vindas; o importante é descrever com clareza o que foi alterado e como a mudança foi verificada.
 
+## Como ajudar sem programar
+
+Relatos de experiência também são contribuições. É possível ajudar percorrendo
+Hoenn gradualmente, revisando textos em português do Brasil, comparando um evento
+com o jogo de referência, conferindo créditos ou discutindo decisões de interface
+e progressão. Um comentário geral pode orientar uma investigação, mas somente um
+relato reproduzível deve ser tratado como validação de correção.
+
+Ao compartilhar o projeto em fóruns ou redes sociais, deixe claro que Hoenn é a
+base jogável em validação e que as outras regiões ainda não são campanhas
+completas. Não anuncie ROM, instalador ou lançamento público que o repositório não
+oferece.
+
 ## Antes de começar
 
 1. leia o [README principal](../../README.md) e o [STATUS.md](STATUS.md);
@@ -28,19 +41,28 @@ Documenta o formato do pacote de recursos
 Antes de enviar:
 
 - compile o alvo afetado;
-- execute o cenário alterado;
+- use o save de exploração para sistemas gerais e um save narrativo autêntico para eventos de história;
 - confira `git diff` e `git status`;
 - atualize a documentação quando o comportamento público mudar;
 - informe limitações conhecidas.
 
+Não reinicie a campanha inteira a cada alteração nem produza capturas em massa sem uma finalidade de diagnóstico. Consulte [Estratégia de desenvolvimento e testes](TESTING_STRATEGY.md).
+
 ## Estilo de documentação
 
-- escreva em português claro;
+- use português do Brasil como idioma principal e escreva de forma clara;
+- mantenha textos novos para o jogador em português do Brasil; traduções entram pela futura camada de localização;
+- preserve identificadores técnicos em inglês quando forem herdados ou compartilhados com projetos upstream;
 - explique a sigla ou termo técnico na primeira ocorrência;
 - use exemplos executáveis quando ajudarem;
 - diferencie fato validado, hipótese e planejamento;
 - evite emojis, linguagem promocional e afirmações sem evidência;
 - não apague o contexto histórico de decisões antigas.
+
+Scripts PowerShell que exibem texto com acentos devem ser mantidos em UTF-8 com
+BOM e testados também no Windows PowerShell 5.1 (`powershell.exe`). UTF-8 sem BOM
+pode ser interpretado como ANSI nessa versão e até transformar pontuação em
+delimitadores inválidos.
 
 ## Organização do código
 
@@ -65,7 +87,9 @@ Inclua:
 - resultado esperado e resultado observado;
 - log ou captura de tela, sem dados pessoais.
 
+Antes de anexar um log, confira se ele não contém nome de usuário do Windows,
+caminhos pessoais ou localização de saves particulares.
+
 ## Pull requests
 
 Uma pull request deve ter escopo compreensível e explicar os testes realizados. Alterações na base `pokeemerald-expansion` que não sejam específicas deste projeto também podem ser candidatas a uma contribuição no repositório upstream.
-

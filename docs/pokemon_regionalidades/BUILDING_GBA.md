@@ -35,7 +35,7 @@ espaços do caminho do projeto. Por isso, ele também pode ser chamado de qualqu
 pasta com um caminho absoluto:
 
 ```powershell
-$Project = 'C:\Users\Rafael\Documents\Codex\2026-08-02\pokemon-go-world-pc'
+$Project = 'C:\caminho\para\pokemon-regionalidades'
 powershell -ExecutionPolicy Bypass -File "$Project\tools\pokemon_go_world\build_rom.ps1"
 ```
 
@@ -54,6 +54,11 @@ O resultado esperado é:
 ```text
 pokemon_regionalidades.gba
 ```
+
+Na validação de 11 de setembro de 2026, o alvo voltou a compilar com 22,88 MiB
+de ROM, 217,86 KiB de EWRAM e 28,39 KiB de IWRAM. Esses números são uma medição
+da revisão testada, não uma garantia para commits posteriores. A IWRAM é a margem
+mais apertada e deve continuar sendo acompanhada.
 
 ## Teste em emulador
 

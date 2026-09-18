@@ -75,7 +75,7 @@ O alvo interno também está disponível como `make pc` quando `make`, GCC i686,
 
 - Direcional: setas.
 - A e B: `Z` e `X`.
-- Start e Select: `Enter` e `\`.
+- Start e Select: `Enter` e `Backspace`.
 - L e R: `A` e `S`.
 - Acelerar: `Espaço`.
 - Reiniciar: `Ctrl+R`; pausar: `Ctrl+P`.

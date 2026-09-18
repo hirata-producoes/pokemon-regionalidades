@@ -9,16 +9,24 @@ Para conhecer o projeto:
 1. [README principal](../../README.md)
 2. [Regiões e jogos de referência](REGIONS.md)
 3. [Planejamento de design e rastreabilidade](DESIGN_PLAN.md)
-4. [Sistema ambiental](ENVIRONMENT_SYSTEM.md)
-5. [Estado atual](STATUS.md)
-6. [Roteiro de desenvolvimento](ROADMAP.md)
+4. [Estratégia da versão-base](BASELINE_STRATEGY.md)
+5. [Estratégia de desenvolvimento e testes](TESTING_STRATEGY.md)
+6. [Sistema ambiental](ENVIRONMENT_SYSTEM.md)
+7. [Progressão narrativa e recompensas multirregionais](STORY_PROGRESS_ARCHITECTURE.md)
+8. [Política de itens e equipamentos entre regiões](CROSS_REGION_ITEM_POLICY.md)
+9. [Política para versões e remakes](VERSION_VARIANTS_POLICY.md)
+10. [Auditoria de cenas e eventos de Hoenn](HOENN_EVENT_AUDIT.md)
+11. [Arquitetura de save nativo para PC](PC_SAVE_ARCHITECTURE.md)
+12. [Estado atual](STATUS.md)
+13. [Roteiro de desenvolvimento](ROADMAP.md)
 
 Para estudar o porte:
 
 1. [Arquitetura](ARCHITECTURE.md)
 2. [Compilação no Windows](BUILDING_WINDOWS.md)
-3. [Compilação GBA](BUILDING_GBA.md)
-4. [Relatório técnico completo](../pokemon_go_world/RELATORIO_TECNICO_PORTE_PC.md)
+3. [Controles atuais do porte](CONTROLS.md)
+4. [Compilação GBA](BUILDING_GBA.md)
+5. [Relatório técnico completo](../pokemon_go_world/RELATORIO_TECNICO_PORTE_PC.md)
 
 Para colaborar ou redistribuir:
 

@@ -6,9 +6,11 @@ O porte para PC deverá permitir que duas pessoas joguem sem misturar progresso 
 que cada perfil recupere uma gravação anterior caso encontre um soft lock, uma
 falha ou uma incompatibilidade durante o desenvolvimento.
 
-Essa camada pertence ao produto para PC. O núcleo compartilhado continua usando
-o formato de save do jogo sempre que possível, mas o programa escolhe qual
-arquivo será apresentado ao motor antes de iniciar a sessão.
+Essa camada pertence ao produto para PC. Durante a primeira baseline, o programa
+escolhe qual imagem de flash Emerald será apresentada ao motor. Antes de ativar
+outras regiões, cada perfil migrará para o contêiner nativo descrito em
+[Arquitetura de save nativo para PC](PC_SAVE_ARCHITECTURE.md): a imagem antiga
+continuará dentro dele como compatibilidade, sem limitar os dados novos.
 
 ## Conceitos separados
 
@@ -25,10 +27,10 @@ arquivo será apresentado ao motor antes de iniciar a sessão.
 O save de exploração não será confundido com uma campanha pessoal nem promovido
 automaticamente para a campanha real.
 
-Durante o desenvolvimento atual, o responsável escolheu reservar o perfil 1 da
-interface para exploração e testes e o perfil 2 para a campanha normal de Hoenn.
-Essa atribuição é explícita e aparece nos títulos; ela não transforma resultados
-do perfil de exploração em evidência de continuidade narrativa.
+Durante o desenvolvimento atual, o responsável usa o primeiro espaço para
+exploração e testes e o segundo para a campanha normal de Hoenn. Esses são usos
+daquelas campanhas, não nomes fixos do produto, e resultados da exploração não
+se tornam evidência de continuidade narrativa.
 
 ## Estrutura lógica planejada
 
@@ -41,24 +43,37 @@ dados-do-jogador/
   perfis/
     perfil-1/
       perfil.json
-      atual.sav
-      recuperacao-1.sav
-      recuperacao-2.sav
-      recuperacao-3.sav
+      atual.pgrsave
+      recuperacao-1.pgrsave
+      recuperacao-2.pgrsave
+      recuperacao-3.pgrsave
     perfil-2/
       perfil.json
-      atual.sav
-      recuperacao-1.sav
-      recuperacao-2.sav
-      recuperacao-3.sav
+      atual.pgrsave
+      recuperacao-1.pgrsave
+      recuperacao-2.pgrsave
+      recuperacao-3.pgrsave
   desenvolvimento/
     exploracao/
     marcos-narrativos/
 ```
 
-Os nomes exibidos poderão ser escolhidos pelos jogadores. Identificadores
-internos não dependerão do nome para evitar perda de vínculo ao renomear um
-perfil.
+Os nomes exibidos já podem ser escolhidos pelos jogadores. Identificadores
+internos não dependem do nome, portanto renomear um perfil não muda seu diretório
+nem perde o vínculo com a campanha.
+
+Cada cartão já mostra o nome escolhido para o perfil. Nome do personagem, tempo
+total de jogo e versão usada na última gravação ainda serão acrescentados. Em um
+perfil vazio, a pessoa pode renomear o espaço antes de iniciar ou importar uma
+campanha.
+
+Uma ação explícita de reinício retira o progresso ativo e as recuperações
+daquele perfil somente depois de confirmação clara. A pasta anterior inteira é
+movida para um diretório `profile-N-reset-DATA-HORA`, no mesmo diretório dos
+perfis, antes que o espaço vazio seja recriado com o nome personalizado. Assim,
+a campanha nova não herda gerações ou recuperações e o estado anterior continua
+recuperável. Exportar permanece a forma recomendada de guardar uma cópia
+portátil.
 
 ## Gravação segura e rotação
 
@@ -78,6 +93,11 @@ Como os arquivos podem ser criados no mesmo segundo, o horário do Windows não 
 usado sozinho para distingui-los. O backend já lê o contador de geração gravado
 nos setores completos do próprio formato Emerald e também apresenta um hash
 SHA-256; os dados amigáveis da campanha serão acrescentados à interface gráfica.
+
+Os nomes acima já são usados pela interface. Perfis anteriores continuam
+visíveis pelo `.sav` até sua primeira abertura; o executável cria o `.pgrsave`
+ao lado e preserva a origem. Recuperações antigas permanecem selecionáveis
+durante a transição e são substituídas gradualmente pela rotação nativa.
 
 ### Fundação já implementada
 
@@ -99,8 +119,11 @@ pedido explícito e é recusada quando o perfil de destino já possui progresso.
 
 A primeira interface gráfica para Windows chama esse backend para abrir,
 importar, exportar e restaurar. Ela não acessa os arquivos por uma segunda lógica própria.
-O acabamento, os nomes personalizados e a integração ao menu externo definitivo
-permanecem posteriores à validação funcional dessa etapa.
+O nome personalizado e o reinício individual já usam esse backend. Um teste
+isolado renomeia um perfil, importa uma cópia, valida a interface, reinicia a
+campanha e confirma que o nome permaneceu, que o perfil ativo ficou vazio e que
+o save anterior continuou idêntico na pasta de segurança. Os dados amigáveis da
+campanha e o acabamento definitivo permanecem posteriores.
 
 ## Save rápido, carregamento rápido e Soft Reset
 
@@ -135,5 +158,9 @@ seguros sem impedir o carregamento dos perfis.
 6. acrescentar save rápido, carregamento rápido e Soft Reset;
 7. validar migração entre versões e concluir os dados amigáveis exibidos pela
    interface.
+
+A migração do contêiner nativo é uma etapa estrutural intermediária obrigatória
+entre os itens 5 e 6. Ela será concluída antes da integração jogável de outra
+região.
 
 Nenhuma etapa substitui o save atual sem backup e teste de recuperação.

@@ -44,9 +44,9 @@ Essa abordagem também impede um reroll artificial por viagem: Fly, carregamento
 
 ## Vertical slice de Littleroot
 
-Somente o mapa externo de Littleroot usa o perfil ambiental neste checkpoint. Casas, laboratório, mapas submersos e climas roteirizados continuam usando suas regras originais.
+Somente o mapa externo de Littleroot usa o perfil ambiental nesta implementação inicial. Casas, laboratório, mapas submersos e climas roteirizados continuam usando suas regras originais.
 
-Ao entrar em Littleroot, o estado lógico é traduzido para `WEATHER_DYNAMIC`. Enquanto o jogador permanece no mapa, a verificação temporal atualiza o efeito quando começa um novo bloco climático. O popup de área mostra estação, dia, condição e horário em campos separados.
+Ao entrar em Littleroot, o estado lógico é traduzido para `WEATHER_DYNAMIC`. Enquanto o jogador permanece no mapa, a verificação temporal atualiza o efeito quando começa um novo bloco climático. O popup de área tenta mostrar estação, dia, condição e horário, mas sua composição atual ainda não possui espaço suficiente para o nome da área e todos os dados ambientais.
 
 O perfil é opt-in no código para não forçar a regeneração dos 884 mapas durante este protótipo e para proteger eventos climáticos da campanha de Hoenn. Depois que os perfis de bioma e os grupos sazonais forem validados, a associação deve migrar para dados gerados por mapa ou Location.
 
@@ -63,17 +63,29 @@ Também continuam abertos:
 - influência sobre encontros, atividade e exploração;
 - transições visuais de tilesets entre estações.
 
+### Problemas visuais observados
+
+O teste manual de 1º de setembro de 2026 registrou:
+
+- nuvens do estado `CLOUDY` recortadas em algumas faixas ou blocos da tela no porte PC;
+- nome `LITTLEROOT TOWN` comprimido ou sobreposto aos dados sazonais;
+- nomes de estação e clima ainda apresentados em inglês.
+
+Em 4 de setembro também foi observado que a neblina passa atrás de partes de telhados e dos personagens. A composição visual do clima ainda não possui uma política final única: efeitos atmosféricos que representam uma camada diante da câmera devem ser compostos depois de cenários e personagens, enquanto efeitos localizados podem exigir máscara ou profundidade própria. A correção será feita na ordem de composição do renderizador, sem alterar o estado lógico `FOG`.
+
+Os nomes ambientais passaram a usar `PRIMAVERA`, `VERAO`, `OUTONO`, `INVERNO`, `ABERTO`, `NUBLADO`, `CHUVA`, `TEMPESTADE`, `NEBLINA` e `VENTO`. `VERAO` é uma forma técnica temporária: a fonte herdada não possui o glifo `Ã`, e a interface final deve apresentar `VERÃO` depois da ampliação do conjunto de caracteres para português. Ainda falta validar visualmente o espaçamento no popup. O problema das nuvens deve ser tratado na renderização do efeito, não escondido alterando o resultado lógico do clima.
+
 ## Compatibilidade de save
 
 Nenhum campo novo foi acrescentado aos `SaveBlock`. O sistema reutiliza `VAR_PGW_WEATHER_SEED`, criada anteriormente para o estado mundial. Saves da versão anterior continuam válidos. Se o seed for zero, o cálculo usa o valor seguro `1` até a próxima inicialização ou evolução do estado.
 
 ## Evidência de verificação
 
-O checkpoint inclui testes para:
+A implementação inclui testes para:
 
 - estabilidade dentro de um bloco de seis horas;
 - equivalência da previsão antes e depois da meia-noite;
 - limites válidos das condições;
 - nomes estáveis para a interface.
 
-Em 1º de setembro de 2026, o teste foi compilado no alvo nativo de testes e o porte PC foi recompilado integralmente. Um smoke test isolado manteve o executável ativo por 12 segundos e confirmou inicialização sem encerramento inesperado. A validação manual do efeito visual em Littleroot, da mudança ao vivo entre blocos e da legibilidade do popup ainda é obrigatória antes de considerar o sistema validado.
+Em 1º de setembro de 2026, o teste foi compilado no alvo nativo de testes e o porte PC foi recompilado integralmente. Um smoke test isolado manteve o executável ativo por 12 segundos e confirmou inicialização sem encerramento inesperado. A chuva e o estado nublado foram observados manualmente em Littleroot. O recorte das nuvens e a falta de espaço do popup mantêm a apresentação visual em estado de protótipo; a mudança ao vivo entre blocos também continua pendente.
