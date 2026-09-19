@@ -853,8 +853,16 @@ void SetContinueGameWarpToDynamicWarp(int unused)
 const struct MapConnection *GetMapConnection(u8 dir)
 {
     s32 i;
-    s32 count = gMapHeader.connections->count;
-    const struct MapConnection *connection = gMapHeader.connections->connections;
+    s32 count;
+    const struct MapConnection *connection;
+
+    // Alguns mapas, como a entrada subaquática de Sootopolis, definem
+    // o destino de Dive por script e não possuem conexões comuns.
+    if (gMapHeader.connections == NULL)
+        return NULL;
+
+    count = gMapHeader.connections->count;
+    connection = gMapHeader.connections->connections;
 
     if (connection == NULL)
         return NULL;
