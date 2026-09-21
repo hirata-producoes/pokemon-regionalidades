@@ -1,5 +1,5 @@
 ﻿param(
-    [ValidateSet(1, 2)]
+    [ValidateRange(1, 2147483647)]
     [int]$Profile = 1,
     [string]$ImportSave,
     [string]$ExportSave,
@@ -12,6 +12,14 @@
     [switch]$GetProfileInfo,
     [string]$SetProfileName,
     [switch]$ResetProfile,
+    [switch]$CreateProfile,
+    [switch]$DeleteProfile,
+    [ValidateRange(-1, 3)]
+    [int]$FavoriteFromSlot = -1,
+    [ValidateRange(0, 5)]
+    [int]$RestoreFavorite = 0,
+    [ValidateRange(0, 5)]
+    [int]$RemoveFavorite = 0,
     [switch]$PrepareOnly
 )
 
@@ -48,6 +56,14 @@ $configPath = Join-Path $configDir 'pokemon_regionalidades.cfg'
 $runtimeLog = Join-Path $profileDir 'runtime-last.log'
 $runtimeHistoryDir = Join-Path $profileDir 'runtime-history'
 $profileMetadataPath = Join-Path $profileDir 'profile.json'
+$favoritesDir = Join-Path $profileDir 'favorites'
+
+if ($CreateProfile -and (Test-Path -LiteralPath $profileDir)) {
+    throw "O perfil $Profile ja existe. Nenhum dado foi alterado."
+}
+if ($DeleteProfile -and -not (Test-Path -LiteralPath $profileDir -PathType Container)) {
+    throw "O perfil $Profile nao existe."
+}
 
 New-Item -ItemType Directory -Path $profileDir -Force | Out-Null
 New-Item -ItemType Directory -Path $configDir -Force | Out-Null
@@ -55,7 +71,10 @@ New-Item -ItemType Directory -Path $configDir -Force | Out-Null
 function Get-ProfileMetadata {
     $defaultName = "Perfil $Profile"
     if (-not (Test-Path -LiteralPath $profileMetadataPath -PathType Leaf)) {
-        return [pscustomobject]@{ SchemaVersion = 1; DisplayName = $defaultName }
+        $oldTestProfile = $Profile -eq 1 -and
+            ((Test-Path -LiteralPath $savePath -PathType Leaf) -or
+             (Test-Path -LiteralPath $legacySavePath -PathType Leaf))
+        return [pscustomobject]@{ SchemaVersion = 1; DisplayName = $defaultName; TechnicalMobility = $oldTestProfile }
     }
     try {
         $metadata = Get-Content -Raw -LiteralPath $profileMetadataPath | ConvertFrom-Json
@@ -67,6 +86,7 @@ function Get-ProfileMetadata {
         return [pscustomobject]@{
             SchemaVersion = 1
             DisplayName = ([string]$metadata.DisplayName).Trim()
+            TechnicalMobility = if ($null -eq $metadata.TechnicalMobility) { $Profile -eq 1 } else { [bool]$metadata.TechnicalMobility }
         }
     } catch {
         throw "Os metadados do perfil $Profile estao invalidos: $profileMetadataPath"
@@ -74,21 +94,31 @@ function Get-ProfileMetadata {
 }
 
 function Set-ProfileMetadataName {
-    param([Parameter(Mandatory = $true)][string]$Name)
+    param(
+        [Parameter(Mandatory = $true)][string]$Name,
+        [Nullable[bool]]$TechnicalMobility = $null
+    )
 
     $normalized = $Name.Trim()
     if ([string]::IsNullOrWhiteSpace($normalized) -or $normalized.Length -gt 32 -or
         $normalized.IndexOfAny([char[]]"`r`n`t") -ge 0) {
         throw 'O nome do perfil deve ter entre 1 e 32 caracteres e ocupar uma unica linha.'
     }
-    $metadata = [ordered]@{ SchemaVersion = 1; DisplayName = $normalized }
+    $previous = Get-ProfileMetadata
+    $useTechnicalMobility = if ($null -ne $TechnicalMobility) { [bool]$TechnicalMobility } else { [bool]$previous.TechnicalMobility }
+    $metadata = [ordered]@{
+        SchemaVersion = 1
+        DisplayName = $normalized
+        TechnicalMobility = $useTechnicalMobility
+    }
     $pendingPath = "$profileMetadataPath.pending"
     $json = $metadata | ConvertTo-Json
     $utf8Bom = New-Object Text.UTF8Encoding($true)
     [IO.File]::WriteAllText($pendingPath, $json, $utf8Bom)
     try {
         if (Test-Path -LiteralPath $profileMetadataPath -PathType Leaf) {
-            [IO.File]::Replace($pendingPath, $profileMetadataPath, $null, $true)
+            $metadataBackup = "$profileMetadataPath.before-update-$(Get-Date -Format 'yyyyMMdd-HHmmssfff')"
+            [IO.File]::Replace($pendingPath, $profileMetadataPath, $metadataBackup, $true)
         } else {
             Move-Item -LiteralPath $pendingPath -Destination $profileMetadataPath
         }
@@ -112,6 +142,129 @@ function Resolve-ProfileSavePath {
         return $legacyCandidate
     }
     return $null
+}
+
+function Resolve-FavoritePath {
+    param([ValidateRange(1, 5)][int]$Slot)
+    return Join-Path $favoritesDir ("favorite-$Slot.pgrsave")
+}
+
+function Restore-ProfileSave {
+    param(
+        [Parameter(Mandatory = $true)][string]$SourcePath,
+        [Parameter(Mandatory = $true)][string]$Description
+    )
+    if (Get-Process -Name 'pokemon_regionalidades-pc' -ErrorAction SilentlyContinue) {
+        throw 'Feche todas as instancias do jogo antes de restaurar um save.'
+    }
+    $activePath = Resolve-ProfileSavePath
+    if ($null -eq $activePath -or -not (Test-RegionalidadesSave -Path $activePath)) {
+        throw "O perfil $Profile nao possui um save ativo valido."
+    }
+    if (-not (Test-RegionalidadesSave -Path $SourcePath)) {
+        throw "$Description nao existe ou e invalido."
+    }
+    if ($activePath.Equals($legacySavePath, [StringComparison]::OrdinalIgnoreCase) -and
+        (Get-RegionalidadesSaveDescriptor -Path $SourcePath).Kind -eq 'Native') {
+        throw 'Abra o perfil para migrar o save legado antes de restaurar um favorito nativo.'
+    }
+    $activeHash = (Get-FileHash -LiteralPath $activePath -Algorithm SHA256).Hash
+    $sourceHash = (Get-FileHash -LiteralPath $SourcePath -Algorithm SHA256).Hash
+    $pendingRestore = "$activePath.restoring"
+    $backupPath = "$activePath.before-restore-$(Get-Date -Format 'yyyyMMdd-HHmmssfff')"
+    if (Test-Path -LiteralPath $pendingRestore) {
+        throw 'Ha uma restauracao pendente. Revise os arquivos antes de continuar.'
+    }
+    Copy-Item -LiteralPath $SourcePath -Destination $pendingRestore
+    if ((Get-FileHash -LiteralPath $pendingRestore -Algorithm SHA256).Hash -ne $sourceHash) {
+        Remove-Item -LiteralPath $pendingRestore -Force
+        throw 'A copia preparada para restauracao nao corresponde ao save escolhido.'
+    }
+    try {
+        [IO.File]::Replace($pendingRestore, $activePath, $backupPath, $true)
+    } catch {
+        if (Test-Path -LiteralPath $pendingRestore -PathType Leaf) {
+            Remove-Item -LiteralPath $pendingRestore -Force
+        }
+        throw
+    }
+    if ((Get-FileHash -LiteralPath $activePath -Algorithm SHA256).Hash -ne $sourceHash -or
+        (Get-FileHash -LiteralPath $backupPath -Algorithm SHA256).Hash -ne $activeHash) {
+        throw 'A verificacao posterior da restauracao falhou. Nao abra o jogo antes de revisar os arquivos.'
+    }
+    Write-Host "$Description restaurado no perfil $Profile. Save anterior preservado em: $backupPath"
+}
+
+if ($CreateProfile) {
+    [void](Set-ProfileMetadataName -Name "Perfil $Profile")
+    Write-Host "Perfil $Profile criado."
+    return
+}
+
+if ($DeleteProfile) {
+    if (Get-Process -Name 'pokemon_regionalidades-pc' -ErrorAction SilentlyContinue) {
+        throw 'Feche todas as instancias do jogo antes de apagar um perfil.'
+    }
+    $archiveRoot = Join-Path $DataRoot 'profiles-archived'
+    $resolvedDataRoot = [IO.Path]::GetFullPath($DataRoot).TrimEnd([IO.Path]::DirectorySeparatorChar)
+    $resolvedProfile = [IO.Path]::GetFullPath($profileDir)
+    $resolvedArchive = [IO.Path]::GetFullPath($archiveRoot)
+    $safePrefix = "$resolvedDataRoot$([IO.Path]::DirectorySeparatorChar)"
+    if (-not $resolvedProfile.StartsWith($safePrefix, [StringComparison]::OrdinalIgnoreCase) -or
+        -not $resolvedArchive.StartsWith($safePrefix, [StringComparison]::OrdinalIgnoreCase)) {
+        throw 'Os caminhos do perfil e do arquivo nao estao dentro dos dados do jogo.'
+    }
+    New-Item -ItemType Directory -Path $archiveRoot -Force | Out-Null
+    $archivePath = Join-Path $archiveRoot ("profile-$Profile-$(Get-Date -Format 'yyyyMMdd-HHmmssfff')-$([guid]::NewGuid().ToString('N'))")
+    Move-Item -LiteralPath $profileDir -Destination $archivePath
+    $result = [pscustomobject]@{ Profile = $Profile; BackupPath = $archivePath }
+    if ($PassThru) { $result } else { Write-Host "Perfil $Profile arquivado em: $archivePath" }
+    return
+}
+
+if ($FavoriteFromSlot -ge 0) {
+    $sourcePath = Resolve-ProfileSavePath -Recovery $FavoriteFromSlot
+    if ($null -eq $sourcePath) {
+        throw 'O save escolhido para favoritar nao existe ou e invalido.'
+    }
+    $slot = 1
+    while ($slot -le 5 -and (Test-Path -LiteralPath (Resolve-FavoritePath -Slot $slot))) { $slot++ }
+    if ($slot -gt 5) { throw 'Este perfil ja possui cinco favoritos.' }
+    New-Item -ItemType Directory -Path $favoritesDir -Force | Out-Null
+    $destination = Resolve-FavoritePath -Slot $slot
+    $pending = "$destination.pending"
+    if (Test-Path -LiteralPath $pending) { throw 'Ha um favorito pendente. Revise os arquivos antes de continuar.' }
+    $descriptor = Get-RegionalidadesSaveDescriptor -Path $sourcePath
+    if ($descriptor.Kind -eq 'Native') {
+        Copy-Item -LiteralPath $sourcePath -Destination $pending
+    } else {
+        $nativeBytes = Convert-RegionalidadesLegacyToNativeBytes -LegacyBytes ([IO.File]::ReadAllBytes($sourcePath))
+        [IO.File]::WriteAllBytes($pending, $nativeBytes)
+    }
+    if (-not (Test-RegionalidadesSave -Path $pending)) {
+        Remove-Item -LiteralPath $pending -Force
+        throw 'O favorito preparado nao passou pela validacao.'
+    }
+    $hash = (Get-FileHash -LiteralPath $pending -Algorithm SHA256).Hash
+    Move-Item -LiteralPath $pending -Destination $destination
+    if ((Get-FileHash -LiteralPath $destination -Algorithm SHA256).Hash -ne $hash) {
+        throw 'A verificacao posterior do favorito falhou.'
+    }
+    Write-Host "Favorito $slot criado no perfil $Profile."
+    return
+}
+
+if ($RemoveFavorite -gt 0) {
+    $favoritePath = Resolve-FavoritePath -Slot $RemoveFavorite
+    if (-not (Test-Path -LiteralPath $favoritePath -PathType Leaf)) {
+        throw 'O favorito escolhido nao existe.'
+    }
+    $removedDir = Join-Path $profileDir 'favorites-removed'
+    New-Item -ItemType Directory -Path $removedDir -Force | Out-Null
+    $removedPath = Join-Path $removedDir ("favorite-$RemoveFavorite-$(Get-Date -Format 'yyyyMMdd-HHmmssfff')-$([guid]::NewGuid().ToString('N')).pgrsave")
+    Move-Item -LiteralPath $favoritePath -Destination $removedPath
+    Write-Host "Favorito $RemoveFavorite removido da lista e preservado em: $removedPath"
+    return
 }
 
 if ($GetProfileInfo) {
@@ -156,7 +309,7 @@ if ($ResetProfile) {
     Move-Item -LiteralPath $profileDir -Destination $resetPath
     try {
         New-Item -ItemType Directory -Path $profileDir -Force | Out-Null
-        [void](Set-ProfileMetadataName -Name $metadata.DisplayName)
+        [void](Set-ProfileMetadataName -Name $metadata.DisplayName -TechnicalMobility $metadata.TechnicalMobility)
     } catch {
         $resetFailurePath = "$resetPath.failed-new-profile"
         if (Test-Path -LiteralPath $profileDir -PathType Container) {
@@ -257,65 +410,40 @@ if (-not [string]::IsNullOrWhiteSpace($ExportSave)) {
     return
 }
 
+if ($RestoreRecovery -ne 0 -and $RestoreFavorite -ne 0) {
+    throw 'Escolha somente uma origem para restaurar.'
+}
 if ($RestoreRecovery -ne 0) {
-    if (Get-Process -Name 'pokemon_regionalidades-pc' -ErrorAction SilentlyContinue) {
-        throw 'Feche todas as instancias do jogo antes de restaurar uma recuperacao.'
-    }
-
-    $activeSavePath = Resolve-ProfileSavePath
     $recoveryPath = Resolve-ProfileSavePath -Recovery $RestoreRecovery
-    if ($null -eq $activeSavePath) {
-        throw "O perfil $Profile ainda nao possui um save ativo."
-    }
-    if (-not (Test-RegionalidadesSave -Path $activeSavePath)) {
-        throw "O save ativo do perfil $Profile nao tem um formato reconhecido."
-    }
-    if ($null -eq $recoveryPath -or -not (Test-RegionalidadesSave -Path $recoveryPath)) {
-        throw "A recuperacao $RestoreRecovery do perfil $Profile nao existe ou e invalida."
-    }
-
-    $activeHash = (Get-FileHash -LiteralPath $activeSavePath -Algorithm SHA256).Hash
-    $recoveryHash = (Get-FileHash -LiteralPath $recoveryPath -Algorithm SHA256).Hash
-    $pendingRestore = "$activeSavePath.restoring"
-    $backupPath = "$activeSavePath.before-restore-$(Get-Date -Format 'yyyyMMdd-HHmmssfff')"
-
-    Copy-Item -LiteralPath $recoveryPath -Destination $pendingRestore -Force
-    if ((Get-FileHash -LiteralPath $pendingRestore -Algorithm SHA256).Hash -ne $recoveryHash) {
-        Remove-Item -LiteralPath $pendingRestore -Force
-        throw 'A copia preparada para restauracao nao corresponde a recuperacao escolhida.'
-    }
-
-    try {
-        [IO.File]::Replace($pendingRestore, $activeSavePath, $backupPath, $true)
-    } catch {
-        if (Test-Path -LiteralPath $pendingRestore -PathType Leaf) {
-            Remove-Item -LiteralPath $pendingRestore -Force
-        }
-        throw
-    }
-
-    if ((Get-FileHash -LiteralPath $activeSavePath -Algorithm SHA256).Hash -ne $recoveryHash -or
-        (Get-FileHash -LiteralPath $backupPath -Algorithm SHA256).Hash -ne $activeHash) {
-        throw 'A verificacao posterior da restauracao falhou. Nao abra o jogo antes de revisar os arquivos.'
-    }
-
-    Write-Host "Recuperacao $RestoreRecovery restaurada no perfil $Profile."
-    Write-Host "O save ativo anterior foi preservado em: $backupPath"
+    if ($null -eq $recoveryPath) { throw "A recuperacao $RestoreRecovery nao existe ou e invalida." }
+    Restore-ProfileSave -SourcePath $recoveryPath -Description "Recuperacao $RestoreRecovery"
+    if (-not $ListRecoveries) { return }
+}
+if ($RestoreFavorite -ne 0) {
+    $favoritePath = Resolve-FavoritePath -Slot $RestoreFavorite
+    Restore-ProfileSave -SourcePath $favoritePath -Description "Favorito $RestoreFavorite"
+    if (-not $ListRecoveries) { return }
 }
 
 if ($ListRecoveries) {
     $entries = @(
-        [pscustomobject]@{ Estado = 'Ativo'; Caminho = (Resolve-ProfileSavePath) },
-        [pscustomobject]@{ Estado = 'Recuperacao 1'; Caminho = (Resolve-ProfileSavePath -Recovery 1) },
-        [pscustomobject]@{ Estado = 'Recuperacao 2'; Caminho = (Resolve-ProfileSavePath -Recovery 2) },
-        [pscustomobject]@{ Estado = 'Recuperacao 3'; Caminho = (Resolve-ProfileSavePath -Recovery 3) }
+        [pscustomobject]@{ Estado = 'Ativo'; Kind = 'Active'; Slot = 0; Caminho = (Resolve-ProfileSavePath) },
+        [pscustomobject]@{ Estado = 'Recuperacao 1'; Kind = 'Recovery'; Slot = 1; Caminho = (Resolve-ProfileSavePath -Recovery 1) },
+        [pscustomobject]@{ Estado = 'Recuperacao 2'; Kind = 'Recovery'; Slot = 2; Caminho = (Resolve-ProfileSavePath -Recovery 2) },
+        [pscustomobject]@{ Estado = 'Recuperacao 3'; Kind = 'Recovery'; Slot = 3; Caminho = (Resolve-ProfileSavePath -Recovery 3) },
+        [pscustomobject]@{ Estado = 'Favorito 1'; Kind = 'Favorite'; Slot = 1; Caminho = (Resolve-FavoritePath -Slot 1) },
+        [pscustomobject]@{ Estado = 'Favorito 2'; Kind = 'Favorite'; Slot = 2; Caminho = (Resolve-FavoritePath -Slot 2) },
+        [pscustomobject]@{ Estado = 'Favorito 3'; Kind = 'Favorite'; Slot = 3; Caminho = (Resolve-FavoritePath -Slot 3) },
+        [pscustomobject]@{ Estado = 'Favorito 4'; Kind = 'Favorite'; Slot = 4; Caminho = (Resolve-FavoritePath -Slot 4) },
+        [pscustomobject]@{ Estado = 'Favorito 5'; Kind = 'Favorite'; Slot = 5; Caminho = (Resolve-FavoritePath -Slot 5) }
     )
     $available = foreach ($entry in $entries) {
         if ($null -ne $entry.Caminho -and (Test-Path -LiteralPath $entry.Caminho -PathType Leaf)) {
             $file = Get-Item -LiteralPath $entry.Caminho
             [pscustomobject]@{
                 Estado = $entry.Estado
-                Slot = [array]::IndexOf($entries, $entry)
+                Kind = $entry.Kind
+                Slot = $entry.Slot
                 Geracao = Get-RegionalidadesSaveGeneration -Path $entry.Caminho
                 Tamanho = $file.Length
                 Modificado = $file.LastWriteTime
@@ -378,7 +506,7 @@ try {
     [Environment]::SetEnvironmentVariable('POKEMON_REGIONALIDADES_PROFILE_RUNNER', $PSCommandPath, 'Process')
     [Environment]::SetEnvironmentVariable('POKEMON_REGIONALIDADES_PROFILE_ID', [string]$Profile, 'Process')
     [Environment]::SetEnvironmentVariable('POKEMON_REGIONALIDADES_SETTINGS_SCRIPT', (Join-Path $PSScriptRoot 'open_pc_settings.ps1'), 'Process')
-    if ($Profile -eq 1) {
+    if ((Get-ProfileMetadata).TechnicalMobility) {
         [Environment]::SetEnvironmentVariable('POKEMON_REGIONALIDADES_TECHNICAL_MOBILITY', '1', 'Process')
     }
 
