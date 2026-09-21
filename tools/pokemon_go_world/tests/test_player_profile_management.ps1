@@ -35,6 +35,38 @@ try {
         throw 'O perfil renomeado nao reconheceu o save importado.'
     }
 
+    & $runner -Profile 3 -DataRoot $testRoot -CreateProfile
+    [void](& $runner -Profile 3 -DataRoot $testRoot -SetProfileName 'Teste Kanto' -PassThru)
+    & $runner -Profile 3 -DataRoot $testRoot -ImportSave $sourceSave -PrepareOnly | Out-Null
+    foreach ($favorite in 1..5) {
+        & $runner -Profile 3 -DataRoot $testRoot -FavoriteFromSlot 0 | Out-Null
+    }
+    $entries = @(& $runner -Profile 3 -DataRoot $testRoot -ListRecoveries -PassThru)
+    if (@($entries | Where-Object Kind -eq 'Favorite').Count -ne 5 -or
+        @($entries | Where-Object Kind -eq 'Active').Count -ne 1) {
+        throw 'A lista nao preservou o save ativo e os cinco favoritos.'
+    }
+    try {
+        & $runner -Profile 3 -DataRoot $testRoot -FavoriteFromSlot 0 | Out-Null
+        throw 'Um sexto favorito foi aceito.'
+    } catch {
+        if ($_.Exception.Message -eq 'Um sexto favorito foi aceito.') { throw }
+    }
+    & $runner -Profile 3 -DataRoot $testRoot -RestoreFavorite 5 | Out-Null
+    & $runner -Profile 3 -DataRoot $testRoot -RemoveFavorite 2 | Out-Null
+    $entries = @(& $runner -Profile 3 -DataRoot $testRoot -ListRecoveries -PassThru)
+    if (@($entries | Where-Object Kind -eq 'Favorite').Count -ne 4 -or
+        -not (Test-Path -LiteralPath (Join-Path $testRoot 'profiles\profile-3\favorites-removed') -PathType Container)) {
+        throw 'A remocao do favorito nao preservou a copia recuperavel.'
+    }
+    & $profileUi -DataRoot $testRoot -ValidateOnly
+    $archived = & $runner -Profile 3 -DataRoot $testRoot -DeleteProfile -PassThru
+    if (-not (Test-Path -LiteralPath $archived.BackupPath -PathType Container) -or
+        (Test-Path -LiteralPath (Join-Path $testRoot 'profiles\profile-3') -PathType Container) -or
+        -not (Test-Path -LiteralPath (Join-Path $testRoot 'profiles\profile-1') -PathType Container)) {
+        throw 'Apagar o perfil nao preservou o arquivo ou afetou outro perfil.'
+    }
+
     $reset = & $runner -Profile 1 -DataRoot $testRoot -ResetProfile -PassThru
     & $profileUi -DataRoot $testRoot -ValidateOnly
     $afterReset = & $runner -Profile 1 -DataRoot $testRoot -GetProfileInfo -PassThru

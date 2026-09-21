@@ -4,7 +4,6 @@
 )
 
 $ErrorActionPreference = 'Stop'
-
 Add-Type -AssemblyName System.Windows.Forms
 Add-Type -AssemblyName System.Drawing
 Add-Type -AssemblyName Microsoft.VisualBasic
@@ -12,105 +11,162 @@ Add-Type -AssemblyName Microsoft.VisualBasic
 $repoRoot = (Resolve-Path (Join-Path $PSScriptRoot '..\..')).Path
 $profileRunner = Join-Path $PSScriptRoot 'run_player_profile_pc.ps1'
 $settingsUi = Join-Path $PSScriptRoot 'open_pc_settings.ps1'
-
 if ([string]::IsNullOrWhiteSpace($DataRoot)) {
-    $localData = [Environment]::GetFolderPath([Environment+SpecialFolder]::LocalApplicationData)
-    if ([string]::IsNullOrWhiteSpace($localData)) {
-        throw 'O Windows nao informou o diretorio local de dados do usuario.'
-    }
-    $DataRoot = Join-Path $localData 'Pokemon Regionalidades'
+    $DataRoot = Join-Path ([Environment]::GetFolderPath([Environment+SpecialFolder]::LocalApplicationData)) 'Pokemon Regionalidades'
 } else {
     $DataRoot = [IO.Path]::GetFullPath($DataRoot)
 }
-
-$colorBackground = [Drawing.Color]::FromArgb(28, 35, 48)
-$colorCard = [Drawing.Color]::FromArgb(42, 52, 68)
-$colorPrimary = [Drawing.Color]::FromArgb(59, 130, 246)
-$colorSecondary = [Drawing.Color]::FromArgb(71, 85, 105)
-$colorText = [Drawing.Color]::FromArgb(241, 245, 249)
-$colorMuted = [Drawing.Color]::FromArgb(184, 196, 210)
+$profilesRoot = Join-Path $DataRoot 'profiles'
+$background = [Drawing.Color]::FromArgb(28, 35, 48)
+$cardColor = [Drawing.Color]::FromArgb(42, 52, 68)
+$buttonColor = [Drawing.Color]::FromArgb(71, 85, 105)
+$primaryColor = [Drawing.Color]::FromArgb(59, 130, 246)
+$textColor = [Drawing.Color]::FromArgb(241, 245, 249)
+$mutedColor = [Drawing.Color]::FromArgb(184, 196, 210)
 
 $form = New-Object Windows.Forms.Form
 $form.Text = 'Pokémon Regionalidades — Perfis'
-$form.ClientSize = New-Object Drawing.Size(820, 545)
+$form.ClientSize = New-Object Drawing.Size(970, 625)
 $form.StartPosition = 'CenterScreen'
 $form.FormBorderStyle = 'FixedSingle'
 $form.MaximizeBox = $false
-$form.BackColor = $colorBackground
-$form.ForeColor = $colorText
+$form.BackColor = $background
+$form.ForeColor = $textColor
 $form.Font = New-Object Drawing.Font('Segoe UI', 10)
 $form.AutoScaleMode = 'Dpi'
 
-$title = New-Object Windows.Forms.Label
-$title.Text = 'Pokémon Regionalidades'
-$title.Font = New-Object Drawing.Font('Segoe UI Semibold', 22)
-$title.ForeColor = $colorText
-$title.Location = New-Object Drawing.Point(28, 20)
-$title.AutoSize = $true
-$form.Controls.Add($title)
+function Add-Label {
+    param([string]$Value, [int]$X, [int]$Y, [int]$Width, [int]$Height, [int]$Size = 10)
+    $label = New-Object Windows.Forms.Label
+    $label.Text = $Value
+    $label.Location = New-Object Drawing.Point($X, $Y)
+    $label.Size = New-Object Drawing.Size($Width, $Height)
+    $label.ForeColor = $textColor
+    $label.Font = New-Object Drawing.Font('Segoe UI', $Size)
+    $label.AutoEllipsis = $true
+    $form.Controls.Add($label)
+    return $label
+}
 
-$subtitle = New-Object Windows.Forms.Label
-$subtitle.Text = 'Escolha uma campanha para continuar'
-$subtitle.Font = New-Object Drawing.Font('Segoe UI', 11)
-$subtitle.ForeColor = $colorMuted
-$subtitle.Location = New-Object Drawing.Point(31, 64)
-$subtitle.AutoSize = $true
-$form.Controls.Add($subtitle)
-
-$settingsButton = New-Object Windows.Forms.Button
-$settingsButton.Text = 'Configurações'
-$settingsButton.Location = New-Object Drawing.Point(500, 35)
-$settingsButton.Size = New-Object Drawing.Size(140, 34)
-$settingsButton.FlatStyle = 'Flat'
-$settingsButton.BackColor = $colorSecondary
-$settingsButton.ForeColor = $colorText
-$form.Controls.Add($settingsButton)
-
-$shortcutButton = New-Object Windows.Forms.Button
-$shortcutButton.Text = 'Criar atalho'
-$shortcutButton.Location = New-Object Drawing.Point(650, 35)
-$shortcutButton.Size = New-Object Drawing.Size(140, 34)
-$shortcutButton.FlatStyle = 'Flat'
-$shortcutButton.BackColor = $colorSecondary
-$shortcutButton.ForeColor = $colorText
-$form.Controls.Add($shortcutButton)
-
-$settingsButton.Add_Click({
-    try {
-        & $settingsUi -DataRoot $DataRoot
-    } catch {
-        Show-ProfileError -Message $_.Exception.Message
-    }
-})
-
-$cards = @{}
+function Add-Button {
+    param([string]$Value, [int]$X, [int]$Y, [int]$Width, [int]$Height, [bool]$Primary = $false)
+    $button = New-Object Windows.Forms.Button
+    $button.Text = $Value
+    $button.Location = New-Object Drawing.Point($X, $Y)
+    $button.Size = New-Object Drawing.Size($Width, $Height)
+    $button.FlatStyle = 'Flat'
+    $button.BackColor = if ($Primary) { $primaryColor } else { $buttonColor }
+    $button.ForeColor = $textColor
+    $button.FlatAppearance.BorderSize = 0
+    $form.Controls.Add($button)
+    return $button
+}
 
 function Show-ProfileError {
     param([string]$Message)
-    [void][Windows.Forms.MessageBox]::Show(
-        $form,
-        $Message,
-        'Pokémon Regionalidades',
-        [Windows.Forms.MessageBoxButtons]::OK,
-        [Windows.Forms.MessageBoxIcon]::Error)
+    [void][Windows.Forms.MessageBox]::Show($form, $Message, 'Pokémon Regionalidades',
+        [Windows.Forms.MessageBoxButtons]::OK, [Windows.Forms.MessageBoxIcon]::Error)
 }
 
-function Get-ProfileEntries {
-    param([int]$Profile)
-    return @(& $profileRunner -Profile $Profile -DataRoot $DataRoot -ListRecoveries -PassThru)
+function Show-ProfileNotice {
+    param([string]$Message)
+    [void][Windows.Forms.MessageBox]::Show($form, $Message, 'Pokémon Regionalidades',
+        [Windows.Forms.MessageBoxButtons]::OK, [Windows.Forms.MessageBoxIcon]::Information)
 }
 
-function Get-ProfileInfo {
-    param([int]$Profile)
-    return & $profileRunner -Profile $Profile -DataRoot $DataRoot -GetProfileInfo -PassThru
+function Confirm-ProfileAction {
+    param([string]$Message)
+    return [Windows.Forms.MessageBox]::Show($form, $Message, 'Confirmar',
+        [Windows.Forms.MessageBoxButtons]::YesNo, [Windows.Forms.MessageBoxIcon]::Warning) -eq
+        [Windows.Forms.DialogResult]::Yes
+}
+
+function Get-ExistingProfileIds {
+    if (-not (Test-Path -LiteralPath $profilesRoot -PathType Container)) { return @() }
+    $ids = foreach ($directory in Get-ChildItem -LiteralPath $profilesRoot -Directory) {
+        if ($directory.Name -match '^profile-([1-9][0-9]*)$') {
+            [int]$id = 0
+            if ([int]::TryParse($Matches[1], [ref]$id)) { $id }
+        }
+    }
+    return @($ids | Sort-Object)
+}
+
+function Get-SelectedProfileId {
+    if ($null -eq $profileList.SelectedItem) { return $null }
+    return [int]$profileList.SelectedItem.Id
+}
+
+function Get-SelectedSave {
+    return $saveList.SelectedItem
+}
+
+function Refresh-ProfileList {
+    param([int]$SelectId = 0)
+    $profileList.BeginUpdate()
+    try {
+        $profileList.Items.Clear()
+        $selectedIndex = -1
+        foreach ($id in @(Get-ExistingProfileIds)) {
+            $info = & $profileRunner -Profile $id -DataRoot $DataRoot -GetProfileInfo -PassThru
+            $item = [pscustomobject]@{ Id = $id; Text = $info.DisplayName }
+            $index = $profileList.Items.Add($item)
+            if ($id -eq $SelectId) { $selectedIndex = $index }
+        }
+        if ($selectedIndex -ge 0) { $profileList.SelectedIndex = $selectedIndex }
+        elseif ($profileList.Items.Count -gt 0) { $profileList.SelectedIndex = 0 }
+    } finally {
+        $profileList.EndUpdate()
+    }
+    Refresh-ProfileDetails
+}
+
+function Refresh-ProfileDetails {
+    $id = Get-SelectedProfileId
+    $hasProfile = $null -ne $id
+    $saveList.Items.Clear()
+    $profileName.Text = if ($hasProfile) { $profileList.SelectedItem.Text } else { 'Nenhum perfil selecionado' }
+    $profileStatus.Text = if ($hasProfile) { 'Sem campanha iniciada' } else { 'Crie um perfil para começar.' }
+    $hasActive = $false
+    $favoriteCount = 0
+    if ($hasProfile) {
+        $entries = @(& $profileRunner -Profile $id -DataRoot $DataRoot -ListRecoveries -PassThru)
+        foreach ($entry in $entries) {
+            if ($entry.Kind -eq 'Active') { $hasActive = $true }
+            if ($entry.Kind -eq 'Favorite') { $favoriteCount++ }
+            $generation = if ($null -eq $entry.Geracao) { 'desconhecida' } else { $entry.Geracao }
+            $item = [pscustomobject]@{
+                Text = "$($entry.Estado) — geração $generation — $($entry.Modificado.ToString('dd/MM/yyyy HH:mm'))"
+                Kind = $entry.Kind
+                Slot = $entry.Slot
+            }
+            [void]$saveList.Items.Add($item)
+        }
+        if ($hasActive) {
+            $profileStatus.Text = 'Campanha ativa. Selecione um save abaixo para recuperar ou favoritar.'
+        }
+    }
+    if ($saveList.Items.Count -gt 0) { $saveList.SelectedIndex = 0 }
+    $openButton.Enabled = $hasProfile
+    $renameButton.Enabled = $hasProfile
+    $deleteButton.Enabled = $hasProfile
+    $importButton.Enabled = $hasProfile -and -not $hasActive
+    $exportButton.Enabled = $hasActive
+    $resetButton.Enabled = $hasActive
+    $script:currentFavoriteCount = $favoriteCount
+    Refresh-SaveButtons
+}
+
+function Refresh-SaveButtons {
+    $selected = Get-SelectedSave
+    $restoreButton.Enabled = $null -ne $selected -and $selected.Kind -ne 'Active'
+    $favoriteButton.Enabled = $null -ne $selected -and
+        $selected.Kind -ne 'Favorite' -and $script:currentFavoriteCount -lt 5
+    $removeFavoriteButton.Enabled = $null -ne $selected -and $selected.Kind -eq 'Favorite'
 }
 
 function New-RegionalidadesShortcut {
-    param(
-        [Parameter(Mandatory = $true)]
-        [string]$ShortcutPath
-    )
-
+    param([string]$ShortcutPath)
     $powershell = Join-Path $env:SystemRoot 'System32\WindowsPowerShell\v1.0\powershell.exe'
     $shell = New-Object -ComObject WScript.Shell
     $shortcut = $shell.CreateShortcut($ShortcutPath)
@@ -124,344 +180,185 @@ function New-RegionalidadesShortcut {
     [void][Runtime.InteropServices.Marshal]::FinalReleaseComObject($shell)
 }
 
+$title = Add-Label 'Pokémon Regionalidades' 28 20 470 42 22
+$subtitle = Add-Label 'Escolha um perfil na lista para ver sua campanha' 31 64 580 26 11
+$subtitle.ForeColor = $mutedColor
+$settingsButton = Add-Button 'Configurações' 650 32 140 36
+$shortcutButton = Add-Button 'Criar atalho' 800 32 140 36
+
+$profileList = New-Object Windows.Forms.ListBox
+$profileList.Location = New-Object Drawing.Point(28, 112)
+$profileList.Size = New-Object Drawing.Size(265, 410)
+$profileList.DisplayMember = 'Text'
+$profileList.BackColor = $cardColor
+$profileList.ForeColor = $textColor
+$profileList.IntegralHeight = $false
+$form.Controls.Add($profileList)
+$createButton = Add-Button 'Criar perfil' 28 535 265 38 $true
+
+$profileName = Add-Label 'Nenhum perfil selecionado' 320 110 620 38 18
+$profileStatus = Add-Label 'Crie um perfil para começar.' 320 154 620 52
+$profileStatus.ForeColor = $mutedColor
+$openButton = Add-Button 'Abrir perfil' 320 204 620 38 $true
+$saveLabel = Add-Label 'Save atual, recuperações e favoritos' 320 256 450 26
+$saveLabel.ForeColor = $mutedColor
+$saveList = New-Object Windows.Forms.ListBox
+$saveList.Location = New-Object Drawing.Point(320, 286)
+$saveList.Size = New-Object Drawing.Size(460, 160)
+$saveList.DisplayMember = 'Text'
+$saveList.BackColor = $cardColor
+$saveList.ForeColor = $textColor
+$saveList.IntegralHeight = $false
+$form.Controls.Add($saveList)
+$restoreButton = Add-Button 'Restaurar' 792 286 148 36
+$favoriteButton = Add-Button 'Favoritar' 792 329 148 36
+$removeFavoriteButton = Add-Button 'Remover favorito' 792 372 148 36
+$importButton = Add-Button 'Importar save' 320 460 145 36
+$exportButton = Add-Button 'Exportar save' 474 460 145 36
+$renameButton = Add-Button 'Renomear' 628 460 145 36
+$resetButton = Add-Button 'Reiniciar campanha' 320 507 220 36
+$deleteButton = Add-Button 'Apagar perfil' 550 507 220 36
+$footer = Add-Label 'Cada perfil tem uma campanha, três recuperações rotativas e até cinco favoritos fixos.' 30 583 910 28
+$footer.ForeColor = $mutedColor
+
+$profileList.Add_SelectedIndexChanged({ Refresh-ProfileDetails })
+$saveList.Add_SelectedIndexChanged({ Refresh-SaveButtons })
+$settingsButton.Add_Click({
+    try { & $settingsUi -DataRoot $DataRoot } catch { Show-ProfileError $_.Exception.Message }
+})
 $shortcutButton.Add_Click({
     try {
         $desktop = [Environment]::GetFolderPath([Environment+SpecialFolder]::DesktopDirectory)
-        if ([string]::IsNullOrWhiteSpace($desktop)) {
-            throw 'O Windows não informou o caminho da área de trabalho.'
-        }
-        $shortcutPath = Join-Path $desktop 'Pokémon Regionalidades.lnk'
-        New-RegionalidadesShortcut -ShortcutPath $shortcutPath
-        [void][Windows.Forms.MessageBox]::Show(
-            $form,
-            "Atalho criado em:`r`n$shortcutPath",
-            'Atalho criado',
-            [Windows.Forms.MessageBoxButtons]::OK,
-            [Windows.Forms.MessageBoxIcon]::Information)
-    } catch {
-        Show-ProfileError -Message $_.Exception.Message
-    }
+        if ([string]::IsNullOrWhiteSpace($desktop)) { throw 'O Windows não informou a área de trabalho.' }
+        $path = Join-Path $desktop 'Pokémon Regionalidades.lnk'
+        New-RegionalidadesShortcut $path
+        Show-ProfileNotice "Atalho criado em:`r`n$path"
+    } catch { Show-ProfileError $_.Exception.Message }
 })
-
-function Refresh-ProfileCard {
-    param([int]$Profile)
-
-    $card = $cards[$Profile]
-    $profileInfo = Get-ProfileInfo -Profile $Profile
-    $entries = @(Get-ProfileEntries -Profile $Profile)
-    $active = @($entries | Where-Object Slot -eq 0)
-    $recoveries = @($entries | Where-Object Slot -gt 0 | Sort-Object Slot)
-
-    $card.Heading.Text = $profileInfo.DisplayName
-    if ($active.Count -eq 0) {
-        $card.Status.Text = 'Novo perfil — nenhuma campanha iniciada'
-        $card.Import.Enabled = $true
-        $card.Export.Enabled = $false
-    } else {
-        $generation = if ($null -eq $active[0].Geracao) { 'desconhecida' } else { $active[0].Geracao }
-        $card.Status.Text = "Save ativo — geração $generation`r`nAtualizado em $($active[0].Modificado.ToString('dd/MM/yyyy HH:mm:ss'))"
-        $card.Import.Enabled = $false
-        $card.Export.Enabled = $true
-    }
-    $card.Reset.Enabled = $active.Count -gt 0
-
-    $card.Recoveries.Items.Clear()
-    foreach ($recovery in $recoveries) {
-        $generation = if ($null -eq $recovery.Geracao) { 'desconhecida' } else { $recovery.Geracao }
-        $item = [pscustomobject]@{
-            Text = "Recuperação $($recovery.Slot) — geração $generation"
-            Slot = $recovery.Slot
+$createButton.Add_Click({
+    try {
+        $ids = @(Get-ExistingProfileIds)
+        $id = if ($ids.Count -eq 0) { 1 } else { [int]$ids[-1] + 1 }
+        if ($id -lt 1) { throw 'O identificador de perfis atingiu o limite do sistema.' }
+        $name = [Microsoft.VisualBasic.Interaction]::InputBox(
+            'Nome do novo perfil (até 32 caracteres):', 'Criar perfil', "Perfil $id")
+        if ([string]::IsNullOrWhiteSpace($name)) { return }
+        if ($name.Trim().Length -gt 32 -or $name.IndexOfAny([char[]]"`r`n`t") -ge 0) {
+            throw 'O nome precisa ter até 32 caracteres e ocupar uma linha.'
         }
-        [void]$card.Recoveries.Items.Add($item)
-    }
-    if ($card.Recoveries.Items.Count -gt 0) {
-        $card.Recoveries.SelectedIndex = 0
-    }
-    $card.Restore.Enabled = $card.Recoveries.Items.Count -gt 0
-}
-
-function New-ProfileCard {
-    param(
-        [int]$Profile,
-        [int]$Left
-    )
-
-    $panel = New-Object Windows.Forms.Panel
-    $panel.Location = New-Object Drawing.Point($Left, 105)
-    $panel.Size = New-Object Drawing.Size(370, 350)
-    $panel.BackColor = $colorCard
-    $panel.BorderStyle = 'FixedSingle'
-    $form.Controls.Add($panel)
-
-    $heading = New-Object Windows.Forms.Label
-    $heading.Text = "Perfil $Profile"
-    $heading.Font = New-Object Drawing.Font('Segoe UI Semibold', 16)
-    $heading.ForeColor = $colorText
-    $heading.Location = New-Object Drawing.Point(20, 18)
-    $heading.Size = New-Object Drawing.Size(325, 32)
-    $heading.AutoEllipsis = $true
-    $panel.Controls.Add($heading)
-
-    $status = New-Object Windows.Forms.Label
-    $status.ForeColor = $colorMuted
-    $status.Location = New-Object Drawing.Point(22, 58)
-    $status.Size = New-Object Drawing.Size(325, 52)
-    $panel.Controls.Add($status)
-
-    $openButton = New-Object Windows.Forms.Button
-    $openButton.Text = 'Abrir perfil'
-    $openButton.Location = New-Object Drawing.Point(22, 120)
-    $openButton.Size = New-Object Drawing.Size(325, 40)
-    $openButton.FlatStyle = 'Flat'
-    $openButton.BackColor = $colorPrimary
-    $openButton.ForeColor = [Drawing.Color]::White
-    $openButton.FlatAppearance.BorderSize = 0
-    $panel.Controls.Add($openButton)
-
-    $importButton = New-Object Windows.Forms.Button
-    $importButton.Text = 'Importar save'
-    $importButton.Location = New-Object Drawing.Point(22, 172)
-    $importButton.Size = New-Object Drawing.Size(155, 34)
-    $importButton.FlatStyle = 'Flat'
-    $importButton.BackColor = $colorSecondary
-    $importButton.ForeColor = $colorText
-    $panel.Controls.Add($importButton)
-
-    $exportButton = New-Object Windows.Forms.Button
-    $exportButton.Text = 'Exportar save'
-    $exportButton.Location = New-Object Drawing.Point(192, 172)
-    $exportButton.Size = New-Object Drawing.Size(155, 34)
-    $exportButton.FlatStyle = 'Flat'
-    $exportButton.BackColor = $colorSecondary
-    $exportButton.ForeColor = $colorText
-    $panel.Controls.Add($exportButton)
-
-    $recoveryLabel = New-Object Windows.Forms.Label
-    $recoveryLabel.Text = 'Recuperações disponíveis'
-    $recoveryLabel.ForeColor = $colorMuted
-    $recoveryLabel.Location = New-Object Drawing.Point(22, 218)
-    $recoveryLabel.AutoSize = $true
-    $panel.Controls.Add($recoveryLabel)
-
-    $recoveries = New-Object Windows.Forms.ComboBox
-    $recoveries.DropDownStyle = 'DropDownList'
-    $recoveries.DisplayMember = 'Text'
-    $recoveries.Location = New-Object Drawing.Point(22, 244)
-    $recoveries.Size = New-Object Drawing.Size(211, 32)
-    $panel.Controls.Add($recoveries)
-
-    $restoreButton = New-Object Windows.Forms.Button
-    $restoreButton.Text = 'Restaurar'
-    $restoreButton.Location = New-Object Drawing.Point(243, 243)
-    $restoreButton.Size = New-Object Drawing.Size(104, 32)
-    $restoreButton.FlatStyle = 'Flat'
-    $restoreButton.BackColor = $colorSecondary
-    $restoreButton.ForeColor = $colorText
-    $panel.Controls.Add($restoreButton)
-
-    $renameButton = New-Object Windows.Forms.Button
-    $renameButton.Text = 'Renomear perfil'
-    $renameButton.Location = New-Object Drawing.Point(22, 292)
-    $renameButton.Size = New-Object Drawing.Size(155, 34)
-    $renameButton.FlatStyle = 'Flat'
-    $renameButton.BackColor = $colorSecondary
-    $renameButton.ForeColor = $colorText
-    $panel.Controls.Add($renameButton)
-
-    $resetButton = New-Object Windows.Forms.Button
-    $resetButton.Text = 'Reiniciar campanha'
-    $resetButton.Location = New-Object Drawing.Point(192, 292)
-    $resetButton.Size = New-Object Drawing.Size(155, 34)
-    $resetButton.FlatStyle = 'Flat'
-    $resetButton.BackColor = $colorSecondary
-    $resetButton.ForeColor = $colorText
-    $panel.Controls.Add($resetButton)
-
-    $cards[$Profile] = [pscustomobject]@{
-        Panel = $panel
-        Heading = $heading
-        Status = $status
-        Open = $openButton
-        Import = $importButton
-        Export = $exportButton
-        Recoveries = $recoveries
-        Restore = $restoreButton
-        Rename = $renameButton
-        Reset = $resetButton
-    }
-
-    $profileId = $Profile
-    $openButton.Add_Click({
-        try {
-            & $profileRunner -Profile $profileId -DataRoot $DataRoot
-            $form.Close()
-        } catch {
-            Show-ProfileError -Message $_.Exception.Message
-        }
-    }.GetNewClosure())
-
-    $importButton.Add_Click({
-        $dialog = New-Object Windows.Forms.OpenFileDialog
-        $dialog.Title = "Importar save para o perfil $profileId"
+        & $profileRunner -Profile $id -DataRoot $DataRoot -CreateProfile | Out-Null
+        & $profileRunner -Profile $id -DataRoot $DataRoot -SetProfileName $name | Out-Null
+        Refresh-ProfileList -SelectId $id
+    } catch { Show-ProfileError $_.Exception.Message }
+})
+$openButton.Add_Click({
+    try {
+        $id = Get-SelectedProfileId
+        if ($null -eq $id) { return }
+        & $profileRunner -Profile $id -DataRoot $DataRoot
+        $form.Close()
+    } catch { Show-ProfileError $_.Exception.Message }
+})
+$renameButton.Add_Click({
+    try {
+        $id = Get-SelectedProfileId
+        if ($null -eq $id) { return }
+        $name = [Microsoft.VisualBasic.Interaction]::InputBox('Novo nome do perfil:',
+            'Renomear perfil', $profileName.Text)
+        if ([string]::IsNullOrWhiteSpace($name)) { return }
+        & $profileRunner -Profile $id -DataRoot $DataRoot -SetProfileName $name | Out-Null
+        Refresh-ProfileList -SelectId $id
+    } catch { Show-ProfileError $_.Exception.Message }
+})
+$importButton.Add_Click({
+    $dialog = New-Object Windows.Forms.OpenFileDialog
+    try {
+        $dialog.Title = 'Importar save'
         $dialog.Filter = 'Save de Pokémon Regionalidades (*.pgrsave;*.sav)|*.pgrsave;*.sav|Todos os arquivos (*.*)|*.*'
-        if ($dialog.ShowDialog($form) -eq [Windows.Forms.DialogResult]::OK) {
-            try {
-                & $profileRunner -Profile $profileId -DataRoot $DataRoot -ImportSave $dialog.FileName -PrepareOnly
-                Refresh-ProfileCard -Profile $profileId
-                [void][Windows.Forms.MessageBox]::Show(
-                    $form,
-                    'O save foi copiado. O arquivo original continua preservado.',
-                    'Importação concluída',
-                    [Windows.Forms.MessageBoxButtons]::OK,
-                    [Windows.Forms.MessageBoxIcon]::Information)
-            } catch {
-                Show-ProfileError -Message $_.Exception.Message
-            }
-        }
-        $dialog.Dispose()
-    }.GetNewClosure())
-
-    $exportButton.Add_Click({
-        $dialog = New-Object Windows.Forms.SaveFileDialog
-        $dialog.Title = "Exportar save do perfil $profileId"
-        $dialog.Filter = 'Save nativo de Pokémon Regionalidades (*.pgrsave)|*.pgrsave'
+        if ($dialog.ShowDialog($form) -ne [Windows.Forms.DialogResult]::OK) { return }
+        $id = Get-SelectedProfileId
+        & $profileRunner -Profile $id -DataRoot $DataRoot -ImportSave $dialog.FileName -PrepareOnly | Out-Null
+        Refresh-ProfileDetails
+        Show-ProfileNotice 'Save importado. O arquivo original foi preservado.'
+    } catch { Show-ProfileError $_.Exception.Message } finally { $dialog.Dispose() }
+})
+$exportButton.Add_Click({
+    $dialog = New-Object Windows.Forms.SaveFileDialog
+    try {
+        $id = Get-SelectedProfileId
+        $dialog.Title = 'Exportar save'
+        $dialog.Filter = 'Save nativo (*.pgrsave)|*.pgrsave'
         $dialog.DefaultExt = 'pgrsave'
         $dialog.AddExtension = $true
         $dialog.OverwritePrompt = $true
-        $dialog.FileName = "pokemon-regionalidades-perfil-$profileId-$(Get-Date -Format 'yyyyMMdd-HHmm').pgrsave"
-        if ($dialog.ShowDialog($form) -eq [Windows.Forms.DialogResult]::OK) {
-            try {
-                & $profileRunner -Profile $profileId -DataRoot $DataRoot -ExportSave $dialog.FileName -AllowExportOverwrite -PrepareOnly
-                [void][Windows.Forms.MessageBox]::Show(
-                    $form,
-                    "O save foi exportado para:`r`n$($dialog.FileName)",
-                    'Exportação concluída',
-                    [Windows.Forms.MessageBoxButtons]::OK,
-                    [Windows.Forms.MessageBoxIcon]::Information)
-            } catch {
-                Show-ProfileError -Message $_.Exception.Message
-            }
+        $dialog.FileName = "pokemon-regionalidades-perfil-$id-$(Get-Date -Format 'yyyyMMdd-HHmm').pgrsave"
+        if ($dialog.ShowDialog($form) -ne [Windows.Forms.DialogResult]::OK) { return }
+        & $profileRunner -Profile $id -DataRoot $DataRoot -ExportSave $dialog.FileName -AllowExportOverwrite -PrepareOnly | Out-Null
+        Show-ProfileNotice "Save exportado para:`r`n$($dialog.FileName)"
+    } catch { Show-ProfileError $_.Exception.Message } finally { $dialog.Dispose() }
+})
+$restoreButton.Add_Click({
+    try {
+        $id = Get-SelectedProfileId
+        $entry = Get-SelectedSave
+        if ($null -eq $entry -or -not (Confirm-ProfileAction "Restaurar $($entry.Text)? O save atual será preservado.")) { return }
+        if ($entry.Kind -eq 'Recovery') {
+            & $profileRunner -Profile $id -DataRoot $DataRoot -RestoreRecovery $entry.Slot | Out-Null
+        } elseif ($entry.Kind -eq 'Favorite') {
+            & $profileRunner -Profile $id -DataRoot $DataRoot -RestoreFavorite $entry.Slot | Out-Null
         }
-        $dialog.Dispose()
-    }.GetNewClosure())
+        Refresh-ProfileDetails
+        Show-ProfileNotice 'Save restaurado; o estado anterior foi preservado.'
+    } catch { Show-ProfileError $_.Exception.Message }
+})
+$favoriteButton.Add_Click({
+    try {
+        $id = Get-SelectedProfileId
+        $entry = Get-SelectedSave
+        if ($null -eq $entry -or $entry.Kind -eq 'Favorite') { return }
+        & $profileRunner -Profile $id -DataRoot $DataRoot -FavoriteFromSlot $entry.Slot | Out-Null
+        Refresh-ProfileDetails
+    } catch { Show-ProfileError $_.Exception.Message }
+})
+$removeFavoriteButton.Add_Click({
+    try {
+        $id = Get-SelectedProfileId
+        $entry = Get-SelectedSave
+        if ($null -eq $entry -or $entry.Kind -ne 'Favorite' -or
+            -not (Confirm-ProfileAction "Remover $($entry.Text) da lista? Uma cópia recuperável será preservada.")) { return }
+        & $profileRunner -Profile $id -DataRoot $DataRoot -RemoveFavorite $entry.Slot | Out-Null
+        Refresh-ProfileDetails
+    } catch { Show-ProfileError $_.Exception.Message }
+})
+$resetButton.Add_Click({
+    try {
+        $id = Get-SelectedProfileId
+        if (-not (Confirm-ProfileAction 'Reiniciar esta campanha? O perfil e seu nome serão mantidos. Uma cópia completa será preservada.')) { return }
+        $result = & $profileRunner -Profile $id -DataRoot $DataRoot -ResetProfile -PassThru
+        Refresh-ProfileList -SelectId $id
+        Show-ProfileNotice "Campanha reiniciada. Cópia recuperável:`r`n$($result.BackupPath)"
+    } catch { Show-ProfileError $_.Exception.Message }
+})
+$deleteButton.Add_Click({
+    try {
+        $id = Get-SelectedProfileId
+        if (-not (Confirm-ProfileAction "Apagar o perfil $id da lista? Sua pasta será arquivada e poderá ser recuperada manualmente.")) { return }
+        $result = & $profileRunner -Profile $id -DataRoot $DataRoot -DeleteProfile -PassThru
+        Refresh-ProfileList
+        Show-ProfileNotice "Perfil retirado da lista. Cópia recuperável:`r`n$($result.BackupPath)"
+    } catch { Show-ProfileError $_.Exception.Message }
+})
 
-    $restoreButton.Add_Click({
-        $selected = $cards[$profileId].Recoveries.SelectedItem
-        if ($null -eq $selected) {
-            return
-        }
-        $answer = [Windows.Forms.MessageBox]::Show(
-            $form,
-            "Restaurar $($selected.Text)?`r`n`r`nO save ativo atual também será preservado.",
-            'Confirmar restauração',
-            [Windows.Forms.MessageBoxButtons]::YesNo,
-            [Windows.Forms.MessageBoxIcon]::Question)
-        if ($answer -ne [Windows.Forms.DialogResult]::Yes) {
-            return
-        }
-        try {
-            & $profileRunner -Profile $profileId -DataRoot $DataRoot -RestoreRecovery $selected.Slot -PrepareOnly
-            Refresh-ProfileCard -Profile $profileId
-            [void][Windows.Forms.MessageBox]::Show(
-                $form,
-                'A recuperação foi restaurada e o save ativo anterior foi preservado.',
-                'Restauração concluída',
-                [Windows.Forms.MessageBoxButtons]::OK,
-                [Windows.Forms.MessageBoxIcon]::Information)
-        } catch {
-            Show-ProfileError -Message $_.Exception.Message
-        }
-    }.GetNewClosure())
-
-    $renameButton.Add_Click({
-        try {
-            $current = (Get-ProfileInfo -Profile $profileId).DisplayName
-            $name = [Microsoft.VisualBasic.Interaction]::InputBox(
-                'Digite um nome de até 32 caracteres para identificar este perfil.',
-                'Renomear perfil',
-                $current)
-            if (-not [string]::IsNullOrWhiteSpace($name)) {
-                & $profileRunner -Profile $profileId -DataRoot $DataRoot -SetProfileName $name -PrepareOnly
-                Refresh-ProfileCard -Profile $profileId
-            }
-        } catch {
-            Show-ProfileError -Message $_.Exception.Message
-        }
-    }.GetNewClosure())
-
-    $resetButton.Add_Click({
-        $answer = [Windows.Forms.MessageBox]::Show(
-            $form,
-            "Reiniciar somente este perfil?`r`n`r`nO save ativo e as recuperações sairão da campanha atual. Uma cópia de segurança será preservada.",
-            'Confirmar reinício da campanha',
-            [Windows.Forms.MessageBoxButtons]::YesNo,
-            [Windows.Forms.MessageBoxIcon]::Warning)
-        if ($answer -ne [Windows.Forms.DialogResult]::Yes) {
-            return
-        }
-        try {
-            $result = & $profileRunner -Profile $profileId -DataRoot $DataRoot -ResetProfile -PassThru
-            Refresh-ProfileCard -Profile $profileId
-            [void][Windows.Forms.MessageBox]::Show(
-                $form,
-                "O perfil está pronto para uma nova campanha.`r`n`r`nCópia de segurança:`r`n$($result.BackupPath)",
-                'Perfil reiniciado',
-                [Windows.Forms.MessageBoxButtons]::OK,
-                [Windows.Forms.MessageBoxIcon]::Information)
-        } catch {
-            Show-ProfileError -Message $_.Exception.Message
-        }
-    }.GetNewClosure())
-}
-
-New-ProfileCard -Profile 1 -Left 28
-New-ProfileCard -Profile 2 -Left 422
-Refresh-ProfileCard -Profile 1
-Refresh-ProfileCard -Profile 2
-
-$footer = New-Object Windows.Forms.Label
-$footer.Text = 'Cada perfil mantém sua própria campanha e até três recuperações. As configurações do programa são compartilhadas.'
-$footer.ForeColor = $colorMuted
-$footer.Location = New-Object Drawing.Point(30, 485)
-$footer.Size = New-Object Drawing.Size(755, 42)
-$footer.TextAlign = 'MiddleCenter'
-$form.Controls.Add($footer)
-
+Refresh-ProfileList
 if ($ValidateOnly) {
-    if ($cards.Count -ne 2 -or $cards[1].Open.Text -ne 'Abrir perfil' -or
-        $cards[2].Recoveries.DisplayMember -ne 'Text' -or $shortcutButton.Text -ne 'Criar atalho' -or
-        $settingsButton.Text -ne 'Configurações' -or
-        $cards[1].Rename.Text -ne 'Renomear perfil' -or
-        $cards[2].Reset.Text -ne 'Reiniciar campanha') {
-        throw 'A validacao estrutural da interface de perfis falhou.'
+    if ($profileList.DisplayMember -ne 'Text' -or $saveList.DisplayMember -ne 'Text' -or
+        $createButton.Text -ne 'Criar perfil' -or $favoriteButton.Text -ne 'Favoritar' -or
+        $settingsButton.Text -ne 'Configurações') {
+        throw 'A validação estrutural da lista de perfis falhou.'
     }
-    $profile1Save = Join-Path $DataRoot 'profiles\profile-1\pokemon_regionalidades.pgrsave'
-    $profile1LegacySave = Join-Path $DataRoot 'profiles\profile-1\pokemon_regionalidades.sav'
-    if (((Test-Path -LiteralPath $profile1Save -PathType Leaf) -or
-         (Test-Path -LiteralPath $profile1LegacySave -PathType Leaf)) -and
-        ($cards[1].Status.Text -notlike 'Save ativo*' -or $cards[1].Import.Enabled -or -not $cards[1].Export.Enabled)) {
-        throw 'A interface nao reconheceu corretamente o save ativo do perfil 1.'
-    }
-    $expectedRecoveries = @(Get-ProfileEntries -Profile 1 | Where-Object Slot -gt 0).Count
-    if ($cards[1].Recoveries.Items.Count -ne $expectedRecoveries) {
-        throw 'A interface nao apresentou todas as recuperacoes do perfil 1.'
-    }
-    $testShortcutPath = Join-Path $DataRoot 'profile-ui-validation.lnk'
-    New-RegionalidadesShortcut -ShortcutPath $testShortcutPath
-    $testShell = New-Object -ComObject WScript.Shell
-    $testShortcut = $testShell.CreateShortcut($testShortcutPath)
-    $expectedTarget = Join-Path $env:SystemRoot 'System32\WindowsPowerShell\v1.0\powershell.exe'
-    if ($testShortcut.TargetPath -ne $expectedTarget -or
-        $testShortcut.Arguments -notlike '*open_player_profiles_pc.ps1*') {
-        throw 'A validacao do atalho da interface falhou.'
-    }
-    [void][Runtime.InteropServices.Marshal]::FinalReleaseComObject($testShortcut)
-    [void][Runtime.InteropServices.Marshal]::FinalReleaseComObject($testShell)
-    Remove-Item -LiteralPath $testShortcutPath -Force
     $form.Dispose()
     Write-Output 'PROFILE_UI_TEST_OK'
     return
 }
-
 [void]$form.ShowDialog()
 $form.Dispose()

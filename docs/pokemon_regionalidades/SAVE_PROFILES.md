@@ -2,9 +2,9 @@
 
 ## Objetivo
 
-O porte para PC deverá permitir que duas pessoas joguem sem misturar progresso e
-que cada perfil recupere uma gravação anterior caso encontre um soft lock, uma
-falha ou uma incompatibilidade durante o desenvolvimento.
+O porte para PC permite criar perfis conforme a necessidade, sem um limite fixo
+de dois espaços, e recuperar uma gravação anterior caso encontre um soft lock,
+uma falha ou uma incompatibilidade durante o desenvolvimento.
 
 Essa camada pertence ao produto para PC. Durante a primeira baseline, o programa
 escolhe qual imagem de flash Emerald será apresentada ao motor. Antes de ativar
@@ -19,6 +19,7 @@ continuará dentro dele como compatibilidade, sem limitar os dados novos.
 | Perfil de jogador | Campanha pessoal de uma pessoa |
 | Save ativo | Estado carregado normalmente pelo jogo naquele perfil |
 | Ponto de recuperação | Uma das três versões anteriores confirmadas do save ativo |
+| Favorito | Uma de até cinco cópias verificadas de saves escolhidos explicitamente, fixas e separadas da rotação automática |
 | Save rápido | Solicitação de gravação pelo sistema oficial em um estado seguro |
 | Carregamento rápido | Reinicialização controlada da sessão usando um save validado |
 | Save de exploração | Ferramenta técnica isolada, com Fly, HMs e recursos de teste |
@@ -32,37 +33,50 @@ exploração e testes e o segundo para a campanha normal de Hoenn. Esses são us
 daquelas campanhas, não nomes fixos do produto, e resultados da exploração não
 se tornam evidência de continuidade narrativa.
 
-## Estrutura lógica planejada
+### Interface de perfis implementada
+
+A interface mostra uma lista rolável de perfis existentes e o botão **Criar
+perfil**. A seleção exibe a campanha, o save atual, até três recuperações e até
+cinco favoritos. Há ações para abrir, renomear, importar, exportar, reiniciar
+ou retirar o perfil da lista mediante confirmação. Cada perfil tem uma campanha
+independente, permitindo testar o início de Kanto e a entrada a partir de
+Hoenn sem sobrescrever a campanha pessoal.
+
+Cada favorito é uma cópia própria validada do save atual ou de uma recuperação,
+não um dos três arquivos que a rotação substitui. Ele permanece na seleção até
+ser removido pelo usuário. Restaurar um favorito ou uma recuperação preserva o
+save ativo anterior. Remover favorito ou perfil move os arquivos para uma pasta
+recuperável. Os perfis 1 e 2 preexistentes conservam os mesmos caminhos, nomes
+e saves. O teste automatizado usa perfis temporários, valida cinco favoritos e
+recusa o sexto. O usuário validou a tela de perfis com suas campanhas; o teste
+automatizado de gerenciamento foi repetido com sucesso em 21/09/2026, usando
+somente saves temporários.
+
+## Estrutura de dados dos perfis
 
 No Windows, os perfis usam `%LOCALAPPDATA%\Pokemon Regionalidades`. A
 organização lógica é:
 
 ```text
-dados-do-jogador/
-  configuracao-global/
-  perfis/
-    perfil-1/
-      perfil.json
-      atual.pgrsave
-      recuperacao-1.pgrsave
-      recuperacao-2.pgrsave
-      recuperacao-3.pgrsave
-    perfil-2/
-      perfil.json
-      atual.pgrsave
-      recuperacao-1.pgrsave
-      recuperacao-2.pgrsave
-      recuperacao-3.pgrsave
-  desenvolvimento/
-    exploracao/
-    marcos-narrativos/
+Pokemon Regionalidades/
+  config/
+  profiles/
+    profile-1/, profile-2/, ... profile-N/
+      profile.json
+      pokemon_regionalidades.pgrsave
+      pokemon_regionalidades.pgrsave.recovery-1
+      pokemon_regionalidades.pgrsave.recovery-2
+      pokemon_regionalidades.pgrsave.recovery-3
+      favorites/
+        favorite-1.pgrsave ... favorite-5.pgrsave
+  profiles-archived/
 ```
 
 Os nomes exibidos já podem ser escolhidos pelos jogadores. Identificadores
 internos não dependem do nome, portanto renomear um perfil não muda seu diretório
 nem perde o vínculo com a campanha.
 
-Cada cartão já mostra o nome escolhido para o perfil. Nome do personagem, tempo
+A seleção mostra o nome escolhido para o perfil. Nome do personagem, tempo
 total de jogo e versão usada na última gravação ainda serão acrescentados. Em um
 perfil vazio, a pessoa pode renomear o espaço antes de iniciar ou importar uma
 campanha.
