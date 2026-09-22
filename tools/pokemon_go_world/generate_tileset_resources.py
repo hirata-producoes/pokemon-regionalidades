@@ -15,6 +15,7 @@ WRAPPER = r"""
 #define FALSE 0
 #define MODERN 1
 #define EMERALD 1
+#define PORTABLE 1
 #include "config/general.h"
 #include "config/overworld.h"
 #include "data/tilesets/graphics.h"

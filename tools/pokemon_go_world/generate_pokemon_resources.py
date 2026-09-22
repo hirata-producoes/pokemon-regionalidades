@@ -17,6 +17,8 @@ WRAPPER = r"""
 #include "config/general.h"
 #include "config/pokemon.h"
 #include "config/overworld.h"
+#undef OW_POKEMON_OBJECT_EVENTS
+#define OW_POKEMON_OBJECT_EVENTS TRUE
 #include "data/graphics/pokemon.h"
 """
 
@@ -148,6 +150,10 @@ def generate(root: Path, cpp: Path, header: Path, resource_list: Path, makefile:
         raise ValueError("normal palette fallback is missing from active graphics")
     if SHINY_PALETTE_FALLBACK.rsplit("/", 1)[1] not in palette_declarations:
         raise ValueError("shiny palette fallback is missing from active graphics")
+    if not any(symbol.startswith("gOverworldPalette_") for symbol in palette_declarations):
+        raise ValueError("Pokemon overworld palettes are missing from PC resources")
+    if not any(symbol.startswith("gShinyOverworldPalette_") for symbol in palette_declarations):
+        raise ValueError("shiny Pokemon overworld palettes are missing from PC resources")
     for fallback in (ICON_FALLBACK, EGG_ICON_FALLBACK, FOOTPRINT_FALLBACK):
         if fallback.rsplit("/", 1)[1] not in u8_declarations:
             raise ValueError(f"u8 fallback is missing from active graphics: {fallback}")

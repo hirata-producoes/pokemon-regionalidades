@@ -169,7 +169,10 @@ class WildEncounterAssembler:
             elif "LeafGreen" in shared_label:
                 version = "LEAFGREEN"
             
-            self.WriteLine(f"#ifdef {version}")
+            if version == "FIRERED":
+                self.WriteLine("#if defined(FIRERED) || defined(PORTABLE)")
+            else:
+                self.WriteLine(f"#ifdef {version}")
 
             self.WriteLine("{", 1)
             self.WriteLine(f".mapGroup = {map_group},", 2)
@@ -241,7 +244,10 @@ class WildEncounterAssembler:
                     version = "FIRERED"
                 elif "LeafGreen" in shared_label:
                     version = "LEAFGREEN"
-                self.WriteLine(f"#ifdef {version}")
+                if version == "FIRERED":
+                    self.WriteLine("#if defined(FIRERED) || defined(PORTABLE)")
+                else:
+                    self.WriteLine(f"#ifdef {version}")
                 for mon_type in self.config.mon_types:
                     if mon_type not in map_encounters:
                         headers["data"][shared_label][mon_type] = "NULL"

@@ -37,6 +37,16 @@ string version;
 // System directory separator
 string sep;
 
+bool is_emerald_version() {
+    return version == "emerald" || version == "emerald_pc";
+}
+
+bool is_kanto_map_preview(Json map_data) {
+    return version == "emerald_pc"
+        && map_data["region"].string_value() == "REGION_KANTO"
+        && !map_data["world_enabled"].bool_value();
+}
+
 string read_text_file(string filepath) {
     ifstream in_file(filepath);
 
@@ -123,6 +133,15 @@ string get_include_guard_end(const string &name) {
     return guard.str();
 }
 
+vector<Json> get_enabled_connections(const Json &map_data) {
+    vector<Json> connections = map_data["connections"].array_items();
+    if (version == "emerald_pc") {
+        for (const auto &connection : map_data["connections_pc"].array_items())
+            connections.push_back(connection);
+    }
+    return connections;
+}
+
 string generate_map_header_text(Json map_data, Json layouts_data) {
     string map_layout_id = json_to_string(map_data, "layout");
 
@@ -146,18 +165,23 @@ string generate_map_header_text(Json map_data, Json layouts_data) {
     text << mapName << ":\n"
          << "\t.4byte " << json_to_string(layout, "name") << "\n";
 
-    if (map_data.object_items().find("shared_events_map") != map_data.object_items().end())
+    bool previewOnly = is_kanto_map_preview(map_data);
+
+    if (!previewOnly && map_data.object_items().find("shared_events_map") != map_data.object_items().end())
         text << "\t.4byte " << json_to_string(map_data, "shared_events_map") << "_MapEvents\n";
     else
         text << "\t.4byte " << mapName << "_MapEvents\n";
 
-    if (map_data.object_items().find("shared_scripts_map") != map_data.object_items().end())
+    if (previewOnly)
+        text << "\t.4byte NULL\n";
+    else if (map_data.object_items().find("shared_scripts_map") != map_data.object_items().end())
         text << "\t.4byte " << json_to_string(map_data, "shared_scripts_map") << "_MapScripts\n";
     else
         text << "\t.4byte " << mapName << "_MapScripts\n";
 
-    if (map_data.object_items().find("connections") != map_data.object_items().end()
-     && map_data["connections"].array_items().size() > 0 && json_to_string(map_data, "connections_no_include", true) != "TRUE")
+    if (!get_enabled_connections(map_data).empty()
+     && (json_to_string(map_data, "connections_no_include", true) != "TRUE"
+      || (version == "emerald_pc" && json_to_string(map_data, "connections_pc_preview", true) == "TRUE")))
         text << "\t.4byte " << mapName << "_MapConnections\n";
     else
         text << "\t.4byte NULL\n";
@@ -179,7 +203,7 @@ string generate_map_header_text(Json map_data, Json layouts_data) {
 
     if (version == "ruby")
         text << "\t.byte " << json_to_string(map_data, "show_map_name") << "\n";
-    else if (version == "emerald" || version == "firered")
+    else if (is_emerald_version() || version == "firered")
         text << "\tmap_header_flags "
              << "allow_cycling=" << json_to_string(map_data, "allow_cycling") << ", "
              << "allow_escaping=" << json_to_string(map_data, "allow_escaping") << ", "
@@ -206,7 +230,8 @@ vector<string> get_existing_maps() {
 }
 
 string generate_map_connections_text(Json map_data) {
-    if (map_data["connections"] == Json())
+    vector<Json> connections = get_enabled_connections(map_data);
+    if (connections.empty())
         return string("\n");
 
     string mapName = json_to_string(map_data, "name");
@@ -216,7 +241,7 @@ string generate_map_connections_text(Json map_data) {
     text << get_generated_warning("data/maps/" + mapName + "/map.json", true);
     text << mapName << "_MapConnectionsList:\n";
 
-    for (auto &connection : map_data["connections"].array_items()) {
+    for (auto &connection : connections) {
         auto it = find(existing_maps.begin(), existing_maps.end(), json_to_string(connection, "map"));
         if (it == existing_maps.end())
             continue;
@@ -227,14 +252,15 @@ string generate_map_connections_text(Json map_data) {
     }
 
     text << "\n" << mapName << "_MapConnections:\n"
-         << "\t.4byte " << map_data["connections"].array_items().size() << "\n"
+         << "\t.4byte " << connections.size() << "\n"
          << "\t.4byte " << mapName << "_MapConnectionsList\n\n";
 
     return text.str();
 }
 
 string generate_map_events_text(Json map_data) {
-    if (map_data.object_items().find("shared_events_map") != map_data.object_items().end())
+    bool previewOnly = is_kanto_map_preview(map_data);
+    if (!previewOnly && map_data.object_items().find("shared_events_map") != map_data.object_items().end())
         return string("\n");
 
     string mapName = json_to_string(map_data, "name");
@@ -245,7 +271,7 @@ string generate_map_events_text(Json map_data) {
 
     string objects_label, warps_label, coords_label, bgs_label;
 
-    if (map_data["object_events"].array_items().size() > 0) {
+    if (!previewOnly && map_data["object_events"].array_items().size() > 0) {
         objects_label = mapName + "_ObjectEvents";
         text << objects_label << ":\n";
         for (unsigned int i = 0; i < map_data["object_events"].array_items().size(); i++) {
@@ -286,6 +312,14 @@ string generate_map_events_text(Json map_data) {
         warps_label = mapName + "_MapWarps";
         text << warps_label << ":\n";
         for (auto &warp_event : map_data["warp_events"].array_items()) {
+            string destination = json_to_string(warp_event, "dest_map");
+            if (previewOnly && (destination == "MAP_DYNAMIC"
+                             || destination == "MAP_CELADON_CITY_DEPARTMENT_STORE_ELEVATOR")) {
+                // A prévia não executa o script que configura o destino dinâmico.
+                // Mantém a posição na tabela, mas não deixa esse warp ser ativado.
+                text << "\twarp_def -1, -1, 0, 0, MAP_PALLET_TOWN\n";
+                continue;
+            }
             text << "\twarp_def "
                  << json_to_string(warp_event, "x") << ", "
                  << json_to_string(warp_event, "y") << ", "
@@ -298,7 +332,7 @@ string generate_map_events_text(Json map_data) {
         warps_label = "NULL";
     }
 
-    if (map_data["coord_events"].array_items().size() > 0) {
+    if (!previewOnly && map_data["coord_events"].array_items().size() > 0) {
         coords_label = mapName + "_MapCoordEvents";
         text << coords_label << ":\n";
         for (auto &coord_event : map_data["coord_events"].array_items()) {
@@ -327,7 +361,7 @@ string generate_map_events_text(Json map_data) {
         coords_label = "NULL";
     }
 
-    if (map_data["bg_events"].array_items().size() > 0) {
+    if (!previewOnly && map_data["bg_events"].array_items().size() > 0) {
         bgs_label = mapName + "_MapBGEvents";
         text << bgs_label << ":\n";
         for (auto &bg_event : map_data["bg_events"].array_items()) {
@@ -734,7 +768,7 @@ void process_groups(string groups_filepath, vector<string> &map_filepaths, strin
         bool worldEnabled = json_to_string(map_data, "world_enabled", true) == "TRUE";
 
         if (region.empty()) {
-            if (version == "emerald")
+            if (is_emerald_version())
                 region = "REGION_HOENN";
             else if (version == "firered")
                 region = "REGION_KANTO";
@@ -742,6 +776,7 @@ void process_groups(string groups_filepath, vector<string> &map_filepaths, strin
         string map_name = json_to_string(map_data, "name");
 
         if ((version == "emerald" && region != "REGION_HOENN" && !worldEnabled)
+         || (version == "emerald_pc" && region != "REGION_HOENN" && region != "REGION_KANTO" && !worldEnabled)
          || (version == "firered" && region != "REGION_KANTO")) {
             invalid_maps.push_back(map_name);
         }
@@ -777,12 +812,13 @@ string generate_layout_headers_text(Json layouts_data) {
         bool worldEnabled = json_to_string(layout, "world_enabled", true) == "TRUE";
 
         if (layout_version.empty()) {
-            if (version == "emerald")
+            if (is_emerald_version())
                 layout_version = "emerald";
             else if (version == "firered")
                 layout_version = "frlg";
         }
         if ((version == "emerald" && layout_version != "emerald" && !worldEnabled)
+         || (version == "emerald_pc" && layout_version != "emerald" && layout_version != "frlg" && !worldEnabled)
          || (version == "firered" && layout_version != "frlg"))
             continue;
         string layoutName = json_to_string(layout, "name");
@@ -836,12 +872,14 @@ string generate_layouts_table_text(Json layouts_data) {
         string layout_version = json_to_string(layout, "layout_version", true);
         bool worldEnabled = json_to_string(layout, "world_enabled", true) == "TRUE";
         if (layout_version.empty()) {
-            if (version == "emerald")
+            if (is_emerald_version())
                 layout_version = "emerald";
             else if (version == "firered")
                 layout_version = "frlg";
         }
-        if ((version == "emerald" && layout_version != "emerald" && !worldEnabled) || (version == "firered" && layout_version != "frlg")) {
+        if ((version == "emerald" && layout_version != "emerald" && !worldEnabled)
+         || (version == "emerald_pc" && layout_version != "emerald" && layout_version != "frlg" && !worldEnabled)
+         || (version == "firered" && layout_version != "frlg")) {
             text << "\t.4byte NULL\n";
         } else {
             string layout_name = json_to_string(layout, "name", true);
@@ -929,14 +967,27 @@ void process_layouts(string layouts_filepath, string output_asm, string output_c
     write_text_file(output_c + "layouts.h", layouts_constants_text);
 }
 
+static vector<string> get_all_map_json_filepaths() {
+    vector<string> filepaths;
+    for (const auto &entry : std::filesystem::directory_iterator("data/maps")) {
+        if (entry.is_directory()) {
+            auto filepath = entry.path() / "map.json";
+            if (std::filesystem::exists(filepath))
+                filepaths.push_back(filepath.generic_string());
+        }
+    }
+    std::sort(filepaths.begin(), filepaths.end());
+    return filepaths;
+}
+
 int main(int argc, char *argv[]) {
     if (argc < 3)
         FATAL_ERROR("USAGE: mapjson <mode> <game-version> [options]\n");
 
     char *version_arg = argv[2];
     version = string(version_arg);
-    if (version != "emerald" && version != "ruby" && version != "firered")
-        FATAL_ERROR("ERROR: <game-version> must be 'emerald', 'firered', or 'ruby'.\n");
+    if (version != "emerald" && version != "emerald_pc" && version != "ruby" && version != "firered")
+        FATAL_ERROR("ERROR: <game-version> must be 'emerald', 'emerald_pc', 'firered', or 'ruby'.\n");
 
     char *mode_arg = argv[1];
     string mode(mode_arg);
@@ -959,11 +1010,11 @@ int main(int argc, char *argv[]) {
         string filepath(argv[3]);
 
         vector<string> map_filepaths;
-        const int firstMapFileArg = 4;
-        const int lastMapFileArg = argc - 3;
-        for (int i = firstMapFileArg; i <= lastMapFileArg; i++) {
-            map_filepaths.push_back(argv[i]);
-        }
+        if (argc == 7 && string(argv[4]) == "--all-maps")
+            map_filepaths = get_all_map_json_filepaths();
+        else
+            for (int i = 4; i <= argc - 3; i++)
+                map_filepaths.push_back(argv[i]);
 
         string output_asm(argv[argc - 2]);
         string output_c(argv[argc - 1]);
@@ -988,11 +1039,11 @@ int main(int argc, char *argv[]) {
         infer_separator(argv[3]);
 
         vector<string> filepaths;
-        const int firstMapFileArg = 3;
-        const int lastMapFileArg = argc - 2;
-        for (int i = firstMapFileArg; i <= lastMapFileArg; i++) {
-            filepaths.push_back(argv[i]);
-        }
+        if (argc == 5 && string(argv[3]) == "--all-maps")
+            filepaths = get_all_map_json_filepaths();
+        else
+            for (int i = 3; i <= argc - 2; i++)
+                filepaths.push_back(argv[i]);
         string output_ids_file(argv[argc - 1]);
 
         process_event_constants(filepaths, output_ids_file);

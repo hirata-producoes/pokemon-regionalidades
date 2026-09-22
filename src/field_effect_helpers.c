@@ -252,7 +252,7 @@ static void UpdateObjectReflectionSprite(struct Sprite *reflectionSprite)
         reflectionSprite->invisible = TRUE;
 
     // Support "virtual" sprites which can't be rotated via affines
-    if (reflectionSprite->subspriteTables[0].subsprites)
+    if (reflectionSprite->subspriteTables != NULL && reflectionSprite->subspriteTables[0].subsprites)
     {
         reflectionSprite->oam.affineMode = ST_OAM_AFFINE_OFF;
         return;
