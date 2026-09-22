@@ -196,9 +196,9 @@ def verify(root: Path) -> None:
 
     external_layouts: set[str] = set()
     for resource_name in generated_by_name:
-        if resource_name.endswith("_Layout_Border"):
+        if resource_name.endswith("_Border"):
             external_layouts.add(resource_name.removeprefix("map_layouts/").removesuffix("_Border"))
-        elif resource_name.endswith("_Layout_Blockdata"):
+        elif resource_name.endswith("_Blockdata"):
             external_layouts.add(resource_name.removeprefix("map_layouts/").removesuffix("_Blockdata"))
         else:
             errors.append(f"unexpected generated map resource name: {resource_name}")

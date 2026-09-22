@@ -29,6 +29,9 @@
 #include "palette.h"
 #include "party_menu.h"
 #include "pokemon.h"
+#ifdef PORTABLE
+#include "pokemon_resources.h"
+#endif
 #include "pokeball.h"
 #include "random.h"
 #include "region_map.h"
@@ -531,7 +534,7 @@ static const struct SpritePalette sObjectEventSpritePalettes[] = {
     {gObjectEventPal_Lugia,                 OBJ_EVENT_PAL_TAG_LUGIA},
     {gObjectEventPal_RubySapphireBrendan,   OBJ_EVENT_PAL_TAG_RS_BRENDAN},
     {gObjectEventPal_RubySapphireMay,       OBJ_EVENT_PAL_TAG_RS_MAY},
-#if IS_FRLG
+#if IS_FRLG || defined(PORTABLE)
     {gObjectEventPal_PlayerFrlg,            OBJ_EVENT_PAL_TAG_PLAYER_RED},
     {gObjectEventPal_PlayerReflectionFrlg,  OBJ_EVENT_PAL_TAG_PLAYER_RED_REFLECTION},
     {gObjectEventPal_PlayerFrlg,            OBJ_EVENT_PAL_TAG_PLAYER_GREEN},
@@ -2183,13 +2186,14 @@ static u32 LoadDynamicFollowerPalette(enum Species species, bool32 shiny, bool32
     u32 paletteNum;
     // Use standalone palette, unless entry is OOB or NULL (fallback to front-sprite-based)
 #if OW_POKEMON_OBJECT_EVENTS == TRUE && OW_PKMN_OBJECTS_SHARE_PALETTES == FALSE
-    if ((shiny && gSpeciesInfo[species].overworldPalette)
-    || (!shiny && gSpeciesInfo[species].overworldShinyPalette))
+    if ((shiny && gSpeciesInfo[species].overworldShinyPalette)
+    || (!shiny && gSpeciesInfo[species].overworldPalette))
     {
         struct SpritePalette spritePalette;
         u16 palTag = species + OBJ_EVENT_MON + (shiny ? OBJ_EVENT_MON_SHINY : 0);
     #if P_GENDER_DIFFERENCES
-        if (female && gSpeciesInfo[species].overworldShinyPaletteFemale != NULL)
+        if (female && (shiny ? gSpeciesInfo[species].overworldShinyPaletteFemale
+                             : gSpeciesInfo[species].overworldPaletteFemale) != NULL)
             palTag += OBJ_EVENT_MON_FEMALE;
     #endif
         // palette already loaded
@@ -2197,7 +2201,8 @@ static u32 LoadDynamicFollowerPalette(enum Species species, bool32 shiny, bool32
             return paletteNum;
         spritePalette.tag = palTag;
     #if P_GENDER_DIFFERENCES
-        if (female && gSpeciesInfo[species].overworldPaletteFemale != NULL)
+        if (female && (shiny ? gSpeciesInfo[species].overworldShinyPaletteFemale
+                             : gSpeciesInfo[species].overworldPaletteFemale) != NULL)
         {
             if (shiny)
                 spritePalette.data = gSpeciesInfo[species].overworldShinyPaletteFemale;
@@ -2212,6 +2217,12 @@ static u32 LoadDynamicFollowerPalette(enum Species species, bool32 shiny, bool32
             else
                 spritePalette.data = gSpeciesInfo[species].overworldPalette;
         }
+
+#ifdef PORTABLE
+        // No PC, o símbolo compilado identifica o recurso; a paleta real está
+        // no pacote externo e precisa ser resolvida antes de copiar as cores.
+        spritePalette.data = GetExternalPokemonPalette(spritePalette.data);
+#endif
 
         paletteNum = LoadSpritePalette(&spritePalette);
     }
