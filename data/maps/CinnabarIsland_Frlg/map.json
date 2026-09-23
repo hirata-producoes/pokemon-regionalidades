@@ -26,6 +26,13 @@
       "direction": "right"
     }
   ],
+  "connections_pc": [
+    {
+      "map": "MAP_ROUTE124",
+      "offset": 0,
+      "direction": "down"
+    }
+  ],
   "object_events": [
     {
       "type": "object",

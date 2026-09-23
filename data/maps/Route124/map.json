@@ -40,6 +40,13 @@
       "direction": "dive"
     }
   ],
+  "connections_pc": [
+    {
+      "map": "MAP_CINNABAR_ISLAND",
+      "offset": 0,
+      "direction": "up"
+    }
+  ],
   "object_events": [
     {
       "graphics_id": "OBJ_EVENT_GFX_SWIMMER_M",

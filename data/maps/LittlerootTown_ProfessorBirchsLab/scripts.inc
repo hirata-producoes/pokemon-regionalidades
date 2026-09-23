@@ -689,7 +689,7 @@ LittlerootTown_ProfessorBirchsLab_EventScript_TravelToKanto::
 	goto_if_eq VAR_RESULT, NO, LittlerootTown_ProfessorBirchsLab_EventScript_StayInHoenn
 	setvar VAR_0x8004, 0 @ PGW_START_KANTO
 	special Pgw_ScriptSetCurrentRegion
-	warp MAP_PGW_PALLET_TOWN, 12, 18
+	warp MAP_PALLET_TOWN, 11, 17
 	waitstate
 	release
 	end

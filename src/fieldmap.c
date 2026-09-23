@@ -238,6 +238,24 @@ static void FillConnection(s32 x, s32 y, const struct MapHeader *connectedMapHea
     u16 *dest;
     s32 mapWidth;
 
+#ifdef PORTABLE
+    if ((gMapHeader.mapLayoutId == LAYOUT_CINNABAR_ISLAND && connectedMapHeader->mapLayoutId == LAYOUT_ROUTE124)
+     || (gMapHeader.mapLayoutId == LAYOUT_ROUTE124 && connectedMapHeader->mapLayoutId == LAYOUT_CINNABAR_ISLAND))
+    {
+        // Os conjuntos gráficos são diferentes. Enquanto a câmera ainda usa o
+        // mapa atual, prolonga sua faixa de mar até ocorrer a troca de mapa.
+        s32 edgeY = y == 0 ? MAP_OFFSET : y - 1;
+        const u16 *edge = &gBackupMapLayout.map[gBackupMapLayout.width * edgeY + x];
+        dest = &gBackupMapLayout.map[gBackupMapLayout.width * y + x];
+        for (i = 0; i < height; i++)
+        {
+            CpuCopy16(edge, dest, width * 2);
+            dest += gBackupMapLayout.width;
+        }
+        return;
+    }
+#endif
+
     // PC map data lives in the external resource package. The static map
     // header still points to a one-word compiled placeholder, so resolve the
     // connected layout before copying its border strip into the current map.
@@ -568,7 +586,7 @@ static bool32 SavedMapViewIsEmpty(void)
         return FALSE;
 }
 
-static void ClearSavedMapView(void)
+void ClearSavedMapView(void)
 {
     CpuFill16(0, gSaveBlock1Ptr->mapView, sizeof(gSaveBlock1Ptr->mapView));
 }
@@ -772,6 +790,7 @@ bool8 CameraMove(s32 x, s32 y)
             return gCamera.active;
         }
 
+        const struct MapLayout *previousLayout = gMapHeader.mapLayout;
         SetPositionFromConnection(connection, direction, x, y);
         LoadMapFromCameraTransition(connection->mapGroup, connection->mapNum);
         gCamera.active = TRUE;
@@ -779,7 +798,10 @@ bool8 CameraMove(s32 x, s32 y)
         gCamera.y = old_y - gSaveBlock1Ptr->pos.y;
         gSaveBlock1Ptr->pos.x += x;
         gSaveBlock1Ptr->pos.y += y;
-        MoveMapViewToBackup(direction);
+        if (previousLayout->primaryTileset != gMapHeader.mapLayout->primaryTileset)
+            ClearSavedMapView();
+        else
+            MoveMapViewToBackup(direction);
     }
 
     return gCamera.active;
@@ -960,7 +982,7 @@ static void CopyTilesetToVram(struct Tileset const *tileset, u16 numTiles, u16 o
         if (!tileset->isCompressed)
             LoadBgTiles(2, tiles, numTiles * 32, offset);
         else
-            DecompressAndCopyTileDataToVram(2, tiles, numTiles * 32, offset, 0);
+            DecompressAndCopyTileDataToVram(2, tiles, 0, offset, 0);
     }
 }
 
@@ -974,7 +996,7 @@ static void CopyTilesetToVramUsingHeap(struct Tileset const *tileset, u16 numTil
         if (!tileset->isCompressed)
             LoadBgTiles(2, tiles, numTiles * 32, offset);
         else
-            DecompressAndLoadBgGfxUsingHeap(2, tiles, numTiles * 32, offset, 0);
+            DecompressAndLoadBgGfxUsingHeap(2, tiles, 0, offset, 0);
     }
 }
 
@@ -1025,6 +1047,11 @@ static void LoadTilesetPalette(struct Tileset const *tileset, u16 destOffset, u1
 void CopyPrimaryTilesetToVram(struct MapLayout const *mapLayout)
 {
     CopyTilesetToVram(mapLayout->primaryTileset, GetNumTilesInPrimary(mapLayout), 0);
+}
+
+void CopyPrimaryTilesetToVramUsingHeap(struct MapLayout const *mapLayout)
+{
+    CopyTilesetToVramUsingHeap(mapLayout->primaryTileset, GetNumTilesInPrimary(mapLayout), 0);
 }
 
 void CopySecondaryTilesetToVram(struct MapLayout const *mapLayout)

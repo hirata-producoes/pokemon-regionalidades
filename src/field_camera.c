@@ -12,6 +12,9 @@
 #include "sprite.h"
 #include "text.h"
 #include "tileset_resources.h"
+#ifdef PORTABLE
+#include "resource_pack.h"
+#endif
 
 //EWRAM_DATA bool8 gUnusedBikeCameraAheadPanback = FALSE;   //  Old EWRAM variable that was never set to anything other than false
 
@@ -228,18 +231,51 @@ static void DrawMetatileAt(const struct MapLayout *mapLayout, u16 offset, int x,
 {
     u16 metatileId = MapGridGetMetatileIdAt(x, y);
     const u16 *metatiles;
+#ifdef PORTABLE
+    static const struct MapLayout *sCheckedLayout;
+    static u32 sMetatileCounts[2];
+    u64 resourceSize;
+    bool32 isSecondary;
 
-    if (metatileId > NUM_METATILES_TOTAL)
+    if (sCheckedLayout != mapLayout)
+    {
+        const u16 *primary = ResolveTilesetMetatiles(mapLayout->primaryTileset->metatiles);
+        const u16 *secondary = ResolveTilesetMetatiles(mapLayout->secondaryTileset->metatiles);
+        sMetatileCounts[0] = NUM_METATILES_TOTAL;
+        sMetatileCounts[1] = NUM_METATILES_TOTAL;
+        if (ResourcePack_GetCachedSize(primary, &resourceSize))
+            sMetatileCounts[0] = resourceSize / (sizeof(u16) * NUM_TILES_PER_METATILE);
+        if (ResourcePack_GetCachedSize(secondary, &resourceSize))
+            sMetatileCounts[1] = resourceSize / (sizeof(u16) * NUM_TILES_PER_METATILE);
+        sCheckedLayout = mapLayout;
+    }
+#endif
+
+    if (metatileId >= NUM_METATILES_TOTAL)
         metatileId = 0;
     if (metatileId < GetNumMetatilesInPrimary(mapLayout))
     {
         metatiles = ResolveTilesetMetatiles(mapLayout->primaryTileset->metatiles);
+#ifdef PORTABLE
+        isSecondary = FALSE;
+#endif
     }
     else
     {
         metatiles = ResolveTilesetMetatiles(mapLayout->secondaryTileset->metatiles);
         metatileId -= GetNumMetatilesInPrimary(mapLayout);
+#ifdef PORTABLE
+        isSecondary = TRUE;
+#endif
     }
+#ifdef PORTABLE
+    if (metatileId >= sMetatileCounts[isSecondary])
+    {
+        DBGPRINTF("Metabloco fora dos graficos do mapa em (%d, %d): %u; usando bloco inicial.\n", x, y, metatileId);
+        metatiles = ResolveTilesetMetatiles(mapLayout->primaryTileset->metatiles);
+        metatileId = 0;
+    }
+#endif
     DrawMetatile(MapGridGetMetatileLayerTypeAt(x, y), metatiles + metatileId * NUM_TILES_PER_METATILE, offset);
 }
 
@@ -413,9 +449,12 @@ void CameraUpdateNoObjectRefresh(void)
 
     if (deltaX != 0 || deltaY != 0)
     {
+        const struct MapLayout *previousLayout = gMapHeader.mapLayout;
         CameraMove(deltaX, deltaY);
         AddCameraTileOffset(&sFieldCameraOffset, deltaX * 2, deltaY * 2);
         RedrawMapSlicesForCameraUpdate(&sFieldCameraOffset, deltaX * 2, deltaY * 2);
+        if (gCamera.active && previousLayout->primaryTileset != gMapHeader.mapLayout->primaryTileset)
+            DrawWholeMapView();
     }
 
     AddCameraPixelOffset(&sFieldCameraOffset, movementSpeedX, movementSpeedY);
@@ -476,12 +515,15 @@ void CameraUpdate(void)
 
     if (deltaX != 0 || deltaY != 0)
     {
+        const struct MapLayout *previousLayout = gMapHeader.mapLayout;
         CameraMove(deltaX, deltaY);
         UpdateObjectEventsForCameraUpdate(deltaX, deltaY);
         RotatingGatePuzzleCameraUpdate(deltaX, deltaY);
         SetBerryTreesSeen();
         AddCameraTileOffset(&sFieldCameraOffset, deltaX * 2, deltaY * 2);
         RedrawMapSlicesForCameraUpdate(&sFieldCameraOffset, deltaX * 2, deltaY * 2);
+        if (gCamera.active && previousLayout->primaryTileset != gMapHeader.mapLayout->primaryTileset)
+            DrawWholeMapView();
         TryDespawnOWEsCrossingMapConnection();
     }
 

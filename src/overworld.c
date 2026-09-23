@@ -904,6 +904,9 @@ bool8 SetDiveWarpDive(u16 x, u16 y)
 
 void LoadMapFromCameraTransition(u8 mapGroup, u8 mapNum)
 {
+    const struct MapLayout *previousLayout = gMapHeader.mapLayout;
+    bool8 primaryTilesetChanged;
+
     SetWarpDestination(mapGroup, mapNum, WARP_ID_NONE, -1, -1);
 
     // Dont transition map music between BF Outside West/East
@@ -912,6 +915,13 @@ void LoadMapFromCameraTransition(u8 mapGroup, u8 mapNum)
 
     ApplyCurrentWarp();
     LoadCurrentMapData();
+    primaryTilesetChanged = previousLayout->primaryTileset != gMapHeader.mapLayout->primaryTileset
+                         || GetNumTilesInPrimary(previousLayout) != GetNumTilesInPrimary(gMapHeader.mapLayout);
+    // A vista salva pertence ao conjunto visual do mapa anterior. Ela precisa
+    // ser descartada antes de InitMap para não reaparecer como um retângulo de
+    // blocos incorretos durante uma passagem direta entre regiões.
+    if (primaryTilesetChanged)
+        ClearSavedMapView();
     LoadObjEventTemplatesFromHeader();
     TrySetMapSaveWarpStatus();
     ClearTempFieldEventData();
@@ -932,12 +942,23 @@ void LoadMapFromCameraTransition(u8 mapGroup, u8 mapNum)
     Overworld_ClearSavedMusic();
     RunOnTransitionMapScript();
     InitMap();
+    if (primaryTilesetChanged)
+        CopyPrimaryTilesetToVramUsingHeap(gMapHeader.mapLayout);
     CopySecondaryTilesetToVramUsingHeap(gMapHeader.mapLayout);
-    LoadSecondaryTilesetPalette(gMapHeader.mapLayout, TRUE); // skip copying to Faded, gamma shift will take care of it
+    if (primaryTilesetChanged)
+        LoadMapTilesetPalettes(gMapHeader.mapLayout);
+    else
+        LoadSecondaryTilesetPalette(gMapHeader.mapLayout, TRUE); // skip copying to Faded, gamma shift will take care of it
 
-    ApplyWeatherColorMapToPals(GetNumPalsInPrimary(gMapHeader.mapLayout), NUM_PALS_TOTAL - GetNumPalsInPrimary(gMapHeader.mapLayout)); // palettes [6,12]
+    if (primaryTilesetChanged)
+        ApplyWeatherColorMapToPals(0, NUM_PALS_TOTAL);
+    else
+        ApplyWeatherColorMapToPals(GetNumPalsInPrimary(gMapHeader.mapLayout), NUM_PALS_TOTAL - GetNumPalsInPrimary(gMapHeader.mapLayout)); // palettes [6,12]
 
-    InitSecondaryTilesetAnimation();
+    if (primaryTilesetChanged)
+        InitTilesetAnimations();
+    else
+        InitSecondaryTilesetAnimation();
     UpdateLocationHistoryForRoamer();
     MoveAllRoamers();
     DoCurrentWeather();
@@ -1999,7 +2020,7 @@ void CB2_NewGame(void)
     PlayTimeCounter_Start();
     ScriptContext_Init();
     UnlockPlayerFieldControls();
-    if (IS_FRLG)
+    if (IS_FRLG || Pgw_GetStartingRegion() == PGW_START_KANTO)
         gFieldCallback = FieldCB_WarpExitFadeFromBlack;
     else
         gFieldCallback = ExecuteTruckSequence;
