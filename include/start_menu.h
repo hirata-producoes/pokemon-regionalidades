@@ -3,6 +3,14 @@
 
 extern bool8 (*gMenuCallback)(void);
 
+#ifdef PLATFORM_SDL2
+bool8 Pgr_IsPanelMenuActive(void);
+u8 Pgr_GetPanelMenuCount(void);
+const u8 *Pgr_GetPanelMenuLabel(u8 index);
+u8 Pgr_GetPanelMenuCursor(void);
+void Pgr_ClickPanelMenu(u8 index);
+#endif
+
 void ShowReturnToFieldStartMenu(void);
 void Task_ShowStartMenu(u8 taskId);
 void ShowStartMenu(void);

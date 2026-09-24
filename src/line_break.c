@@ -267,7 +267,7 @@ void BreakSubStringAutomatic(u8 *src, u32 maxWidth, u32 screenLines, u8 fontId, 
         {
             if (toggleScrollPrompt == SHOW_SCROLL_PROMPT && currWordIndex + 1 == numWords)
                 currLineWidth += SCROLL_PROMPT_WIDTH;
-            if (currLineWidth + allWords[currWordIndex].length > maxWidth)
+            if (currLineWidth + allWords[currWordIndex].width > maxWidth)
             {
                 totalLines++;
                 currLineWidth = allWords[currWordIndex].width;
@@ -411,8 +411,18 @@ u32 GetStringBadness(struct StringLine *stringLines, u32 numLines, u32 maxWidth)
 void BuildNewString(struct StringLine *stringLines, u32 numLines, u32 maxLines, u8 *str, enum ToggleScrollPrompt toggleScrollPrompt)
 {
     u32 srcCharIndex = 0;
+
+    // Uma estimativa conservadora pode reservar linhas que acabem vazias.
+    // Retirá-las também evita acrescentar uma quebra depois da última linha real.
+    while (numLines > 0 && stringLines[numLines - 1].numWords == 0)
+        numLines--;
+
     for (u32 lineIndex = 0; lineIndex < numLines; lineIndex++)
     {
+        // Proteção para layouts incompletos: não há primeira palavra para copiar.
+        if (stringLines[lineIndex].numWords == 0)
+            continue;
+
         srcCharIndex += stringLines[lineIndex].words[0].length;
         for (u32 wordIndex = 1; wordIndex < stringLines[lineIndex].numWords; wordIndex++)
             //  Add length of word and a space

@@ -122,6 +122,23 @@ static bool8 BattlePyramidRetireReturnCallback(void);
 static bool8 BattlePyramidRetireCallback(void);
 static bool8 HandleStartMenuInput(void);
 
+#if defined(PLATFORM_SDL2) && !defined(__ANDROID__)
+static s16 sPanelMenuClick = -1;
+
+bool8 Pgr_IsPanelMenuActive(void)
+{
+    return FuncIsActiveTask(Task_ShowStartMenu) && gMenuCallback == HandleStartMenuInput;
+}
+
+u8 Pgr_GetPanelMenuCount(void) { return sNumStartMenuActions; }
+u8 Pgr_GetPanelMenuCursor(void) { return sStartMenuCursorPos; }
+void Pgr_ClickPanelMenu(u8 index)
+{
+    if (Pgr_IsPanelMenuActive() && index < sNumStartMenuActions)
+        sPanelMenuClick = index;
+}
+#endif
+
 // Save dialog callbacks
 static u8 SaveConfirmSaveCallback(void);
 static u8 SaveYesNoCallback(void);
@@ -209,6 +226,17 @@ static const struct MenuAction sStartMenuItems[] =
     [MENU_ACTION_DEBUG]           = {sText_MenuDebug,   {.u8_void = StartMenuDebugCallback}},
     [MENU_ACTION_DEXNAV]          = {gText_MenuDexNav,  {.u8_void = StartMenuDexNavCallback}},
 };
+
+#if defined(PLATFORM_SDL2) && !defined(__ANDROID__)
+const u8 *Pgr_GetPanelMenuLabel(u8 index)
+{
+    if (index >= sNumStartMenuActions)
+        return gText_MenuExit;
+    if (sCurrentStartMenuActions[index] == MENU_ACTION_PLAYER)
+        return gSaveBlock2Ptr->playerName;
+    return sStartMenuItems[sCurrentStartMenuActions[index]].text;
+}
+#endif
 
 static const struct BgTemplate sBgTemplates_LinkBattleSave[] =
 {
@@ -535,7 +563,12 @@ static bool32 InitStartMenuStep(void)
         break;
     case 2:
         LoadMessageBoxAndBorderGfx();
+#if defined(PLATFORM_SDL2) && !defined(__ANDROID__)
+        AddStartMenuWindow(sNumStartMenuActions);
+        sPanelMenuClick = -1;
+#else
         DrawStdWindowFrame(AddStartMenuWindow(sNumStartMenuActions), FALSE);
+#endif
         sInitStartMenuData[1] = 0;
         sInitStartMenuData[0]++;
         break;
@@ -547,12 +580,21 @@ static bool32 InitStartMenuStep(void)
         sInitStartMenuData[0]++;
         break;
     case 4:
+#if defined(PLATFORM_SDL2) && !defined(__ANDROID__)
+        sInitStartMenuData[0]++;
+#else
         if (PrintStartMenuActions(&sInitStartMenuData[1], 2))
             sInitStartMenuData[0]++;
+#endif
         break;
     case 5:
+#if defined(PLATFORM_SDL2) && !defined(__ANDROID__)
+        if (sStartMenuCursorPos >= sNumStartMenuActions)
+            sStartMenuCursorPos = 0;
+#else
         sStartMenuCursorPos = InitMenuNormal(GetStartMenuWindowId(), FONT_NORMAL, 0, 9, 16, sNumStartMenuActions, sStartMenuCursorPos);
         CopyWindowToVram(GetStartMenuWindowId(), COPYWIN_MAP);
+#endif
         return TRUE;
     }
 
@@ -637,6 +679,25 @@ void ShowStartMenu(void)
 
 static bool8 HandleStartMenuInput(void)
 {
+#if defined(PLATFORM_SDL2) && !defined(__ANDROID__)
+    bool8 panelClick = sPanelMenuClick >= 0;
+    if (panelClick)
+    {
+        sStartMenuCursorPos = sPanelMenuClick;
+        sPanelMenuClick = -1;
+    }
+    else if (JOY_NEW(DPAD_ANY))
+    {
+        s16 next = sStartMenuCursorPos;
+        if (JOY_NEW(DPAD_UP)) next -= 2;
+        else if (JOY_NEW(DPAD_DOWN)) next += 2;
+        else if (JOY_NEW(DPAD_LEFT)) next--;
+        else if (JOY_NEW(DPAD_RIGHT)) next++;
+        if (next >= 0 && next < sNumStartMenuActions)
+            sStartMenuCursorPos = next;
+        PlaySE(SE_SELECT);
+    }
+#else
     if (JOY_NEW(DPAD_UP))
     {
         PlaySE(SE_SELECT);
@@ -648,8 +709,13 @@ static bool8 HandleStartMenuInput(void)
         PlaySE(SE_SELECT);
         sStartMenuCursorPos = Menu_MoveCursor(1);
     }
+#endif
 
+#if defined(PLATFORM_SDL2) && !defined(__ANDROID__)
+    if (panelClick || JOY_NEW(A_BUTTON))
+#else
     if (JOY_NEW(A_BUTTON))
+#endif
     {
         PlaySE(SE_SELECT);
         if (sStartMenuItems[sCurrentStartMenuActions[sStartMenuCursorPos]].func.u8_void == StartMenuPokedexCallback)

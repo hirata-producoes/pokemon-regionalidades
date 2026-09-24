@@ -366,6 +366,10 @@ enum {
 
 void ShowMapNamePopup(void)
 {
+#ifdef PORTABLE
+    // No PC, essas informações permanecem na segunda tela inferior.
+    return;
+#endif
     if (FlagGet(FLAG_HIDE_MAP_NAME_POPUP) != TRUE)
     {
         if (!FuncIsActiveTask(Task_MapNamePopUpWindow))
