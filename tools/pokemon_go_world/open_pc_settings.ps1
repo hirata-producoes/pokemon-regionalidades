@@ -37,7 +37,7 @@ $defaults = [ordered]@{
     controllerA = 'A'; controllerB = 'X'; controllerStart = 'Start'
     controllerSelect = 'Back'; controllerL = 'LB'; controllerR = 'RB'
     controllerSpeed = 'RT'; speedMultiplier = '5'
-    fullscreen = '0'; windowScale = '4'; windowResizable = '1'
+    fullscreen = '0'; windowScale = '1'; windowResizable = '1'
     integerScale = '0'; vsync = '1'; border = '1'
     volume = '10'; musicVolume = '10'; effectsVolume = '10'
 }
@@ -267,10 +267,11 @@ $videoMode.SelectedItem = if ([int]$values.windowResizable -ne 0) { 'Redimension
 $videoTab.Controls.Add($videoMode)
 
 $videoScaleValues = [ordered]@{
-    '2× — 640 × 360' = '2'
-    '3× — 960 × 540' = '3'
-    '4× — 1280 × 720 (recomendado)' = '4'
-    '5× — 1600 × 900' = '5'
+    '1× — 320 × 360 (duas telas)' = '1'
+    '2× — 640 × 720' = '2'
+    '3× — 960 × 1080' = '3'
+    '4× — 1280 × 1440' = '4'
+    '5× — 1600 × 1800' = '5'
 }
 $videoScaleLabel = New-Object Windows.Forms.Label
 $videoScaleLabel.Text = 'Tamanho predefinido'
@@ -284,7 +285,7 @@ $videoScale.Location = New-Object Drawing.Point(290, 88)
 $videoScale.Size = New-Object Drawing.Size(225, 30)
 [void]$videoScale.Items.AddRange([string[]]$videoScaleValues.Keys)
 $videoScale.SelectedItem = [string]($videoScaleValues.GetEnumerator() | Where-Object { $_.Value -eq [string]$values.windowScale } | Select-Object -First 1).Key
-if ($videoScale.SelectedIndex -lt 0) { $videoScale.SelectedItem = '4× — 1280 × 720 (recomendado)' }
+if ($videoScale.SelectedIndex -lt 0) { $videoScale.SelectedItem = '1× — 320 × 360 (duas telas)' }
 $videoTab.Controls.Add($videoScale)
 
 $fullscreenCheck = New-Object Windows.Forms.CheckBox
