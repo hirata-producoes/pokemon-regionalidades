@@ -24,9 +24,16 @@ SlateportCity_EventScript_KeepScottOpportunity::
 	return
 
 SlateportCity_EventScript_SyncSubmarineInterview::
-	goto_if_ne VAR_SLATEPORT_CITY_STATE, 1, SlateportCity_EventScript_HideSubmarineInterview
 	special PgrProgress_ScriptCheckHoennSubmarineTheft
-	goto_if_eq VAR_RESULT, TRUE, SlateportCity_EventScript_ShowSubmarineInterview
+	goto_if_eq VAR_RESULT, FALSE, SlateportCity_EventScript_HideSubmarineInterview
+	goto_if_eq VAR_SLATEPORT_CITY_STATE, 0, SlateportCity_EventScript_RestoreSubmarineInterview
+	goto_if_eq VAR_SLATEPORT_CITY_STATE, 1, SlateportCity_EventScript_ShowSubmarineInterview
+	goto SlateportCity_EventScript_HideSubmarineInterview
+
+SlateportCity_EventScript_RestoreSubmarineInterview::
+	setvar VAR_SLATEPORT_CITY_STATE, 1
+	setvar VAR_SLATEPORT_HARBOR_STATE, 1
+	goto SlateportCity_EventScript_ShowSubmarineInterview
 
 SlateportCity_EventScript_HideSubmarineInterview::
 	setflag FLAG_HIDE_SLATEPORT_CITY_CAPTAIN_STERN

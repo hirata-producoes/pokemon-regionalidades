@@ -19,6 +19,19 @@ static unsigned char sNativeInventoryEncoded[PC_INVENTORY_MAX_ENCODED_SIZE];
 static bool32 sNativeInventoryReady;
 static u32 sTemporaryInventoryDepth;
 
+static u32 GetLegacyInventoryCapacity(u32 location)
+{
+    switch (location)
+    {
+    case POCKET_ITEMS:      return BAG_ITEMS_COUNT;
+    case POCKET_KEY_ITEMS:  return BAG_KEYITEMS_COUNT;
+    case POCKET_POKE_BALLS: return BAG_POKEBALLS_COUNT;
+    case POCKET_TM_HM:      return BAG_TMHM_COUNT;
+    case POCKET_BERRIES:    return BAG_BERRIES_COUNT;
+    default:                return PC_ITEMS_COUNT;
+    }
+}
+
 static bool32 RemoveLegacyHeldExpShares(void)
 {
     bool32 found = FALSE;
@@ -167,7 +180,7 @@ static bool32 BuildLegacyInventory(struct PcInventoryState *inventory)
     {
         if (gBagPockets[pocket].capacity > PC_INVENTORY_MAX_SLOTS_PER_LOCATION)
             return FALSE;
-        for (u32 slot = 0; slot < gBagPockets[pocket].capacity; slot++)
+        for (u32 slot = 0; slot < GetLegacyInventoryCapacity(pocket); slot++)
         {
             const struct LegacyItemSlot *legacyItem = &gBagPockets[pocket].itemSlots[slot];
             u32 itemId = legacyItem->itemId;
@@ -230,7 +243,7 @@ static bool32 ProjectNativeInventoryToLegacy(const struct PcInventoryState *inve
 
     for (u32 pocket = 0; pocket < POCKETS_COUNT; pocket++)
     {
-        for (u32 slot = 0; slot < gBagPockets[pocket].capacity; slot++)
+        for (u32 slot = 0; slot < GetLegacyInventoryCapacity(pocket); slot++)
         {
             const struct PcInventorySlot *item = &inventory->slots[pocket][slot];
             struct LegacyItemSlot *legacyItem = &gBagPockets[pocket].itemSlots[slot];
@@ -260,9 +273,7 @@ static bool32 LegacyMirrorMatchesNative(void)
 
     for (u32 location = 0; location < PC_INVENTORY_LOCATION_COUNT; location++)
     {
-        u32 legacyCapacity = location < POCKETS_COUNT
-                           ? gBagPockets[location].capacity
-                           : PC_ITEMS_COUNT;
+        u32 legacyCapacity = GetLegacyInventoryCapacity(location);
 
         for (u32 slot = 0; slot < PC_INVENTORY_MAX_SLOTS_PER_LOCATION; slot++)
         {
@@ -271,12 +282,9 @@ static bool32 LegacyMirrorMatchesNative(void)
             u32 expectedItemId = nativeItem->itemId;
             u32 expectedQuantity = min(nativeItem->quantity, MAX_LEGACY_ITEM_CAPACITY);
 
+            // Posições nativas extras não existem no espelho Emerald.
             if (slot >= legacyCapacity)
-            {
-                if (expectedItemId != ITEM_NONE || expectedQuantity != 0)
-                    return FALSE;
                 continue;
-            }
             if (legacyItem->itemId != expectedItemId
              || legacyItem->quantity != expectedQuantity)
                 return FALSE;
@@ -350,10 +358,11 @@ bool32 PgrInventory_TryGetLiveSlot(u32 location, u32 slot, u32 *itemId, u32 *qua
 {
     const struct PcInventorySlot *nativeSlot;
 
-    if (!sNativeInventoryReady
-     || location >= PC_INVENTORY_LOCATION_COUNT
+    if (location >= PC_INVENTORY_LOCATION_COUNT
      || slot >= PC_INVENTORY_MAX_SLOTS_PER_LOCATION
      || itemId == NULL || quantity == NULL)
+        return FALSE;
+    if (!sNativeInventoryReady && !CopyLegacyInventory())
         return FALSE;
 
     nativeSlot = &sNativeInventorySnapshot.slots[location][slot];
@@ -366,9 +375,10 @@ bool32 PgrInventory_TrySetLiveSlot(u32 location, u32 slot, u32 itemId, u32 quant
 {
     struct PcInventorySlot *nativeSlot;
 
-    if (!sNativeInventoryReady
-     || location >= PC_INVENTORY_LOCATION_COUNT
+    if (location >= PC_INVENTORY_LOCATION_COUNT
      || slot >= PC_INVENTORY_MAX_SLOTS_PER_LOCATION)
+        return FALSE;
+    if (!sNativeInventoryReady && !CopyLegacyInventory())
         return FALSE;
 
     if (itemId == ITEM_NONE || quantity == 0)

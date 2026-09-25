@@ -35,6 +35,16 @@ Se uma recompensa regional oferece um TM ou HM já possuído, o marco narrativo
 regional ainda é concluído, mas o inventário não recebe outra cópia. A posse do
 disco e o acontecimento da história permanecem independentes.
 
+Ao vender um TM, a loja deverá reconhecer a posse permanente e impedir a compra
+duplicada, ou apresentar um aviso claro antes da confirmação. Cobrar por um
+disco já adquirido sem entregar uma nova capacidade é desperdício de dinheiro.
+Essa proteção de loja ainda precisa ser implementada e testada.
+
+Os HMs devem poder ser esquecidos ou trocados como os demais golpes, porque a
+posse do disco é permanente e o uso de movimentos de campo já não depende de
+insígnias. Essa liberdade ainda requer a revisão da regra atual de esquecimento
+e dos menus que ensinam ou substituem movimentos.
+
 O uso de movimentos de campo continua seguindo D-067: não exige insígnia nem
 progresso narrativo, apenas um Pokémon não ovo da equipe que conheça o movimento
 e um alvo, terreno ou destino válido.
@@ -164,6 +174,10 @@ permissões separadas. Nenhum deles usa quantidade.
   módulos regionais;
 - Running Shoes libera correr uma única vez; sapatos futuros são cosméticos;
 - consumíveis comuns continuam usando quantidades e o inventário nativo;
+- o protótipo do PC triplica as posições de cada bolso, preservando o tamanho
+  dos blocos legados do save; o limite de 99.999 unidades por posição não
+  substitui esse teste de capacidade. Se três vezes ainda for insuficiente,
+  avaliar inventário sem limite fixo antes de mexer no formato persistente;
 - objetos puramente narrativos permanecem regionais quando sua posse não deve
   produzir uma capacidade global.
 

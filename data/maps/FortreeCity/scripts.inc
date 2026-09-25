@@ -10,8 +10,7 @@ FortreeCity_OnTransition:
 
 FortreeCity_EventScript_SyncKecleonVisibility::
 	goto_if_set FLAG_KECLEON_FLED_FORTREE, FortreeCity_EventScript_HideKecleon
-	special PgrProgress_ScriptCheckHoennFortreeGymPath
-	goto_if_eq VAR_RESULT, TRUE, FortreeCity_EventScript_ShowKecleon
+	goto FortreeCity_EventScript_ShowKecleon
 
 FortreeCity_EventScript_HideKecleon::
 	setflag FLAG_HIDE_FORTREE_CITY_KECLEON
