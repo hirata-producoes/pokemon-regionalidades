@@ -38,6 +38,19 @@ static void NONNULL BagPocket_CompactItems(struct BagPocket *pocket);
 static u16 SanitizeItemId(enum Item itemId);
 static u16 SanitizeBagItemId(enum Item itemId);
 
+static u32 BagPocket_GetLegacyCapacity(enum Pocket pocketId)
+{
+    switch (pocketId)
+    {
+    case POCKET_ITEMS:     return BAG_ITEMS_COUNT;
+    case POCKET_KEY_ITEMS: return BAG_KEYITEMS_COUNT;
+    case POCKET_POKE_BALLS:return BAG_POKEBALLS_COUNT;
+    case POCKET_TM_HM:     return BAG_TMHM_COUNT;
+    case POCKET_BERRIES:   return BAG_BERRIES_COUNT;
+    default:               return PC_ITEMS_COUNT;
+    }
+}
+
 EWRAM_DATA struct BagPocket gBagPockets[POCKETS_COUNT] = {0};
 
 #include "data/pokemon/item_effects.h"
@@ -108,6 +121,10 @@ struct ItemSlot NONNULL BagPocket_GetSlotData(struct BagPocket *pocket, u32 pock
         return (struct ItemSlot) {itemId, quantity};
 #endif
 
+    // Posições extras existem somente no inventário nativo do PC.
+    if (pocketPos >= BagPocket_GetLegacyCapacity(pocket->id))
+        return (struct ItemSlot) {0};
+
     switch (pocket->id)
     {
     case POCKET_ITEMS:
@@ -140,6 +157,8 @@ void NONNULL BagPocket_SetSlotData(struct BagPocket *pocket, u32 pocketPos, stru
 #ifdef PORTABLE
     nativeUpdated = PgrInventory_TrySetLiveSlot(pocket->id, pocketPos,
                                                 newSlot.itemId, newSlot.quantity);
+    if (pocketPos >= BagPocket_GetLegacyCapacity(pocket->id))
+        return;
 #endif
 
     switch (pocket->id)
@@ -169,7 +188,7 @@ void ApplyNewEncryptionKeyToBagItems(u32 newKey)
     enum Item item;
     for (pocketId = 0; pocketId < POCKETS_COUNT; pocketId++)
     {
-        for (item = ITEM_NONE; item < gBagPockets[pocketId].capacity; item++)
+        for (item = ITEM_NONE; item < BagPocket_GetLegacyCapacity(pocketId); item++)
             ApplyNewEncryptionKeyToHword(&(gBagPockets[pocketId].itemSlots[item].quantity), newKey);
     }
 }
@@ -177,23 +196,23 @@ void ApplyNewEncryptionKeyToBagItems(u32 newKey)
 void SetBagItemsPointers(void)
 {
     gBagPockets[POCKET_ITEMS].itemSlots = gSaveBlock1Ptr->bag.items;
-    gBagPockets[POCKET_ITEMS].capacity = BAG_ITEMS_COUNT;
+    gBagPockets[POCKET_ITEMS].capacity = BAG_GAMEPLAY_CAPACITY(BAG_ITEMS_COUNT);
     gBagPockets[POCKET_ITEMS].id = POCKET_ITEMS;
 
     gBagPockets[POCKET_KEY_ITEMS].itemSlots = gSaveBlock1Ptr->bag.keyItems;
-    gBagPockets[POCKET_KEY_ITEMS].capacity = BAG_KEYITEMS_COUNT;
+    gBagPockets[POCKET_KEY_ITEMS].capacity = BAG_GAMEPLAY_CAPACITY(BAG_KEYITEMS_COUNT);
     gBagPockets[POCKET_KEY_ITEMS].id = POCKET_KEY_ITEMS;
 
     gBagPockets[POCKET_POKE_BALLS].itemSlots = gSaveBlock1Ptr->bag.pokeBalls;
-    gBagPockets[POCKET_POKE_BALLS].capacity = BAG_POKEBALLS_COUNT;
+    gBagPockets[POCKET_POKE_BALLS].capacity = BAG_GAMEPLAY_CAPACITY(BAG_POKEBALLS_COUNT);
     gBagPockets[POCKET_POKE_BALLS].id = POCKET_POKE_BALLS;
 
     gBagPockets[POCKET_TM_HM].itemSlots = gSaveBlock1Ptr->bag.TMsHMs;
-    gBagPockets[POCKET_TM_HM].capacity = BAG_TMHM_COUNT;
+    gBagPockets[POCKET_TM_HM].capacity = BAG_GAMEPLAY_CAPACITY(BAG_TMHM_COUNT);
     gBagPockets[POCKET_TM_HM].id = POCKET_TM_HM;
 
     gBagPockets[POCKET_BERRIES].itemSlots = gSaveBlock1Ptr->bag.berries;
-    gBagPockets[POCKET_BERRIES].capacity = BAG_BERRIES_COUNT;
+    gBagPockets[POCKET_BERRIES].capacity = BAG_GAMEPLAY_CAPACITY(BAG_BERRIES_COUNT);
     gBagPockets[POCKET_BERRIES].id = POCKET_BERRIES;
 }
 

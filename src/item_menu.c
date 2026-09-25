@@ -59,11 +59,14 @@
 // number of item slots that could fit in a single pocket, + 1 for Cancel.
 // This constant picks the max of the existing pocket sizes.
 // By default, the largest pocket is BAG_TMHM_COUNT at 64.
-#define MAX_POCKET_ITEMS  ((max(BAG_TMHM_COUNT,              \
-                            max(BAG_BERRIES_COUNT,           \
-                            max(BAG_ITEMS_COUNT,             \
-                            max(BAG_KEYITEMS_COUNT,          \
-                                BAG_POKEBALLS_COUNT))))) + 1)
+#define MAX_POCKET_ITEMS  ((max(BAG_GAMEPLAY_CAPACITY(BAG_TMHM_COUNT),              \
+                            max(BAG_GAMEPLAY_CAPACITY(BAG_BERRIES_COUNT),           \
+                            max(BAG_GAMEPLAY_CAPACITY(BAG_ITEMS_COUNT),             \
+                            max(BAG_GAMEPLAY_CAPACITY(BAG_KEYITEMS_COUNT),          \
+                                BAG_GAMEPLAY_CAPACITY(BAG_POKEBALLS_COUNT)))))) + 1)
+
+// O contador atual da interface é u8; uma mochila ilimitada exigirá paginação.
+STATIC_ASSERT(MAX_POCKET_ITEMS <= 255, BagMenuPocketCountExceedsByte);
 
 // Up to 8 item slots can be visible at a time
 #define MAX_ITEMS_SHOWN 8

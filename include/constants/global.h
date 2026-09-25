@@ -116,6 +116,14 @@ enum Language
 #define BAG_TMHM_COUNT 64
 #define BAG_BERRIES_COUNT 46
 
+// A capacidade de jogo do PC usa o inventário nativo. Os tamanhos BAG_* acima
+// continuam iguais para preservar a disposição do save herdado de Emerald.
+#ifdef PORTABLE
+#define BAG_GAMEPLAY_CAPACITY(legacyCapacity) ((legacyCapacity) * 3)
+#else
+#define BAG_GAMEPLAY_CAPACITY(legacyCapacity) (legacyCapacity)
+#endif
+
 // Number of facilities for Ranking Hall.
 // 7 facilities for single mode + tower double mode + tower multi mode.
 // Excludes link modes. See RANKING_HALL_* in include/constants/battle_frontier.h

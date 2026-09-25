@@ -99,6 +99,7 @@ static const u8 sText_PokeFluteAwakenedMon[] = _("The POKé FLUTE awakened sleep
 
 // EWRAM variables
 EWRAM_DATA static TaskFunc sItemUseOnFieldCB = NULL;
+EWRAM_DATA static struct Mail sBagMail;
 
 // Below is set TRUE by UseRegisteredKeyItemOnField
 #define tUsingRegisteredKeyItem  data[3]
@@ -233,10 +234,12 @@ u8 CheckIfItemIsTMHMOrEvolutionStone(enum Item itemId)
 // Mail in the bag menu can't have a message but it can be checked (view the mail background, no message)
 static void CB2_CheckMail(void)
 {
-    struct Mail mail;
-    mail.itemId = gSpecialVar_ItemId;
-    mail.species = SPECIES_NONE;
-    ReadMail(&mail, CB2_ReturnToBagMenuPocket, FALSE);
+    // A tela de leitura mantém este ponteiro após o retorno do callback.
+    // Uma variável local deixaria um endereço de pilha inválido.
+    memset(&sBagMail, 0, sizeof(sBagMail));
+    sBagMail.itemId = gSpecialVar_ItemId;
+    sBagMail.species = SPECIES_NONE;
+    ReadMail(&sBagMail, CB2_ReturnToBagMenuPocket, FALSE);
 }
 
 void ItemUseOutOfBattle_Mail(u8 taskId)
