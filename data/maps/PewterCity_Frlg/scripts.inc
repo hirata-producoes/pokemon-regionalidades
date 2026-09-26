@@ -842,27 +842,6 @@ PewterCity_Movement_WalkInPlaceLeft::
 	walk_in_place_left
 	step_end
 
-Text_DreamEaterTeach::
-	.string "Yawn!\n"
-	.string "I must have dozed off in the sun.\p"
-	.string "I had this weird dream about\n"
-	.string "a DROWZEE eating my dream.\p"
-	.string "And…\n"
-	.string "I learned how to eat dreams…\p"
-	.string "Oogh, this is too spooky!\p"
-	.string "Let me teach it to a POKéMON so\n"
-	.string "I can forget about it!$"
-
-Text_DreamEaterDeclined::
-	.string "…Snore…$"
-
-Text_DreamEaterWhichMon::
-	.string "Which POKéMON wants to learn\n"
-	.string "DREAM EATER?$"
-
-Text_DreamEaterTaught::
-	.string "…ZZZ…\n"
-	.string "I…can't eat…anymore…$"
 
 PewterCity_Text_ClefairyCameFromMoon::
 	.string "CLEFAIRY came from the moon.\n"
@@ -973,4 +952,3 @@ PewterCity_Text_RunningShoesLetterFromMom::
 	.string "Remember, I'll always cheer for\n"
 	.string "you! Don't ever give up!\p"
 	.string "From Mom$"
-

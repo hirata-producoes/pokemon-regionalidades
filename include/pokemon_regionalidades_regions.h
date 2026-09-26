@@ -8,6 +8,7 @@ enum PgrRegionAvailability
 {
     PGR_REGION_PLANNED,
     PGR_REGION_MAP_DATA,
+    PGR_REGION_OPENING_TEST,
     PGR_REGION_PLAYABLE,
 };
 
@@ -15,6 +16,7 @@ enum PgrRegionIntro
 {
     PGR_REGION_INTRO_NONE,
     PGR_REGION_INTRO_HOENN,
+    PGR_REGION_INTRO_KANTO,
 };
 
 struct PgrRegionEntryPoint

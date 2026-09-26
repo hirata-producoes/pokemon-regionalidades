@@ -7,16 +7,28 @@ static const u8 sText_Johto[] = _("JOHTO");
 static const u8 sText_Hoenn[] = _("HOENN");
 static const u8 sText_Sinnoh[] = _("SINNOH");
 
-// This registry is the single source of truth for the four-region world.
-// A region only becomes selectable after its campaign entry point is validated.
+// Este registro distingue uma abertura em teste de uma campanha validada.
 static const struct PgrRegionDefinition sWorldRegions[PGR_WORLD_REGION_COUNT] =
 {
     {
         .id = PGW_START_KANTO,
         .name = sText_Kanto,
+#ifdef PORTABLE
+        .availability = PGR_REGION_OPENING_TEST,
+        .intro = PGR_REGION_INTRO_KANTO,
+        .entryPoint =
+        {
+            MAP_GROUP(MAP_PALLET_TOWN_PLAYERS_HOUSE_2F),
+            MAP_NUM(MAP_PALLET_TOWN_PLAYERS_HOUSE_2F),
+            WARP_ID_NONE,
+            9,
+            6,
+        },
+#else
         .availability = PGR_REGION_MAP_DATA,
         .intro = PGR_REGION_INTRO_NONE,
         .entryPoint = { -1, -1, WARP_ID_NONE, -1, -1 },
+#endif
     },
     {
         .id = PGW_START_JOHTO,
@@ -79,7 +91,8 @@ bool32 Pgr_CanStartAdventureInRegion(enum PgwStartingRegion region)
     const struct PgrRegionDefinition *definition = Pgr_FindWorldRegion(region);
 
     return definition != NULL
-        && definition->availability == PGR_REGION_PLAYABLE
+        && (definition->availability == PGR_REGION_PLAYABLE
+         || definition->availability == PGR_REGION_OPENING_TEST)
         && definition->intro != PGR_REGION_INTRO_NONE
         && definition->entryPoint.mapGroup >= 0
         && definition->entryPoint.mapNum >= 0;

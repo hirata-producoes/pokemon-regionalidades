@@ -4863,7 +4863,8 @@
       "secondary_tileset": "gTileset_GenericBuilding1",
       "border_filepath": "data/layouts/PalletTown_PlayersHouse_1F_Frlg/border.bin",
       "blockdata_filepath": "data/layouts/PalletTown_PlayersHouse_1F_Frlg/map.bin",
-      "layout_version": "frlg"
+      "layout_version": "frlg",
+      "world_enabled": true
     },
     {
       "id": "LAYOUT_PALLET_TOWN_PLAYERS_HOUSE_2F_FRLG",
@@ -4876,7 +4877,8 @@
       "secondary_tileset": "gTileset_GenericBuilding1",
       "border_filepath": "data/layouts/PalletTown_PlayersHouse_2F_Frlg/border.bin",
       "blockdata_filepath": "data/layouts/PalletTown_PlayersHouse_2F_Frlg/map.bin",
-      "layout_version": "frlg"
+      "layout_version": "frlg",
+      "world_enabled": true
     },
     {
       "id": "LAYOUT_PALLET_TOWN_RIVALS_HOUSE",
@@ -4889,7 +4891,8 @@
       "secondary_tileset": "gTileset_GenericBuilding2",
       "border_filepath": "data/layouts/PalletTown_RivalsHouse_Frlg/border.bin",
       "blockdata_filepath": "data/layouts/PalletTown_RivalsHouse_Frlg/map.bin",
-      "layout_version": "frlg"
+      "layout_version": "frlg",
+      "world_enabled": true
     },
     {
       "id": "LAYOUT_PALLET_TOWN_PROFESSOR_OAKS_LAB",
@@ -4902,7 +4905,8 @@
       "secondary_tileset": "gTileset_Lab_Frlg",
       "border_filepath": "data/layouts/PalletTown_ProfessorOaksLab_Frlg/border.bin",
       "blockdata_filepath": "data/layouts/PalletTown_ProfessorOaksLab_Frlg/map.bin",
-      "layout_version": "frlg"
+      "layout_version": "frlg",
+      "world_enabled": true
     },
     {
       "id": "LAYOUT_HOUSE1_FRLG",

@@ -5,12 +5,31 @@ PalletTown_Frlg_MapScripts::
 	map_script MAP_SCRIPT_ON_FRAME_TABLE, PalletTown_OnFrame
 	.byte 0
 
+PalletTown_EventScript_ReturnToHoenn::
+	goto PalletTown_Pgw_EventScript_ReturnToHoenn
+
 PalletTown_OnTransition::
 	setworldmapflag FLAG_WORLD_MAP_PALLET_TOWN
+	special Pgw_ScriptGetStartingRegion
+	call_if_eq VAR_RESULT, 0, PalletTown_EventScript_SyncOakVisibility
+	call_if_ne VAR_RESULT, 0, PalletTown_EventScript_HideOakForVisitor
 	call_if_set FLAG_PALLET_LADY_NOT_BLOCKING_SIGN, PalletTown_EventScript_TryReadySignLady
 	call_if_eq VAR_MAP_SCENE_PALLET_TOWN_SIGN_LADY, 0, PalletTown_EventScript_SetSignLadyPos
 	call_if_eq VAR_MAP_SCENE_PALLET_TOWN_SIGN_LADY, 1, PalletTown_EventScript_SetSignLadyDone
 	end
+
+PalletTown_EventScript_SyncOakVisibility::
+	call_if_set FLAG_SYS_POKEMON_GET, PalletTown_EventScript_HideOakAfterStarter
+	return
+
+PalletTown_EventScript_HideOakAfterStarter::
+	setflag FLAG_HIDE_OAK_IN_PALLET_TOWN
+	return
+
+PalletTown_EventScript_HideOakForVisitor::
+	@ A visita a Kanto nao deve iniciar a cena da campanha regional.
+	setflag FLAG_HIDE_OAK_IN_PALLET_TOWN
+	return
 
 PalletTown_EventScript_TryReadySignLady::
 	goto_if_unset FLAG_OPENED_START_MENU, Common_EventScript_NopReturn
@@ -179,6 +198,10 @@ PalletTown_EventScript_OakTriggerRight::
 	end
 
 PalletTown_EventScript_OakTrigger::
+	@ Visitar Kanto a partir de outra regiao nao inicia a campanha de FRLG.
+	special Pgw_ScriptGetStartingRegion
+	goto_if_ne VAR_RESULT, 0, PalletTown_EventScript_SkipOakIntro
+	goto_if_set FLAG_SYS_POKEMON_GET, PalletTown_EventScript_SkipOakIntro
 	famechecker FAMECHECKER_OAK, FCPICKSTATE_COLORED, UpdatePickStateFromSpecialVar8005
 	textcolor NPC_TEXT_COLOR_MALE
 	delay 30
@@ -216,6 +239,10 @@ PalletTown_EventScript_OakTrigger::
 	setflag FLAG_DONT_TRANSITION_MUSIC
 	warp MAP_PALLET_TOWN_PROFESSOR_OAKS_LAB, 6, 12
 	waitstate
+	releaseall
+	end
+
+PalletTown_EventScript_SkipOakIntro::
 	releaseall
 	end
 
@@ -544,5 +571,3 @@ PalletTown_Text_LookCopiedTrainerTipsSign::
 PalletTown_Text_PressStartToOpenMenuCopy::
 	.string "TRAINER TIPS!\p"
 	.string "Press START to open the MENU!$"
-
-

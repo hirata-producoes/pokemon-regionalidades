@@ -5,6 +5,7 @@
 #include "pokemon_regionalidades_dex.h"
 #include "pokemon_regionalidades_progress.h"
 #include "rtc.h"
+#include "text.h"
 
 static const u8 sText_SeasonSpring[] = _("PRIMAVERA");
 static const u8 sText_SeasonSummer[] = _("VERAO");
@@ -38,6 +39,48 @@ static const u8 *const sClimateNames[PGW_CLIMATE_COUNT] =
 // Keep this zero-initialized so it lives in BSS on the GBA target.
 // Zero means no explicit selection; stored selections use region + 1.
 static u8 sNewGameStartingRegionPlusOne;
+static u8 sKantoRivalName[PLAYER_NAME_LENGTH + 1];
+static const u16 sKantoRivalNameVars[] =
+{
+    VAR_PGR_KANTO_RIVAL_NAME_0,
+    VAR_PGR_KANTO_RIVAL_NAME_1,
+    VAR_PGR_KANTO_RIVAL_NAME_2,
+    VAR_PGR_KANTO_RIVAL_NAME_3,
+};
+
+u8 *Pgw_GetNewGameKantoRivalNameBuffer(void)
+{
+    return sKantoRivalName;
+}
+
+void Pgw_StoreNewGameKantoRivalName(void)
+{
+    u32 i;
+
+    if (Pgw_GetStartingRegion() != PGW_START_KANTO)
+        return;
+
+    for (i = 0; i < ARRAY_COUNT(sKantoRivalNameVars); i++)
+    {
+        u16 value = sKantoRivalName[i * 2];
+        value |= (u16)sKantoRivalName[i * 2 + 1] << 8;
+        VarSet(sKantoRivalNameVars[i], value);
+    }
+}
+
+const u8 *Pgw_GetKantoRivalName(void)
+{
+    u32 i;
+
+    for (i = 0; i < ARRAY_COUNT(sKantoRivalNameVars); i++)
+    {
+        u16 value = VarGet(sKantoRivalNameVars[i]);
+        sKantoRivalName[i * 2] = value;
+        sKantoRivalName[i * 2 + 1] = value >> 8;
+    }
+    sKantoRivalName[PLAYER_NAME_LENGTH] = EOS;
+    return sKantoRivalName;
+}
 
 static bool32 GetRealTimeSeconds(u32 *seconds)
 {
@@ -87,6 +130,7 @@ void Pgw_SelectStartingRegionForNewGame(enum PgwStartingRegion region)
     if (region >= PGW_START_REGION_COUNT)
         region = PGW_DEFAULT_STARTING_REGION;
     sNewGameStartingRegionPlusOne = region + 1;
+    memset(sKantoRivalName, EOS, sizeof(sKantoRivalName));
 }
 
 enum PgwStartingRegion Pgw_GetSelectedStartingRegionForNewGame(void)
@@ -148,6 +192,10 @@ enum PgwStartingRegion Pgw_GetStartingRegion(void)
 {
     u16 region = VarGet(VAR_PGW_STARTING_REGION);
 
+    // Um save anterior ao estado mundial tem todas estas variaveis zeradas.
+    // Zero e Kanto, mas esse save deve continuar sendo tratado como Hoenn.
+    if (VarGet(VAR_PGW_SEASON_DAY) == 0)
+        return PGW_DEFAULT_STARTING_REGION;
     if (region >= PGW_START_REGION_COUNT)
         return PGW_DEFAULT_STARTING_REGION;
     return region;
@@ -166,6 +214,8 @@ enum PgwStartingRegion Pgw_GetCurrentRegion(void)
 {
     u16 region = VarGet(VAR_PGW_CURRENT_REGION);
 
+    if (VarGet(VAR_PGW_SEASON_DAY) == 0)
+        return PGW_DEFAULT_STARTING_REGION;
     if (region >= PGW_START_REGION_COUNT)
         return PGW_DEFAULT_STARTING_REGION;
     return region;

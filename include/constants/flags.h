@@ -1663,12 +1663,14 @@
 
 // FRLG flags
 
-#define FLAG_HIDE_BULBASAUR_BALL                           0
-#define FLAG_HIDE_SQUIRTLE_BALL                            0
-#define FLAG_HIDE_CHARMANDER_BALL                          0
-#define FLAG_HIDE_OAK_IN_HIS_LAB                           0
-#define FLAG_HIDE_OAK_IN_PALLET_TOWN                       0
-#define FLAG_HIDE_RIVAL_IN_LAB                             0
+// Identificadores persistentes de Kanto no espaço já reservado pelo save de Hoenn.
+// Os valores originais de FRLG colidem com eventos de Hoenn neste porte conjunto.
+#define FLAG_HIDE_BULBASAUR_BALL                           FLAG_UNUSED_0x8E5
+#define FLAG_HIDE_SQUIRTLE_BALL                            FLAG_UNUSED_0x8E6
+#define FLAG_HIDE_CHARMANDER_BALL                          FLAG_UNUSED_0x8E7
+#define FLAG_HIDE_OAK_IN_HIS_LAB                           FLAG_UNUSED_0x8E8
+#define FLAG_HIDE_OAK_IN_PALLET_TOWN                       FLAG_UNUSED_0x8E9
+#define FLAG_HIDE_RIVAL_IN_LAB                             FLAG_UNUSED_0x8EA
 #define FLAG_HIDE_PEWTER_CITY_GYM_GUIDE                    0
 #define FLAG_HIDE_DOME_FOSSIL                              0
 #define FLAG_HIDE_HELIX_FOSSIL                             0
@@ -1796,11 +1798,11 @@
 #define FLAG_HIDE_MISC_KANTO_ROCKETS                       0
 #define FLAG_HIDE_SAFFRON_CITY_POKECENTER_SABRINA_JOURNALS 0
 
-#define FLAG_HIDE_ROUTE2_ETHER                                  0
-#define FLAG_HIDE_ROUTE2_PARALYZE_HEAL                          0
-#define FLAG_HIDE_VIRIDIAN_FOREST_POKE_BALL                     0
-#define FLAG_HIDE_VIRIDIAN_FOREST_ANTIDOTE                      0
-#define FLAG_HIDE_VIRIDIAN_FOREST_POTION                        0
+#define FLAG_HIDE_ROUTE2_ETHER                                  FLAG_UNUSED_0x8F0
+#define FLAG_HIDE_ROUTE2_PARALYZE_HEAL                          FLAG_UNUSED_0x8F1
+#define FLAG_HIDE_VIRIDIAN_FOREST_POKE_BALL                     FLAG_UNUSED_0x8F2
+#define FLAG_HIDE_VIRIDIAN_FOREST_ANTIDOTE                      FLAG_UNUSED_0x8F3
+#define FLAG_HIDE_VIRIDIAN_FOREST_POTION                        FLAG_UNUSED_0x8F4
 #define FLAG_HIDE_MT_MOON_1F_PARALYZE_HEAL                      0
 #define FLAG_HIDE_MT_MOON_1F_TM09                               0
 #define FLAG_HIDE_MT_MOON_1F_POTION                             0
@@ -1902,7 +1904,7 @@
 #define FLAG_HIDE_THREE_ISLAND_ZINC                             0
 #define FLAG_0x1BC                                              0
 #define FLAG_0x1BD                                              0
-#define FLAG_HIDE_VIRIDIAN_FOREST_POTION_2                      0
+#define FLAG_HIDE_VIRIDIAN_FOREST_POTION_2                      FLAG_UNUSED_0x8F5
 #define FLAG_HIDE_MT_MOON_B2F_REVIVE                            0
 #define FLAG_HIDE_MT_MOON_B2F_ANTIDOTE                          0
 #define FLAG_HIDE_ROUTE11_X_DEFEND                              0
@@ -1917,7 +1919,7 @@
 #define FLAG_HIDE_POKEMON_MANSION_1F_PROTEIN                    0
 #define FLAG_HIDE_POKEMON_MANSION_2F_ZINC                       0
 #define FLAG_HIDE_POKEMON_MANSION_2F_HP_UP                      0
-#define FLAG_HIDE_VIRIDIAN_CITY_POTION                          0
+#define FLAG_HIDE_VIRIDIAN_CITY_POTION                          FLAG_UNUSED_0x8EC
 #define FLAG_HIDE_ROUTE11_GREAT_BALL                            0
 #define FLAG_HIDE_ROUTE11_AWAKENING                             0
 #define FLAG_HIDE_POKEMON_TOWER_5F_CLEANSE_TAG                  0
@@ -1969,7 +1971,7 @@
 #define FLAG_HIDE_SILPH_CO_4F_TM41                              0
 
 #define STORY_FLAGS_START                                0
-#define FLAG_GOT_POTION_ON_ROUTE_1                       0
+#define FLAG_GOT_POTION_ON_ROUTE_1                       FLAG_UNUSED_0x8EB
 #define FLAG_GOT_TM34_FROM_SURGE                         0
 #define FLAG_GOT_FOSSIL_FROM_MT_MOON                     0
 #define FLAG_HELPED_BILL_IN_SEA_COTTAGE                  0
@@ -2098,7 +2100,7 @@
 #define FLAG_TUTOR_EXPLOSION                             0
 #define FLAG_TUTOR_MEGA_PUNCH                            0
 #define FLAG_TUTOR_MEGA_KICK                             0
-#define FLAG_TUTOR_DREAM_EATER                           0
+#define FLAG_TUTOR_DREAM_EATER                           FLAG_UNUSED_0x8ED
 #define FLAG_TUTOR_SOFT_BOILED                           0
 #define FLAG_TUTOR_SUBSTITUTE                            0
 #define FLAG_TUTOR_SWORDS_DANCE                          0
@@ -2155,8 +2157,8 @@
 #define FLAG_NO_ROOM_FOR_JOYFUL_GAME_CORNER_MOON_STONE   0
 #define FLAG_OAKS_RATING_IS_VIA_PC                       0
 
-#define FLAG_HIDDEN_ITEM_VIRIDIAN_FOREST_POTION                            0
-#define FLAG_HIDDEN_ITEM_VIRIDIAN_FOREST_ANTIDOTE                          0
+#define FLAG_HIDDEN_ITEM_VIRIDIAN_FOREST_POTION                            FLAG_UNUSED_0x8F6
+#define FLAG_HIDDEN_ITEM_VIRIDIAN_FOREST_ANTIDOTE                          FLAG_UNUSED_0x8F7
 #define FLAG_HIDDEN_ITEM_MT_MOON_B2F_MOON_STONE                            0
 #define FLAG_HIDDEN_ITEM_MT_MOON_B2F_ETHER                                 0
 #define FLAG_HIDDEN_ITEM_ROUTE25_ELIXIR                                    0
@@ -2383,7 +2385,7 @@
 
 // World Map Flags
 #define FLAG_WORLD_MAP_PALLET_TOWN                                  0
-#define FLAG_WORLD_MAP_VIRIDIAN_CITY                                0
+#define FLAG_WORLD_MAP_VIRIDIAN_CITY                                FLAG_UNUSED_0x8EE
 #define FLAG_WORLD_MAP_PEWTER_CITY                                  0
 #define FLAG_WORLD_MAP_CERULEAN_CITY                                0
 #define FLAG_WORLD_MAP_LAVENDER_TOWN                                0
@@ -2402,7 +2404,7 @@
 #define FLAG_WORLD_MAP_SIX_ISLAND                                   0
 #define FLAG_WORLD_MAP_ROUTE4_POKEMON_CENTER_1F                     0
 #define FLAG_WORLD_MAP_ROUTE10_POKEMON_CENTER_1F                    0
-#define FLAG_WORLD_MAP_VIRIDIAN_FOREST                              0
+#define FLAG_WORLD_MAP_VIRIDIAN_FOREST                              FLAG_UNUSED_0x8EF
 #define FLAG_WORLD_MAP_MT_MOON_1F                                   0
 #define FLAG_WORLD_MAP_SSANNE_EXTERIOR                              0
 #define FLAG_WORLD_MAP_UNDERGROUND_PATH_NORTH_SOUTH_TUNNEL          0

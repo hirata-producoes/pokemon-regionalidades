@@ -4,6 +4,9 @@
   "layout": "LAYOUT_PALLET_TOWN",
   "music": "MUS_RG_PALLET",
   "region": "REGION_KANTO",
+  "world_enabled": true,
+  "connections_no_include": true,
+  "connections_pc_preview": true,
   "region_map_section": "MAPSEC_PALLET_TOWN",
   "requires_flash": false,
   "weather": "WEATHER_SUNNY",
@@ -71,6 +74,21 @@
       "trainer_sight_or_berry_tree_id": "0",
       "script": "0x0",
       "flag": "FLAG_HIDE_OAK_IN_PALLET_TOWN"
+    },
+    {
+      "local_id": "LOCALID_PALLET_HOENN_SAILOR",
+      "type": "object",
+      "graphics_id": "OBJ_EVENT_GFX_SAILOR",
+      "x": 11,
+      "y": 16,
+      "elevation": 3,
+      "movement_type": "MOVEMENT_TYPE_FACE_DOWN",
+      "movement_range_x": 0,
+      "movement_range_y": 0,
+      "trainer_type": "TRAINER_TYPE_NONE",
+      "trainer_sight_or_berry_tree_id": "0",
+      "script": "PalletTown_EventScript_ReturnToHoenn",
+      "flag": "0"
     }
   ],
   "warp_events": [

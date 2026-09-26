@@ -445,9 +445,25 @@ static const struct WindowTemplate sNewGameRegionSelectWindows[] =
 
 static const u8 sText_ChooseStartingRegion[] = _("ESCOLHA A REGIAO");
 static const u8 sText_RegionPlayable[] = _("JOGAVEL");
+static const u8 sText_RegionOpeningTest[] = _("INICIO EM TESTE");
 static const u8 sText_RegionMapData[] = _("EM PREPARACAO");
 static const u8 sText_RegionPlanned[] = _("PLANEJADA");
 static const u8 sText_RegionUnavailable[] = _("REGIAO AINDA NAO JOGAVEL");
+
+static const u8 sText_KantoWelcome[] = _("Oi! Bem-vindo ao mundo dos\nPOKéMON!\pSou o Professor OAK. Estudo os\nPOKéMON de Kanto.");
+static const u8 sText_KantoPokemon[] = _("Este e um POKéMON.{PAUSE 96}\p");
+static const u8 sText_KantoMainSpeech[] = _("POKéMON vivem por toda parte.\pAlguns nos acompanham; outros\nnos desafiam em batalhas.\pAinda existem muitos segredos\nsobre eles. Por isso pesquiso.");
+static const u8 sText_KantoAndYouAre[] = _("Mas antes, quem e voce?");
+static const u8 sText_KantoBoyOrGirl[] = _("Voce e menino ou menina?");
+static const u8 sText_KantoWhatsYourName[] = _("Qual e o seu nome?");
+static const u8 sText_KantoSoItsPlayer[] = _("Seu nome e {PLAYER}?");
+static const u8 sText_KantoYourePlayer[] = _("Ah, sim! Voce e {PLAYER},\nde Pallet Town.\pPasse no meu laboratorio antes\nde iniciar sua jornada.");
+static const u8 sText_KantoAreYouReady[] = _("Sua aventura em Kanto vai\ncomecar!\pVenha me encontrar no\nlaboratorio de Pallet Town.");
+
+static bool8 IsKantoNewGameIntro(void)
+{
+    return Pgw_GetSelectedStartingRegionForNewGame() == PGW_START_KANTO;
+}
 
 static const u16 sMainMenuBgPal[] = INCGFX_U16("graphics/interface/main_menu_bg.pal", ".gbapal");
 static const u16 sMainMenuTextPal[] = INCGFX_U16("graphics/interface/main_menu_text.pal", ".gbapal");
@@ -1334,6 +1350,7 @@ static void NewGameBirchSpeech_InitScene(u8 taskId)
     SetGpuReg(REG_OFFSET_DISPCNT, 0);
     SetGpuReg(REG_OFFSET_DISPCNT, DISPCNT_OBJ_ON | DISPCNT_OBJ_1D_MAP);
     InitBgFromTemplate(&sBirchBgTemplate);
+    DmaFill16(3, 0, VRAM, VRAM_SIZE);
     SetGpuReg(REG_OFFSET_WIN0H, 0);
     SetGpuReg(REG_OFFSET_WIN0V, 0);
     SetGpuReg(REG_OFFSET_WININ, 0);
@@ -1378,6 +1395,8 @@ static void Task_NewGameBirchSpeech_Init(u8 taskId)
 
         if (definition->availability == PGR_REGION_PLAYABLE)
             status = sText_RegionPlayable;
+        else if (definition->availability == PGR_REGION_OPENING_TEST)
+            status = sText_RegionOpeningTest;
         else if (definition->availability == PGR_REGION_MAP_DATA)
             status = sText_RegionMapData;
         else
@@ -1426,6 +1445,15 @@ static void Task_NewGameRegionSelect_WaitForFadeOut(u8 taskId)
     if (gPaletteFade.active)
         return;
 
+    if (Pgw_GetSelectedStartingRegionForNewGame() == PGW_START_KANTO)
+    {
+        FreeAllWindowBuffers();
+        DestroyTask(taskId);
+        gMain.state = 0;
+        StartNewGameSceneFrlg();
+        return;
+    }
+
     FillBgTilemapBufferRect(0, 0, 0, 0, 32, 32, 0);
     CopyBgTilemapBufferToVram(0);
     FreeAllWindowBuffers();
@@ -1434,7 +1462,7 @@ static void Task_NewGameRegionSelect_WaitForFadeOut(u8 taskId)
     CopyBgTilemapBufferToVram(0);
     BeginNormalPaletteFade(PALETTES_ALL, 0, 16, 0, RGB_BLACK);
     gTasks[taskId].tTimer = 30;
-    PlayBGM(MUS_ROUTE122);
+    PlayBGM(IsKantoNewGameIntro() ? MUS_RG_OAK : MUS_ROUTE122);
     DBGPRINTF("New game: regional selection cleared; Birch scene restarted\n");
     gTasks[taskId].func = Task_NewGameBirchSpeech_WaitToShowBirch;
 }
@@ -1479,7 +1507,7 @@ static void Task_NewGameBirchSpeech_WaitForSpriteFadeInWelcome(u8 taskId)
             PutWindowTilemap(0);
             CopyWindowToVram(0, COPYWIN_GFX);
             NewGameBirchSpeech_ClearWindow(0);
-            StringExpandPlaceholders(gStringVar4, gText_Birch_Welcome);
+            StringExpandPlaceholders(gStringVar4, IsKantoNewGameIntro() ? sText_KantoWelcome : gText_Birch_Welcome);
             AddTextPrinterForMessage(TRUE);
             DBGPRINTF("New game: Birch welcome text opened\n");
             gTasks[taskId].func = Task_NewGameBirchSpeech_ThisIsAPokemon;
@@ -1492,7 +1520,7 @@ static void Task_NewGameBirchSpeech_ThisIsAPokemon(u8 taskId)
     if (!gPaletteFade.active && !RunTextPrintersAndIsPrinter0Active())
     {
         gTasks[taskId].func = Task_NewGameBirchSpeech_MainSpeech;
-        StringExpandPlaceholders(gStringVar4, gText_ThisIsAPokemon);
+        StringExpandPlaceholders(gStringVar4, IsKantoNewGameIntro() ? sText_KantoPokemon : gText_ThisIsAPokemon);
         AddTextPrinterWithCallbackForMessage(TRUE, NewGameBirchSpeech_WaitForThisIsPokemonText);
         sBirchSpeechMainTaskId = taskId;
     }
@@ -1502,7 +1530,7 @@ static void Task_NewGameBirchSpeech_MainSpeech(u8 taskId)
 {
     if (!RunTextPrintersAndIsPrinter0Active())
     {
-        StringExpandPlaceholders(gStringVar4, gText_Birch_MainSpeech);
+        StringExpandPlaceholders(gStringVar4, IsKantoNewGameIntro() ? sText_KantoMainSpeech : gText_Birch_MainSpeech);
         AddTextPrinterForMessage(TRUE);
         gTasks[taskId].func = Task_NewGameBirchSpeech_AndYouAre;
     }
@@ -1519,7 +1547,8 @@ static void Task_NewGameBirchSpeechSub_InitPokeBall(u8 taskId)
     gSprites[spriteId].invisible = FALSE;
     gSprites[spriteId].data[0] = 0;
 
-    CreatePokeballSpriteToReleaseMon(spriteId, gSprites[spriteId].oam.paletteNum, 112, 58, 0, 0, 32, PALETTES_BG, SPECIES_LOTAD);
+    CreatePokeballSpriteToReleaseMon(spriteId, gSprites[spriteId].oam.paletteNum, 112, 58, 0, 0, 32, PALETTES_BG,
+                                     IsKantoNewGameIntro() ? SPECIES_NIDORAN_F : SPECIES_LOTAD);
     gTasks[taskId].func = Task_NewGameBirchSpeechSub_WaitForLotad;
     gTasks[sBirchSpeechMainTaskId].tTimer = 0;
 }
@@ -1557,7 +1586,7 @@ static void Task_NewGameBirchSpeech_AndYouAre(u8 taskId)
     if (!RunTextPrintersAndIsPrinter0Active())
     {
         sStartedPokeBallTask = FALSE;
-        StringExpandPlaceholders(gStringVar4, gText_Birch_AndYouAre);
+        StringExpandPlaceholders(gStringVar4, IsKantoNewGameIntro() ? sText_KantoAndYouAre : gText_Birch_AndYouAre);
         AddTextPrinterForMessage(TRUE);
         gTasks[taskId].func = Task_NewGameBirchSpeech_StartBirchLotadPlatformFade;
     }
@@ -1629,7 +1658,7 @@ static void Task_NewGameBirchSpeech_WaitForPlayerFadeIn(u8 taskId)
 static void Task_NewGameBirchSpeech_BoyOrGirl(u8 taskId)
 {
     NewGameBirchSpeech_ClearWindow(0);
-    StringExpandPlaceholders(gStringVar4, gText_Birch_BoyOrGirl);
+    StringExpandPlaceholders(gStringVar4, IsKantoNewGameIntro() ? sText_KantoBoyOrGirl : gText_Birch_BoyOrGirl);
     AddTextPrinterForMessage(TRUE);
     gTasks[taskId].func = Task_NewGameBirchSpeech_WaitToShowGenderMenu;
 }
@@ -1721,7 +1750,7 @@ static void Task_NewGameBirchSpeech_SlideInNewGenderSprite(u8 taskId)
 static void Task_NewGameBirchSpeech_WhatsYourName(u8 taskId)
 {
     NewGameBirchSpeech_ClearWindow(0);
-    StringExpandPlaceholders(gStringVar4, gText_Birch_WhatsYourName);
+    StringExpandPlaceholders(gStringVar4, IsKantoNewGameIntro() ? sText_KantoWhatsYourName : gText_Birch_WhatsYourName);
     AddTextPrinterForMessage(TRUE);
     gTasks[taskId].func = Task_NewGameBirchSpeech_WaitForWhatsYourNameToPrint;
 }
@@ -1749,14 +1778,14 @@ static void Task_NewGameBirchSpeech_StartNamingScreen(u8 taskId)
         FreeAndDestroyMonPicSprite(gTasks[taskId].tLotadSpriteId);
         NewGameBirchSpeech_SetDefaultPlayerName(Random() % NUM_PRESET_NAMES);
         DestroyTask(taskId);
-        DoNamingScreen(NAMING_SCREEN_PLAYER, gSaveBlock2Ptr->playerName, gSaveBlock2Ptr->playerGender, 0, 0, CB2_NewGameBirchSpeech_ReturnFromNamingScreen);
+        DoNamingScreen(NAMING_SCREEN_PLAYER, gSaveBlock2Ptr->playerName, gSaveBlock2Ptr->playerGender, NAMING_SCREEN_NEW_GAME_ICON, 0, CB2_NewGameBirchSpeech_ReturnFromNamingScreen);
     }
 }
 
 static void Task_NewGameBirchSpeech_SoItsPlayerName(u8 taskId)
 {
     NewGameBirchSpeech_ClearWindow(0);
-    StringExpandPlaceholders(gStringVar4, gText_Birch_SoItsPlayer);
+    StringExpandPlaceholders(gStringVar4, IsKantoNewGameIntro() ? sText_KantoSoItsPlayer : gText_Birch_SoItsPlayer);
     AddTextPrinterForMessage(TRUE);
     gTasks[taskId].func = Task_NewGameBirchSpeech_CreateNameYesNo;
 }
@@ -1822,7 +1851,7 @@ static void Task_NewGameBirchSpeech_ReshowBirchLotad(u8 taskId)
         NewGameBirchSpeech_StartFadeInTarget1OutTarget2(taskId, 2);
         NewGameBirchSpeech_StartFadePlatformOut(taskId, 1);
         NewGameBirchSpeech_ClearWindow(0);
-        StringExpandPlaceholders(gStringVar4, gText_Birch_YourePlayer);
+        StringExpandPlaceholders(gStringVar4, IsKantoNewGameIntro() ? sText_KantoYourePlayer : gText_Birch_YourePlayer);
         AddTextPrinterForMessage(TRUE);
         gTasks[taskId].func = Task_NewGameBirchSpeech_WaitForSpriteFadeInAndTextPrinter;
     }
@@ -1870,7 +1899,8 @@ static void Task_NewGameBirchSpeech_AreYouReady(u8 taskId)
         gTasks[taskId].tPlayerSpriteId = spriteId;
         NewGameBirchSpeech_StartFadeInTarget1OutTarget2(taskId, 2);
         NewGameBirchSpeech_StartFadePlatformOut(taskId, 1);
-        StringExpandPlaceholders(gStringVar4, gText_Birch_AreYouReady);
+        NewGameBirchSpeech_ClearWindow(0);
+        StringExpandPlaceholders(gStringVar4, IsKantoNewGameIntro() ? sText_KantoAreYouReady : gText_Birch_AreYouReady);
         AddTextPrinterForMessage(TRUE);
         gTasks[taskId].func = Task_NewGameBirchSpeech_ShrinkPlayer;
     }
@@ -2019,7 +2049,8 @@ static void SpriteCB_MovePlayerDownWhileShrinking(struct Sprite *sprite)
 
 static u8 NewGameBirchSpeech_CreateLotadSprite(u8 x, u8 y)
 {
-    return CreateMonPicSprite_Affine(SPECIES_LOTAD, FALSE, 0, MON_PIC_AFFINE_FRONT, x, y, 14, TAG_NONE);
+    return CreateMonPicSprite_Affine(IsKantoNewGameIntro() ? SPECIES_NIDORAN_F : SPECIES_LOTAD,
+                                     FALSE, 0, MON_PIC_AFFINE_FRONT, x, y, 14, TAG_NONE);
 }
 
 static void AddBirchSpeechObjects(u8 taskId)
@@ -2029,7 +2060,9 @@ static void AddBirchSpeechObjects(u8 taskId)
     u8 brendanSpriteId;
     u8 maySpriteId;
 
-    birchSpriteId = AddNewGameBirchObject(0x88, 0x3C, 1);
+    birchSpriteId = IsKantoNewGameIntro()
+                  ? CreateTrainerSprite(TRAINER_PIC_PROFESSOR_OAK_FRLG, 0x88, 0x3C, 1, NULL)
+                  : AddNewGameBirchObject(0x88, 0x3C, 1);
     gSprites[birchSpriteId].callback = SpriteCB_Null;
     gSprites[birchSpriteId].oam.priority = 0;
     gSprites[birchSpriteId].invisible = TRUE;
@@ -2039,12 +2072,12 @@ static void AddBirchSpeechObjects(u8 taskId)
     gSprites[lotadSpriteId].oam.priority = 0;
     gSprites[lotadSpriteId].invisible = TRUE;
     gTasks[taskId].tLotadSpriteId = lotadSpriteId;
-    brendanSpriteId = CreateTrainerSprite(FacilityClassToPicIndex(FACILITY_CLASS_BRENDAN), 120, 60, 0, NULL);
+    brendanSpriteId = CreateTrainerSprite(IsKantoNewGameIntro() ? TRAINER_PIC_RED : FacilityClassToPicIndex(FACILITY_CLASS_BRENDAN), 120, 60, 0, NULL);
     gSprites[brendanSpriteId].callback = SpriteCB_Null;
     gSprites[brendanSpriteId].invisible = TRUE;
     gSprites[brendanSpriteId].oam.priority = 0;
     gTasks[taskId].tBrendanSpriteId = brendanSpriteId;
-    maySpriteId = CreateTrainerSprite(FacilityClassToPicIndex(FACILITY_CLASS_MAY), 120, 60, 0, NULL);
+    maySpriteId = CreateTrainerSprite(IsKantoNewGameIntro() ? TRAINER_PIC_LEAF : FacilityClassToPicIndex(FACILITY_CLASS_MAY), 120, 60, 0, NULL);
     gSprites[maySpriteId].callback = SpriteCB_Null;
     gSprites[maySpriteId].invisible = TRUE;
     gSprites[maySpriteId].oam.priority = 0;
@@ -2377,12 +2410,8 @@ static void NewGameBirchSpeech_ClearGenderWindow(u8 windowId, bool8 copyToVram)
 static void NewGameBirchSpeech_ClearWindow(u8 windowId)
 {
     u8 bgColor = GetFontAttribute(FONT_NORMAL, FONTATTR_COLOR_BACKGROUND);
-    u8 maxCharWidth = GetFontAttribute(FONT_NORMAL, FONTATTR_MAX_LETTER_WIDTH);
-    u8 maxCharHeight = GetFontAttribute(FONT_NORMAL, FONTATTR_MAX_LETTER_HEIGHT);
-    u8 winWidth = GetWindowAttribute(windowId, WINDOW_WIDTH);
-    u8 winHeight = GetWindowAttribute(windowId, WINDOW_HEIGHT);
 
-    FillWindowPixelRect(windowId, bgColor, 0, 0, maxCharWidth * winWidth, maxCharHeight * winHeight);
+    FillWindowPixelBuffer(windowId, PIXEL_FILL(bgColor));
     CopyWindowToVram(windowId, COPYWIN_GFX);
 }
 

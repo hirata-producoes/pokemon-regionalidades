@@ -20,6 +20,7 @@
 #include "item.h"
 #include "math_util.h"
 #include "pokemon.h"
+#include "pokemon_go_world.h"
 #include "random.h"
 #include "recorded_battle.h"
 #include "util.h"
@@ -6661,7 +6662,16 @@ static s32 AI_Safari(enum BattlerId battlerAtk, enum BattlerId battlerDef, enum 
 // First battle logic
 static s32 AI_FirstBattle(enum BattlerId battlerAtk, enum BattlerId battlerDef, enum Move move, s32 score)
 {
-    if (!IS_FRLG && gAiLogicData->hpPercents[battlerDef] <= 20)
+    bool32 isBirchRescueBattle = !IS_FRLG;
+
+#ifdef PORTABLE
+    // A abertura de Kanto reutiliza a marca de primeira batalha, mas não deve
+    // herdar a fuga automática do Zigzagoon da introdução de Hoenn.
+    if (Pgw_GetStartingRegion() == PGW_START_KANTO)
+        isBirchRescueBattle = FALSE;
+#endif
+
+    if (isBirchRescueBattle && gAiLogicData->hpPercents[battlerDef] <= 20)
         AI_Flee();
 
     return score;

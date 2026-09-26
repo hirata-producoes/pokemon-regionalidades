@@ -860,11 +860,35 @@
 #define TRAINER_BRENDAN_PLACEHOLDER         853
 #define TRAINER_MAY_PLACEHOLDER             854
 
+// Rivais iniciais de Kanto: os IDs de FRLG (226-228) pertencem a Hoenn no PC.
+#define TRAINER_PGR_KANTO_RIVAL_SQUIRTLE    855
+#define TRAINER_PGR_KANTO_RIVAL_BULBASAUR   856
+#define TRAINER_PGR_KANTO_RIVAL_CHARMANDER  857
+
+// Regional trainer IDs live outside the legacy Hoenn flag/index space. Their
+// battle data and defeated state are resolved by region, so importing Kanto
+// never aliases an existing Hoenn trainer and future regions can do the same.
+#define TRAINER_PGR_KANTO_BASE               0x1000
+#define TRAINER_PGR_KANTO(localId)           (TRAINER_PGR_KANTO_BASE + (localId))
+
+#define KANTO_TRAINER_BUG_CATCHER_RICK       0
+#define KANTO_TRAINER_BUG_CATCHER_DOUG       1
+#define KANTO_TRAINER_BUG_CATCHER_SAMMY      2
+#define KANTO_TRAINER_BUG_CATCHER_ANTHONY    3
+#define KANTO_TRAINER_BUG_CATCHER_CHARLIE    4
+#define KANTO_TRAINERS_COUNT                 5
+
+#define TRAINER_PGR_KANTO_BUG_CATCHER_RICK    TRAINER_PGR_KANTO(KANTO_TRAINER_BUG_CATCHER_RICK)
+#define TRAINER_PGR_KANTO_BUG_CATCHER_DOUG    TRAINER_PGR_KANTO(KANTO_TRAINER_BUG_CATCHER_DOUG)
+#define TRAINER_PGR_KANTO_BUG_CATCHER_SAMMY   TRAINER_PGR_KANTO(KANTO_TRAINER_BUG_CATCHER_SAMMY)
+#define TRAINER_PGR_KANTO_BUG_CATCHER_ANTHONY TRAINER_PGR_KANTO(KANTO_TRAINER_BUG_CATCHER_ANTHONY)
+#define TRAINER_PGR_KANTO_BUG_CATCHER_CHARLIE TRAINER_PGR_KANTO(KANTO_TRAINER_BUG_CATCHER_CHARLIE)
+
 // NOTE: Because each Trainer uses a flag to determine when they are defeated, there is only space for 9 additional trainers before trainer flag space overflows
 //       More space can be made by shifting flags around in constants/flags.h or changing how trainer flags are handled
 //       MAX_TRAINERS_COUNT can be increased but will take up additional saveblock space
 
-#define TRAINERS_COUNT_EMERALD     855
+#define TRAINERS_COUNT_EMERALD     858
 #define MAX_TRAINERS_COUNT_EMERALD 864
 
 #if IS_FRLG

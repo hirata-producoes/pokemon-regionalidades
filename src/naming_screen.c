@@ -30,6 +30,7 @@
 #include "decompress.h"
 #include "constants/event_objects.h"
 #include "constants/rgb.h"
+#include "pokemon_go_world.h"
 
 enum {
     INPUT_NONE,
@@ -1411,7 +1412,12 @@ static void NamingScreen_CreatePlayerIcon(void)
     u16 rivalGfxId;
     u8 spriteId;
 
-    rivalGfxId = GetRivalAvatarGraphicsIdByStateIdAndGender(PLAYER_AVATAR_STATE_NORMAL, (enum Gender)sNamingScreen->monSpecies);
+    if (sNamingScreen->monGender == NAMING_SCREEN_NEW_GAME_ICON && sNamingScreen->templateNum == NAMING_SCREEN_PLAYER)
+        rivalGfxId = Pgw_GetSelectedStartingRegionForNewGame() == PGW_START_KANTO
+                   ? GetFRLGAvatarGraphicsIdByGender((enum Gender)sNamingScreen->monSpecies)
+                   : GetRivalAvatarGraphicsIdByStateIdAndGender(PLAYER_AVATAR_STATE_NORMAL, (enum Gender)sNamingScreen->monSpecies);
+    else
+        rivalGfxId = GetRivalAvatarGraphicsIdByStateIdAndGender(PLAYER_AVATAR_STATE_NORMAL, (enum Gender)sNamingScreen->monSpecies);
     spriteId = CreateObjectGraphicsSprite(rivalGfxId, SpriteCallbackDummy, 56, 37, 0);
     gSprites[spriteId].oam.priority = 3;
     StartSpriteAnim(&gSprites[spriteId], ANIM_STD_GO_SOUTH);
