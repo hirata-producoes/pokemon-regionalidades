@@ -2,6 +2,7 @@
 #include "string_util.h"
 #include "text.h"
 #include "strings.h"
+#include "pokemon_go_world.h"
 #include "union_room_chat.h"
 
 EWRAM_DATA u8 gStringVar1[0x100] = {0};
@@ -481,6 +482,23 @@ static const u8 *ExpandPlaceholder_RivalName(void)
 #if IS_FRLG
     if (gSaveBlock1Ptr->rivalName[0] != EOS)
         return gSaveBlock1Ptr->rivalName;
+#endif
+
+#ifdef PORTABLE
+    const u8 *newGameRivalName = Pgw_GetNewGameKantoRivalNameBuffer();
+
+    // Durante a apresentação, a região ainda não foi gravada no estado do
+    // mundo. O nome escolhido nessa própria abertura é a fonte correta.
+    if (newGameRivalName[0] != EOS && newGameRivalName[0] != 0)
+        return newGameRivalName;
+
+    if (Pgw_GetStartingRegion() == PGW_START_KANTO)
+    {
+        const u8 *rivalName = Pgw_GetKantoRivalName();
+        if (rivalName[0] != EOS && rivalName[0] != 0)
+            return rivalName;
+        return gText_ExpandedPlaceholder_Green;
+    }
 #endif
 
     if (gSaveBlock2Ptr->playerGender == MALE)

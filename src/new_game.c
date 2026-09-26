@@ -227,6 +227,8 @@ void NewGameInitData(void)
         RunScriptImmediately(EventScript_ResetAllMapFlagsFrlg);
     else
         RunScriptImmediately(EventScript_ResetAllMapFlags);
+    if (Pgw_GetSelectedStartingRegionForNewGame() == PGW_START_KANTO && !IS_FRLG)
+        RunScriptImmediately(EventScript_ResetAllMapFlagsFrlg);
 #if IS_FRLG
         StringCopy(gSaveBlock1Ptr->rivalName, rivalName);
 #endif
@@ -242,6 +244,7 @@ void NewGameInitData(void)
     ResetTrainerTowerResults();
     ResetContestLinkResults();
     Pgw_InitWorldState();
+    Pgw_StoreNewGameKantoRivalName();
     SetCurrentDifficultyLevel(DIFFICULTY_NORMAL);
     ResetItemFlags();
     ResetDexNav();

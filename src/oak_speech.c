@@ -11,6 +11,7 @@
 #include "overworld.h"
 #include "palette.h"
 #include "pokeball.h"
+#include "pokemon_go_world.h"
 #include "random.h"
 #include "scanline_effect.h"
 #include "sound.h"
@@ -22,7 +23,7 @@
 #include "constants/rgb.h"
 #include "constants/songs.h"
 
-#if IS_FRLG
+#if IS_FRLG || defined(PORTABLE)
 
 #define INTRO_SPECIES SPECIES_NIDORAN_F
 
@@ -1455,7 +1456,7 @@ static void Task_OakSpeech_DoNamingScreen(u8 taskId)
         {
             ClearStdWindowAndFrameToTransparent(gTasks[taskId].tMenuWindowId, TRUE);
             RemoveWindow(gTasks[taskId].tMenuWindowId);
-            DoNamingScreen(NAMING_SCREEN_RIVAL, gSaveBlock1Ptr->rivalName, 0, 0, 0, CB2_ReturnFromNamingScreen);
+            DoNamingScreen(NAMING_SCREEN_RIVAL, Pgw_GetNewGameKantoRivalNameBuffer(), 0, 0, 0, CB2_ReturnFromNamingScreen);
         }
         DestroyPikachuOrPlatformSprites(taskId, SPRITE_TYPE_PLATFORM);
         FreeAllWindowBuffers();
@@ -2156,7 +2157,7 @@ static void GetDefaultName(u8 hasPlayerBeenNamed, u8 nameChoice)
     else
     {
         src = sRivalNameChoices[nameChoice];
-        dest = gSaveBlock1Ptr->rivalName;
+        dest = Pgw_GetNewGameKantoRivalNameBuffer();
     }
     for (i = 0; i < PLAYER_NAME_LENGTH && src[i] != EOS; i++)
         dest[i] = src[i];
@@ -2190,4 +2191,4 @@ static void GetDefaultName(u8 hasPlayerBeenNamed, u8 nameChoice)
 #undef tUnusedState
 #undef tFadeTimer
 
-#endif // IS_FRLG
+#endif // IS_FRLG || PORTABLE

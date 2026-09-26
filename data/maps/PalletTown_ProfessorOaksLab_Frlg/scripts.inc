@@ -12,12 +12,39 @@ PalletTown_ProfessorOaksLab_Frlg_MapScripts::
 	.byte 0
 
 PalletTown_ProfessorOaksLab_OnTransition::
+	special Pgw_ScriptGetStartingRegion
+	goto_if_ne VAR_RESULT, 0, PalletTown_ProfessorOaksLab_EventScript_VisitorTransition
 	setflag FLAG_VISITED_OAKS_LAB
+	call_if_ge VAR_MAP_SCENE_PALLET_TOWN_PROFESSOR_OAKS_LAB, 3, PalletTown_ProfessorOaksLab_EventScript_SyncStarterBalls
 	call_if_eq VAR_MAP_SCENE_PALLET_TOWN_PROFESSOR_OAKS_LAB, 1, PalletTown_ProfessorOaksLab_EventScript_ReadyOakForStarterScene
 	call_if_eq VAR_MAP_SCENE_PALLET_TOWN_PROFESSOR_OAKS_LAB, 7, PalletTown_ProfessorOaksLab_EventScript_ReadyOakForNationalDexScene
 	call_if_eq VAR_MAP_SCENE_PALLET_TOWN_PROFESSOR_OAKS_LAB, 8, PalletTown_ProfessorOaksLab_EventScript_SetNationalDexSceneFinished
 	call_if_set FLAG_GOT_POKEBALLS_FROM_OAK_AFTER_22_RIVAL, PalletTown_ProfessorOaksLab_EventScript_SetSkipPokeBallCheck
 	end
+
+PalletTown_ProfessorOaksLab_EventScript_VisitorTransition::
+	end
+
+PalletTown_ProfessorOaksLab_EventScript_SyncStarterBalls::
+	call_if_eq VAR_STARTER_MON, 0, PalletTown_ProfessorOaksLab_EventScript_HideBulbasaurAndCharmander
+	call_if_eq VAR_STARTER_MON, 1, PalletTown_ProfessorOaksLab_EventScript_HideSquirtleAndBulbasaur
+	call_if_eq VAR_STARTER_MON, 2, PalletTown_ProfessorOaksLab_EventScript_HideCharmanderAndSquirtle
+	return
+
+PalletTown_ProfessorOaksLab_EventScript_HideBulbasaurAndCharmander::
+	setflag FLAG_HIDE_BULBASAUR_BALL
+	setflag FLAG_HIDE_CHARMANDER_BALL
+	return
+
+PalletTown_ProfessorOaksLab_EventScript_HideSquirtleAndBulbasaur::
+	setflag FLAG_HIDE_SQUIRTLE_BALL
+	setflag FLAG_HIDE_BULBASAUR_BALL
+	return
+
+PalletTown_ProfessorOaksLab_EventScript_HideCharmanderAndSquirtle::
+	setflag FLAG_HIDE_CHARMANDER_BALL
+	setflag FLAG_HIDE_SQUIRTLE_BALL
+	return
 
 PalletTown_ProfessorOaksLab_EventScript_SetSkipPokeBallCheck::
 	setflag FLAG_OAK_SKIP_22_RIVAL_CHECK
@@ -330,7 +357,7 @@ PalletTown_ProfessorOaksLab_EventScript_RivalApproachForBattleSquirtleRight::
 	end
 
 PalletTown_ProfessorOaksLab_EventScript_RivalBattleSquirtle::
-	trainerbattle_earlyrival TRAINER_RIVAL_OAKS_LAB_SQUIRTLE, RIVAL_BATTLE_TUTORIAL, PalletTown_ProfessorOaksLab_Text_RivalDefeat, Text_RivalVictory
+	trainerbattle_earlyrival TRAINER_PGR_KANTO_RIVAL_SQUIRTLE, RIVAL_BATTLE_TUTORIAL, PalletTown_ProfessorOaksLab_Text_RivalDefeat, Text_RivalVictory
 	goto PalletTown_ProfessorOaksLab_EventScript_EndRivalBattle
 	end
 
@@ -383,7 +410,7 @@ PalletTown_ProfessorOaksLab_EventScript_RivalApproachForBattleCharmanderRight::
 	end
 
 PalletTown_ProfessorOaksLab_EventScript_RivalBattleCharmander::
-	trainerbattle_earlyrival TRAINER_RIVAL_OAKS_LAB_CHARMANDER, RIVAL_BATTLE_TUTORIAL, PalletTown_ProfessorOaksLab_Text_RivalDefeat, Text_RivalVictory
+	trainerbattle_earlyrival TRAINER_PGR_KANTO_RIVAL_CHARMANDER, RIVAL_BATTLE_TUTORIAL, PalletTown_ProfessorOaksLab_Text_RivalDefeat, Text_RivalVictory
 	goto PalletTown_ProfessorOaksLab_EventScript_EndRivalBattle
 	end
 
@@ -439,7 +466,7 @@ PalletTown_ProfessorOaksLab_EventScript_RivalApproachForBattleBulbasaurRight::
 	end
 
 PalletTown_ProfessorOaksLab_EventScript_RivalBattleBulbasaur::
-	trainerbattle_earlyrival TRAINER_RIVAL_OAKS_LAB_BULBASAUR, RIVAL_BATTLE_TUTORIAL, PalletTown_ProfessorOaksLab_Text_RivalDefeat, Text_RivalVictory
+	trainerbattle_earlyrival TRAINER_PGR_KANTO_RIVAL_BULBASAUR, RIVAL_BATTLE_TUTORIAL, PalletTown_ProfessorOaksLab_Text_RivalDefeat, Text_RivalVictory
 	goto PalletTown_ProfessorOaksLab_EventScript_EndRivalBattle
 	end
 
@@ -567,6 +594,8 @@ PalletTown_ProfessorOaksLab_EventScript_RivalChoseStarter::
 PalletTown_ProfessorOaksLab_EventScript_ProfOak::
 	lock
 	faceplayer
+	special Pgw_ScriptGetStartingRegion
+	goto_if_ne VAR_RESULT, 0, PalletTown_ProfessorOaksLab_EventScript_VisitingOak
 	goto_if_set SHOWED_OAK_COMPLETE_DEX, PalletTown_ProfessorOaksLab_EventScript_OakJustShownCompleteDex
 	goto_if_eq VAR_MAP_SCENE_PALLET_TOWN_PROFESSOR_OAKS_LAB, 9, PalletTown_ProfessorOaksLab_EventScript_RatePokedex
 	goto_if_eq VAR_MAP_SCENE_PALLET_TOWN_PROFESSOR_OAKS_LAB, 8, PalletTown_ProfessorOaksLab_EventScript_MonsAroundWorldWait
@@ -577,6 +606,11 @@ PalletTown_ProfessorOaksLab_EventScript_ProfOak::
 	goto_if_eq VAR_MAP_SCENE_PALLET_TOWN_PROFESSOR_OAKS_LAB, 4, PalletTown_ProfessorOaksLab_EventScript_OakBattleMonForItToGrow
 	goto_if_eq VAR_MAP_SCENE_PALLET_TOWN_PROFESSOR_OAKS_LAB, 3, PalletTown_ProfessorOaksLab_EventScript_OakCanReachNextTownWithMon
 	msgbox PalletTown_ProfessorOaksLab_Text_OakWhichOneWillYouChoose
+	release
+	end
+
+PalletTown_ProfessorOaksLab_EventScript_VisitingOak::
+	msgbox PalletTown_ProfessorOaksLab_Text_VisitingOak
 	release
 	end
 
@@ -1067,6 +1101,8 @@ PalletTown_ProfessorOaksLab_Movement_RivalExit::
 PalletTown_ProfessorOaksLab_EventScript_BulbasaurBall::
 	lock
 	faceplayer
+	special Pgw_ScriptGetStartingRegion
+	goto_if_ne VAR_RESULT, 0, PalletTown_ProfessorOaksLab_EventScript_ReservedStarter
 	setvar PLAYER_STARTER_NUM, 0
 	setvar PLAYER_STARTER_SPECIES, SPECIES_BULBASAUR
 	setvar RIVAL_STARTER_SPECIES, SPECIES_CHARMANDER
@@ -1112,6 +1148,9 @@ PalletTown_ProfessorOaksLab_EventScript_DeclinedStarter::
 
 PalletTown_ProfessorOaksLab_EventScript_ChoseStarter::
 	hidemonpic
+	call_if_eq PLAYER_STARTER_NUM, 0, PalletTown_ProfessorOaksLab_EventScript_HideBulbasaurBall
+	call_if_eq PLAYER_STARTER_NUM, 1, PalletTown_ProfessorOaksLab_EventScript_HideSquirtleBall
+	call_if_eq PLAYER_STARTER_NUM, 2, PalletTown_ProfessorOaksLab_EventScript_HideCharmanderBall
 	removeobject VAR_LAST_TALKED
 	msgbox PalletTown_ProfessorOaksLab_Text_OakThisMonIsEnergetic
 	call EventScript_RestorePrevTextColor
@@ -1128,6 +1167,18 @@ PalletTown_ProfessorOaksLab_EventScript_ChoseStarter::
 	goto_if_eq VAR_RESULT, YES, EventScript_GiveNicknameToStarter
 	goto_if_eq VAR_RESULT, NO, PalletTown_ProfessorOaksLab_EventScript_RivalPicksStarter
 	end
+
+PalletTown_ProfessorOaksLab_EventScript_HideBulbasaurBall::
+	setflag FLAG_HIDE_BULBASAUR_BALL
+	return
+
+PalletTown_ProfessorOaksLab_EventScript_HideSquirtleBall::
+	setflag FLAG_HIDE_SQUIRTLE_BALL
+	return
+
+PalletTown_ProfessorOaksLab_EventScript_HideCharmanderBall::
+	setflag FLAG_HIDE_CHARMANDER_BALL
+	return
 
 EventScript_GiveNicknameToStarter::
 	setvar VAR_0x8004, 0
@@ -1163,6 +1214,9 @@ PalletTown_ProfessorOaksLab_EventScript_RivalWalksToBulbasaur::
 PalletTown_ProfessorOaksLab_EventScript_RivalTakesStarter::
 	textcolor NPC_TEXT_COLOR_MALE
 	msgbox PalletTown_ProfessorOaksLab_Text_RivalIllTakeThisOneThen
+	call_if_eq RIVAL_STARTER_SPECIES, SPECIES_BULBASAUR, PalletTown_ProfessorOaksLab_EventScript_HideBulbasaurBall
+	call_if_eq RIVAL_STARTER_SPECIES, SPECIES_SQUIRTLE, PalletTown_ProfessorOaksLab_EventScript_HideSquirtleBall
+	call_if_eq RIVAL_STARTER_SPECIES, SPECIES_CHARMANDER, PalletTown_ProfessorOaksLab_EventScript_HideCharmanderBall
 	removeobject RIVAL_STARTER_ID
 	textcolor NPC_TEXT_COLOR_NEUTRAL
 	bufferspeciesname STR_VAR_1, RIVAL_STARTER_SPECIES
@@ -1210,6 +1264,8 @@ PalletTown_ProfessorOaksLab_Movement_RivalWalksToBulbasaur::
 PalletTown_ProfessorOaksLab_EventScript_SquirtleBall::
 	lock
 	faceplayer
+	special Pgw_ScriptGetStartingRegion
+	goto_if_ne VAR_RESULT, 0, PalletTown_ProfessorOaksLab_EventScript_ReservedStarter
 	setvar PLAYER_STARTER_NUM, 1
 	setvar PLAYER_STARTER_SPECIES, SPECIES_SQUIRTLE
 	setvar RIVAL_STARTER_SPECIES, SPECIES_BULBASAUR
@@ -1223,6 +1279,8 @@ PalletTown_ProfessorOaksLab_EventScript_SquirtleBall::
 PalletTown_ProfessorOaksLab_EventScript_CharmanderBall::
 	lock
 	faceplayer
+	special Pgw_ScriptGetStartingRegion
+	goto_if_ne VAR_RESULT, 0, PalletTown_ProfessorOaksLab_EventScript_ReservedStarter
 	setvar PLAYER_STARTER_NUM, 2
 	setvar PLAYER_STARTER_SPECIES, SPECIES_CHARMANDER
 	setvar RIVAL_STARTER_SPECIES, SPECIES_SQUIRTLE
@@ -1230,6 +1288,11 @@ PalletTown_ProfessorOaksLab_EventScript_CharmanderBall::
 	goto_if_ge VAR_MAP_SCENE_PALLET_TOWN_PROFESSOR_OAKS_LAB, 3, PalletTown_ProfessorOaksLab_EventScript_LastPokeBall
 	goto_if_eq VAR_MAP_SCENE_PALLET_TOWN_PROFESSOR_OAKS_LAB, 2, PalletTown_ProfessorOaksLab_EventScript_ConfirmStarterChoice
 	msgbox PalletTown_ProfessorOaksLab_Text_ThoseArePokeBalls
+	release
+	end
+
+PalletTown_ProfessorOaksLab_EventScript_ReservedStarter::
+	msgbox PalletTown_ProfessorOaksLab_Text_ReservedStarter
 	release
 	end
 
@@ -1655,3 +1718,10 @@ PalletTown_ProfessorOaksLab_Text_RivalIllCompleteThePokedex::
 	.string "ONE ISLAND first…\p"
 	.string "Anyways, I'm outta here!$"
 
+PalletTown_ProfessorOaksLab_Text_VisitingOak::
+	.string "Estou reunindo dados dos POKéMON\n"
+	.string "de Kanto. Aproveite a visita!$"
+
+PalletTown_ProfessorOaksLab_Text_ReservedStarter::
+	.string "Estes POKéMON aguardam novos\n"
+	.string "Treinadores de Kanto.$"

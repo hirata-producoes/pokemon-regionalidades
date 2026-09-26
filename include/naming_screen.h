@@ -14,6 +14,9 @@ enum {
     NAMING_SCREEN_RIVAL,
 };
 
+// Sinaliza que o retrato da nova partida deve seguir a região escolhida.
+#define NAMING_SCREEN_NEW_GAME_ICON 1
+
 extern void BattleMainCB2(void);
 
 void DoNamingScreen(u8 templateNum, u8 *destBuffer, u16 monSpeciesOrPlayerGender, u16 monGender, u32 monPersonality, MainCallback returnCallback);

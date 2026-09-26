@@ -2,6 +2,9 @@
 #define GUARD_POKEMON_GO_WORLD_H
 
 void Pgw_InitWorldState(void);
+u8 *Pgw_GetNewGameKantoRivalNameBuffer(void);
+const u8 *Pgw_GetKantoRivalName(void);
+void Pgw_StoreNewGameKantoRivalName(void);
 void Pgw_SelectStartingRegionForNewGame(enum PgwStartingRegion region);
 enum PgwStartingRegion Pgw_GetSelectedStartingRegionForNewGame(void);
 void Pgw_AdvanceWorldDays(u16 days);

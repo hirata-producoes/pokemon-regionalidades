@@ -3,13 +3,14 @@
 Ter uma espécie, um inicial ou uma constante de região no código não significa que uma campanha inteira esteja pronta. Esta página usa três estados:
 
 - **jogável/base:** conteúdo integrado ao fluxo atual;
+- **início em teste:** abertura selecionável no PC, sem validação da campanha inteira;
 - **dados presentes:** mapas ou mecânicas existem, mas ainda não formam uma campanha validada;
 - **planejado:** há design, constantes ou iniciais, mas faltam mapas, eventos e progressão.
 
 | Região | Jogos de referência | Estado |
 |---|---|---|
-| Hoenn | Emerald como baseline; Ruby, Sapphire e ORAS como referências classificadas | Base atual. A campanha principal possui proteção estrutural até a Liga; validação manual completa está pendente. |
-| Kanto | Red, Green, Blue, Yellow, FireRed, LeafGreen e referências de Let's Go | Dados de FRLG presentes. Pallet Town possui uma integração inicial; a campanha completa ainda não foi validada. |
+| Hoenn | Emerald como baseline; Ruby, Sapphire e ORAS como referências classificadas | Base atual. A campanha principal foi percorrida manualmente até os créditos; pós-jogo e caminhos alternativos seguem em validação. |
+| Kanto | Red, Green, Blue, Yellow, FireRed, LeafGreen e referências de Let's Go | Início em teste no PC: seleção regional, introdução com Oak, chegada à casa em Pallet Town e scripts herdados até a escolha do inicial. A sequência ainda depende de teste manual e a campanha completa não está validada. |
 | Ilhas Sevii | FireRed e LeafGreen | Mapas registrados com os dados FRLG; progressão mundial não implementada. |
 | Johto | Gold, Silver, Crystal e HGSS | Planejada; iniciais e identificador preparados. |
 | Sinnoh | Diamond, Pearl, Platinum e BDSP | Planejada; iniciais e identificador preparados. |

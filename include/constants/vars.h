@@ -276,6 +276,21 @@
 #define VAR_PGW_REAL_TIME_ANCHOR_LO                      0x40FE
 #define VAR_PGW_REAL_TIME_ANCHOR_HI                      0x40FF
 
+// Nome do rival de Kanto no save conjunto. Usa quatro variáveis antigas não
+// utilizadas para preservar o tamanho e a compatibilidade do bloco legado.
+#define VAR_PGR_KANTO_RIVAL_NAME_0                       VAR_UNUSED_0x40DB
+#define VAR_PGR_KANTO_RIVAL_NAME_1                       VAR_UNUSED_0x40DC
+#define VAR_PGR_KANTO_RIVAL_NAME_2                       VAR_UNUSED_0x40E5
+#define VAR_PGR_KANTO_RIVAL_NAME_3                       VAR_UNUSED_0x409D
+
+// Keep Viridian's story separate from the occupied Hoenn variables.
+#undef VAR_MAP_SCENE_VIRIDIAN_CITY_OLD_MAN
+#undef VAR_MAP_SCENE_VIRIDIAN_CITY_MART
+#undef VAR_MAP_SCENE_VIRIDIAN_CITY_GYM_DOOR
+#define VAR_MAP_SCENE_VIRIDIAN_CITY_OLD_MAN               VAR_UNUSED_0x4083
+#define VAR_MAP_SCENE_VIRIDIAN_CITY_MART                  VAR_UNUSED_0x408B
+#define VAR_MAP_SCENE_VIRIDIAN_CITY_GYM_DOOR              VAR_UNUSED_0x4091
+
 #define VARS_END                                         0x40FF
 #define VARS_COUNT                                       (VARS_END - VARS_START + 1)
 
