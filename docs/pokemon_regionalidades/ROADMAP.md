@@ -48,7 +48,10 @@ Estado: em validação progressiva da campanha original.
 - [ ] validar individualmente Cut, Flash, Rock Smash, Strength, Surf, Fly,
   Dive, Waterfall, Defog e Rock Climb apenas com o movimento conhecido;
 - [ ] validar a transferência de itens quando um marco real exigir essa função;
-- [ ] percorrer marcos de Hoenn até os créditos.
+- [x] percorrer marcos de Hoenn até os créditos na campanha pessoal: oito
+  ginásios e Elite Four confirmados manualmente em 20 de setembro de 2026.
+  Essa validação não encerra a auditoria de todos os caminhos alternativos
+  nem do pós-jogo, que continua em teste.
 
 Antes de iniciar testes pessoais prolongados da campanha:
 
@@ -61,6 +64,9 @@ Antes de iniciar testes pessoais prolongados da campanha:
 - [x] validar visualmente a interface e oferecer criação de atalho sem terminal;
 - [x] permitir selecionar e abrir os dois perfis pela interface;
 - [x] permitir nomes personalizados para os dois perfis;
+- [x] trocar os dois cartões fixos por lista rolável de perfis criados pelo
+  jogador, mantendo os perfis antigos e até cinco favoritos por perfil;
+- [ ] validar visualmente a nova lista e os favoritos com campanhas reais;
 - [ ] mostrar nome do personagem, tempo jogado e última versão usada em cada perfil;
 - [x] permitir reiniciar somente o perfil escolhido, com confirmação, removendo
   também as gerações da campanha anterior e preservando uma cópia recuperável;
@@ -90,6 +96,8 @@ Fundação ambiental iniciada a partir das decisões D-023, D-029 e D-052:
 - [ ] apresentar estação e clima primeiro em português do Brasil;
 - [ ] ampliar as fontes para os caracteres necessários ao português do Brasil, incluindo `Ã` e `ã`;
 - [ ] validar visualmente Littleroot em diferentes horários, estações e climas.
+- [ ] prototipar uma moldura informativa externa à câmera, preservando a
+  quantidade de blocos visíveis e a escala proporcional da janela;
 
 Uma *vertical slice* é uma pequena parte do jogo funcionando de ponta a ponta. O objetivo é validar:
 
@@ -150,12 +158,32 @@ Antes de ativar uma segunda região jogável, o PC concluirá a primeira fase do
 RotomDex, inventário e atualizações futuras sejam construídos sobre o limite de
 128 KiB da flash do GBA.
 
-Somente Hoenn está marcada como campanha jogável. Kanto possui dados de mapas importados,
-mas permanece indisponível na seleção até ter entrada, scripts e continuidade validados.
-Johto e Sinnoh permanecem planejadas. Essa barreira impede que um protótipo ou conjunto
-parcial de mapas seja confundido com a base real do jogo.
+Somente Hoenn está marcada como campanha jogável. Kanto agora aparece como
+**início em teste** no PC, com introdução de Oak e entrada na casa de Pallet
+Town; a cadeia até o inicial ainda exige validação manual e a campanha inteira
+não foi promovida a jogável. Johto e Sinnoh permanecem planejadas. A distinção
+na seleção impede que o protótipo seja confundido com a base completa.
 
 O encaixe espacial das regiões e ilhas será prototipado conforme o [Planejamento da geografia mundial](WORLD_GEOGRAPHY_PLAN.md), sem confundir uma hipótese cartográfica com uma conexão implementada.
+
+Kanto avançará em partes jogáveis pequenas, enquanto uma mecânica ou ideia
+multirregional por vez é integrada e testada entre campanhas. A posição de
+Cinnabar ao norte da Route 124 é uma referência cartográfica, não autorização
+para ativar todos os eventos de Kanto. Cada cena depende de pré-requisitos
+explícitos de progresso, tempo e local; testes incluirão chegada antecipada,
+retorno posterior e início da campanha em outra região.
+
+Primeira proteção de Pallet Town: a introdução herdada de Oak só pode disparar
+para quem começou em Kanto e ainda não recebeu o primeiro Pokémon. Em uma
+visita de outra região, as Poké Bolas do laboratório ficam reservadas e falar
+com Oak não aciona a entrega herdada de Pokédex ou a cena de pós-jogo de FRLG.
+O início próprio de Kanto foi acrescentado depois dessa proteção, mas faltam a
+validação manual da abertura, a progressão regional e a auditoria dos outros
+mapas antes da ligação Hoenn–Kanto.
+
+Os dados de mapas FRLG já estão registrados em conjunto. Não será necessário
+importar novamente todos os mapas para depois começar os eventos: a integração
+de entrada, saída, scripts narrativos e testes ocorrerá em partes jogáveis.
 
 ## Marco 5 — Pacote externo de recursos
 

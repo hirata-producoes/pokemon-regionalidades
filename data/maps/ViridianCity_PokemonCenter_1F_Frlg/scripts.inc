@@ -8,9 +8,17 @@ ViridianCity_PokemonCenter_1F_OnTransition::
 	end
 
 ViridianCity_PokemonCenter_1F_EventScript_Nurse::
+.if IS_FRLG
 	lock
 	faceplayer
 	call EventScript_PkmnCenterNurse_Frlg
+.else
+	@ Use the shared healing flow, including following Pokemon restoration.
+	setvar VAR_0x800B, LOCALID_VIRIDIAN_NURSE
+	call Common_EventScript_PkmnCenterNurse
+	waitmessage
+	waitbuttonpress
+.endif
 	release
 	end
 
@@ -43,4 +51,3 @@ ViridianCity_PokemonCenter_1F_Text_PokeCentersHealMons::
 	.string "hurt, or fainted POKéMON.\p"
 	.string "They make all POKéMON completely\n"
 	.string "healthy.$"
-

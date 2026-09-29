@@ -4,10 +4,18 @@ ViridianCity_Frlg_MapScripts::
 
 ViridianCity_OnTransition::
 	setworldmapflag FLAG_WORLD_MAP_VIRIDIAN_CITY
+	special Pgw_ScriptGetStartingRegion
+	goto_if_ne VAR_RESULT, 0, ViridianCity_Pgw_VisitorTransition
 	call_if_eq VAR_MAP_SCENE_VIRIDIAN_CITY_OLD_MAN, 0, ViridianCity_EventScript_SetOldManBlockingRoad
 	call_if_eq VAR_MAP_SCENE_VIRIDIAN_CITY_OLD_MAN, 1, ViridianCity_EventScript_SetOldManStandingByRoad
 	call_if_ge VAR_MAP_SCENE_VIRIDIAN_CITY_OLD_MAN, 2, ViridianCity_EventScript_SetOldManNormal
 	call_if_eq VAR_MAP_SCENE_VIRIDIAN_CITY_GYM_DOOR, 0, ViridianCity_EventScript_TryUnlockGym
+	end
+
+ViridianCity_Pgw_VisitorTransition::
+	setvar VAR_OBJ_GFX_ID_0, OBJ_EVENT_GFX_OLD_MAN_1
+	setobjectxyperm LOCALID_TUTORIAL_MAN, 21, 6
+	setobjectmovementtype LOCALID_TUTORIAL_MAN, MOVEMENT_TYPE_LOOK_AROUND
 	end
 
 ViridianCity_EventScript_SetOldManNormal::
@@ -97,6 +105,8 @@ ViridianCity_EventScript_OldManGymLeaderReturned::
 ViridianCity_EventScript_TutorialOldMan::
 	lock
 	faceplayer
+	special Pgw_ScriptGetStartingRegion
+	goto_if_ne VAR_RESULT, 0, ViridianCity_EventScript_TutorialCompleted
 	goto_if_set FLAG_BADGE01_GET, ViridianCity_EventScript_AskIfTeachyTVHelpful
 	goto_if_ge VAR_MAP_SCENE_VIRIDIAN_CITY_OLD_MAN, 2, ViridianCity_EventScript_TutorialCompleted
 	goto_if_eq VAR_MAP_SCENE_VIRIDIAN_CITY_OLD_MAN, 1, ViridianCity_EventScript_TutorialStart
@@ -179,12 +189,55 @@ ViridianCity_EventScript_WomanRoadBlocked::
 	release
 	end
 
+Text_DreamEaterTeach::
+	.string "Yawn!\n"
+	.string "I must have dozed off in the sun.\p"
+	.string "I had this weird dream about\n"
+	.string "a DROWZEE eating my dream.\p"
+	.string "And…\n"
+	.string "I learned how to eat dreams…\p"
+	.string "Oogh, this is too spooky!\p"
+	.string "Let me teach it to a POKéMON so\n"
+	.string "I can forget about it!$"
+
+Text_DreamEaterDeclined::
+	.string "…Snore…$"
+
+Text_DreamEaterWhichMon::
+	.string "Which POKéMON wants to learn\n"
+	.string "DREAM EATER?$"
+
+Text_DreamEaterTaught::
+	.string "…ZZZ…\n"
+	.string "I…can't eat…anymore…$"
+
+
 ViridianCity_EventScript_DreamEaterTutor::
+.if IS_FRLG
 	goto EventScript_DreamEaterTutor
+.else
+	lock
+	faceplayer
+	move_tutor MOVE_DREAM_EATER, Text_DreamEaterTeach, Text_DreamEaterWhichMon, ViridianCity_Pgw_DreamEaterDeclined, ViridianCity_Pgw_DreamEaterTaught, FLAG_TUTOR_DREAM_EATER
+	release
+	end
+
+ViridianCity_Pgw_DreamEaterDeclined::
+	msgbox Text_DreamEaterDeclined
+	release
+	end
+
+ViridianCity_Pgw_DreamEaterTaught::
+	msgbox Text_DreamEaterTaught
+	release
+	end
+.endif
 	end
 
 ViridianCity_EventScript_RoadBlocked::
 	lockall
+	special Pgw_ScriptGetStartingRegion
+	goto_if_ne VAR_RESULT, 0, ViridianCity_Pgw_ReleaseVisitor
 	textcolor NPC_TEXT_COLOR_MALE
 	msgbox ViridianCity_Text_ThisIsPrivateProperty
 	closemessage
@@ -196,6 +249,10 @@ ViridianCity_EventScript_RoadBlocked::
 ViridianCity_Movement_WalkDown::
 	walk_down
 	step_end
+
+ViridianCity_Pgw_ReleaseVisitor::
+	releaseall
+	end
 
 ViridianCity_EventScript_TutorialTriggerLeft::
 	lockall
@@ -356,4 +413,3 @@ ViridianCity_Text_GymSign::
 
 ViridianCity_Text_GymDoorsAreLocked::
 	.string "VIRIDIAN GYM's doors are locked…$"
-

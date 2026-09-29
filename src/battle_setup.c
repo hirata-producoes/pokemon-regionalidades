@@ -43,6 +43,7 @@
 #include "data.h"
 #include "vs_seeker.h"
 #include "item.h"
+#include "pokemon_regionalidades_progress.h"
 #include "script.h"
 #include "field_name_box.h"
 #include "wild_encounter_ow.h"
@@ -864,7 +865,7 @@ enum BattleTransition GetTrainerBattleTransition(void)
     u8 transitionType;
     u8 enemyLevel;
     u8 playerLevel;
-    u32 trainerId = SanitizeTrainerId(TRAINER_BATTLE_PARAM.opponentA);
+    u32 trainerId = TRAINER_BATTLE_PARAM.opponentA;
     enum TrainerClassID trainerClass = GetTrainerClassFromId(TRAINER_BATTLE_PARAM.opponentA);
 
     if (DoesTrainerHaveMugshot(trainerId))
@@ -1008,16 +1009,6 @@ static void TryUpdateGymLeaderRematchFromTrainer(void)
 {
     if (GetGameStat(GAME_STAT_TRAINER_BATTLES) % 20 == 0)
         UpdateGymLeaderRematch();
-}
-
-static u16 GetTrainerAFlag(void)
-{
-    return TRAINER_FLAGS_START + TRAINER_BATTLE_PARAM.opponentA;
-}
-
-static u16 GetTrainerBFlag(void)
-{
-    return TRAINER_FLAGS_START + TRAINER_BATTLE_PARAM.opponentB;
 }
 
 static bool32 IsPlayerDefeated(u32 battleOutcome)
@@ -1228,7 +1219,7 @@ void SetUpTwoTrainersBattle(void)
 bool32 GetTrainerFlagFromScriptPointer(const u8 *data)
 {
     TrainerBattleParameter *temp = (TrainerBattleParameter*)(data + OPCODE_OFFSET);
-    return FlagGet(TRAINER_FLAGS_START + temp->params.opponentA);
+    return HasTrainerBeenFought(temp->params.opponentA);
 }
 
 bool32 GetRematchFromScriptPointer(const u8 *data)
@@ -1273,33 +1264,50 @@ bool8 GetTrainerFlag(void)
     else if (InTrainerHill())
         return GetHillTrainerFlag(gSelectedObjectEvent);
     else
-        return FlagGet(GetTrainerAFlag());
+        return HasTrainerBeenFought(TRAINER_BATTLE_PARAM.opponentA);
 }
 
 static void SetBattledTrainersFlags(void)
 {
     if (TRAINER_BATTLE_PARAM.opponentB != 0)
-        FlagSet(GetTrainerBFlag());
-    FlagSet(GetTrainerAFlag());
+        SetTrainerFlag(TRAINER_BATTLE_PARAM.opponentB);
+    SetTrainerFlag(TRAINER_BATTLE_PARAM.opponentA);
 }
 
 static void UNUSED SetBattledTrainerFlag(void)
 {
-    FlagSet(GetTrainerAFlag());
+    SetTrainerFlag(TRAINER_BATTLE_PARAM.opponentA);
 }
 
 bool8 HasTrainerBeenFought(u16 trainerId)
 {
+    if (IsKantoTrainerId(trainerId))
+        return PgrProgress_IsStoryEventComplete(
+            PGW_START_KANTO,
+            PGR_REGIONAL_TRAINER_EVENT_BASE + trainerId - TRAINER_PGR_KANTO_BASE);
     return FlagGet(TRAINER_FLAGS_START + trainerId);
 }
 
 void SetTrainerFlag(u16 trainerId)
 {
+    if (IsKantoTrainerId(trainerId))
+    {
+        PgrProgress_TryCompleteStoryEvent(
+            PGW_START_KANTO,
+            PGR_REGIONAL_TRAINER_EVENT_BASE + trainerId - TRAINER_PGR_KANTO_BASE,
+            NULL,
+            0);
+        return;
+    }
     FlagSet(TRAINER_FLAGS_START + trainerId);
 }
 
 void ClearTrainerFlag(u16 trainerId)
 {
+    // Regional trainer victories are campaign progress and intentionally have
+    // no generic clear path. Debug/reset flows reset the regional state.
+    if (IsKantoTrainerId(trainerId))
+        return;
     FlagClear(TRAINER_FLAGS_START + trainerId);
 }
 

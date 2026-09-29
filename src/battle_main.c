@@ -5629,6 +5629,14 @@ static void TryEvolvePokemon(void)
             enum EvolutionMode mode = EVO_MODE_BATTLE_SPECIAL;
             u32 evolutionItemArg = i;
 
+            // Um Pokémon que desmaiou depois de ganhar o nível não deve
+            // evoluir na sequência de encerramento desta batalha.
+            if (GetMonData(&gParties[B_TRAINER_PLAYER][i], MON_DATA_HP) == 0)
+            {
+                gTriedEvolving |= 1u << i;
+                continue;
+            }
+
             enum Species species = GetEvolutionTargetSpecies(&gParties[B_TRAINER_PLAYER][i], mode, evolutionItemArg, NULL, &canStopEvo, CHECK_EVO);
             gTriedEvolving |= 1u << i;
 
@@ -5663,6 +5671,15 @@ static void WaitForEvoSceneToFinish(void)
 
 static void ReturnFromBattleToOverworld(void)
 {
+#ifdef PORTABLE
+    DBGPRINTF("Batalha encerrada: resultado=%u tipos=0x%08X treinadorA=%u treinadorB=%u HP=%u/%u\n",
+              gBattleOutcome,
+              gBattleTypeFlags,
+              TRAINER_BATTLE_PARAM.opponentA,
+              TRAINER_BATTLE_PARAM.opponentB,
+              GetMonData(&gParties[B_TRAINER_PLAYER][0], MON_DATA_HP),
+              GetMonData(&gParties[B_TRAINER_PLAYER][0], MON_DATA_MAX_HP));
+#endif
     if (!(gBattleTypeFlags & BATTLE_TYPE_LINK))
     {
         CalculatePlayerPartyCount();

@@ -1,4 +1,5 @@
 ViridianCity_Mart_Frlg_MapScripts::
+	map_script MAP_SCRIPT_ON_TRANSITION, ViridianCity_Mart_PgwOnTransition
 	map_script MAP_SCRIPT_ON_LOAD, ViridianCity_Mart_OnLoad
 	map_script MAP_SCRIPT_ON_FRAME_TABLE, ViridianCity_Mart_OnFrame
 	.byte 0
@@ -13,10 +14,22 @@ ViridianCity_Mart_EventScript_HideQuestionnaire::
 	end
 
 ViridianCity_Mart_OnFrame::
-	map_script_2 VAR_MAP_SCENE_VIRIDIAN_CITY_MART, 0, ViridianCity_Mart_EventScript_ParcelScene
+	map_script_2 VAR_TEMP_1, 1, ViridianCity_Mart_EventScript_ParcelScene
 	.2byte 0
 
+ViridianCity_Mart_PgwOnTransition::
+	setvar VAR_TEMP_1, 0
+	special Pgw_ScriptGetStartingRegion
+	goto_if_ne VAR_RESULT, 0, ViridianCity_Mart_EventScript_SkipParcelScene
+	goto_if_ne VAR_MAP_SCENE_VIRIDIAN_CITY_MART, 0, ViridianCity_Mart_EventScript_SkipParcelScene
+	setvar VAR_TEMP_1, 1
+	end
+
 ViridianCity_Mart_EventScript_ParcelScene::
+	setvar VAR_TEMP_1, 0
+	@ Perfis visitantes podem usar o mercado sem iniciar a campanha de Kanto.
+	special Pgw_ScriptGetStartingRegion
+	goto_if_ne VAR_RESULT, 0, ViridianCity_Mart_EventScript_SkipParcelScene
 	lockall
 	textcolor NPC_TEXT_COLOR_MALE
 	applymovement LOCALID_VIRIDIAN_MART_CLERK, Common_Movement_WalkInPlaceFasterDown
@@ -31,6 +44,9 @@ ViridianCity_Mart_EventScript_ParcelScene::
 	giveitem_msg ViridianCity_Mart_Text_ReceivedOaksParcelFromClerk, ITEM_OAKS_PARCEL, 1, MUS_RG_OBTAIN_KEY_ITEM
 	setvar VAR_MAP_SCENE_PALLET_TOWN_PROFESSOR_OAKS_LAB, 5
 	releaseall
+	end
+
+ViridianCity_Mart_EventScript_SkipParcelScene::
 	end
 
 ViridianCity_Mart_Movement_ApproachCounter::
@@ -52,7 +68,11 @@ ViridianCity_Mart_Movement_FacePlayer::
 ViridianCity_Mart_EventScript_Clerk::
 	lock
 	faceplayer
+	special Pgw_ScriptGetStartingRegion
+	goto_if_ne VAR_RESULT, 0, ViridianCity_Mart_EventScript_OpenShop
 	goto_if_eq VAR_MAP_SCENE_VIRIDIAN_CITY_MART, 1, ViridianCity_Mart_EventScript_SayHiToOak
+
+ViridianCity_Mart_EventScript_OpenShop::
 	message gText_HowMayIServeYou
 	waitmessage
 	pokemart ViridianCity_Mart_Items
@@ -108,4 +128,3 @@ ViridianCity_Mart_Text_GotToBuySomePotions::
 	.string "I've got to buy some POTIONS.\p"
 	.string "You never know when your POKéMON\n"
 	.string "will need quick healing.$"
-

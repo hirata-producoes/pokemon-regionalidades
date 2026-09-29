@@ -907,3 +907,177 @@ delas podia ser escolhida. O menu agora valida que a ordem contém exatamente os
 seis identificadores distintos e, se necessário, a reconstrói a partir dos dois
 Pokémon ativos antes de copiar qualquer dado. A compilação PC passou; falta
 repetir manualmente um desmaio com substituição obrigatória em batalha dupla.
+
+## Seguidores e paletas no PC — 19 de setembro de 2026
+
+O protótipo de Pokémon seguindo foi ativado apenas no porte PC, sem alterar os
+blocos legados do save. Na primeira validação manual, seis Pokémon exibiram
+silhuetas corretas e cores incorretas. A causa identificada foi dupla: o
+gerador do pacote PC não incluía as paletas de mundo recém-ativadas e o
+carregamento do seguidor usava o identificador compilado em vez dos 32 bytes da
+paleta no pacote. O gerador agora inclui essas paletas e o carregamento resolve
+o recurso antes de aplicá-lo; a seleção normal/brilhante e feminina também foi
+revisada. A compilação passou e o recurso do Marshtomp consta no pacote. Em
+teste manual posterior, Swampert, Crobat, Aggron, Metang, Gardevoir e Trapinch
+apareceram com as cores corretas. O defeito relatado para esses seis está
+resolvido; isso não prova a cobertura de todas as espécies e formas. Mudança de
+mapa, batalha e reabertura de save ainda precisam de validação específica do
+acompanhante.
+
+## Campanha de Hoenn e seguidor — 20 de setembro de 2026
+
+Na campanha pessoal, o jogador concluiu os oito ginásios, a Elite Four e os
+créditos. O pós-jogo está em validação: já recebeu do pai o bilhete para os
+navios e obteve e reviveu os dois fósseis, um pela Mirage Tower e outro pelo
+túnel em Fallarbor Town. Isso confirma o percurso principal testado, não todos
+os desvios, eventos opcionais ou caminhos fora de ordem.
+
+O seguidor está funcionando na campanha observada, inclusive com as cores
+corretas dos seis Pokémon citados acima. Passa de protótipo sem validação visual
+para recurso implementado e em acompanhamento de regressões. Não será exigido
+testar exaustivamente cada espécie e cada bloco antes de avançar o projeto.
+No PC, a capacidade de posições de cada bolso da mochila foi triplicada no
+código. O jogador observou que a mochila está maior e conseguiu retirar itens
+do PC pessoal. Ainda falta testar o uso próximo ao limite das posições novas e
+a persistência dessas posições extras após salvar e reabrir.
+
+## Lista de perfis e favoritos — 20 de setembro de 2026
+
+A interface inicial passou a listar perfis de forma rolável e a exibir os
+detalhes somente do perfil selecionado. O iniciador aceita novos identificadores
+sem limite fixo de dois perfis, mantendo os caminhos antigos. Cada campanha
+conserva três recuperações rotativas e agora pode guardar até cinco favoritos
+fixos, independentes dessa rotação. Apagar um perfil o arquiva em vez de apagar
+seus arquivos; remover um favorito também preserva a cópia anterior. Testes
+temporários verificaram criação, importação, cinco favoritos, recusa do sexto,
+restauração, remoção, arquivamento e isolamento de outro perfil. Ainda falta
+validação visual manual com os perfis reais. Nenhum save pessoal foi alterado
+durante esses testes.
+
+## Preparação geográfica Cinnabar–Route 124 — 20 de setembro de 2026
+
+Os prints marcados pelo jogador identificaram dez rochas de 2×2 blocos no sul
+de Cinnabar Island e onze no trecho norte da Route 124. Somente esses 84
+blocos foram substituídos por mar compatível com Surf e com o tileset de cada
+mapa. A comparação binária confirmou o mesmo tamanho dos layouts e exatamente
+40 blocos alterados em Cinnabar e 44 na Route 124; a verificação estrutural dos
+936 mapas passou. Nenhuma conexão ou cena de Kanto foi ativada por essa edição.
+
+## Abertura de Kanto em teste — 20 de setembro de 2026
+
+O menu do PC agora distingue `INICIO EM TESTE` de campanha `JOGAVEL` e permite
+selecionar Kanto sem declarar a região completa. A introdução usa o professor
+Oak, Nidoran, Red ou Leaf e texto inicial em português adaptado aos caracteres
+atualmente aceitos pelo motor. O novo jogo chega ao quarto da casa do jogador
+em Pallet Town, sobre um bloco de piso livre. A aparência de campo usa os
+sprites de Red ou Leaf conforme o gênero escolhido. As flags iniciais de FRLG
+são preparadas junto das flags comuns e o nome padrão do rival em Kanto é Green;
+isso evita usar o nome da rival de Hoenn sem alterar o formato de save.
+Saves antigos sem estado mundial inicializado continuam sendo interpretados
+como Hoenn, e não como Kanto apenas porque o valor inicial da variável é zero.
+
+A compilação PC e as verificações do pacote de recursos e dos 936 mapas passaram.
+O perfil 3 validou manualmente a introdução original de Kanto, a ausência da
+sequência do caminhão, o quarto, o encontro com Oak, a escolha do inicial e a
+entrada na primeira batalha. O antigo defeito gráfico do quarto não reapareceu.
+A primeira batalha terminou de forma antecipada porque a IA herdou da abertura
+de Hoenn a fuga automática do oponente quando o jogador chegou a 20% de HP. O
+registro ampliado confirmou o resultado `MON_FLED`; a abertura de Kanto agora
+mantém a batalha até uma condição normal de vitória ou derrota. Isso não era uma
+permissão para o jogador fugir de uma luta entre treinadores. O nome do rival
+também deixa de aparecer temporariamente como May durante a apresentação: antes
+de o estado regional ser gravado, o texto passa a consultar diretamente o nome
+que acabou de ser escolhido.
+
+Um perfil originado em Hoenn encontrou Oak visível no meio de Pallet porque as
+flags da abertura de Kanto não pertenciam àquela campanha. A transição agora
+oculta esse Oak de campanha para visitantes, sem iniciar a narrativa regional.
+Também foi corrigido o esgotamento de buffers gráficos ao atravessar repetidas
+vezes a conexão Cinnabar–Route 124. A repetição da travessia foi validada
+manualmente, mas revelou uma vista retangular antiga sobre o mar: a vista salva
+agora é descartada antes da montagem do mapa quando muda o conjunto gráfico
+primário. Essa última correção ainda aguarda validação manual.
+Os diálogos e eventos importados de FRLG após a abertura ainda exigem revisão de
+português, identidades regionais de treinadores e pré-requisitos narrativos.
+Kanto continua em teste somente no porte PC.
+
+## Janela do PC e interface em duas telas — 21 de setembro de 2026
+
+O executável passa a ocultar apenas sua janela técnica, sem remover os registros
+de diagnóstico de cada perfil e sem ocultar a janela SDL do jogo. O vídeo aceita
+também a escala 1×, de 320×180,
+como menor tamanho predefinido, e a criação da janela respeita desde o início a
+escala e a opção de redimensionamento gravadas. A futura interface permanente
+deixa de ser planejada como uma borda ao redor da câmera e passa a usar uma
+segunda tela inferior, inspirada na organização de HeartGold e SoulSilver, para
+informações ambientais e futuras interfaces próprias. Essa segunda tela é uma
+decisão de planejamento. Seu primeiro protótipo passa a ocupar 320×180 abaixo
+do jogo, mostrando permanentemente local, clima, estação, horário, data e turno.
+Mapa, RotomDex e mochila aparecem apenas como reservas visuais, ainda sem ação.
+O popup temporário de entrada em mapas foi desativado no PC para evitar
+informação duplicada.
+
+A primeira validação mostrou que o painel ocupava toda a largura de 320 pixels,
+enquanto a imagem 3:2 do jogo ficava centralizada em uma área menor. O painel
+passa a usar exatamente o mesmo retângulo renderizado pelo jogo. Mouse e troca
+de foco por Start passaram à primeira implementação interativa no PC: Start
+abre o menu na tela inferior e Start/B retornam ao mapa; direcionais e A
+selecionam as ações. O mouse abre o painel pelo rodapé e aciona os botões.
+O painel reutiliza a lista, os desbloqueios e as funções do menu original;
+o menu sobreposto no mapa deixa de ser desenhado. As telas internas de bolsa,
+equipe, Pokédex e confirmação de salvamento ainda usam a tela principal.
+Os gráficos são provisórios: as folhas HGSS fornecidas por link não puderam
+ser obtidas nesta etapa (servidor respondeu HTTP 403). Não foram importados
+sprites nem animações dessas folhas. Validação manual dos controles pendente.
+
+## Primeiro ciclo jogável de Kanto — 21 de setembro de 2026
+
+Route 1, Viridian City e o Poké Mart de Viridian deixaram o modo de prévia e
+passaram a carregar seus personagens, scripts e interações no PC. Esse recorte
+forma um ciclo narrativo único: sair de Pallet, atravessar Route 1, receber o
+pacote de Oak no mercado e retornar ao laboratório para a entrega e a etapa da
+Pokédex. Os mapas não contêm treinadores próprios, portanto esta ativação não
+introduz novas identidades de batalha que possam colidir com Hoenn. O ciclo
+ainda aguarda validação manual completa antes de liberar o próximo trecho.
+Os scripts e suas dependências foram incluídos na compilação; a cena automática
+do Pacote de Oak é restrita a perfis iniciados em Kanto. Visitantes podem comprar
+normalmente no mercado sem receber o pacote nem alterar a cena do laboratório.
+Route 1/Viridian usam marcadores persistentes próprios para os dois itens,
+o tutor e a descoberta da cidade. As três variáveis de progressão de Viridian
+foram deslocadas para posições livres do save: seus números originais de FRLG
+colidiam com eventos de Hoenn. Não é feita migração dos valores desses números
+antigos, pois poderiam pertencer legitimamente à campanha de Hoenn.
+
+### Centro Pokémon de Viridian
+
+O primeiro andar foi ativado com seus NPCs e o ponto de retorno após derrota.
+A enfermeira usa o fluxo compartilhado de cura, incluindo a atualização do
+Pokémon seguidor, para visitantes e campanhas iniciadas em Kanto. O monitor
+da máquina escolhe a arte de FRLG pelo layout do prédio, sem alterar o monitor
+dos Centros de Hoenn. O segundo andar e seus serviços de comunicação continuam
+fora desta ativação. Cura, recusa, acesso ao PC e retorno após derrota ainda
+aguardam teste manual do usuário.
+
+O commit 297ca08238 registra somente os perfis e favoritos já validados;
+os avanços de Kanto e a interface inferior seguem separados, sem novo commit.
+
+### Rota 2 e Floresta de Viridian
+
+Route 2, as portarias sul e norte e Viridian Forest formam agora o segundo
+trecho contínuo ativado da campanha. As tabelas selvagens de FireRed/LeafGreen
+já existentes são usadas na rota e na floresta. Os seis itens visíveis, os dois
+itens ocultos e a descoberta da floresta receberam marcadores persistentes
+próprios, sem reutilizar progresso de Hoenn.
+
+Os cinco Bug Catchers da floresta inauguram o espaço regional de treinadores:
+Rick, Doug, Sammy, Anthony e Charlie possuem dados e identificadores exclusivos
+de Kanto. A vitória de cada um é gravada no bloco nativo de progresso de Kanto,
+fora da faixa antiga de flags de treinadores de Hoenn. Essa base evita colisões
+agora e permite acrescentar os próximos treinadores na ordem da campanha sem
+deslocar identidades ou o formato legado do save.
+
+A compilação PC completa passou com 14.938 recursos, 936 mapas, 785 layouts e
+1.570 recursos de layout verificados. O executável não foi aberto nesta etapa.
+O teste manual seguinte deve cobrir a travessia Viridian–Route 2–portaria sul–
+floresta–portaria norte, encontros selvagens, coleta persistente dos itens e a
+derrota persistente dos cinco treinadores após salvar e recarregar.

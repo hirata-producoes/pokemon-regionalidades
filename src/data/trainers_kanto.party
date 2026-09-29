@@ -1,0 +1,91 @@
+/* Kanto campaign trainers imported in story order. Their public battle IDs
+ * are regional and never overlap the legacy Hoenn trainer/flag space. */
+
+=== KANTO_TRAINER_BUG_CATCHER_RICK ===
+Name: RICK
+Class: Bug Catcher Frlg
+Pic: Bug Catcher Frlg
+Gender: Male
+Music: Male
+Double Battle: No
+AI: Check Bad Move
+
+Weedle
+Level: 6
+IVs: 0 HP / 0 Atk / 0 Def / 0 SpA / 0 SpD / 0 Spe
+
+Caterpie
+Level: 6
+IVs: 0 HP / 0 Atk / 0 Def / 0 SpA / 0 SpD / 0 Spe
+
+=== KANTO_TRAINER_BUG_CATCHER_DOUG ===
+Name: DOUG
+Class: Bug Catcher Frlg
+Pic: Bug Catcher Frlg
+Gender: Male
+Music: Male
+Double Battle: No
+AI: Check Bad Move
+
+Weedle
+Level: 7
+IVs: 0 HP / 0 Atk / 0 Def / 0 SpA / 0 SpD / 0 Spe
+
+Kakuna
+Level: 7
+IVs: 0 HP / 0 Atk / 0 Def / 0 SpA / 0 SpD / 0 Spe
+
+Weedle
+Level: 7
+IVs: 0 HP / 0 Atk / 0 Def / 0 SpA / 0 SpD / 0 Spe
+
+=== KANTO_TRAINER_BUG_CATCHER_SAMMY ===
+Name: SAMMY
+Class: Bug Catcher Frlg
+Pic: Bug Catcher Frlg
+Gender: Male
+Music: Male
+Double Battle: No
+AI: Check Bad Move
+
+Weedle
+Level: 9
+IVs: 0 HP / 0 Atk / 0 Def / 0 SpA / 0 SpD / 0 Spe
+
+=== KANTO_TRAINER_BUG_CATCHER_ANTHONY ===
+Name: ANTHONY
+Class: Bug Catcher Frlg
+Pic: Bug Catcher Frlg
+Gender: Male
+Music: Male
+Double Battle: No
+AI: Check Bad Move
+
+Caterpie
+Level: 7
+IVs: 0 HP / 0 Atk / 0 Def / 0 SpA / 0 SpD / 0 Spe
+
+Caterpie
+Level: 8
+IVs: 0 HP / 0 Atk / 0 Def / 0 SpA / 0 SpD / 0 Spe
+
+=== KANTO_TRAINER_BUG_CATCHER_CHARLIE ===
+Name: CHARLIE
+Class: Bug Catcher Frlg
+Pic: Bug Catcher Frlg
+Gender: Male
+Music: Male
+Double Battle: No
+AI: Check Bad Move
+
+Metapod
+Level: 7
+IVs: 0 HP / 0 Atk / 0 Def / 0 SpA / 0 SpD / 0 Spe
+
+Caterpie
+Level: 7
+IVs: 0 HP / 0 Atk / 0 Def / 0 SpA / 0 SpD / 0 Spe
+
+Metapod
+Level: 7
+IVs: 0 HP / 0 Atk / 0 Def / 0 SpA / 0 SpD / 0 Spe

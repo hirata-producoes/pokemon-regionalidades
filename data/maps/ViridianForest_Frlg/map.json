@@ -1,6 +1,7 @@
 {
   "id": "MAP_VIRIDIAN_FOREST",
   "name": "ViridianForest_Frlg",
+  "world_enabled": true,
   "layout": "LAYOUT_VIRIDIAN_FOREST",
   "music": "MUS_RG_VIRIDIAN_FOREST",
   "region": "REGION_KANTO",
