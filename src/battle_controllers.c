@@ -21,6 +21,7 @@
 #include "palette.h"
 #include "party_menu.h"
 #include "pokemon_animation.h"
+#include "pokemon_go_world.h"
 #include "recorded_battle.h"
 #include "string_util.h"
 #include "sound.h"
@@ -273,7 +274,14 @@ static void InitBtlControllersInternal(void)
             else if (gBattleTypeFlags & BATTLE_TYPE_SAFARI)
                 gBattlerControllerFuncs[GetBattlerPosition(B_BATTLER_0)] = SetControllerToSafari;
             else if (gBattleTypeFlags & BATTLE_TYPE_CATCH_TUTORIAL)
-                gBattlerControllerFuncs[GetBattlerPosition(B_BATTLER_0)] = IS_FRLG ? SetControllerToOakOrOldMan : SetControllerToWally;
+            {
+#ifdef PORTABLE
+                if (Pgw_GetStartingRegion() == PGW_START_KANTO)
+                    gBattlerControllerFuncs[GetBattlerPosition(B_BATTLER_0)] = SetControllerToOakOrOldMan;
+                else
+#endif
+                    gBattlerControllerFuncs[GetBattlerPosition(B_BATTLER_0)] = IS_FRLG ? SetControllerToOakOrOldMan : SetControllerToWally;
+            }
             else if (IS_FRLG && (gBattleTypeFlags & BATTLE_TYPE_FIRST_BATTLE))
                 gBattlerControllerFuncs[gBattlerPositions[B_BATTLER_0]] = SetControllerToOakOrOldMan;
             else if (isAIvsAI)

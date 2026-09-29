@@ -862,16 +862,27 @@ static bool8 TrainerMoveToPlayer(u8 taskId, struct Task *task, struct ObjectEven
 static bool8 PlayerFaceApproachingTrainer(u8 taskId, struct Task *task, struct ObjectEvent *trainerObj)
 {
     struct ObjectEvent *playerObj;
+    enum Direction direction;
 
     if (ObjectEventIsMovementOverridden(trainerObj) && !ObjectEventClearHeldMovementIfFinished(trainerObj))
         return FALSE;
+
+    playerObj = &gObjectEvents[gPlayerAvatar.objectEventId];
+    direction = GetDirectionToFace(trainerObj->currentCoords.x, trainerObj->currentCoords.y,
+                                   playerObj->currentCoords.x, playerObj->currentCoords.y);
+    // Treinadores que patrulham ou vêm de direções opostas podem terminar
+    // a aproximação olhando para longe do jogador. Ajuste antes do diálogo.
+    if (trainerObj->facingDirection != direction)
+    {
+        ObjectEventSetHeldMovement(trainerObj, GetFaceDirectionMovementAction(direction));
+        return FALSE;
+    }
 
     // Set trainer's movement type so they stop and remain facing that direction
     SetTrainerMovementType(trainerObj, GetTrainerFacingDirectionMovementType(trainerObj->facingDirection));
     TryOverrideTemplateCoordsForObjectEvent(trainerObj, GetTrainerFacingDirectionMovementType(trainerObj->facingDirection));
     OverrideTemplateCoordsForObjectEvent(trainerObj);
 
-    playerObj = &gObjectEvents[gPlayerAvatar.objectEventId];
     if (ObjectEventIsMovementOverridden(playerObj) && !ObjectEventClearHeldMovementIfFinished(playerObj))
         return FALSE;
 

@@ -235,6 +235,15 @@ const struct Trainer gTrainers[DIFFICULTY_COUNT][TRAINERS_COUNT] =
 #include "data/trainers.h"
 #endif
 };
+
+#if !IS_FRLG
+const struct Trainer gKantoTrainers[DIFFICULTY_COUNT][KANTO_TRAINERS_COUNT] =
+{
+#include "data/trainers_kanto.h"
+};
+#else
+const struct Trainer gKantoTrainers[DIFFICULTY_COUNT][KANTO_TRAINERS_COUNT] = {0};
+#endif
 #endif
 
 #include "data/text/follower_messages.h"

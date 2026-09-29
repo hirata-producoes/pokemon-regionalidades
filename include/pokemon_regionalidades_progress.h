@@ -108,6 +108,10 @@ enum PgrUniqueReward
     PGR_REWARD_BICYCLE_ACCESS,
 };
 
+// Native PC saves reserve 4096 progress bits per region. Story milestones use
+// the low range; trainer victories use this separate stable range.
+#define PGR_REGIONAL_TRAINER_EVENT_BASE 2048
+
 struct PgrStoryRequirement
 {
     enum PgwStartingRegion region;

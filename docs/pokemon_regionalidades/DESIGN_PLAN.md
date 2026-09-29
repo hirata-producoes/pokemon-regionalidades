@@ -97,6 +97,37 @@ A pausa de menu não usa `OW_FLAG_PAUSE_TIME`, porque esse flag pertence ao save
 
 O popup de área da geração 5 foi escolhido como primeiro protótipo de apresentação porque já mostrava o horário e existe nos dois alvos. A faixa secundária agora apresenta `ESTAÇÃO DD CLIMA` à esquerda e o horário em 24 horas à direita. Essa solução serve para validar legibilidade e utilidade durante a vertical slice; ela não define o HUD permanente nem substitui o futuro protótipo do Rotom Phone. A fase de transição ainda não aparece nessa faixa.
 
+Como apresentação permanente a prototipar no PC, o jogo terá uma segunda tela
+abaixo da área principal, inspirada na organização de HeartGold e SoulSilver,
+mas redesenhada para as necessidades de Regionalidades. A câmera superior
+continuará mostrando a mesma quantidade lógica de blocos e manterá o
+redimensionamento proporcional. A tela inferior reunirá nome do mapa, clima
+atual, estação, horário, turno do dia e data do calendário interno, e poderá
+receber atalhos e interfaces próprias de mapa, RotomDex, mochila e outras
+funções. Isso substitui o plano anterior de uma moldura informativa ao redor da
+câmera. Antes da implementação, definir proporções, navegação por teclado e
+controle, comportamento em janelas pequenas e a possibilidade de reduzir ou
+ocultar a tela inferior. O popup temporário de área permanece apenas como
+protótipo e poderá ser simplificado depois dessa validação.
+
+O primeiro protótipo usa duas áreas de 320×180 empilhadas. A tela inferior tem
+um painel próprio, ainda não definitivo, com local atual, clima, estação,
+horário, data e turno, além de espaços reservados para mapa, RotomDex e mochila.
+O popup de entrada em mapas fica desativado no PC para não duplicar essas
+informações. Os espaços reservados ainda não são botões funcionais e a
+integração dos menus e futuros minijogos será feita em etapas.
+
+O retângulo útil da tela inferior deve ter exatamente a mesma largura e altura
+visual do jogo, mesmo quando a janela externa deixa margens laterais. No PC, o
+mouse é a entrada direta da primeira versão interativa da tela inferior.
+No controle, Start abre o painel; Start/B retornam ao mapa, e direcional/A
+selecionam as ações. As telas internas ainda usam o visor superior. Cada
+botão deve chamar a mesma ação interna usada pelos menus, sem manter duas
+implementações concorrentes de Pokédex, equipe, mochila, salvamento ou opções.
+Durante batalhas, avaliar deslocar comandos e golpes para a tela inferior sem
+duplicar os comandos na tela superior; a decisão depende de um protótipo de
+legibilidade, teclado, mouse e controle.
+
 O clima lógico usa blocos de seis horas e uma janela determinística de 24 horas. Os pesos sazonais atuais são valores de protótipo: D-029 exige continuidade, mas a fórmula ecológica e os perfis de bioma ainda não estão congelados. Consulte [Sistema ambiental](ENVIRONMENT_SYSTEM.md).
 
 ## Registro resumido das decisões
@@ -140,6 +171,40 @@ As hipóteses atuais para aproximar Kanto, Sinnoh, Hoenn, Johto e as Ilhas Sevii
 - D-059: obediência por insígnias, vínculo e origem do Pokémon;
 - D-060: captura clássica contextualizada e encontros em grupo quando coerentes.
 
+### Decisões de evolução e treinamento a detalhar
+
+- A obtenção da National Dex, uma cena de apresentação ou outro marco narrativo
+  não deve ser pré-requisito oculto para uma evolução comum, por amizade,
+  pedra, troca adaptada ou outra condição mecânica satisfeita. Auditar também
+  Crobat, Gallade, as evoluções de Eevee e as espécies importadas de outras
+  gerações antes de liberar cada região. A mesma separação vale para o uso de
+  Mega Evolution: narrativa pode apresentá-la, mas não deve bloquear seu uso
+  quando Pokémon, item e demais condições próprias da mecânica estão presentes.
+- Prototipar a evolução imediatamente durante a batalha, após a distribuição
+  de experiência que dá o nível necessário, inclusive na passagem entre um
+  desmaio e a escolha de substituto. Ainda é preciso definir pausa do turno,
+  aprendizado de golpes, múltiplas evoluções e segurança de save; isso não está
+  implementado. A proteção atual apenas impede que um Pokémon desmaiado evolua
+  no encerramento da batalha.
+- Para esse protótipo de evolução durante a batalha, avaliar a limpeza de
+  condições negativas, a cura de 10% do HP máximo e um estágio positivo nos
+  atributos de combate. Definir antes de implementar quais efeitos são limpos,
+  quais atributos entram no bônus, o arredondamento, o momento exato do turno e
+  a interação com desmaio, troca e formas temporárias. É uma proposta de
+  balanceamento, não uma regra já ativa.
+- Exibir IVs e EVs de forma legível para o jogador e permitir acompanhar a
+  distribuição de EVs. O motor contém dados e opções de resumo para esses
+  valores, mas a interface de consulta precisa ser habilitada, localizada e
+  validada no produto antes de ser considerada disponível.
+- O sistema de Pokémon acompanhante, no estilo de Johto, está ativado como
+  protótipo no PC e usa o primeiro Pokémon apto da equipe. Ainda requer teste
+  manual de cobertura por espécie e forma, animações, mudanças de mapa,
+  Surf/Dive, colisão, eventos roteirizados, desempenho e reabertura de save.
+  Ativação de protótipo não equivale a funcionalidade validada para jogadores.
+- Reavaliar preço de compra/venda de HP Up, Protein, Iron, Calcium, Zinc e
+  Carbos e a possibilidade de produção, sem eliminar os limites de EV ou
+  transformar esses itens em ganho ilimitado. Balanceamento ainda em discussão.
+
 ### Progressão, história, batalha e conclusão
 
 - D-024: especializações paralelas, sem classes exclusivas;
@@ -163,6 +228,10 @@ As hipóteses atuais para aproximar Kanto, Sinnoh, Hoenn, Johto e as Ilhas Sevii
   posição; o espelho Emerald continua limitado a 999 sem reduzir o valor
   nativo. Captura, descarte, depósito e retirada já foram validados com cinco
   dígitos, enquanto compra e venda acima de 999 ainda aguardam teste manual;
+- como protótipo de capacidade no PC, cada bolso da mochila dispõe de três
+  vezes as posições da estrutura Emerald. O save herdado conserva o tamanho
+  original; posições adicionais pertencem exclusivamente ao inventário nativo.
+  A suficiência das posições e a interface ainda dependem de teste manual;
 - D-048 e D-064: 100% regional e 100% global/Platina finitos e verificáveis;
 - D-061: turnos tradicionais, mais Double Battles e IA por perfis sem leitura do turno;
 - ajustes de nível de Pokémon selvagens e treinadores serão orientados por dados e medidos somente depois que a campanha-base de Hoenn estiver percorrível;
@@ -190,6 +259,16 @@ As hipóteses atuais para aproximar Kanto, Sinnoh, Hoenn, Johto e as Ilhas Sevii
 Os cálculos, escopos e pendências dessas decisões estão na
 [Política de itens e equipamentos entre regiões](CROSS_REGION_ITEM_POLICY.md).
 
+### Protótipos futuros de balanceamento de batalha
+
+- Avaliar ajustes de atributos, golpes e dificuldade somente com testes
+  comparáveis, preservando a campanha-base como referência.
+- Testar duração variável de 8 a 10 turnos para efeitos de terreno que hoje
+  duram 5, definindo por efeito os gatilhos, avisos e condições de término.
+- Revisar golpes de proteção e barreira nas Double Battles: decidir por golpe
+  se protege o usuário, um aliado escolhido ou ambos. Não aplicar uma regra
+  universal sem examinar alvos, prioridade, repetição e equilíbrio.
+
 ### Plataforma, acesso e portabilidade
 
 - a região inicial já é escolhida depois de `New Game` e antes da introdução regional; somente campanhas validadas podem ser abertas;
@@ -200,6 +279,20 @@ Os cálculos, escopos e pendências dessas decisões estão na
 - controles, tamanhos de janela, vídeo, áudio e aceleração serão configuráveis sem entrar no save da campanha;
 - save rápido, carregamento rápido e Soft Reset serão funções distintas e testadas separadamente;
 - esses recursos de produto entram depois que a campanha-base estiver estável.
+
+### Trilha sonora e atualização do aplicativo
+
+- Permitir trilhas próprias por local ou contexto de batalha, com pontos de
+  loop definidos e créditos/licenças registrados. No porte PC atual, acelerar
+  pausa o áudio; música em 1× durante a aceleração requer separar reprodução
+  musical do relógio da simulação antes de incorporar uma biblioteca externa
+  de faixas. Formatos de distribuição e troca de música em tempo real ainda
+  serão prototipados.
+- Planejar atualização do aplicativo com verificação de integridade,
+  preservação e migração dos saves e opção de retorno seguro. Após uma
+  distribuição pública apropriada, estudar canais estável, experimental e
+  versões arquivadas. Uma versão antiga não deve abrir sem proteção um save
+  gravado por esquema mais recente. Não há atualizador implementado.
 
 ## Fontes e política de pesquisa
 

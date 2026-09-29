@@ -6197,11 +6197,16 @@ static inline u32 CalcMoveBasePower(struct DamageContext *ctx)
         basePower = gBerries[ItemIdToBerryType(gBattleMons[battlerAtk].item)].naturalGiftPower;
         break;
     case EFFECT_DOUBLE_POWER_ON_ARG_STATUS:
+    {
+        const struct AdditionalEffect *additionalEffect = GetMoveAdditionalEffectById(move, 0);
+
         // Comatose targets treated as if asleep
         if ((gBattleMons[battlerDef].status1 | (STATUS1_SLEEP * (ctx->abilities[ctx->battlerDef] == ABILITY_COMATOSE))) & GetMoveEffectArg_Status(move)
-         && !((GetMoveAdditionalEffectById(move, 0)->moveEffect == MOVE_EFFECT_REMOVE_STATUS) && DoesSubstituteBlockMove(battlerAtk, battlerDef, move)))
+         && !((additionalEffect != NULL && additionalEffect->moveEffect == MOVE_EFFECT_REMOVE_STATUS)
+            && DoesSubstituteBlockMove(battlerAtk, battlerDef, move)))
             basePower *= 2;
         break;
+    }
     case EFFECT_POWER_BASED_ON_TARGET_HP:
         basePower = gBattleMons[battlerDef].hp * basePower / gBattleMons[battlerDef].maxHP;
         break;
@@ -9753,13 +9758,11 @@ bool32 AreMultiPartiesFullTeams(void)
         return FALSE;
     }
 #else
-    enum DifficultyLevel difficulty = GetCurrentDifficultyLevel();
-
     if (B_MULTI_HALF_TEAMS
      || TRAINER_BATTLE_PARAM.opponentA == TRAINER_LINK_OPPONENT
      || gBattleTypeFlags & BATTLE_TYPE_TOWER_LINK_MULTI
-     || (gTrainers[difficulty][TRAINER_BATTLE_PARAM.opponentA].multiTeamSize == MULTI_TEAM_SIZE_HALF)
-     || (gTrainers[difficulty][TRAINER_BATTLE_PARAM.opponentB].multiTeamSize == MULTI_TEAM_SIZE_HALF))
+     || (GetTrainerStructFromId(TRAINER_BATTLE_PARAM.opponentA)->multiTeamSize == MULTI_TEAM_SIZE_HALF)
+     || (GetTrainerStructFromId(TRAINER_BATTLE_PARAM.opponentB)->multiTeamSize == MULTI_TEAM_SIZE_HALF))
     {
         gSpecialVar_Result = FALSE;
         return FALSE;

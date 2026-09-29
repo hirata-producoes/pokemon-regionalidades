@@ -1,6 +1,7 @@
 {
   "id": "MAP_ROUTE2",
   "name": "Route2_Frlg",
+  "world_enabled": true,
   "layout": "LAYOUT_ROUTE2",
   "music": "MUS_RG_ROUTE1",
   "region": "REGION_KANTO",

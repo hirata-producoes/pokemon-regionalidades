@@ -218,6 +218,7 @@ extern const union AnimCmd *const gAnims_Trainer[];
 extern const struct TrainerPicInfo gTrainerPicInfo[TRAINER_PIC_COUNT];
 
 extern const struct Trainer gTrainers[DIFFICULTY_COUNT][TRAINERS_COUNT];
+extern const struct Trainer gKantoTrainers[DIFFICULTY_COUNT][KANTO_TRAINERS_COUNT];
 extern const struct Trainer gBattlePartners[DIFFICULTY_COUNT][PARTNER_COUNT];
 
 extern const struct TrainerClass gTrainerClasses[TRAINER_CLASS_COUNT];
@@ -242,6 +243,12 @@ static inline bool8 IsPartnerTrainerId(u16 trainerId)
     if (trainerId > TRAINER_PARTNER(PARTNER_NONE) && trainerId < TRAINER_PARTNER(PARTNER_COUNT))
         return TRUE;
     return FALSE;
+}
+
+static inline bool8 IsKantoTrainerId(u16 trainerId)
+{
+    return trainerId >= TRAINER_PGR_KANTO_BASE
+        && trainerId < TRAINER_PGR_KANTO_BASE + KANTO_TRAINERS_COUNT;
 }
 
 static inline bool32 IsSpecialTrainer(u16 trainerId)
@@ -281,7 +288,16 @@ static inline const struct Trainer *GetTrainerStructFromId(u16 trainerId)
     if (gIsDebugBattle) return GetDebugAiTrainer();
     enum DifficultyLevel difficulty;
 
-    if (IsPartnerTrainerId(trainerId))
+    if (IsKantoTrainerId(trainerId))
+    {
+        u16 localId = trainerId - TRAINER_PGR_KANTO_BASE;
+
+        difficulty = GetCurrentDifficultyLevel();
+        if (difficulty != DIFFICULTY_NORMAL && gKantoTrainers[difficulty][localId].party == NULL)
+            difficulty = DIFFICULTY_NORMAL;
+        return &gKantoTrainers[difficulty][localId];
+    }
+    else if (IsPartnerTrainerId(trainerId))
     {
         difficulty = GetBattlePartnerDifficultyLevel(trainerId);
         return &gBattlePartners[difficulty][GetPartnerIdFromTrainerId(trainerId)];
