@@ -143,7 +143,7 @@ function Refresh-ProfileDetails {
             [void]$saveList.Items.Add($item)
         }
         if ($hasActive) {
-            $profileStatus.Text = 'Campanha ativa. Selecione um save abaixo para recuperar ou favoritar.'
+            $profileStatus.Text = 'A campanha atual é única. O histórico gira; use “Fixar save” para guardar uma cópia permanente.'
         }
     }
     if ($saveList.Items.Count -gt 0) { $saveList.SelectedIndex = 0 }
@@ -200,7 +200,7 @@ $profileName = Add-Label 'Nenhum perfil selecionado' 320 110 620 38 18
 $profileStatus = Add-Label 'Crie um perfil para começar.' 320 154 620 52
 $profileStatus.ForeColor = $mutedColor
 $openButton = Add-Button 'Abrir perfil' 320 204 620 38 $true
-$saveLabel = Add-Label 'Save atual, recuperações e favoritos' 320 256 450 26
+$saveLabel = Add-Label 'Campanha, histórico automático e saves fixos' 320 256 470 26
 $saveLabel.ForeColor = $mutedColor
 $saveList = New-Object Windows.Forms.ListBox
 $saveList.Location = New-Object Drawing.Point(320, 286)
@@ -211,14 +211,14 @@ $saveList.ForeColor = $textColor
 $saveList.IntegralHeight = $false
 $form.Controls.Add($saveList)
 $restoreButton = Add-Button 'Restaurar' 792 286 148 36
-$favoriteButton = Add-Button 'Favoritar' 792 329 148 36
-$removeFavoriteButton = Add-Button 'Remover favorito' 792 372 148 36
+$favoriteButton = Add-Button 'Fixar save' 792 329 148 36
+$removeFavoriteButton = Add-Button 'Remover fixo' 792 372 148 36
 $importButton = Add-Button 'Importar save' 320 460 145 36
 $exportButton = Add-Button 'Exportar save' 474 460 145 36
 $renameButton = Add-Button 'Renomear' 628 460 145 36
 $resetButton = Add-Button 'Reiniciar campanha' 320 507 220 36
 $deleteButton = Add-Button 'Apagar perfil' 550 507 220 36
-$footer = Add-Label 'Cada perfil tem uma campanha, três recuperações rotativas e até cinco favoritos fixos.' 30 583 910 28
+$footer = Add-Label 'Cada perfil tem uma campanha, três históricos temporários e até cinco saves fixos.' 30 583 910 28
 $footer.ForeColor = $mutedColor
 
 $profileList.Add_SelectedIndexChanged({ Refresh-ProfileDetails })
@@ -333,7 +333,7 @@ $removeFavoriteButton.Add_Click({
 $resetButton.Add_Click({
     try {
         $id = Get-SelectedProfileId
-        if (-not (Confirm-ProfileAction 'Reiniciar esta campanha? O perfil e seu nome serão mantidos. Uma cópia completa será preservada.')) { return }
+        if (-not (Confirm-ProfileAction 'Reiniciar esta campanha? O perfil, o nome e os saves fixos serão mantidos. Uma cópia completa também será preservada.')) { return }
         $result = & $profileRunner -Profile $id -DataRoot $DataRoot -ResetProfile -PassThru
         Refresh-ProfileList -SelectId $id
         Show-ProfileNotice "Campanha reiniciada. Cópia recuperável:`r`n$($result.BackupPath)"
@@ -352,7 +352,7 @@ $deleteButton.Add_Click({
 Refresh-ProfileList
 if ($ValidateOnly) {
     if ($profileList.DisplayMember -ne 'Text' -or $saveList.DisplayMember -ne 'Text' -or
-        $createButton.Text -ne 'Criar perfil' -or $favoriteButton.Text -ne 'Favoritar' -or
+        $createButton.Text -ne 'Criar perfil' -or $favoriteButton.Text -ne 'Fixar save' -or
         $settingsButton.Text -ne 'Configurações') {
         throw 'A validação estrutural da lista de perfis falhou.'
     }

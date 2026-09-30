@@ -55,6 +55,8 @@ $legacySavePath = Join-Path $profileDir 'pokemon_regionalidades.sav'
 $configPath = Join-Path $configDir 'pokemon_regionalidades.cfg'
 $runtimeLog = Join-Path $profileDir 'runtime-last.log'
 $runtimeHistoryDir = Join-Path $profileDir 'runtime-history'
+$launcherLog = Join-Path $profileDir 'launcher-last.log'
+$launcherHistoryDir = Join-Path $profileDir 'launcher-history'
 $profileMetadataPath = Join-Path $profileDir 'profile.json'
 $favoritesDir = Join-Path $profileDir 'favorites'
 
@@ -310,6 +312,16 @@ if ($ResetProfile) {
     try {
         New-Item -ItemType Directory -Path $profileDir -Force | Out-Null
         [void](Set-ProfileMetadataName -Name $metadata.DisplayName -TechnicalMobility $metadata.TechnicalMobility)
+        $archivedFavorites = Join-Path $resetPath 'favorites'
+        if (Test-Path -LiteralPath $archivedFavorites -PathType Container) {
+            $restoredFavorites = Join-Path $profileDir 'favorites'
+            Copy-Item -LiteralPath $archivedFavorites -Destination $restoredFavorites -Recurse
+            foreach ($favorite in Get-ChildItem -LiteralPath $restoredFavorites -File -Filter 'favorite-*.pgrsave') {
+                if (-not (Test-RegionalidadesSave -Path $favorite.FullName)) {
+                    throw "O save fixo $($favorite.Name) nao passou pela validacao apos o reinicio."
+                }
+            }
+        }
     } catch {
         $resetFailurePath = "$resetPath.failed-new-profile"
         if (Test-Path -LiteralPath $profileDir -PathType Container) {
@@ -427,15 +439,15 @@ if ($RestoreFavorite -ne 0) {
 
 if ($ListRecoveries) {
     $entries = @(
-        [pscustomobject]@{ Estado = 'Ativo'; Kind = 'Active'; Slot = 0; Caminho = (Resolve-ProfileSavePath) },
-        [pscustomobject]@{ Estado = 'Recuperacao 1'; Kind = 'Recovery'; Slot = 1; Caminho = (Resolve-ProfileSavePath -Recovery 1) },
-        [pscustomobject]@{ Estado = 'Recuperacao 2'; Kind = 'Recovery'; Slot = 2; Caminho = (Resolve-ProfileSavePath -Recovery 2) },
-        [pscustomobject]@{ Estado = 'Recuperacao 3'; Kind = 'Recovery'; Slot = 3; Caminho = (Resolve-ProfileSavePath -Recovery 3) },
-        [pscustomobject]@{ Estado = 'Favorito 1'; Kind = 'Favorite'; Slot = 1; Caminho = (Resolve-FavoritePath -Slot 1) },
-        [pscustomobject]@{ Estado = 'Favorito 2'; Kind = 'Favorite'; Slot = 2; Caminho = (Resolve-FavoritePath -Slot 2) },
-        [pscustomobject]@{ Estado = 'Favorito 3'; Kind = 'Favorite'; Slot = 3; Caminho = (Resolve-FavoritePath -Slot 3) },
-        [pscustomobject]@{ Estado = 'Favorito 4'; Kind = 'Favorite'; Slot = 4; Caminho = (Resolve-FavoritePath -Slot 4) },
-        [pscustomobject]@{ Estado = 'Favorito 5'; Kind = 'Favorite'; Slot = 5; Caminho = (Resolve-FavoritePath -Slot 5) }
+        [pscustomobject]@{ Estado = 'Campanha atual'; Kind = 'Active'; Slot = 0; Caminho = (Resolve-ProfileSavePath) },
+        [pscustomobject]@{ Estado = 'Historico automatico 1'; Kind = 'Recovery'; Slot = 1; Caminho = (Resolve-ProfileSavePath -Recovery 1) },
+        [pscustomobject]@{ Estado = 'Historico automatico 2'; Kind = 'Recovery'; Slot = 2; Caminho = (Resolve-ProfileSavePath -Recovery 2) },
+        [pscustomobject]@{ Estado = 'Historico automatico 3'; Kind = 'Recovery'; Slot = 3; Caminho = (Resolve-ProfileSavePath -Recovery 3) },
+        [pscustomobject]@{ Estado = 'Save fixo 1'; Kind = 'Favorite'; Slot = 1; Caminho = (Resolve-FavoritePath -Slot 1) },
+        [pscustomobject]@{ Estado = 'Save fixo 2'; Kind = 'Favorite'; Slot = 2; Caminho = (Resolve-FavoritePath -Slot 2) },
+        [pscustomobject]@{ Estado = 'Save fixo 3'; Kind = 'Favorite'; Slot = 3; Caminho = (Resolve-FavoritePath -Slot 3) },
+        [pscustomobject]@{ Estado = 'Save fixo 4'; Kind = 'Favorite'; Slot = 4; Caminho = (Resolve-FavoritePath -Slot 4) },
+        [pscustomobject]@{ Estado = 'Save fixo 5'; Kind = 'Favorite'; Slot = 5; Caminho = (Resolve-FavoritePath -Slot 5) }
     )
     $available = foreach ($entry in $entries) {
         if ($null -ne $entry.Caminho -and (Test-Path -LiteralPath $entry.Caminho -PathType Leaf)) {
@@ -479,6 +491,48 @@ if (Test-Path -LiteralPath $runtimeLog -PathType Leaf) {
         Select-Object -Skip 5) | Remove-Item -Force
 }
 
+if (Test-Path -LiteralPath $launcherLog -PathType Leaf) {
+    New-Item -ItemType Directory -Path $launcherHistoryDir -Force | Out-Null
+    $archiveLauncherLog = Join-Path $launcherHistoryDir ("launcher-{0}.log" -f (Get-Date -Format 'yyyyMMdd-HHmmssfff'))
+    Copy-Item -LiteralPath $launcherLog -Destination $archiveLauncherLog
+    @(Get-ChildItem -LiteralPath $launcherHistoryDir -Filter 'launcher-*.log' -File |
+        Sort-Object LastWriteTime -Descending |
+        Select-Object -Skip 10) | Remove-Item -Force
+}
+
+$launcherEncoding = New-Object Text.UTF8Encoding($false)
+function Write-LauncherLog {
+    param([Parameter(Mandatory = $true)][string]$Message)
+    $line = "{0} {1}{2}" -f (Get-Date).ToString('yyyy-MM-ddTHH:mm:ss.fffK'), $Message, [Environment]::NewLine
+    [IO.File]::AppendAllText($launcherLog, $line, $launcherEncoding)
+}
+
+function Get-LauncherFileSha256 {
+    param([Parameter(Mandatory = $true)][string]$Path)
+    $stream = [IO.File]::OpenRead($Path)
+    $sha256 = [Security.Cryptography.SHA256]::Create()
+    try {
+        return ([BitConverter]::ToString($sha256.ComputeHash($stream))).Replace('-', '')
+    } finally {
+        $sha256.Dispose()
+        $stream.Dispose()
+    }
+}
+
+[IO.File]::WriteAllText($launcherLog, '', $launcherEncoding)
+$activeSave = Resolve-ProfileSavePath
+$saveSummary = if ($null -eq $activeSave) {
+    'nenhum save ativo; nova campanha'
+} else {
+    $descriptor = Get-RegionalidadesSaveDescriptor -Path $activeSave
+    $saveHash = Get-LauncherFileSha256 -Path $activeSave
+    "save=$activeSave kind=$($descriptor.Kind) generation=$($descriptor.ContainerGeneration) chunks=$($descriptor.ChunkCount) bytes=$((Get-Item -LiteralPath $activeSave).Length) sha256=$saveHash"
+}
+Write-LauncherLog "inicio profile=$Profile $saveSummary"
+Write-LauncherLog "exe=$executable bytes=$((Get-Item -LiteralPath $executable).Length) sha256=$(Get-LauncherFileSha256 -Path $executable)"
+Write-LauncherLog "pack=$resourcePack bytes=$((Get-Item -LiteralPath $resourcePack).Length)"
+Write-LauncherLog "sdl=$sdl bytes=$((Get-Item -LiteralPath $sdl).Length)"
+
 $environmentNames = @(
     'POKEMON_REGIONALIDADES_SAVE_PATH',
     'POKEMON_REGIONALIDADES_CONFIG_PATH',
@@ -492,33 +546,50 @@ $environmentNames = @(
     'POKEMON_REGIONALIDADES_TECHNICAL_MOBILITY',
     'POKEMON_GO_WORLD_AUTOPLAY'
 )
-$oldEnvironment = @{}
-
 try {
+    # Give the game its own explicit environment. This avoids the previous
+    # launch race where the profile selector temporarily changed its process
+    # environment and immediately restored it after asking the Windows shell
+    # to create the child process.
+    $startInfo = New-Object Diagnostics.ProcessStartInfo
+    $startInfo.FileName = $executable
+    $startInfo.WorkingDirectory = $repoRoot
+    $startInfo.UseShellExecute = $false
+    $startInfo.CreateNoWindow = $false
     foreach ($name in $environmentNames) {
-        $oldEnvironment[$name] = [Environment]::GetEnvironmentVariable($name, 'Process')
-        [Environment]::SetEnvironmentVariable($name, $null, 'Process')
+        [void]$startInfo.EnvironmentVariables.Remove($name)
     }
-    [Environment]::SetEnvironmentVariable('POKEMON_REGIONALIDADES_SAVE_PATH', $savePath, 'Process')
-    [Environment]::SetEnvironmentVariable('POKEMON_REGIONALIDADES_CONFIG_PATH', $configPath, 'Process')
-    [Environment]::SetEnvironmentVariable('POKEMON_REGIONALIDADES_LOG_PATH', $runtimeLog, 'Process')
-    [Environment]::SetEnvironmentVariable('POKEMON_REGIONALIDADES_PROFILE_LAUNCHER', (Join-Path $PSScriptRoot 'open_player_profiles_pc.ps1'), 'Process')
-    [Environment]::SetEnvironmentVariable('POKEMON_REGIONALIDADES_PROFILE_RUNNER', $PSCommandPath, 'Process')
-    [Environment]::SetEnvironmentVariable('POKEMON_REGIONALIDADES_PROFILE_ID', [string]$Profile, 'Process')
-    [Environment]::SetEnvironmentVariable('POKEMON_REGIONALIDADES_SETTINGS_SCRIPT', (Join-Path $PSScriptRoot 'open_pc_settings.ps1'), 'Process')
+    $startInfo.EnvironmentVariables['POKEMON_REGIONALIDADES_SAVE_PATH'] = $savePath
+    $startInfo.EnvironmentVariables['POKEMON_REGIONALIDADES_CONFIG_PATH'] = $configPath
+    $startInfo.EnvironmentVariables['POKEMON_REGIONALIDADES_LOG_PATH'] = $runtimeLog
+    $startInfo.EnvironmentVariables['POKEMON_REGIONALIDADES_PROFILE_LAUNCHER'] = Join-Path $PSScriptRoot 'open_player_profiles_pc.ps1'
+    $startInfo.EnvironmentVariables['POKEMON_REGIONALIDADES_PROFILE_RUNNER'] = $PSCommandPath
+    $startInfo.EnvironmentVariables['POKEMON_REGIONALIDADES_PROFILE_ID'] = [string]$Profile
+    $startInfo.EnvironmentVariables['POKEMON_REGIONALIDADES_SETTINGS_SCRIPT'] = Join-Path $PSScriptRoot 'open_pc_settings.ps1'
     if ((Get-ProfileMetadata).TechnicalMobility) {
-        [Environment]::SetEnvironmentVariable('POKEMON_REGIONALIDADES_TECHNICAL_MOBILITY', '1', 'Process')
+        $startInfo.EnvironmentVariables['POKEMON_REGIONALIDADES_TECHNICAL_MOBILITY'] = '1'
     }
 
-    Start-Process -FilePath $executable -WorkingDirectory $repoRoot | Out-Null
-}
-finally {
-    foreach ($name in $environmentNames) {
-        [Environment]::SetEnvironmentVariable($name, $oldEnvironment[$name], 'Process')
+    $process = New-Object Diagnostics.Process
+    $process.StartInfo = $startInfo
+    if (-not $process.Start()) {
+        throw 'O Windows recusou a criacao do processo do jogo.'
     }
+    Write-LauncherLog "processo criado pid=$($process.Id) shellExecute=false"
+    if ($process.WaitForExit(1500)) {
+        $unsignedExitCode = [BitConverter]::ToUInt32([BitConverter]::GetBytes([int]$process.ExitCode), 0)
+        $exitHex = '0x{0:X8}' -f $unsignedExitCode
+        Write-LauncherLog "ERRO processo encerrou antes da inicializacao exitCode=$($process.ExitCode) exitHex=$exitHex runtimeLogExists=$(Test-Path -LiteralPath $runtimeLog -PathType Leaf)"
+        throw "O jogo encerrou durante a inicializacao ($exitHex). Consulte: $launcherLog"
+    }
+    Write-LauncherLog "processo permaneceu ativo apos 1500ms runtimeLogExists=$(Test-Path -LiteralPath $runtimeLog -PathType Leaf)"
+} catch {
+    Write-LauncherLog "ERRO $($_.Exception.GetType().FullName): $($_.Exception.Message)"
+    throw
 }
 
 Write-Host "Perfil $Profile aberto."
 Write-Host "Save: $savePath"
 Write-Host "Configuracao compartilhada: $configPath"
 Write-Host "Registro: $runtimeLog"
+Write-Host "Registro do iniciador: $launcherLog"
