@@ -8,6 +8,12 @@ $testRoot = Join-Path ([IO.Path]::GetTempPath()) ('regionalidades-profile-manage
 $sourceSave = Join-Path $testRoot 'source.sav'
 
 try {
+    $runnerSource = Get-Content -Raw -LiteralPath $runner
+    if ($runnerSource -notmatch '\$startInfo\.UseShellExecute = \$false' -or
+        $runnerSource -notmatch "launcher-last\.log" -or
+        $runnerSource -notmatch 'WaitForExit\(1500\)') {
+        throw 'O iniciador nao possui criacao direta do processo e diagnostico de falha precoce.'
+    }
     [IO.Directory]::CreateDirectory($testRoot) | Out-Null
     [IO.File]::WriteAllBytes($sourceSave, (New-Object byte[] 131072))
     $sourceHash = (Get-FileHash -LiteralPath $sourceSave -Algorithm SHA256).Hash
@@ -34,6 +40,7 @@ try {
     if ($beforeReset.DisplayName -ne 'Minha Jornada' -or -not $beforeReset.HasActiveSave) {
         throw 'O perfil renomeado nao reconheceu o save importado.'
     }
+    & $runner -Profile 1 -DataRoot $testRoot -FavoriteFromSlot 0 | Out-Null
 
     & $runner -Profile 3 -DataRoot $testRoot -CreateProfile
     [void](& $runner -Profile 3 -DataRoot $testRoot -SetProfileName 'Teste Kanto' -PassThru)
@@ -70,8 +77,10 @@ try {
     $reset = & $runner -Profile 1 -DataRoot $testRoot -ResetProfile -PassThru
     & $profileUi -DataRoot $testRoot -ValidateOnly
     $afterReset = & $runner -Profile 1 -DataRoot $testRoot -GetProfileInfo -PassThru
+    $afterResetEntries = @(& $runner -Profile 1 -DataRoot $testRoot -ListRecoveries -PassThru)
     $backupSave = Join-Path $reset.BackupPath 'pokemon_regionalidades.pgrsave'
     if ($afterReset.DisplayName -ne 'Minha Jornada' -or $afterReset.HasActiveSave -or
+        @($afterResetEntries | Where-Object Kind -eq 'Favorite').Count -ne 1 -or
         -not (Test-Path -LiteralPath $backupSave -PathType Leaf) -or
         (Get-FileHash -LiteralPath $sourceSave -Algorithm SHA256).Hash -ne $sourceHash) {
         throw 'O reinicio nao preservou corretamente o nome, o backup ou a origem.'
