@@ -44,6 +44,7 @@
 #include "vs_seeker.h"
 #include "item.h"
 #include "pokemon_regionalidades_progress.h"
+#include "pokemon_go_world.h"
 #include "script.h"
 #include "field_name_box.h"
 #include "wild_encounter_ow.h"
@@ -480,7 +481,7 @@ void StartOldManTutorialBattle(void)
     CreateMaleMon(&gParties[B_TRAINER_OPPONENT_A][0], SPECIES_WEEDLE, 5);
     LockPlayerFieldControls();
     gMain.savedCallback = CB2_ReturnToFieldContinueScriptPlayMapMusic;
-    gBattleTypeFlags = BATTLE_TYPE_CATCH_TUTORIAL;
+    gBattleTypeFlags = BATTLE_TYPE_CATCH_TUTORIAL | BATTLE_TYPE_KANTO_TUTORIAL;
     CreateBattleStartTask(B_TRANSITION_SLICE, 0);
 }
 
@@ -980,6 +981,10 @@ static void CB2_StartFirstBattle(void)
     if (IsBattleTransitionDone() == TRUE)
     {
         gBattleTypeFlags = BATTLE_TYPE_FIRST_BATTLE;
+#ifdef PORTABLE
+        if (Pgw_GetStartingRegion() == PGW_START_KANTO)
+            gBattleTypeFlags |= BATTLE_TYPE_KANTO_TUTORIAL;
+#endif
         gMain.savedCallback = CB2_EndFirstBattle;
         FreeAllWindowBuffers();
         SetMainCallback2(CB2_InitBattle);
@@ -1334,7 +1339,13 @@ void BattleSetup_StartTrainerBattle(void)
     }
 
     if (GetTrainerBattleMode() == TRAINER_BATTLE_EARLY_RIVAL && GetRivalBattleFlags() & RIVAL_BATTLE_TUTORIAL)
+    {
         gBattleTypeFlags |= BATTLE_TYPE_FIRST_BATTLE;
+#ifdef PORTABLE
+        if (Pgw_GetStartingRegion() == PGW_START_KANTO)
+            gBattleTypeFlags |= BATTLE_TYPE_KANTO_TUTORIAL;
+#endif
+    }
 
     if (CurrentBattlePyramidLocation() != PYRAMID_LOCATION_NONE)
     {

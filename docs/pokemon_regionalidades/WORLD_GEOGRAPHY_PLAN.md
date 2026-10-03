@@ -66,6 +66,15 @@ respectivamente 24×20 e 80×80 blocos: o encaixe direto cobre somente os 24
 blocos mais à esquerda do limite norte da Route 124. O restante dessa borda
 precisa conservar um limite ou receber outra solução geográfica coerente.
 
+Esse alinhamento norte/oeste é um protótipo técnico de travessia, não a posição
+mundial final. A composição ampliada enviada em 21 de setembro indica que
+preservá-lo ao inserir Johto pode sobrepor Route 33/Azalea/Ilex ao corredor de
+Route 114/Fortree/Routes 119–120. A alternativa a medir desloca o conjunto de
+Kanto e Cinnabar para oeste, aproximando sua faixa marítima oriental da faixa
+ocidental de Route 124, possivelmente com mapas costeiros intermediários. Isso
+não autoriza ligar diretamente a borda leste de Cinnabar, pois Route 20 já ocupa
+essa direção na geografia de Kanto.
+
 Para preparar a travessia, revisar somente as pequenas rochas marcadas que
 funcionavam como barreira técnica, preservando os obstáculos e eventos que têm
 função própria. Em 20 de setembro de 2026, as
@@ -102,6 +111,27 @@ atuais permitam unir todas as bordas diretamente. Depois, Johto deverá manter
 sua ligação reconhecível com Kanto; sua ligação com Hoenn será escolhida após
 comparar as posições e decidir se são necessários mapas novos ou ajustes locais.
 Nenhuma dessas ligações adicionais foi ativada nesta etapa.
+
+A importação atual usa só os mapas de Johto da fonte `_hns` e seus recursos,
+sem a segunda cópia de Kanto. A auditoria reproduzível
+`tools/pokemon_go_world/audit_johto_hoenn_positions.py` posiciona os retângulos
+na grade provisória Cinnabar–Route 124. A inclusão de Azalea Town e Routes
+32/33, com Johto 30 blocos ao norte, elimina as sobreposições medidas entre
+os mapas externos ancorados de Johto e Hoenn. Ilex Forest foi separada da
+borda direta da Route 34 e colocada a oeste, com acesso pelas portarias.
+A ligação direta Route 22–Route 26 North foi suspensa: após o deslocamento
+faltam blocos caminháveis entre as bordas. Um mapa real de transição é
+necessário antes de reabrir essa travessia.
+
+Ruins of Alph foi deslocada 10 blocos para oeste em relação à Route 36 e
+mantém acesso pelas portarias com Routes 32 e 36. Esse deslocamento reduz,
+mas não elimina, a sobreposição visual com Violet City (162 tiles) e Route 32
+(210 tiles). Resolver completamente esse ponto exige também rever a posição
+vertical ou outras bordas próximas. A fonte conserva ainda uma discrepância
+de deslocamento na conexão Route 42–Ecruteak. Os mapas externos isolados,
+como partes da Safari Zone e encostas de Mt. Silver, continuam em componentes
+separados do atlas até receberem âncoras geográficas próprias. Scripts, NPCs
+e eventos narrativos da fonte não foram importados nesta etapa.
 
 A primeira travessia expôs outro limite do porte: mapas de Hoenn e de FireRed
 usam conjuntos gráficos primários diferentes. A transição de câmera agora
@@ -161,7 +191,36 @@ As medidas abaixo são as dimensões dos layouts atuais em blocos. A coluna ampl
 | Route 119 | 40 × 140 | 80 × 280 |
 | Route 120 | 40 × 100 | 80 × 200 |
 
-As dimensões de Johto e Sinnoh serão acrescentadas depois que suas fontes de implementação forem escolhidas e importadas. Até lá, não é possível afirmar se as bordas propostas cabem sem mapas intermediários.
+O primeiro corredor de Johto foi importado de `pokehns-expansion`. Route 26
+North mede 39 × 30 tiles e a Route 22 atual mede 48 × 24. O deslocamento da
+fonte colocava as duas bordas sem sobreposição; o protótipo usa agora uma faixa
+compartilhada de 20 tiles. Route 26 segue ao sul, Route 27 leva a New Bark Town,
+e Route 28 segue a oeste até Mt. Silver. Essa posição é provisória: o terreno
+da passagem Kanto–Johto e o confronto com a posição final de Hoenn ainda
+precisam de avaliação visual e teste de caminhada. Sinnoh será medida quando
+sua fonte for escolhida e importada.
+
+A faixa exterior adicional de Johto inclui cidades, Routes 30–48, Ruins of
+Alph, Ilex Forest, National Park, Lake of Rage, Mt. Silver e áreas da Safari
+Zone. Azalea Town e Routes 32/33 foram incluídas após a revisão espacial.
+Mapas Kanto `_hns` continuam de fora. O importador retém apenas saídas com
+destino incluído e renumera os warps mantidos.
+
+Na revisão espacial de setembro de 2026, a área `TrainerHill_Courtyard_hns`
+acima da Route 40 foi deslocada 28 blocos para oeste e Ruins of Alph mais 2
+blocos para oeste. A Route 44 já consta do importador e liga Mahogany a
+Blackthorn. Route 42, Mahogany, Route 43, Lake of Rage, Route 44, Blackthorn e
+Route 45 formam agora uma peça posicionada 37 blocos a leste de Ecruteak na
+câmera de planejamento. As antigas arestas Ecruteak–Route 42 e Route 45–46
+ficam desligadas até existirem passagens desenhadas para os vazios. A medição
+atual entre Route 46 e Route 45 mostra 82 tiles de vazio horizontal apesar
+de 28 tiles de faixa vertical em comum; mover Route 46 diretamente quebraria
+seu encaixe com Route 29. Assim, esse trecho precisa de um mapa intermediário
+ou de uma revisão conjunta do corredor leste, não de um deslocamento isolado.
+O espaço Ecruteak–Route 42 mede 37 tiles. Route 34
+e Azalea continuam se sobrepondo e precisam de revisão estrutural posterior.
+O deslocamento de 2 blocos não eliminou toda a sobreposição de Ruins of Alph
+com Violet/Route 32; essa revisão também permanece aberta.
 
 ## Continuidade técnica no PC
 

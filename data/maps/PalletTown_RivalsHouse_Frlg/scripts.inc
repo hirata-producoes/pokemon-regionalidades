@@ -16,6 +16,7 @@ PalletTown_RivalsHouse_EventScript_MoveDaisyToTable::
 
 PalletTown_RivalsHouse_EventScript_AlreadyReceivedTownMap::
 	setvar RECEIVED_TOWN_MAP, TRUE
+	setflag FLAG_HIDE_TOWN_MAP
 	return
 
 PalletTown_RivalsHouse_EventScript_Daisy::
@@ -133,6 +134,7 @@ PalletTown_RivalsHouse_EventScript_GiveTownMap::
 	applymovement LOCALID_DAISY, Common_Movement_WalkInPlaceFasterRight
 	waitmovement 0
 	removeobject LOCALID_TOWN_MAP
+	setflag FLAG_HIDE_TOWN_MAP
 	setvar VAR_MAP_SCENE_PALLET_TOWN_RIVALS_HOUSE, 2
 	delay 15
 	applymovement LOCALID_DAISY, Common_Movement_FacePlayer
@@ -289,4 +291,3 @@ PalletTown_RivalsHouse_Text_WhyWouldMonHateYouSoMuch::
 PalletTown_RivalsHouse_Text_LovelyAndSweetClefairy::
 	.string "“The lovely and sweet\n"
 	.string "CLEFAIRY”$"
-

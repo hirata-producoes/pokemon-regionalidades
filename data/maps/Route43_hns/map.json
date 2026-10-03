@@ -1,0 +1,38 @@
+{
+  "id": "MAP_ROUTE43_HNS",
+  "name": "Route43_hns",
+  "layout": "LAYOUT_ROUTE43_HNS",
+  "music": "MUS_ROUTE101",
+  "region_map_section": "MAPSEC_ROUTE_43",
+  "requires_flash": false,
+  "weather": "WEATHER_NONE",
+  "map_type": "MAP_TYPE_ROUTE",
+  "allow_cycling": true,
+  "allow_escaping": false,
+  "allow_running": true,
+  "show_map_name": true,
+  "battle_scene": "MAP_BATTLE_SCENE_NORMAL",
+  "connections": [
+    {
+      "map": "MAP_MAHOGANYTOWN_HNS",
+      "offset": -2,
+      "direction": "down"
+    },
+    {
+      "map": "MAP_LAKE_OF_RAGE_HNS",
+      "offset": -16,
+      "direction": "up"
+    },
+    {
+      "map": "MAP_LAKE_OF_RAGE_LOW_TIDE_HNS",
+      "offset": -16,
+      "direction": "up"
+    }
+  ],
+  "object_events": [],
+  "warp_events": [],
+  "coord_events": [],
+  "bg_events": [],
+  "region": "REGION_JOHTO",
+  "world_enabled": true
+}

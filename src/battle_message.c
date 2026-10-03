@@ -789,7 +789,7 @@ const u8 *const gBattleStringsTable[STRINGID_COUNT] =
     [STRINGID_PKMNITEMMELTED]                       = COMPOUND_STRING("{B_ATK_NAME_WITH_PREFIX} corroded {B_DEF_NAME_WITH_PREFIX2}'s {B_LAST_ITEM}!"),
     [STRINGID_ULTRABURSTREACTING]                   = COMPOUND_STRING("Bright light is about to burst out of {B_ATK_NAME_WITH_PREFIX2}!"),
     [STRINGID_ULTRABURSTCOMPLETED]                  = COMPOUND_STRING("{B_ATK_NAME_WITH_PREFIX} regained its true power through Ultra Burst!"),
-    [STRINGID_TEAMGAINEDEXP]                        = COMPOUND_STRING("O restante da sua equipe ganhou Pontos de Exp. graças ao Exp. Share!\p"),
+    [STRINGID_TEAMGAINEDEXP]                        = COMPOUND_STRING("O restante da sua equipe ganhou Pontos de Exp.!\p"),
     [STRINGID_CURRENTMOVECANTSELECT]                = COMPOUND_STRING("{B_BUFF1} cannot be used!\p"),
     [STRINGID_TARGETISBEINGSALTCURED]               = COMPOUND_STRING("{B_EFF_NAME_WITH_PREFIX} is being salt cured!"),
     [STRINGID_TARGETISHURTBYSALTCURE]               = COMPOUND_STRING("{B_ATK_NAME_WITH_PREFIX} is hurt by {B_BUFF1}!"),
@@ -3522,7 +3522,7 @@ u32 BattleStringExpandPlaceholders(const u8 *src, u8 *dst, u32 dstSize)
                 toCpy = textStart;
                 if (gBattleTypeFlags & BATTLE_TYPE_CATCH_TUTORIAL)
                 {
-                    if (IS_FRLG)
+                    if (KANTO_CATCH_TUTORIAL)
                         textStart = StringCopy(textStart, COMPOUND_STRING("The old man"));
                     else
                         textStart = StringCopy(textStart, COMPOUND_STRING("WALLY"));

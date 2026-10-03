@@ -1,0 +1,22 @@
+{
+  "id": "MAP_NATIONAL_PARK_NORMAL_HNS",
+  "name": "NationalPark_Normal_hns",
+  "layout": "LAYOUT_NATIONAL_PARK_NORMAL_HNS",
+  "music": "MUS_OLDALE",
+  "region_map_section": "MAPSEC_NATIONAL_PARK",
+  "requires_flash": false,
+  "weather": "WEATHER_NONE",
+  "map_type": "MAP_TYPE_ROUTE",
+  "allow_cycling": false,
+  "allow_escaping": false,
+  "allow_running": false,
+  "show_map_name": true,
+  "battle_scene": "MAP_BATTLE_SCENE_NORMAL",
+  "connections": [],
+  "object_events": [],
+  "warp_events": [],
+  "coord_events": [],
+  "bg_events": [],
+  "region": "REGION_JOHTO",
+  "world_enabled": true
+}

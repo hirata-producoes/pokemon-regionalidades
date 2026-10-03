@@ -5,10 +5,20 @@ PalletTown_Pgw_EventScript_ReturnToHoenn::
 	lock
 	faceplayer
 	msgbox PalletTown_Pgw_Text_ReturnToHoenn, MSGBOX_YESNO
-	goto_if_eq VAR_RESULT, NO, PalletTown_Pgw_EventScript_Stay
+	goto_if_eq VAR_RESULT, NO, PalletTown_Pgw_EventScript_OfferJohto
 	setvar VAR_0x8004, 2 @ PGW_START_HOENN
 	special Pgw_ScriptSetCurrentRegion
 	warp MAP_LITTLEROOT_TOWN_PROFESSOR_BIRCHS_LAB, 4, 10
+	waitstate
+	release
+	end
+
+PalletTown_Pgw_EventScript_OfferJohto::
+	msgbox PalletTown_Pgw_Text_TravelToJohto, MSGBOX_YESNO
+	goto_if_eq VAR_RESULT, NO, PalletTown_Pgw_EventScript_Stay
+	setvar VAR_0x8004, 1 @ PGW_START_JOHTO
+	special Pgw_ScriptSetCurrentRegion
+	warp MAP_NEW_BARK_TOWN_HNS, 15, 13
 	waitstate
 	release
 	end
@@ -26,6 +36,10 @@ PalletTown_Pgw_Text_ReturnToHoenn:
 	.string "Esta e PALLET TOWN, em KANTO!\p"
 	.string "Quer voltar ao laboratorio do\n"
 	.string "PROF. BIRCH, em HOENN?$"
+
+PalletTown_Pgw_Text_TravelToJohto:
+	.string "Quer visitar NEW BARK TOWN,\n"
+	.string "a cidade inicial de JOHTO?$"
 
 PalletTown_Pgw_Text_Stay:
 	.string "Tudo bem. Aproveite KANTO!$"

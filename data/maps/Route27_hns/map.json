@@ -1,0 +1,48 @@
+{
+  "id": "MAP_ROUTE27_HNS",
+  "name": "Route27_hns",
+  "layout": "LAYOUT_ROUTE27_HNS",
+  "music": "MUS_RG_ROUTE3",
+  "region_map_section": "MAPSEC_ROUTE_27",
+  "requires_flash": false,
+  "weather": "WEATHER_NONE",
+  "map_type": "MAP_TYPE_ROUTE",
+  "allow_cycling": true,
+  "allow_escaping": false,
+  "allow_running": true,
+  "show_map_name": true,
+  "battle_scene": "MAP_BATTLE_SCENE_NORMAL",
+  "connections": [
+    {
+      "map": "MAP_NEW_BARK_TOWN_HNS",
+      "offset": 11,
+      "direction": "left"
+    },
+    {
+      "map": "MAP_ROUTE26_HNS",
+      "offset": -42,
+      "direction": "right"
+    }
+  ],
+  "object_events": [],
+  "warp_events": [
+    {
+      "x": 31,
+      "y": 19,
+      "elevation": 0,
+      "dest_map": "MAP_TOHJO_FALLS_CAVERN_HNS",
+      "dest_warp_id": "0"
+    },
+    {
+      "x": 45,
+      "y": 17,
+      "elevation": 0,
+      "dest_map": "MAP_TOHJO_FALLS_CAVERN_HNS",
+      "dest_warp_id": "1"
+    }
+  ],
+  "coord_events": [],
+  "bg_events": [],
+  "region": "REGION_JOHTO",
+  "world_enabled": true
+}

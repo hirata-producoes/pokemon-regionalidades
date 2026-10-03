@@ -1037,7 +1037,7 @@ static void Cmd_setchargingturn(void)
 
 static bool32 ShouldSkipFRLGAccuracyCheck(void)
 {
-    if (!IS_FRLG)
+    if (!IS_FRLG && !KANTO_FIRST_BATTLE)
         return FALSE;
 
     if ((gBattleTypeFlags & BATTLE_TYPE_FIRST_BATTLE
@@ -3915,7 +3915,10 @@ static void Cmd_getexp(void)
                     viaSentIn++;
 
                 holdEffect = GetMonHoldEffect(&gParties[B_TRAINER_PLAYER][i]);
-                if (holdEffect == HOLD_EFFECT_EXP_SHARE || IsGen6ExpShareEnabled())
+                // A small party-wide share is always active in the unified PC
+                // campaign. The key item upgrades it without changing who
+                // receives the full participant reward.
+                if (holdEffect == HOLD_EFFECT_EXP_SHARE || IsGen6ExpShareEnabled() || B_SPLIT_EXP >= GEN_6)
                 {
                     expShareBits |= 1u << i;
                     viaExpShare++;
@@ -3967,7 +3970,7 @@ static void Cmd_getexp(void)
             else
             {
                 *exp = calculatedExp;
-                gBattleStruct->expShareExpValue = calculatedExp / 2;
+                gBattleStruct->expShareExpValue = calculatedExp * (IsGen6ExpShareEnabled() ? 40 : 20) / 100;
                 if (gBattleStruct->expShareExpValue == 0)
                     gBattleStruct->expShareExpValue = 1;
             }
@@ -3984,7 +3987,7 @@ static void Cmd_getexp(void)
             bool32 wasSentOut = (gBattleStruct->expSentInMons & (1u << *expMonId)) != 0;
             holdEffect = GetMonHoldEffect(&gParties[B_TRAINER_PLAYER][*expMonId]);
 
-            if ((holdEffect != HOLD_EFFECT_EXP_SHARE && !wasSentOut && !IsGen6ExpShareEnabled())
+            if ((holdEffect != HOLD_EFFECT_EXP_SHARE && !wasSentOut && !IsGen6ExpShareEnabled() && B_SPLIT_EXP < GEN_6)
              || GetMonData(&gParties[B_TRAINER_PLAYER][*expMonId], MON_DATA_SPECIES_OR_EGG) == SPECIES_EGG)
             {
                 gBattleScripting.getexpState = 5;
@@ -4018,7 +4021,7 @@ static void Cmd_getexp(void)
                     else
                         gBattleStruct->battlerExpReward = 0;
 
-                    if ((holdEffect == HOLD_EFFECT_EXP_SHARE || IsGen6ExpShareEnabled())
+                    if ((holdEffect == HOLD_EFFECT_EXP_SHARE || IsGen6ExpShareEnabled() || B_SPLIT_EXP >= GEN_6)
                         && (B_SPLIT_EXP < GEN_6 || gBattleStruct->battlerExpReward == 0)) // only give exp share bonus in later gens if the mon wasn't sent out
                     {
                         gBattleStruct->battlerExpReward += GetSoftLevelCapExpValue(gParties[B_TRAINER_PLAYER][*expMonId].level, gBattleStruct->expShareExpValue);
@@ -4056,7 +4059,7 @@ static void Cmd_getexp(void)
                     {
                         PrepareStringBattle(STRINGID_PKMNGAINEDEXP, 0);
                     }
-                    else if (IsGen6ExpShareEnabled() && !gBattleStruct->teamGotExpMsgPrinted) // Print 'the rest of your team got exp' message once, when all of the sent-in mons were given experience
+                    else if (B_SPLIT_EXP >= GEN_6 && !gBattleStruct->teamGotExpMsgPrinted) // Print the shared experience message only once.
                     {
                         gLastUsedItem = ITEM_EXP_SHARE;
                         PrepareStringBattle(STRINGID_TEAMGAINEDEXP, 0);

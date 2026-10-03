@@ -1,0 +1,102 @@
+{
+  "id": "MAP_ROUTE40_HNS",
+  "name": "Route40_hns",
+  "layout": "LAYOUT_ROUTE40_HNS",
+  "music": "MUS_ROUTE101",
+  "region_map_section": "MAPSEC_ROUTE_40",
+  "requires_flash": false,
+  "weather": "WEATHER_RAIN",
+  "map_type": "MAP_TYPE_ROUTE",
+  "allow_cycling": true,
+  "allow_escaping": false,
+  "allow_running": true,
+  "show_map_name": true,
+  "battle_scene": "MAP_BATTLE_SCENE_NORMAL",
+  "connections": [
+    {
+      "map": "MAP_OLIVINE_CITY_HNS",
+      "offset": -32,
+      "direction": "right"
+    },
+    {
+      "map": "MAP_ROUTE41_HNS",
+      "offset": -25,
+      "direction": "down"
+    },
+    {
+      "map": "MAP_TRAINER_HILL_COURTYARD_HNS",
+      "offset": -30,
+      "direction": "up"
+    }
+  ],
+  "object_events": [],
+  "warp_events": [
+    {
+      "x": 12,
+      "y": 60,
+      "elevation": 0,
+      "dest_map": "MAP_ROUTE41_HNS",
+      "dest_warp_id": "0"
+    },
+    {
+      "x": 13,
+      "y": 60,
+      "elevation": 0,
+      "dest_map": "MAP_ROUTE41_HNS",
+      "dest_warp_id": "1"
+    },
+    {
+      "x": 14,
+      "y": 60,
+      "elevation": 0,
+      "dest_map": "MAP_ROUTE41_HNS",
+      "dest_warp_id": "2"
+    },
+    {
+      "x": 15,
+      "y": 60,
+      "elevation": 0,
+      "dest_map": "MAP_ROUTE41_HNS",
+      "dest_warp_id": "3"
+    },
+    {
+      "x": 16,
+      "y": 60,
+      "elevation": 0,
+      "dest_map": "MAP_ROUTE41_HNS",
+      "dest_warp_id": "4"
+    },
+    {
+      "x": 17,
+      "y": 60,
+      "elevation": 0,
+      "dest_map": "MAP_ROUTE41_HNS",
+      "dest_warp_id": "5"
+    },
+    {
+      "x": 18,
+      "y": 60,
+      "elevation": 0,
+      "dest_map": "MAP_ROUTE41_HNS",
+      "dest_warp_id": "6"
+    },
+    {
+      "x": 19,
+      "y": 60,
+      "elevation": 0,
+      "dest_map": "MAP_ROUTE41_HNS",
+      "dest_warp_id": "7"
+    },
+    {
+      "x": 20,
+      "y": 60,
+      "elevation": 0,
+      "dest_map": "MAP_ROUTE41_HNS",
+      "dest_warp_id": "8"
+    }
+  ],
+  "coord_events": [],
+  "bg_events": [],
+  "region": "REGION_JOHTO",
+  "world_enabled": true
+}

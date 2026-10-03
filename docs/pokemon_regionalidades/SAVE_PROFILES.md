@@ -19,7 +19,7 @@ continuará dentro dele como compatibilidade, sem limitar os dados novos.
 | Perfil de jogador | Campanha pessoal de uma pessoa |
 | Save ativo | Estado carregado normalmente pelo jogo naquele perfil |
 | Ponto de recuperação | Uma das três versões anteriores confirmadas do save ativo |
-| Favorito | Uma de até cinco cópias verificadas de saves escolhidos explicitamente, fixas e separadas da rotação automática |
+| Save fixo (antigo favorito) | Uma de até cinco cópias verificadas escolhidas explicitamente, permanentes e separadas da rotação automática |
 | Save rápido | Solicitação de gravação pelo sistema oficial em um estado seguro |
 | Carregamento rápido | Reinicialização controlada da sessão usando um save validado |
 | Save de exploração | Ferramenta técnica isolada, com Fly, HMs e recursos de teste |
@@ -36,18 +36,18 @@ se tornam evidência de continuidade narrativa.
 ### Interface de perfis implementada
 
 A interface mostra uma lista rolável de perfis existentes e o botão **Criar
-perfil**. A seleção exibe a campanha, o save atual, até três recuperações e até
-cinco favoritos. Há ações para abrir, renomear, importar, exportar, reiniciar
+perfil**. A seleção exibe a campanha atual, até três históricos automáticos e
+até cinco saves fixos. Há ações para abrir, fixar, renomear, importar, exportar, reiniciar
 ou retirar o perfil da lista mediante confirmação. Cada perfil tem uma campanha
 independente, permitindo testar o início de Kanto e a entrada a partir de
 Hoenn sem sobrescrever a campanha pessoal.
 
-Cada favorito é uma cópia própria validada do save atual ou de uma recuperação,
+Cada save fixo é uma cópia própria validada da campanha atual ou de um histórico,
 não um dos três arquivos que a rotação substitui. Ele permanece na seleção até
-ser removido pelo usuário. Restaurar um favorito ou uma recuperação preserva o
-save ativo anterior. Remover favorito ou perfil move os arquivos para uma pasta
+ser removido pelo usuário. Restaurar um save fixo ou um histórico preserva a
+campanha ativa anterior. Remover save fixo ou perfil move os arquivos para uma pasta
 recuperável. Os perfis 1 e 2 preexistentes conservam os mesmos caminhos, nomes
-e saves. O teste automatizado usa perfis temporários, valida cinco favoritos e
+e saves. O teste automatizado usa perfis temporários, valida cinco saves fixos e
 recusa o sexto. O usuário validou a tela de perfis com suas campanhas; o teste
 automatizado de gerenciamento foi repetido com sucesso em 21/09/2026, usando
 somente saves temporários.
@@ -81,13 +81,14 @@ total de jogo e versão usada na última gravação ainda serão acrescentados. 
 perfil vazio, a pessoa pode renomear o espaço antes de iniciar ou importar uma
 campanha.
 
-Uma ação explícita de reinício retira o progresso ativo e as recuperações
+Uma ação explícita de reinício retira o progresso ativo e os históricos
 daquele perfil somente depois de confirmação clara. A pasta anterior inteira é
 movida para um diretório `profile-N-reset-DATA-HORA`, no mesmo diretório dos
 perfis, antes que o espaço vazio seja recriado com o nome personalizado. Assim,
-a campanha nova não herda gerações ou recuperações e o estado anterior continua
-recuperável. Exportar permanece a forma recomendada de guardar uma cópia
-portátil.
+a campanha nova não herda gerações ou históricos e o estado anterior continua
+recuperável. Os saves fixos são copiados de volta para o perfil recriado e
+também permanecem no arquivo integral de segurança. Exportar permanece a forma
+recomendada de guardar uma cópia portátil.
 
 ## Gravação segura e rotação
 
@@ -107,6 +108,19 @@ Como os arquivos podem ser criados no mesmo segundo, o horário do Windows não 
 usado sozinho para distingui-los. O backend já lê o contador de geração gravado
 nos setores completos do próprio formato Emerald e também apresenta um hash
 SHA-256; os dados amigáveis da campanha serão acrescentados à interface gráfica.
+Abrir uma campanha não cria uma geração nova. O contador só avança quando o
+próprio jogo conclui uma gravação; essas gerações alimentam o histórico
+automático rotativo e não representam slots permanentes. Para conservar uma
+versão sem rotação, o jogador deve usar **Fixar save**.
+
+Em 22/09/2026, o Perfil 1 fechava ao continuar um save localizado num mapa
+sem objetos (Ever Grande City). O carregamento tentava ler a lista inexistente
+de scripts de objetos do mapa; foi corrigido para aceitar mapas vazios e
+limitar a leitura à quantidade real de objetos. Antes do teste, os arquivos
+do perfil foram preservados em `profiles/profile-1/before-save-fix-20260922`.
+No teste controlado, a campanha atual avançou uma geração, foi gravada no
+próprio Perfil 1 e reaberta sem o fechamento. Resta repetir pela interface
+normal de Salvar e conferir a experiência completa do jogador.
 
 Os nomes acima já são usados pela interface. Perfis anteriores continuam
 visíveis pelo `.sav` até sua primeira abertura; o executável cria o `.pgrsave`

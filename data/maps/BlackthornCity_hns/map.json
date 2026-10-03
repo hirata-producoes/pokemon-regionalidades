@@ -1,0 +1,33 @@
+{
+  "id": "MAP_BLACKTHORN_CITY_HNS",
+  "name": "BlackthornCity_hns",
+  "layout": "LAYOUT_BLACKTHORN_CITY_HNS",
+  "music": "MUS_OLDALE",
+  "region_map_section": "MAPSEC_BLACKTHORN_CITY",
+  "requires_flash": false,
+  "weather": "WEATHER_NONE",
+  "map_type": "MAP_TYPE_CITY",
+  "allow_cycling": true,
+  "allow_escaping": false,
+  "allow_running": true,
+  "show_map_name": true,
+  "battle_scene": "MAP_BATTLE_SCENE_NORMAL",
+  "connections": [
+    {
+      "map": "MAP_ROUTE44_HNS",
+      "offset": -9,
+      "direction": "left"
+    },
+    {
+      "map": "MAP_ROUTE45_HNS",
+      "offset": -6,
+      "direction": "down"
+    }
+  ],
+  "object_events": [],
+  "warp_events": [],
+  "coord_events": [],
+  "bg_events": [],
+  "region": "REGION_JOHTO",
+  "world_enabled": true
+}

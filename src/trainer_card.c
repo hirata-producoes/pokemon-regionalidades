@@ -10,6 +10,7 @@
 #include "sound.h"
 #include "frontier_pass.h"
 #include "overworld.h"
+#include "regions.h"
 #include "menu.h"
 #include "text.h"
 #include "event_data.h"
@@ -773,7 +774,8 @@ static void TrainerCard_GenerateCardForPlayer(struct TrainerCard *trainerCard)
 {
     memset(trainerCard, 0, sizeof(struct TrainerCard));
     trainerCard->version = GAME_VERSION;
-    SetPlayerCardData(trainerCard, VersionToCardType(GAME_VERSION));
+    SetPlayerCardData(trainerCard, GetCurrentRegion() == REGION_KANTO
+                                   ? CARD_TYPE_FRLG : VersionToCardType(GAME_VERSION));
 
     if (!IS_FRLG)
     {
@@ -854,6 +856,12 @@ static void SetDataFromTrainerCard(void)
         sData->hasTrades++;
     if (sData->trainerCard.battleTowerWins || sData->trainerCard.battleTowerStraightWins)
         sData->hasBattleTowerWins++;
+
+    if (!sData->isLink && GetCurrentRegion() == REGION_KANTO)
+    {
+        sData->badgeCount[0] = FlagGet(FLAG_DEFEATED_BROCK);
+        return;
+    }
 
     for (i = 0, badgeFlag = FLAG_BADGE01_GET; badgeFlag < FLAG_BADGE01_GET + NUM_BADGES; badgeFlag++, i++)
     {
@@ -1524,7 +1532,7 @@ static void DrawStarsAndBadgesOnCard(void)
     if (!sData->isLink)
     {
         x = 4;
-        y = IS_FRLG ? 16 : 15;
+        y = sData->cardType == CARD_TYPE_FRLG ? 16 : 15;
         for (i = 0; i < NUM_BADGES; i++, tileNum += 2, x += 3)
         {
             if (sData->badgeCount[i])
@@ -1868,6 +1876,11 @@ static u8 GetSetCardType(void)
     }
     else
     {
+        if (!sData->isLink && GetCurrentRegion() == REGION_KANTO)
+        {
+            sData->isHoenn = FALSE;
+            return CARD_TYPE_FRLG;
+        }
         if (sData->trainerCard.version == VERSION_FIRE_RED || sData->trainerCard.version == VERSION_LEAF_GREEN)
         {
             sData->isHoenn = FALSE;

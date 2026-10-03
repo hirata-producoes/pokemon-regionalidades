@@ -1,0 +1,33 @@
+{
+  "id": "MAP_ROUTE28_HNS",
+  "name": "Route28_hns",
+  "layout": "LAYOUT_ROUTE28_HNS",
+  "music": "MUS_RG_ROUTE3",
+  "region_map_section": "MAPSEC_ROUTE_28",
+  "requires_flash": false,
+  "weather": "WEATHER_NONE",
+  "map_type": "MAP_TYPE_ROUTE",
+  "allow_cycling": true,
+  "allow_escaping": false,
+  "allow_running": true,
+  "show_map_name": true,
+  "battle_scene": "MAP_BATTLE_SCENE_NORMAL",
+  "connections": [
+    {
+      "map": "MAP_MT_SILVER_OUTSIDE_HNS",
+      "offset": -6,
+      "direction": "left"
+    },
+    {
+      "map": "MAP_ROUTE26NORTH_HNS",
+      "offset": 29,
+      "direction": "right"
+    }
+  ],
+  "object_events": [],
+  "warp_events": [],
+  "coord_events": [],
+  "bg_events": [],
+  "region": "REGION_JOHTO",
+  "world_enabled": true
+}

@@ -8,6 +8,7 @@
 #include "malloc.h"
 #include "menu.h"
 #include "overworld.h"
+#include "regions.h"
 #include "palette.h"
 #include "region_map.h"
 #include "sound.h"
@@ -232,7 +233,7 @@ static void PrintTitleWindowText(void)
 {
     static const u8 FlyPromptText[] = _("{R_BUTTON} FLY");
     const u8 *region;
-    if (IS_FRLG)
+    if (GetCurrentRegion() == REGION_KANTO)
         region = gText_Kanto;
     else
         region = gText_Hoenn;

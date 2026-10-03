@@ -29,7 +29,7 @@
 // To use this feature, replace the 0 with the flag ID you're assigning it to.
 // Eg: Replace with FLAG_UNUSED_0x264 so you can use that flag to toggle the feature.
 #define I_EXP_SHARE_FLAG        FLAG_SYS_EXP_SHARE_ENABLED // Estado global e persistente; o próprio item alterna entre ligado e desligado.
-#define I_EXP_SHARE_ITEM        GEN_6       // Modelo moderno: participantes recebem 100% e os demais Pokémon elegíveis recebem 50%.
+#define I_EXP_SHARE_ITEM        GEN_6       // No PC, o item eleva o compartilhamento passivo de 20% para 40%.
 
 // Repel/Lure config
 // These two settings are both independent and complementary.

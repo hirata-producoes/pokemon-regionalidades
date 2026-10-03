@@ -7,5 +7,8 @@
 #else
 #include "data/tilesets/graphics.h"
 #include "data/tilesets/metatiles.h"
+#include "data/tilesets/johto_hns_graphics.h"
+#include "data/tilesets/johto_hns_metatiles.h"
 #endif
 #include "data/tilesets/headers.h"
+#include "data/tilesets/johto_hns_headers.h"
