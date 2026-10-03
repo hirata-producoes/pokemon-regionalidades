@@ -134,6 +134,11 @@ static const u8* const *GetTrainerSlideArray(enum DifficultyLevel difficulty, u3
 
 static bool32 DoesTrainerHaveSlideMessage(enum DifficultyLevel difficulty, u32 trainerId, u32 slideId)
 {
+    // Regional trainer IDs live outside the legacy Hoenn slide table. They use
+    // their normal encounter/defeat text until a regional slide table exists.
+    if (IsKantoTrainerId(trainerId))
+        return FALSE;
+
     const u8* const *trainerSlides = GetTrainerSlideArray(difficulty, trainerId, slideId);
     const u8* const *trainerSlidesNormal = GetTrainerSlideArray(DIFFICULTY_NORMAL, trainerId, slideId);
 

@@ -664,7 +664,8 @@ $(C_BUILDDIR)/sound.o: $(PC_CRY_RESOURCE_HEADER)
 
 $(PC_TILESET_RESOURCE_HEADER) $(PC_TILESET_RESOURCE_LIST) $(PC_TILESET_RESOURCE_MAKEFILE) &: \
 		$(PC_TILESET_RESOURCE_GENERATOR) src/data/tilesets/graphics.h \
-		src/data/tilesets/metatiles.h $(wildcard include/config/*.h)
+		src/data/tilesets/metatiles.h src/data/tilesets/johto_hns_graphics.h \
+		src/data/tilesets/johto_hns_metatiles.h $(wildcard include/config/*.h)
 	@mkdir -p $(PC_POKEMON_GENERATED_DIR)
 	$(PYTHON) $(PC_TILESET_RESOURCE_GENERATOR) --root . --cpp $(CPP) \
 		--header $(PC_TILESET_RESOURCE_HEADER) \

@@ -1,0 +1,38 @@
+{
+  "id": "MAP_MAHOGANYTOWN_HNS",
+  "name": "Mahoganytown_hns",
+  "layout": "LAYOUT_MAHOGANYTOWN_HNS",
+  "music": "MUS_OLDALE",
+  "region_map_section": "MAPSEC_MAHOGANY_TOWN",
+  "requires_flash": false,
+  "weather": "WEATHER_NONE",
+  "map_type": "MAP_TYPE_TOWN",
+  "allow_cycling": true,
+  "allow_escaping": false,
+  "allow_running": true,
+  "show_map_name": true,
+  "battle_scene": "MAP_BATTLE_SCENE_NORMAL",
+  "connections": [
+    {
+      "map": "MAP_ROUTE42_HNS",
+      "offset": -3,
+      "direction": "left"
+    },
+    {
+      "map": "MAP_ROUTE43_HNS",
+      "offset": 2,
+      "direction": "up"
+    },
+    {
+      "map": "MAP_ROUTE44_HNS",
+      "offset": -2,
+      "direction": "right"
+    }
+  ],
+  "object_events": [],
+  "warp_events": [],
+  "coord_events": [],
+  "bg_events": [],
+  "region": "REGION_JOHTO",
+  "world_enabled": true
+}

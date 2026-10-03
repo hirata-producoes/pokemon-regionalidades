@@ -8,6 +8,7 @@ bool8 Pgr_IsPanelMenuActive(void);
 u8 Pgr_GetPanelMenuCount(void);
 const u8 *Pgr_GetPanelMenuLabel(u8 index);
 u8 Pgr_GetPanelMenuCursor(void);
+u8 Pgr_GetPanelMenuIcon(u8 index);
 void Pgr_ClickPanelMenu(u8 index);
 #endif
 

@@ -685,11 +685,21 @@ LittlerootTown_ProfessorBirchsLab_EventScript_ScottAboardSSTidalCall::
 LittlerootTown_ProfessorBirchsLab_EventScript_TravelToKanto::
 	lock
 	faceplayer
+	msgbox LittlerootTown_ProfessorBirchsLab_Text_TravelToJohto, MSGBOX_YESNO
+	goto_if_eq VAR_RESULT, YES, LittlerootTown_ProfessorBirchsLab_EventScript_TravelToJohto
 	msgbox LittlerootTown_ProfessorBirchsLab_Text_TravelToKanto, MSGBOX_YESNO
 	goto_if_eq VAR_RESULT, NO, LittlerootTown_ProfessorBirchsLab_EventScript_StayInHoenn
 	setvar VAR_0x8004, 0 @ PGW_START_KANTO
 	special Pgw_ScriptSetCurrentRegion
 	warp MAP_PALLET_TOWN, 11, 17
+	waitstate
+	release
+	end
+
+LittlerootTown_ProfessorBirchsLab_EventScript_TravelToJohto::
+	setvar VAR_0x8004, 1 @ PGW_START_JOHTO
+	special Pgw_ScriptSetCurrentRegion
+	warp MAP_NEW_BARK_TOWN_HNS, 15, 13
 	waitstate
 	release
 	end
@@ -702,6 +712,10 @@ LittlerootTown_ProfessorBirchsLab_EventScript_StayInHoenn::
 LittlerootTown_ProfessorBirchsLab_Text_TravelToKanto:
 	.string "A rota experimental para KANTO esta aberta!\p"
 	.string "Quer viajar agora para PALLET TOWN?$"
+
+LittlerootTown_ProfessorBirchsLab_Text_TravelToJohto:
+	.string "A rota experimental para JOHTO esta aberta!\p"
+	.string "Quer viajar para NEW BARK TOWN?$"
 
 LittlerootTown_ProfessorBirchsLab_Text_StayInHoenn:
 	.string "Sem problema. Estarei aqui quando quiser ir.$"

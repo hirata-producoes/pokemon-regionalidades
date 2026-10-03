@@ -1,5 +1,39 @@
 # Estado atual
 
+## Câmera livre oculta para inspeção — 22 de setembro de 2026
+
+O porte PC possui agora uma câmera de desenvolvedor separada da câmera do
+personagem. `Ctrl + Shift + F` congela temporariamente a simulação e abre um
+atlas de todos os mapas externos cadastrados como cidade, vila, rota terrestre
+ou rota marítima. Arrastar
+com o botão esquerdo move a visão, a roda do mouse controla o zoom de 0,2% a
+800%, e `Esc` ou o mesmo atalho retorna ao jogo. A abertura enquadra o atlas
+inteiro; o limite inferior reduzido permite comportar o mundo
+durante a inspeção. A pausa que existia antes da
+abertura é restaurada ao sair.
+
+A visão é reconstruída diretamente dos layouts, metabloco, tilesets e paletas
+empacotados. Portanto, reduzir o zoom revela terreno adicional de verdade, em
+vez de apenas diminuir os 240×160 pixels já desenhados pelo GBA. As conexões
+definem a posição relativa dos mapas ligados. Conjuntos ainda desconectados são
+organizados em setores separados do atlas, sem fingir que existe uma passagem
+entre eles. Cada mapa usa seu próprio conjunto gráfico.
+O marcador vermelho indica a posição preservada do jogador. A ferramenta não
+move o personagem, não executa colisões, warps ou eventos e não grava estado no
+save. Sprites móveis e efeitos animados não fazem parte desta primeira visão
+cartográfica estática.
+
+O executável Windows compilou com sucesso e o pacote externo foi verificado:
+14.938 recursos, 936 mapas e 785 layouts. A interação visual da nova câmera
+ainda precisa de uma conferência manual curta no computador.
+
+## Validação manual da campanha de Kanto — 22 de setembro de 2026
+
+O responsável repetiu os testes manuais dos problemas relatados anteriormente,
+confirmou as correções e conseguiu atravessar a Viridian Forest. Essa validação
+encerra o bloqueio manual do início atual de Kanto; a continuação da campanha
+pode avançar sem tratar novamente essas falhas como pendentes.
+
 Em 11 de setembro de 2026, as leituras e alterações de itens durante o jogo no
 PC consultam diretamente o bloco nativo `INVENT` depois que o save é carregado. O
 espelho Emerald é reconstruído e comparado de forma independente no momento da
@@ -1081,3 +1115,126 @@ A compilação PC completa passou com 14.938 recursos, 936 mapas, 785 layouts e
 O teste manual seguinte deve cobrir a travessia Viridian–Route 2–portaria sul–
 floresta–portaria norte, encontros selvagens, coleta persistente dos itens e a
 derrota persistente dos cinco treinadores após salvar e recarregar.
+
+## Correções do ciclo inicial de Kanto — 21 de setembro de 2026
+
+A primeira batalha do laboratório e o tutorial de captura agora recebem uma
+identificação explícita de tutorial de Kanto. Isso impede o núcleo Emerald de
+selecionar Birch, Wally, o Pokémon e os controladores de Hoenn para essas cenas.
+A marcação foi aplicada também ao caminho específico de batalha de treinador do
+rival, inclusive ao resultado de derrota. A tela de nome do jogador passa a
+pedir o ícone regional de novo jogo, permitindo que Red ou Leaf seja escolhido
+no lugar do avatar de Hoenn.
+
+O fechamento encontrado no primeiro Bug Catcher da Floresta foi localizado na
+expansão de texto de batalha. O sistema opcional de fala no meio da luta usava o
+identificador regional `0x1000` diretamente como índice da tabela antiga de
+Hoenn e acabava lendo um ponteiro fora dela quando a vida ficava baixa. Os
+treinadores de Kanto deixam de consultar essa tabela; encontro, derrota e fala
+pós-batalha continuam ativos normalmente. Uma tabela regional de falas especiais
+poderá ser criada depois sem reintroduzir a colisão.
+
+A interface de perfis agora nomeia claramente campanha atual, histórico
+automático e save fixo. Reiniciar uma campanha mantém os saves fixos disponíveis
+no perfil recriado, além da cópia integral arquivada. O teste automatizado dessa
+preservação passou. A recompilação PC passou novamente com 14.938 recursos, 936
+mapas, 785 layouts e 1.570 recursos de layout verificados. Avatar, derrota do
+rival, tutorial de captura e treinadores da floresta ainda exigem a repetição do
+teste manual no executável novo.
+A integração seletiva de Johto usa a revisão
+`167aa6d537b109bb229c231ddce4616974c4da71` de `pokehns-expansion`.
+Nove mapas e seus layouts entraram no mundo único: Cherrygrove City, Route 29,
+New Bark Town, Route 27, Tohjo Falls, Route 26, Route 26 North, Route 28 e
+Mt. Silver Outside. Há tilesets e encontros selvagens diurnos/noturnos da
+fonte. A Route 26 North aponta para a Route 22 que já existia em Kanto, sem
+importar cópias de Route 22, Route 23 ou Indigo Plateau de Johto. O desvio da
+fronteira foi ajustado para produzir uma faixa compartilhada de 20 tiles;
+o caminho físico nessa faixa ainda precisa de desenho e teste de caminhada.
+
+Objetos, falas e eventos da fonte ficaram de fora; as duas portas de Tohjo
+Falls mantêm somente as saídas de retorno à Route 27. Scripts vazios evitam
+referências indefinidas. Mapas importados usam `world_enabled`, exigido pelo
+gerador do porte PC para incluir Johto na tabela de mapas. A falta desse campo
+fazia a câmera acessar um grupo vazio e fechar o jogo. O teste de execução com
+save descartável abriu, posicionou 149 mapas externos e desenhou o atlas sem
+exceção. O importador reexecutável está em
+`tools/pokemon_go_world/import_johto_hns_foundation.py`.
+
+## Expansão do terreno de Johto — 22 de setembro de 2026
+
+O importador seletivo agora registra 53 mapas/áreas de Johto com layouts,
+24 tilesets e 79 entradas de encontros selvagens da mesma revisão de
+`pokehns-expansion`. Inclui o restante da malha externa de cidades e rotas,
+Ruins of Alph, Ilex Forest, National Park, Lake of Rage, Mt. Silver e áreas da
+Safari Zone. Não traz a segunda Kanto, nem Azalea Town, Route 32 ou Route 33.
+As três áreas reservadas também não aparecem na tabela de recursos, no atlas
+da câmera ou na tabela de encontros. Warps para destinos omitidos são removidos
+e os restantes são renumerados para não apontarem a saídas incorretas.
+
+O alinhamento com Hoenn continua provisório. A auditoria geométrica indica
+interseção de Route 33 com Route 114 (20 tiles) caso a rota reservada seja
+importada na posição atual; Route 34 e Ilex Forest já importadas também
+intersectam Routes 114/115. Esses mapas fornecem o terreno para inspeção, mas
+não representam uma decisão final sobre a posição mundial nem liberam a
+campanha de Johto. NPCs e eventos narrativos permanecem fora desta importação.
+A compilação PC com verificação do pacote passou (15.140 recursos, 989 mapas),
+e um teste de execução com save descartável abriu e desenhou o atlas da câmera
+livre sem fechar o jogo. Falta testar manualmente a caminhada pelas novas
+bordas e decidir o reposicionamento geográfico antes de ativar os três mapas
+reservados.
+
+## Ajuste espacial de Johto — 22 de setembro de 2026
+
+Azalea Town, Routes 32/33 e as portarias da Ilex Forest e de Ruins of Alph
+entraram no conjunto seletivo: 60 mapas/áreas de Johto, sem duplicar Kanto.
+O importador agora interpreta corretamente os índices de warp escritos como
+texto na fonte e preserva 62 saídas válidas entre mapas incluídos. Ilex
+Forest usa portarias em ambas as pontas, sem ligação direta de borda à Route
+34. Johto foi projetada 30 blocos ao norte em relação ao encaixe provisório
+com Hoenn. A travessia direta Route 22–Route 26 North foi suspensa até existir
+um corredor real que preencha o vão; não há teletransporte substituto.
+
+A auditoria encontra zero sobreposições entre os mapas externos ancorados de
+Johto e Hoenn. Ruins of Alph foi 10 blocos para oeste, como solicitado, mas
+ainda cruza Violet City e Route 32 em pequena área; a correção total precisa
+de um segundo ajuste. Áreas externas sem conexão direta no grafo, como a
+Safari Zone e partes de Mt. Silver, ainda precisam de âncora visual. A
+campanha de Kanto não foi promovida a completa apenas pela presença de mapas:
+404 mapas da região seguem desativados, com eventos e identidades narrativas
+que precisam de validação própria antes de uma liberação geral.
+
+A auditoria preliminar `tools/pokemon_go_world/audit_kanto_campaign.py`
+explica por que não foi acionada uma chave global de história nesta etapa:
+nos scripts desses 404 mapas aparecem 311 nomes de flags, dos quais 281 estão
+definidos como `0` no conjunto compartilhado, incluindo
+`FLAG_DEFEATED_BROCK`; 50 nomes de variáveis e 246 nomes de treinadores não
+constam do cabeçalho principal de Hoenn. A contagem é textual e precisa ser
+confirmada conforme cada arco for portado, mas basta para impedir uma ativação
+segura em massa. O próximo trabalho narrativo deve reservar identidades
+persistentes de Kanto, adaptar treinadores e progressão, então ativar e testar
+cada arco até a Liga sem misturar recompensas e saves de Hoenn.
+
+O pacote atualizado foi compilado em uma cópia isolada com 15.170 recursos,
+verificação de integridade aprovada e teste automático da câmera concluído
+sem encerramento inesperado. O jogo principal estava aberto e o Windows
+bloqueou a substituição de `pokemon_regionalidades.pak` e do executável no
+diretório principal. A cópia de teste está em `build/johto-preview-stage`;
+o jogo principal permanece intacto até poder receber a atualização.
+
+## Primeiro capítulo de Pewter — 22 de setembro de 2026
+
+Pewter City, seu Ginásio, Centro Pokémon e Mercado foram promovidos de prévia
+para eventos ativos no porte PC. Uma lista de eventos `pc_events` mantém as
+fontes originais de FireRed intactas para aquele build e habilita apenas os
+objetos e portas já adaptados no jogo unificado. As três portas ativas da
+cidade têm retorno validado; museu e casas continuam fechados até receberem
+eventos próprios. Route 3 e Mt. Moon ainda são terreno de prévia, sem capítulo
+narrativo ou treinadores ativados.
+
+Liam e Brock usam IDs de treinador regionais de Kanto, preservando o espaço de
+Hoenn. A vitória contra Brock e a entrega da TM39 têm flags persistentes
+separadas; a insígnia de Hoenn não é concedida por esse evento. Falta integrar
+a exibição e os efeitos da Boulderbadge na interface regional. A compilação
+PC, a integridade do pacote e a verificação dos 996 mapas passaram. Também foi
+conferida estaticamente a ida e volta dos warps desse pequeno capítulo. A
+batalha, cura e compra ainda precisam de uma rodada de teste manual no jogo.

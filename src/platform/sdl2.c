@@ -69,6 +69,7 @@ static LONG CALLBACK LogNativeException(EXCEPTION_POINTERS *exception)
 #include "platform/dma.h"
 #include "platform/framedraw.h"
 #include "platform/pc_save_container.h"
+#include "platform/developer_map_camera.h"
 #include "pokemon_regionalidades_dex.h"
 #include "pokemon_regionalidades_inventory.h"
 #include "pokemon_regionalidades_progress.h"
@@ -90,6 +91,10 @@ SDL_Window *sdlWindow;
 SDL_Renderer *sdlRenderer;
 SDL_Texture *sdlTexture;
 #if defined(NATIVE_LINUX) || defined(_WIN32)
+static SDL_Texture *sPanelWorldTexture;
+static SDL_Texture *sPanelIconTexture;
+static SDL_Texture *sPanelButtonTexture;
+static SDL_Texture *sPanelFontTexture;
 #define MAX_BORDER_BACKGROUNDS 15
 SDL_Texture *sdlBackgroundTextures[MAX_BORDER_BACKGROUNDS];
 SDL_Texture *sdlBorderTexture;
@@ -269,6 +274,24 @@ static void DrawRegionalidadesSecondaryScreen(const SDL_Rect *viewport);
 #define PANEL_TOTAL_HEIGHT   (PANEL_LOGICAL_HEIGHT * 2)
 #define PANEL_GLYPH(a, b, c, d, e) (((a) << 12) | ((b) << 9) | ((c) << 6) | ((d) << 3) | (e))
 
+static SDL_Texture *LoadPanelBmp(const char *path)
+{
+    SDL_Surface *surface = SDL_LoadBMP(path);
+    SDL_Texture *texture;
+
+    if (surface == NULL)
+    {
+        SDL_Log("Secondary panel sprite unavailable: %s", path);
+        return NULL;
+    }
+    SDL_SetColorKey(surface, SDL_TRUE, SDL_MapRGB(surface->format, 255, 0, 255));
+    texture = SDL_CreateTextureFromSurface(sdlRenderer, surface);
+    SDL_FreeSurface(surface);
+    if (texture != NULL)
+        SDL_SetTextureBlendMode(texture, SDL_BLENDMODE_BLEND);
+    return texture;
+}
+
 static u16 GetPanelGlyph(char character)
 {
     switch (character)
@@ -335,9 +358,103 @@ static void FillPanelRect(const SDL_Rect *viewport, int x, int y, int width, int
     SDL_RenderFillRect(sdlRenderer, &rect);
 }
 
+static void DrawPanelSprite(const SDL_Rect *viewport, SDL_Texture *texture, SDL_Rect source,
+                            int x, int y, int width, int height)
+{
+    if (texture != NULL)
+    {
+        SDL_Rect target = PanelLogicalRect(viewport, x, y, width, height);
+        SDL_RenderCopy(sdlRenderer, texture, &source, &target);
+    }
+}
+
+static bool GetPanelFontCell(unsigned char character, int *column, int *row)
+{
+    if (character >= 'a' && character <= 'z')
+        character -= 'a' - 'A';
+    if (character >= '0' && character <= '9')
+    {
+        *column = character - '0';
+        *row = 1;
+    }
+    else if (character >= 'A' && character <= 'O')
+    {
+        *column = character - 'A' + 1;
+        *row = 2;
+    }
+    else if (character >= 'P' && character <= 'Z')
+    {
+        *column = character - 'P';
+        *row = 3;
+    }
+    else if (character == ':') { *column = 10; *row = 1; }
+    else if (character == '.') { *column = 14; *row = 0; }
+    else if (character == '-') { *column = 13; *row = 0; }
+    else if (character == '/') { *column = 15; *row = 0; }
+    else if (character == '?') { *column = 15; *row = 1; }
+    else return false;
+    return true;
+}
+
+static bool GetPanelAccentedFontCell(unsigned char suffix, int *column, int *row)
+{
+    // UTF-8 C3 xx forms, from the player's ORAS glyph sheet.
+    switch (suffix)
+    {
+    case 0x80: case 0xA0: *column = 0; *row = 8; return true;  // À
+    case 0x81: case 0xA1: *column = 1; *row = 8; return true;  // Á
+    case 0x82: case 0xA2: *column = 2; *row = 8; return true;  // Â
+    case 0x83: case 0xA3: *column = 3; *row = 8; return true;  // Ã
+    case 0x87: case 0xA7: *column = 7; *row = 8; return true;  // Ç
+    case 0x88: case 0xA8: *column = 8; *row = 8; return true;  // È
+    case 0x89: case 0xA9: *column = 9; *row = 8; return true;  // É
+    case 0x8A: case 0xAA: *column = 10; *row = 8; return true; // Ê
+    case 0x8C: case 0xAC: *column = 12; *row = 8; return true; // Ì
+    case 0x8D: case 0xAD: *column = 13; *row = 8; return true; // Í
+    case 0x93: case 0xB3: *column = 2; *row = 9; return true;  // Ó
+    case 0x95: case 0xB5: *column = 4; *row = 9; return true;  // Õ
+    case 0x9A: case 0xBA: *column = 9; *row = 9; return true;  // Ú
+    default: return false;
+    }
+}
+
 static void DrawPanelText(const SDL_Rect *viewport, int x, int y, int size, const char *text, u8 red, u8 green, u8 blue)
 {
     int originX = x;
+
+    if (sPanelFontTexture != NULL)
+    {
+        int glyphWidth = size == 1 ? 8 : 10;
+        int glyphHeight = size == 1 ? 11 : 14;
+        SDL_SetTextureColorMod(sPanelFontTexture, red, green, blue);
+        for (; *text != '\0'; text++)
+        {
+            int column, row;
+            unsigned char character = (unsigned char)*text;
+            bool found = false;
+            if (character == '\n')
+            {
+                x = originX;
+                y += glyphHeight + 2;
+                continue;
+            }
+            if (character == 0xC3 && text[1] != '\0')
+            {
+                found = GetPanelAccentedFontCell((unsigned char)text[1], &column, &row);
+                text++;
+            }
+            else
+                found = GetPanelFontCell(character, &column, &row);
+            if (found)
+            {
+                SDL_Rect source = {column * 29, row * 36, 29, 36};
+                DrawPanelSprite(viewport, sPanelFontTexture, source, x, y, glyphWidth, glyphHeight);
+            }
+            x += glyphWidth;
+        }
+        SDL_SetTextureColorMod(sPanelFontTexture, 255, 255, 255);
+        return;
+    }
 
     SDL_SetRenderDrawColor(sdlRenderer, red, green, blue, 255);
     for (; *text != '\0'; text++)
@@ -368,6 +485,37 @@ static void DrawPanelText(const SDL_Rect *viewport, int x, int y, int size, cons
         }
         x += size * 4;
     }
+}
+
+static void DrawPanelMenuIcon(const SDL_Rect *viewport, u8 icon, bool selected, int x, int y)
+{
+    SDL_Rect source;
+    int sourceX = selected ? 247 : 209;
+    int sourceRow = icon;
+
+    if (icon == 2) // The Platinum bag pair is in the second icon group.
+    {
+        sourceX = selected ? 338 : 300;
+        sourceRow = 3;
+    }
+    else if (icon == 3) sourceRow = 2; // Pokégear / navigator
+    else if (icon == 4) sourceRow = 4; // Trainer card / document
+    else if (icon == 5) sourceRow = 5; // Save
+    else if (icon == 6) sourceRow = 6; // Options
+    else if (icon >= 7) sourceRow = 7; // Return / other action
+
+    source = (SDL_Rect){sourceX, 102 + sourceRow * 32, 27, 27};
+    DrawPanelSprite(viewport, sPanelIconTexture, source, x, y, 20, 20);
+}
+
+static void DrawPanelMenuButton(const SDL_Rect *viewport, int x, int y, int width, bool selected)
+{
+    SDL_Rect source = selected ? (SDL_Rect){151, 713, 127, 44}
+                               : (SDL_Rect){24, 713, 123, 44};
+    if (sPanelButtonTexture != NULL)
+        DrawPanelSprite(viewport, sPanelButtonTexture, source, x, y, width, 24);
+    else
+        FillPanelRect(viewport, x, y, width, 24, selected ? 47 : 35, selected ? 186 : 139, selected ? 77 : 91);
 }
 
 static void GameTextToPanelText(char *destination, size_t capacity, const u8 *source)
@@ -413,7 +561,7 @@ static void GameTextToPanelText(char *destination, size_t capacity, const u8 *so
 static const char *GetPanelTurnName(u8 hour)
 {
     if (hour >= MORNING_HOUR_BEGIN && hour < MORNING_HOUR_END)
-        return "MANHA";
+        return "MANHÃ";
     if (hour >= DAY_HOUR_BEGIN && hour < DAY_HOUR_END)
         return "DIA";
     if (hour >= EVENING_HOUR_BEGIN && hour < EVENING_HOUR_END)
@@ -423,14 +571,17 @@ static const char *GetPanelTurnName(u8 hour)
 
 static void DrawPanelCard(const SDL_Rect *viewport, int x, int y, int width, const char *label, const char *value)
 {
-    FillPanelRect(viewport, x, y, width, 34, 38, 89, 83);
-    FillPanelRect(viewport, x + 2, y + 2, width - 4, 30, 214, 231, 185);
-    DrawPanelText(viewport, x + 7, y + 5, 1, label, 42, 84, 76);
-    DrawPanelText(viewport, x + 7, y + 17, 2, value, 24, 52, 49);
+    FillPanelRect(viewport, x, y, width, 34, 34, 98, 75);
+    FillPanelRect(viewport, x + 2, y + 2, width - 4, 30, 230, 246, 220);
+    DrawPanelText(viewport, x + 7, y + 4, 1, label, 43, 102, 77);
+    DrawPanelText(viewport, x + 7, y + 17, SDL_strlen(value) * 10 > width - 14 ? 1 : 2,
+                  value, 29, 60, 54);
 }
 
 static SDL_Rect sPanelViewport;
+static SDL_Rect sGameViewport;
 static u16 sPanelMouseKeys;
+static bool sDeveloperCameraPreviousPause;
 
 static void DrawRegionalidadesSecondaryScreen(const SDL_Rect *viewport)
 {
@@ -459,42 +610,143 @@ static void DrawRegionalidadesSecondaryScreen(const SDL_Rect *viewport)
             SDL_snprintf(dateText, sizeof(dateText), "%02u/%02u/20%02u", worldTime->day, worldTime->month, worldTime->year);
     }
 
-    FillPanelRect(viewport, 0, 0, PANEL_LOGICAL_WIDTH, PANEL_LOGICAL_HEIGHT, 16, 48, 50);
-    FillPanelRect(viewport, 4, 4, 312, 172, 182, 153, 70);
-    FillPanelRect(viewport, 7, 7, 306, 166, 105, 155, 124);
-    FillPanelRect(viewport, 11, 11, 298, 42, 226, 238, 196);
-    DrawPanelText(viewport, 18, 17, 1, "LOCAL ATUAL", 61, 100, 88);
-    DrawPanelText(viewport, 18, 32, 2, mapName, 22, 53, 50);
+    FillPanelRect(viewport, 0, 0, PANEL_LOGICAL_WIDTH, PANEL_LOGICAL_HEIGHT, 27, 56, 53);
+    FillPanelRect(viewport, 4, 4, 312, 172, 51, 139, 96);
+    FillPanelRect(viewport, 7, 7, 306, 166, 184, 225, 181);
+    FillPanelRect(viewport, 11, 11, 298, 42, 242, 249, 226);
+    DrawPanelText(viewport, 18, 14, 1, "LOCAL ATUAL", 50, 108, 77);
+    DrawPanelText(viewport, 18, 29, SDL_strlen(mapName) > 28 ? 1 : 2,
+                  mapName, 23, 55, 48);
 
     DrawPanelCard(viewport, 11, 58, 144, "CLIMA", climateName);
-    DrawPanelCard(viewport, 165, 58, 144, "ESTACAO", seasonName);
+    DrawPanelCard(viewport, 165, 58, 144, "ESTAÇÃO", seasonName);
     DrawPanelCard(viewport, 11, 98, 92, "HORARIO", timeText);
     DrawPanelCard(viewport, 113, 98, 94, "DATA", dateText);
     DrawPanelCard(viewport, 217, 98, 92, "TURNO", GetPanelTurnName(hour));
 
-    FillPanelRect(viewport, 11, 140, 298, 27, 38, 89, 83);
-    DrawPanelText(viewport, 62, 150, 1, "CLIQUE OU START: MENU", 218, 232, 187);
+    if (sPanelButtonTexture != NULL)
+        DrawPanelSprite(viewport, sPanelButtonTexture, (SDL_Rect){303, 476, 204, 36}, 11, 140, 298, 29);
+    else
+        FillPanelRect(viewport, 11, 140, 298, 29, 152, 43, 84);
+    DrawPanelText(viewport, 60, 149, 1, "TOQUE OU START: MENU", 255, 248, 245);
     if (Pgr_IsPanelMenuActive())
     {
-        FillPanelRect(viewport, 7, 7, 306, 166, 20, 125, 70);
-        DrawPanelText(viewport, 15, 13, 1, mapName, 240, 255, 230);
-        DrawPanelText(viewport, 244, 13, 1, timeText, 240, 255, 230);
-        char environment[80];
-        SDL_snprintf(environment, sizeof(environment), "%s  %s  %s  %s", dateText, seasonName, climateName, GetPanelTurnName(hour));
-        DrawPanelText(viewport, 15, 21, 1, environment, 240, 255, 230);
+        FillPanelRect(viewport, 7, 7, 306, 166, 18, 112, 68);
+        FillPanelRect(viewport, 9, 9, 302, 29, 24, 89, 63);
+        DrawPanelText(viewport, 14, 11, 1, mapName, 243, 255, 239);
+        DrawPanelText(viewport, 243, 11, 1, timeText, 243, 255, 239);
+        DrawPanelText(viewport, 14, 25, 1, climateName, 205, 241, 216);
+        DrawPanelText(viewport, 153, 25, 1, seasonName, 205, 241, 216);
+        DrawPanelSprite(viewport, sPanelButtonTexture, (SDL_Rect){510, 475, 37, 38}, 285, 10, 23, 24);
         for (u8 i = 0; i < Pgr_GetPanelMenuCount(); i++)
         {
             char label[40];
+            const char *displayLabel;
+            u8 icon = Pgr_GetPanelMenuIcon(i);
             int x = 14 + (i % 2) * 148;
-            int y = 28 + (i / 2) * 25;
+            int y = 41 + (i / 2) * 27;
             bool selected = i == Pgr_GetPanelMenuCursor();
             GameTextToPanelText(label, sizeof(label), Pgr_GetPanelMenuLabel(i));
-            FillPanelRect(viewport, x, y, 140, 22, selected ? 245 : 40, selected ? 191 : 86, selected ? 72 : 68);
-            FillPanelRect(viewport, x + 2, y + 2, 136, 18, 212, 236, 219);
-            DrawPanelText(viewport, x + 7, y + 8, 1, label, 25, 78, 56);
+            switch (icon)
+            {
+            case 0: displayLabel = "POKÉDEX"; break;
+            case 1: displayLabel = "POKÉMON"; break;
+            case 2: displayLabel = "BOLSA"; break;
+            case 3: displayLabel = "NAVEGADOR"; break;
+            case 5: displayLabel = "SALVAR"; break;
+            case 6: displayLabel = "OPÇÕES"; break;
+            default: displayLabel = label; break;
+            }
+            DrawPanelMenuButton(viewport, x, y, 140, selected);
+            DrawPanelMenuIcon(viewport, icon, selected, x + 5, y + 2);
+            DrawPanelText(viewport, x + 31, y + 6, 1, displayLabel,
+                          selected ? 16 : 240, selected ? 73 : 255, selected ? 51 : 239);
         }
-        DrawPanelText(viewport, 20, 162, 1, "A: ABRIR   B / START: VOLTAR", 240, 255, 230);
+        if (Pgr_GetPanelMenuCount() <= 8)
+            DrawPanelText(viewport, 24, 157, 1, "A: ABRIR  B/START: VOLTAR", 230, 250, 225);
     }
+}
+
+static void DrawRegionalidadesPcScreens(void)
+{
+    u8 backgroundOption = Platform_GetBorderBackground();
+    int outputWidth;
+    int outputHeight;
+    int combinedWidth;
+    int combinedHeight;
+    SDL_Rect topScreen;
+    SDL_Rect secondaryScreen;
+
+    SDL_RenderClear(sdlRenderer);
+    if (backgroundOption < sBorderBackgroundCount
+     && sdlBackgroundTextures[backgroundOption] != NULL)
+        SDL_RenderCopy(sdlRenderer, sdlBackgroundTextures[backgroundOption], NULL, NULL);
+
+    SDL_GetRendererOutputSize(sdlRenderer, &outputWidth, &outputHeight);
+    if (sPlatformSettings[PLATFORM_SETTING_INTEGER_SCALE])
+    {
+        int scale = outputWidth / PANEL_LOGICAL_WIDTH;
+        if (outputHeight / PANEL_TOTAL_HEIGHT < scale)
+            scale = outputHeight / PANEL_TOTAL_HEIGHT;
+        if (scale < 1)
+            scale = 1;
+        combinedWidth = PANEL_LOGICAL_WIDTH * scale;
+        combinedHeight = PANEL_TOTAL_HEIGHT * scale;
+    }
+    else
+    {
+        combinedWidth = outputWidth;
+        combinedHeight = combinedWidth * PANEL_TOTAL_HEIGHT / PANEL_LOGICAL_WIDTH;
+        if (combinedHeight > outputHeight)
+        {
+            combinedHeight = outputHeight;
+            combinedWidth = combinedHeight * PANEL_LOGICAL_WIDTH / PANEL_TOTAL_HEIGHT;
+        }
+    }
+    topScreen.x = (outputWidth - combinedWidth) / 2;
+    topScreen.y = (outputHeight - combinedHeight) / 2;
+    topScreen.w = combinedWidth;
+    topScreen.h = combinedHeight / 2;
+
+    sGameViewport.w = topScreen.w;
+    sGameViewport.h = sGameViewport.w * DISPLAY_HEIGHT / DISPLAY_WIDTH;
+    if (sGameViewport.h > topScreen.h)
+    {
+        sGameViewport.h = topScreen.h;
+        sGameViewport.w = sGameViewport.h * DISPLAY_WIDTH / DISPLAY_HEIGHT;
+    }
+    sGameViewport.x = topScreen.x + (topScreen.w - sGameViewport.w) / 2;
+    sGameViewport.y = topScreen.y + (topScreen.h - sGameViewport.h) / 2;
+    secondaryScreen.x = sGameViewport.x;
+    secondaryScreen.y = topScreen.y + topScreen.h;
+    secondaryScreen.w = sGameViewport.w;
+    secondaryScreen.h = sGameViewport.h;
+
+    if (DeveloperMapCamera_IsOpen())
+    {
+        DeveloperMapCamera_Draw(sdlRenderer, &sGameViewport);
+    }
+    else
+    {
+        SDL_Texture *worldTexture = Pgr_IsPanelMenuActive() && sPanelWorldTexture != NULL
+                                  ? sPanelWorldTexture : sdlTexture;
+        SDL_RenderCopy(sdlRenderer, worldTexture, NULL, &sGameViewport);
+    }
+
+    if (sPlatformSettings[PLATFORM_SETTING_BORDER] && sdlBorderTexture != NULL)
+    {
+        SDL_Rect borderSource = {141, 18, 1000, 683};
+        int innerWidth = sGameViewport.w - 2;
+        int innerHeight = sGameViewport.h - 2;
+        SDL_Rect borderViewport = {
+            sGameViewport.x + 1 - innerWidth * 19 / 961,
+            sGameViewport.y + 1 - innerHeight * 20 / 643,
+            innerWidth * 1000 / 961,
+            innerHeight * 683 / 643
+        };
+        SDL_RenderCopy(sdlRenderer, sdlBorderTexture, &borderSource, &borderViewport);
+    }
+    DrawRegionalidadesSecondaryScreen(&secondaryScreen);
 }
 #endif
 
@@ -1046,7 +1298,7 @@ int main(int argc, char **argv)
 #ifdef __ANDROID__
     sdlRenderer = SDL_CreateRenderer(sdlWindow, -1, SDL_RENDERER_ACCELERATED);
 #else
-    sdlRenderer = SDL_CreateRenderer(sdlWindow, -1, SDL_RENDERER_PRESENTVSYNC);
+    sdlRenderer = SDL_CreateRenderer(sdlWindow, -1, SDL_RENDERER_PRESENTVSYNC | SDL_RENDERER_TARGETTEXTURE);
 #endif
     if (sdlRenderer == NULL)
     {
@@ -1145,6 +1397,18 @@ int main(int argc, char **argv)
         return 1;
     }
     SDL_SetTextureBlendMode(sdlTexture, SDL_BLENDMODE_NONE);
+#if defined(NATIVE_LINUX) || defined(_WIN32)
+    // Preserve the last overworld frame for the upper display while Start is
+    // handled exclusively by the lower panel. Game/menu logic still runs.
+    sPanelWorldTexture = SDL_CreateTexture(sdlRenderer, SDL_PIXELFORMAT_ARGB8888,
+                                           SDL_TEXTUREACCESS_STREAMING,
+                                           DISPLAY_WIDTH, DISPLAY_HEIGHT);
+    if (sPanelWorldTexture != NULL)
+        SDL_SetTextureBlendMode(sPanelWorldTexture, SDL_BLENDMODE_NONE);
+    sPanelIconTexture = LoadPanelBmp("graphics/pc_panel/platinum_icons.bmp");
+    sPanelButtonTexture = LoadPanelBmp("graphics/pc_panel/platinum_buttons.bmp");
+    sPanelFontTexture = LoadPanelBmp("graphics/pc_panel/oras_font.bmp");
+#endif
 
     simTime = curGameTime = lastGameTime = SDL_GetPerformanceCounter();
 
@@ -1193,10 +1457,26 @@ int main(int argc, char **argv)
     mainLoopThread = SDL_CreateThread(DoMain, "AgbMain", NULL);
 
     double accumulator = 0.0;
+    bool cameraSmokeRequested = Platform_GetEnvironmentFlag("POKEMON_GO_WORLD_CAMERA_SMOKE");
 
     while (isRunning)
     {
         ProcessEvents();
+#if defined(NATIVE_LINUX) || defined(_WIN32)
+        if (cameraSmokeRequested && gMapHeader.mapLayout != NULL && sGameViewport.w > 0)
+        {
+            cameraSmokeRequested = false;
+            if (DeveloperMapCamera_Open(sdlRenderer))
+            {
+                DeveloperMapCamera_Draw(sdlRenderer, &sGameViewport);
+                DBGPRINTF("PC camera smoke: opened and drew external map atlas\n");
+                DeveloperMapCamera_Close();
+            }
+            else
+                DBGPRINTF("PC camera smoke: could not open map atlas\n");
+            isRunning = false;
+        }
+#endif
 #ifdef _WIN32
         PollConfigFileChanges();
 #endif
@@ -1221,69 +1501,10 @@ int main(int argc, char **argv)
                 if (SDL_AtomicGet(&isFrameAvailable))
                 {
                     VDraw(sdlTexture);
-                    SDL_RenderClear(sdlRenderer);
 #if defined(NATIVE_LINUX) || defined(_WIN32)
-                    u8 backgroundOption = Platform_GetBorderBackground();
-                    if (backgroundOption < sBorderBackgroundCount
-                     && sdlBackgroundTextures[backgroundOption] != NULL)
-                        SDL_RenderCopy(sdlRenderer, sdlBackgroundTextures[backgroundOption], NULL, NULL);
-                    int outputWidth;
-                    int outputHeight;
-                    SDL_GetRendererOutputSize(sdlRenderer, &outputWidth, &outputHeight);
-                    int combinedWidth;
-                    int combinedHeight;
-                    if (sPlatformSettings[PLATFORM_SETTING_INTEGER_SCALE])
-                    {
-                        int scale = outputWidth / PANEL_LOGICAL_WIDTH;
-                        if (outputHeight / PANEL_TOTAL_HEIGHT < scale)
-                            scale = outputHeight / PANEL_TOTAL_HEIGHT;
-                        if (scale < 1)
-                            scale = 1;
-                        combinedWidth = PANEL_LOGICAL_WIDTH * scale;
-                        combinedHeight = PANEL_TOTAL_HEIGHT * scale;
-                    }
-                    else
-                    {
-                        combinedWidth = outputWidth;
-                        combinedHeight = combinedWidth * PANEL_TOTAL_HEIGHT / PANEL_LOGICAL_WIDTH;
-                        if (combinedHeight > outputHeight)
-                        {
-                            combinedHeight = outputHeight;
-                            combinedWidth = combinedHeight * PANEL_LOGICAL_WIDTH / PANEL_TOTAL_HEIGHT;
-                        }
-                    }
-                    SDL_Rect topScreen = {(outputWidth - combinedWidth) / 2,
-                                          (outputHeight - combinedHeight) / 2,
-                                          combinedWidth, combinedHeight / 2};
-                    int gameWidth = topScreen.w;
-                    int gameHeight = gameWidth * DISPLAY_HEIGHT / DISPLAY_WIDTH;
-                    if (gameHeight > topScreen.h)
-                    {
-                        gameHeight = topScreen.h;
-                        gameWidth = gameHeight * DISPLAY_WIDTH / DISPLAY_HEIGHT;
-                    }
-                    SDL_Rect gameViewport = {topScreen.x + (topScreen.w - gameWidth) / 2,
-                                             topScreen.y + (topScreen.h - gameHeight) / 2,
-                                             gameWidth, gameHeight};
-                    SDL_Rect secondaryScreen = {gameViewport.x,
-                                                topScreen.y + topScreen.h,
-                                                gameViewport.w, gameViewport.h};
-                    SDL_RenderCopy(sdlRenderer, sdlTexture, NULL, &gameViewport);
-                    if (sPlatformSettings[PLATFORM_SETTING_BORDER] && sdlBorderTexture != NULL)
-                    {
-                        SDL_Rect borderSource = {141, 18, 1000, 683};
-                        int innerWidth = gameViewport.w - 2;
-                        int innerHeight = gameViewport.h - 2;
-                        SDL_Rect borderViewport = {
-                            gameViewport.x + 1 - innerWidth * 19 / 961,
-                            gameViewport.y + 1 - innerHeight * 20 / 643,
-                            innerWidth * 1000 / 961,
-                            innerHeight * 683 / 643
-                        };
-                        SDL_RenderCopy(sdlRenderer, sdlBorderTexture, &borderSource, &borderViewport);
-                    }
-                    DrawRegionalidadesSecondaryScreen(&secondaryScreen);
+                    DrawRegionalidadesPcScreens();
 #else
+                    SDL_RenderClear(sdlRenderer);
                     SDL_RenderCopy(sdlRenderer, sdlTexture, NULL, NULL);
 #endif
 #ifdef __ANDROID__
@@ -1306,14 +1527,30 @@ int main(int argc, char **argv)
             }
         }
 
+#if defined(NATIVE_LINUX) || defined(_WIN32)
+        if (DeveloperMapCamera_IsOpen())
+        {
+            DrawRegionalidadesPcScreens();
+            SDL_Delay(8);
+        }
+#endif
+
 #ifndef __ANDROID__
         SDL_RenderPresent(sdlRenderer);
 #endif
     }
 
+#if defined(NATIVE_LINUX) || defined(_WIN32)
+    if (DeveloperMapCamera_IsOpen())
+        DeveloperMapCamera_Close();
+#endif
     ResourcePack_Close();
 
 #if defined(NATIVE_LINUX) || defined(_WIN32)
+    SDL_DestroyTexture(sPanelWorldTexture);
+    SDL_DestroyTexture(sPanelIconTexture);
+    SDL_DestroyTexture(sPanelButtonTexture);
+    SDL_DestroyTexture(sPanelFontTexture);
     for (int i = 0; i < sBorderBackgroundCount; i++)
         SDL_DestroyTexture(sdlBackgroundTextures[i]);
     SDL_DestroyTexture(sdlBorderTexture);
@@ -1943,12 +2180,60 @@ static u16 ControllerButtonMask(Uint8 button)
 }
 #endif
 
+#if defined(NATIVE_LINUX) || defined(_WIN32)
+static void CloseDeveloperMapCamera(void)
+{
+    if (!DeveloperMapCamera_IsOpen())
+        return;
+    DeveloperMapCamera_Close();
+    paused = sDeveloperCameraPreviousPause;
+    lastGameTime = SDL_GetPerformanceCounter();
+    DeveloperMapCamera_UpdateWindowTitle(sdlWindow);
+#ifdef _WIN32
+    UpdateNativePauseMenu();
+#endif
+}
+
+static void ToggleDeveloperMapCamera(void)
+{
+    if (DeveloperMapCamera_IsOpen())
+    {
+        CloseDeveloperMapCamera();
+        return;
+    }
+
+    sDeveloperCameraPreviousPause = paused;
+    paused = true;
+    if (!DeveloperMapCamera_Open(sdlRenderer))
+    {
+        paused = sDeveloperCameraPreviousPause;
+        SDL_ShowSimpleMessageBox(SDL_MESSAGEBOX_WARNING, "Camera de desenvolvedor",
+                                 "A camera livre so pode ser aberta depois que um mapa estiver carregado.",
+                                 sdlWindow);
+        return;
+    }
+    DeveloperMapCamera_UpdateWindowTitle(sdlWindow);
+#ifdef _WIN32
+    UpdateNativePauseMenu();
+#endif
+}
+#endif
+
 void ProcessEvents(void)
 {
     SDL_Event event;
 
     while (SDL_PollEvent(&event))
     {
+#if defined(NATIVE_LINUX) || defined(_WIN32)
+        if (DeveloperMapCamera_IsOpen()
+         && (event.type == SDL_MOUSEBUTTONDOWN || event.type == SDL_MOUSEBUTTONUP
+          || event.type == SDL_MOUSEMOTION || event.type == SDL_MOUSEWHEEL))
+        {
+            DeveloperMapCamera_HandleEvent(&event, sdlWindow, sdlRenderer, &sGameViewport);
+            continue;
+        }
+#endif
         switch (event.type)
         {
         case SDL_QUIT:
@@ -1970,17 +2255,19 @@ void ProcessEvents(void)
                     int y = py * PANEL_LOGICAL_HEIGHT / sPanelViewport.h;
                     if (Pgr_IsPanelMenuActive())
                     {
-                        if (x >= 14 && x < 302 && y >= 28 && y < 153)
+                        if (x >= 285 && y >= 10 && y < 34)
+                            sPanelMouseKeys = B_BUTTON;
+                        else if (y >= 155 && Pgr_GetPanelMenuCount() <= 8)
+                            sPanelMouseKeys = B_BUTTON;
+                        else if (x >= 14 && x < 302 && y >= 41 && y < 176)
                         {
                             int col = (x - 14) / 148;
-                            int row = (y - 28) / 25;
-                            if ((x - 14) % 148 < 140 && (y - 28) % 25 < 22)
+                            int row = (y - 41) / 27;
+                            if ((x - 14) % 148 < 140 && (y - 41) % 27 < 24)
                                 Pgr_ClickPanelMenu(row * 2 + col);
                         }
-                        else if (y >= 155)
-                            sPanelMouseKeys = B_BUTTON;
                     }
-                    else if (y >= 140 && gMain.callback2 == CB2_Overworld && !ArePlayerFieldControlsLocked())
+                    else if (gMain.callback2 == CB2_Overworld && !ArePlayerFieldControlsLocked())
                         sPanelMouseKeys = START_BUTTON;
                 }
             }
@@ -2049,6 +2336,20 @@ void ProcessEvents(void)
             u16 keyMask = KeyboardButtonMask(key);
             keyboardKeys |= keyMask;
             keyboardPressedKeys |= keyMask;
+#if defined(NATIVE_LINUX) || defined(_WIN32)
+            if (event.key.repeat == 0
+             && key == SDLK_f
+             && (event.key.keysym.mod & (KMOD_LCTRL | KMOD_RCTRL))
+             && (event.key.keysym.mod & (KMOD_LSHIFT | KMOD_RSHIFT)))
+            {
+                ToggleDeveloperMapCamera();
+            }
+            else if (event.key.repeat == 0 && key == SDLK_ESCAPE && DeveloperMapCamera_IsOpen())
+            {
+                CloseDeveloperMapCamera();
+            }
+            else
+#endif
             if (key == SDLK_RETURN
              && (event.key.keysym.mod & (KMOD_LALT | KMOD_RALT))
              && event.key.repeat == 0)
@@ -2240,6 +2541,10 @@ void VDraw(SDL_Texture *texture)
         image[i] = 0xFF000000 | (r << 16) | (g << 8) | b;
     }
     SDL_UpdateTexture(texture, NULL, image, DISPLAY_WIDTH * sizeof(Uint32));
+#if defined(NATIVE_LINUX) || defined(_WIN32)
+    if (sPanelWorldTexture != NULL && !Pgr_IsPanelMenuActive())
+        SDL_UpdateTexture(sPanelWorldTexture, NULL, image, DISPLAY_WIDTH * sizeof(Uint32));
+#endif
 
     // Optional native-port regression capture. When the environment variable
     // points to an existing directory, save the unscaled GBA framebuffer once

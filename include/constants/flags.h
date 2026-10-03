@@ -1682,7 +1682,7 @@
 #define FLAG_HIDE_LIFT_KEY                                 0
 #define FLAG_HIDE_SILPH_SCOPE                              0
 #define FLAG_HIDE_HIDEOUT_GIOVANNI                         0
-#define FLAG_HIDE_TOWN_MAP                                 0
+#define FLAG_HIDE_TOWN_MAP                                 FLAG_UNUSED_0x8FB
 #define FLAG_HIDE_POKEDEX                                  0
 #define FLAG_HIDE_CERULEAN_ROCKET                          0
 #define FLAG_HIDE_CERULEAN_RIVAL                           0
@@ -2007,7 +2007,7 @@
 #define FLAG_DID_NINA_TRADE                              0
 #define FLAG_GOT_ITEMFINDER                              0
 #define FLAG_WOKE_UP_ROUTE_12_SNORLAX                    0
-#define FLAG_GOT_TM39_FROM_BROCK                         0
+#define FLAG_GOT_TM39_FROM_BROCK                         FLAG_UNUSED_0x8F9
 #define FLAG_GOT_SUPER_ROD                               0
 #define FLAG_GOT_EXP_SHARE_FROM_OAKS_AIDE                0
 #define FLAG_DID_MARC_TRADE                              0
@@ -2269,7 +2269,7 @@
 #define FLAG_HIDDEN_ITEM_ONE_ISLAND_TREASURE_BEACH_BIG_PEARL               0
 #define FLAG_HIDDEN_ITEM_TWO_ISLAND_CAPE_BRINK_RARE_CANDY                  0
 #define FLAG_HIDDEN_ITEM_PEWTER_CITY_POKE_BALL                             0
-#define FLAG_HIDDEN_ITEM_ROUTE3_ORAN_BERRY                                 0
+#define FLAG_HIDDEN_ITEM_ROUTE3_ORAN_BERRY                                 FLAG_UNUSED_0x8FC
 #define FLAG_HIDDEN_ITEM_ROUTE4_PERSIM_BERRY                               0
 #define FLAG_HIDDEN_ITEM_ROUTE24_PECHA_BERRY                               0
 #define FLAG_HIDDEN_ITEM_ROUTE25_ORAN_BERRY                                0
@@ -2348,7 +2348,7 @@
 #define FLAG_HIDDEN_ITEM_VIRIDIAN_CITY_GYM_MACHO_BRACE                     0
 #define FLAG_HIDDEN_ITEM_SSANNE_EXTERIOR_LAVA_COOKIE                       0
 
-#define FLAG_DEFEATED_BROCK           0
+#define FLAG_DEFEATED_BROCK           FLAG_UNUSED_0x8F8
 #define FLAG_DEFEATED_MISTY           0
 #define FLAG_DEFEATED_LT_SURGE        0
 #define FLAG_DEFEATED_ERIKA           0
@@ -2386,7 +2386,7 @@
 // World Map Flags
 #define FLAG_WORLD_MAP_PALLET_TOWN                                  0
 #define FLAG_WORLD_MAP_VIRIDIAN_CITY                                FLAG_UNUSED_0x8EE
-#define FLAG_WORLD_MAP_PEWTER_CITY                                  0
+#define FLAG_WORLD_MAP_PEWTER_CITY                                  FLAG_UNUSED_0x8FA
 #define FLAG_WORLD_MAP_CERULEAN_CITY                                0
 #define FLAG_WORLD_MAP_LAVENDER_TOWN                                0
 #define FLAG_WORLD_MAP_VERMILION_CITY                               0

@@ -40,6 +40,57 @@ para ser ativada sem confundir mapas importados com uma região jogável.
 
 A escolha inicial não significa criar motores separados. Movimento, batalha, menus, inventário e regras compartilhadas continuam em um núcleo comum; cada campanha fornece mapas, scripts, eventos, progresso regional e ponto inicial próprios.
 
+A apresentação também pertence a esse núcleo comum. Pokédex/RotomDex, equipe,
+mochila, salvamento, opções, caixas, textos e menus de batalha serão serviços
+únicos usados por todas as regiões e pelas duas telas; uma região fornece dados,
+eventos e, quando apropriado, tema visual, mas não mantém uma segunda cópia do
+mesmo menu. A folha de caracteres mais recente enviada, proveniente de
+Omega Ruby/Alpha Sapphire e com acentos, é a referência canônica escolhida para
+a fonte da interface em português. Uma cópia estável da imagem recebida foi
+preservada em
+[`references/oras_interface_font_reference.png`](references/oras_interface_font_reference.png).
+Ela está catalogada como fonte visual; o
+recorte, a conversão e a substituição global ainda não foram implementados.
+Todo componente novo que exiba letras deve usar essa mesma folha canônica ou
+uma conversão fiel dela; não deve introduzir outra fonte provisória. O texto
+geométrico atual da tela inferior é legado do primeiro protótipo e será
+substituído em uma etapa própria, porque sua legibilidade já foi rejeitada no
+teste manual. Até essa troca, novas ferramentas de desenvolvimento devem evitar
+rótulos dentro da área gráfica e manter seus controles na documentação externa.
+
+### Direção da tela inferior (setembro de 2026)
+
+- Manter o quadro de 320 × 180 pixels, do mesmo tamanho da vista do jogo.
+- Em exploração, exibir local, clima e horário; clique ou Start abre o menu único
+  na tela inferior. O mapa/personagem permanece visível e parado na superior.
+- Usar o fluxo de interação de HGSS como referência, sem copiar outro menu
+  funcional. Molduras, botões e ícones partem das folhas Platinum enviadas;
+  folhas Diamond/Pearl complementam apenas peças ausentes.
+- A folha ORAS com acentos é a fonte comum planejada. Etiquetas de tipos e
+  estados ORAS incluem Fada e substituem as versões anteriores quando couberem
+  no tamanho lógico sem interpolação.
+- As folhas Platinum de batalha distinguem `Normal`, `Touch` e `Highlight`
+  para botões de movimento. A folha de ícones de menu traz variantes normais e
+  de ambiente Underground; estas **não** equivalem automaticamente a um estado
+  selecionado. Seleção, foco de controle e botão desabilitado precisam de uma
+  tabela de estados e teste de contraste próprios.
+- Cada folha é um atlas de recursos, não uma interface pronta: recortar partes,
+  registrar retângulo/paleta/origem, compor rótulos com glifos e verificar a
+  leitura em 320 × 180 antes de substituir os retângulos provisórios.
+
+Na folha de batalha Platinum, as cores de amostra mais recorrentes incluem
+verde `#389850`/`#40C850`, ouro `#C88000`/`#F8D058` e roxo
+`#A078E0`/`#B098F8`. Os ícones de menu usam sobretudo cinzas
+`#485058`/`#909090` com realces de cor. Esses valores identificam pixels
+dos arquivos recebidos, não uma paleta final imposta a todas as telas; as
+etiquetas ORAS mantêm cores individuais por tipo e estado.
+
+A pausa do menu básico já congela eventos de objeto e o relógio interno; no PC,
+o quadro superior também é mantido enquanto esse menu está aberto. Telas
+profundas (Bolsa, Pokédex, opções e salvamento) ainda usam a apresentação
+legada e exigem migração separada para a tela inferior, sem ocultar seus
+controles antes disso.
+
 Português do Brasil é o idioma principal, o padrão de autoria e a primeira interface completa. Também ficam planejados, para depois da baseline:
 
 - interface multilíngue com textos separados da lógica e idioma armazenado na configuração do PC; os demais idiomas serão traduções da interface principal em português do Brasil;
@@ -124,6 +175,9 @@ No controle, Start abre o painel; Start/B retornam ao mapa, e direcional/A
 selecionam as ações. As telas internas ainda usam o visor superior. Cada
 botão deve chamar a mesma ação interna usada pelos menus, sem manter duas
 implementações concorrentes de Pokédex, equipe, mochila, salvamento ou opções.
+Enquanto esse contrato for respeitado, a campanha de Kanto pode continuar antes
+do acabamento da tela inferior: o painel é uma entrada alternativa para os
+mesmos serviços, não uma dependência da lógica regional.
 Durante batalhas, avaliar deslocar comandos e golpes para a tela inferior sem
 duplicar os comandos na tela superior; a decisão depende de um protótipo de
 legibilidade, teclado, mouse e controle.

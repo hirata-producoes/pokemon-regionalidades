@@ -580,11 +580,24 @@ void LoadObjEventTemplatesFromHeader(void)
 
 void LoadSaveblockObjEventScripts(void)
 {
-    const struct ObjectEventTemplate *mapHeaderObjTemplates = gMapHeader.events->objectEvents;
     struct ObjectEventTemplate *savObjTemplates = gSaveBlock1Ptr->objectEventTemplates;
+    const struct ObjectEventTemplate *mapHeaderObjTemplates;
+    u32 objectEventCount;
     s32 i;
 
-    for (i = 0; i < OBJECT_EVENT_TEMPLATES_COUNT; i++)
+    if (gMapHeader.events == NULL || gMapHeader.events->objectEvents == NULL)
+    {
+        // An empty map has no script array. Old saves may still contain
+        // templates from a previous layout, so do not keep those objects.
+        memset(savObjTemplates, 0, sizeof(gSaveBlock1Ptr->objectEventTemplates));
+        return;
+    }
+
+    mapHeaderObjTemplates = gMapHeader.events->objectEvents;
+    objectEventCount = gMapHeader.events->objectEventCount;
+    if (objectEventCount > OBJECT_EVENT_TEMPLATES_COUNT)
+        objectEventCount = OBJECT_EVENT_TEMPLATES_COUNT;
+    for (i = 0; i < objectEventCount; i++)
         savObjTemplates[i].script = mapHeaderObjTemplates[i].script;
 }
 
@@ -1931,7 +1944,6 @@ void CB2_Overworld(void)
 #if defined(PORTABLE) && defined(PLATFORM_SDL2)
     static bool32 sPcBattleTestStarted;
     static bool32 sPcPartyTestReady;
-
     if (!fading
      && !sPcPartyTestReady
      && Platform_GetEnvironmentFlag("POKEMON_GO_WORLD_TEST_PARTY"))

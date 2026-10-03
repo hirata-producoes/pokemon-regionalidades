@@ -264,6 +264,10 @@ string generate_map_events_text(Json map_data) {
         return string("\n");
 
     string mapName = json_to_string(map_data, "name");
+    // Keep the original FRLG events intact while activating a validated PC
+    // subset of a Kanto map. Missing categories in pc_events are empty.
+    Json event_data = version == "emerald_pc" && map_data.object_items().find("pc_events") != map_data.object_items().end()
+        ? map_data["pc_events"] : map_data;
 
     ostringstream text;
     text << get_generated_warning("data/maps/" + mapName + "/map.json", true);
@@ -271,11 +275,11 @@ string generate_map_events_text(Json map_data) {
 
     string objects_label, warps_label, coords_label, bgs_label;
 
-    if (!previewOnly && map_data["object_events"].array_items().size() > 0) {
+    if (!previewOnly && event_data["object_events"].array_items().size() > 0) {
         objects_label = mapName + "_ObjectEvents";
         text << objects_label << ":\n";
-        for (unsigned int i = 0; i < map_data["object_events"].array_items().size(); i++) {
-            auto obj_event = map_data["object_events"].array_items()[i];
+        for (unsigned int i = 0; i < event_data["object_events"].array_items().size(); i++) {
+            auto obj_event = event_data["object_events"].array_items()[i];
             string type = json_to_string(obj_event, "type", true);
 
             // If no type field is present, assume it's a regular object event.
@@ -308,10 +312,10 @@ string generate_map_events_text(Json map_data) {
         objects_label = "NULL";
     }
 
-    if (map_data["warp_events"].array_items().size() > 0) {
+    if (event_data["warp_events"].array_items().size() > 0) {
         warps_label = mapName + "_MapWarps";
         text << warps_label << ":\n";
-        for (auto &warp_event : map_data["warp_events"].array_items()) {
+        for (auto &warp_event : event_data["warp_events"].array_items()) {
             string destination = json_to_string(warp_event, "dest_map");
             if (previewOnly && (destination == "MAP_DYNAMIC"
                              || destination == "MAP_CELADON_CITY_DEPARTMENT_STORE_ELEVATOR")) {
@@ -332,10 +336,10 @@ string generate_map_events_text(Json map_data) {
         warps_label = "NULL";
     }
 
-    if (!previewOnly && map_data["coord_events"].array_items().size() > 0) {
+    if (!previewOnly && event_data["coord_events"].array_items().size() > 0) {
         coords_label = mapName + "_MapCoordEvents";
         text << coords_label << ":\n";
-        for (auto &coord_event : map_data["coord_events"].array_items()) {
+        for (auto &coord_event : event_data["coord_events"].array_items()) {
             string type = json_to_string(coord_event, "type");
             if (type == "trigger") {
                 text << "\tcoord_event "
@@ -361,10 +365,10 @@ string generate_map_events_text(Json map_data) {
         coords_label = "NULL";
     }
 
-    if (!previewOnly && map_data["bg_events"].array_items().size() > 0) {
+    if (!previewOnly && event_data["bg_events"].array_items().size() > 0) {
         bgs_label = mapName + "_MapBGEvents";
         text << bgs_label << ":\n";
-        for (auto &bg_event : map_data["bg_events"].array_items()) {
+        for (auto &bg_event : event_data["bg_events"].array_items()) {
             string type = json_to_string(bg_event, "type");
             if (type == "sign") {
                 text << "\tbg_sign_event "

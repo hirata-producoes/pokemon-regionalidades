@@ -132,6 +132,25 @@ bool8 Pgr_IsPanelMenuActive(void)
 
 u8 Pgr_GetPanelMenuCount(void) { return sNumStartMenuActions; }
 u8 Pgr_GetPanelMenuCursor(void) { return sStartMenuCursorPos; }
+u8 Pgr_GetPanelMenuIcon(u8 index)
+{
+    if (index >= sNumStartMenuActions)
+        return 7;
+    switch (sCurrentStartMenuActions[index])
+    {
+    case MENU_ACTION_POKEDEX: return 0;
+    case MENU_ACTION_POKEMON: return 1;
+    case MENU_ACTION_BAG:
+    case MENU_ACTION_PYRAMID_BAG: return 2;
+    case MENU_ACTION_POKENAV:
+    case MENU_ACTION_DEXNAV: return 3;
+    case MENU_ACTION_PLAYER:
+    case MENU_ACTION_PLAYER_LINK: return 4;
+    case MENU_ACTION_SAVE: return 5;
+    case MENU_ACTION_OPTION: return 6;
+    default: return 7;
+    }
+}
 void Pgr_ClickPanelMenu(u8 index)
 {
     if (Pgr_IsPanelMenuActive() && index < sNumStartMenuActions)

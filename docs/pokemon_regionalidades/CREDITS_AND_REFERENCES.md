@@ -24,9 +24,16 @@ Este projeto existe porque diferentes comunidades documentaram, reconstruíram e
 
 Essas reconstruções servem para conferir mapas, eventos, encontros e progressão. Código de Nintendo DS não é importado diretamente como código GBA ou PC.
 
+## Recursos visuais da tela secundária no PC
+
+- Os recortes dos ícones de menu e dos botões vêm das folhas de sprites de **Pokémon Platinum** enviadas pelo jogador. As próprias folhas identificam **spaceemotion** como responsável pela extração e pedem crédito pelo uso. As imagens-fonte foram preservadas em `graphics/pc_panel/sources/`.
+- Os glifos latinos e acentuados da tela secundária vêm da folha de fonte de **Pokémon Omega Ruby/Alpha Sapphire** enviada pelo jogador. A imagem recebida não identifica quem a extraiu; a autoria dessa extração permanece a confirmar.
+- `tools/pokemon_go_world/prepare_secondary_panel_assets.py` apenas recorta e converte essas folhas para BMP com transparência por cor, formato carregado pelo SDL2 do projeto. Os gráficos e personagens originais pertencem a seus respectivos titulares; o envio das referências não equivale a uma licença de redistribuição.
+
 ## Demakes e referências de adaptação
 
 - [Pokémon Heart & Soul](https://github.com/PokemonHnS-Development/pokemonHnS): Johto e Kanto recriados sobre Modern Emerald;
+- [Pokémon Heart & Soul Expansion](https://github.com/PokemonHnS-Development/pokehns-expansion), revisão `167aa6d537b109bb229c231ddce4616974c4da71`: fonte seletiva dos mapas, layouts, tilesets e encontros selvagens de Johto. A importação exclui a segunda Kanto, mapas de teste, eventos e identificadores não auditados;
 - [Pokémon Heart & Soul 2.0](https://github.com/PokemonHnS-Development/pokehns-expansion): versão baseada também em `pokeemerald-expansion`, prioritária para estudar integração;
 - [documentação do Heart & Soul](https://github.com/PokemonHnS-Development/pokehns-expansion-documentation): inventário extraído de conteúdo, encontros, treinadores e progressão;
 - [Pokémon Platinum Demake](https://github.com/sinnoh-remakes/pokeemerald-platinum): Sinnoh adaptada à estrutura de `pokeemerald-expansion`;

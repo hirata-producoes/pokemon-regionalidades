@@ -20,6 +20,8 @@ WRAPPER = r"""
 #include "config/overworld.h"
 #include "data/tilesets/graphics.h"
 #include "data/tilesets/metatiles.h"
+#include "data/tilesets/johto_hns_graphics.h"
+#include "data/tilesets/johto_hns_metatiles.h"
 
 // The Emerald primary General graphics remain in src/graphics.c upstream.
 // Repeat their declarations here so the PC generator externalizes the full
