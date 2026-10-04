@@ -1238,3 +1238,25 @@ a exibição e os efeitos da Boulderbadge na interface regional. A compilação
 PC, a integridade do pacote e a verificação dos 996 mapas passaram. Também foi
 conferida estaticamente a ida e volta dos warps desse pequeno capítulo. A
 batalha, cura e compra ainda precisam de uma rodada de teste manual no jogo.
+
+## Route 3 e revisão do atlas — 23 de setembro de 2026
+
+Route 3 foi ativada no porte PC com seus oito treinadores adaptados para IDs
+regionais de Kanto. As equipes usam as espécies e níveis da fonte FireRed;
+o progresso de Mt. Moon permanece para outro capítulo. A distribuição passiva
+de XP agora é global: 20% sem Exp. Share e 40% com ele ligado. A primeira
+insígnia de Kanto é mostrada no cartão regional, sem reutilizar a flag da
+primeira insígnia de Hoenn. O mapa da casa vizinha permanece oculto após ser
+entregue e o mapa regional identifica Kanto e seu protagonista.
+
+No atlas de desenvolvimento, todos os mapas externos de Johto estão 10 blocos
+mais ao sul. Route 45 encosta visualmente em Route 46, com Blackthorn acima,
+como referência provisória; a mudança gerou sobreposição com Route 44 e não
+criou uma travessia jogável. A revisão desse corredor aguarda a imagem do
+acesso entre as duas rotas. Consulte `QA_2026-09-23.md` para testes e limites.
+
+Publicação atribuída a04/10/2026, preparada em06/10: reaplicado o lote histórico
+9177bbbfcd sobre a base publicada de03/10. O ajuste executável deste lote é
+world_enabled de Route3; scripts, IDs e equipes já pertencem à base.
+As observações de23/09 acima são históricas e não certificam o estado posterior
+da reconstrução HGSS. Não houve nova compilação ou teste de gameplay neste envio.
