@@ -1,0 +1,74 @@
+{
+  "schema": 1,
+  "purpose": "F0.2 source inventory; classifications are migration obligations, not implementation or gameplay approval",
+  "flows": {
+    "bag.field": {"phase": "F5", "result": "item/context operation or ITEM_NONE; return to field menu", "entrypoints": "GoToBagMenu CB2_BagMenuFromStartMenu CB2_ReturnToBagMenuPocket UseRegisteredKeyItemOnField"},
+    "bag.battle": {"phase": "F5/F6", "result": "gSpecialVar_ItemId -> CompleteWhenChoseItem; effects belong to battle rules", "entrypoints": "CB2_BagMenuFromBattle ChooseMonForInBattleItem"},
+    "bag.target": {"phase": "F5", "result": "selected item -> original party/storage caller; no second inventory", "entrypoints": "CB2_ChooseMonToGiveItem"},
+    "bag.shop": {"phase": "F5/F10.4", "result": "sale/deposit quantity, confirmation/error; return to shop/item PC", "entrypoints": "CB2_GoToSellMenu CB2_GoToItemDepositMenu"},
+    "bag.script": {"phase": "F5/F10.4", "result": "selected item or cancel in script variables; restore script wait state", "entrypoints": "CB2_ChooseBerry CB2_ChooseMulch ChooseBerryForMachine FavorLadyOpenBagMenu QuizLadyOpenBagMenu ApprenticeOpenBagMenu"},
+    "bag.tutorial": {"phase": "F5/F6.2", "result": "script-controlled selection; temporary inventory must be restored", "entrypoints": "DoWallyTutorialBagMenu InitOldManBag"},
+    "bag.pyramid": {"phase": "F5/F6.2", "result": "Pyramid inventory/rules kept distinct from ordinary bag; same application lifecycle", "entrypoints": "GoToBattlePyramidBagMenu"},
+    "party.field": {"phase": "F4/F7", "result": "selected mon/context, reorder or field move; restore caller", "entrypoints": "InitPartyMenu CB2_PartyMenuFromStartMenu"},
+    "party.battle": {"phase": "F4/F6", "result": "gSelectedMonPartyId + order; battle cancel PARTY_SIZE; forced selection cannot cancel", "entrypoints": "OpenPartyMenuInBattle BufferBattlePartyCurrentOrder"},
+    "party.item": {"phase": "F4.4/F5.3", "result": "target, held item/mail, move slot, validated effect or denial; restore bag/party", "entrypoints": "CB2_ShowPartyMenuForItemUse ChooseMonToGiveMailFromMailbox"},
+    "party.script": {"phase": "F4/F10.4", "result": "party index/order or PARTY_NOTHING_CHOSEN through each caller's contract", "entrypoints": "ChoosePartyMon ChooseMonForDaycare ChooseContestMon ChooseMonForMoveTutor ChooseMonForMoveRelearner InitChooseHalfPartyForBattle BattlePyramidChooseMonHeldItems"},
+    "party.multi": {"phase": "F4/F6.2", "result": "party owner + layout + selected order; do not use player slots for partner", "entrypoints": "ShowPartyMenuToShowcaseMultiBattleParty"},
+    "party.link": {"phase": "F4/F11", "result": "compatibility boundary: native PC transport absent, preserve safe return; no network implementation in this scope", "entrypoints": "ChooseMonForTradingBoard ChooseMonForWirelessMinigame"},
+    "summary.read": {"phase": "F4.3", "result": "last viewed index + exit callback; party and BoxPokemon payloads are different", "entrypoints": "ShowPokemonSummaryScreen CB2_ReturnToPartyMenuFromSummaryScreen"},
+    "summary.move": {"phase": "F4.3/F6.3", "result": "slot 0..MAX_MON_MOVES-1; cancel MAX_MON_MOVES; learner/deleter applies change", "entrypoints": "ShowSelectMovePokemonSummaryScreen GetMoveSlotToReplace MoveDeleterChooseMoveToForget"},
+    "menu.dex": {"phase": "F7/F9", "result": "read/query shared dex; return with cursor/context", "entrypoints": "CB2_OpenPokedex CB2_OpenPokedexPlusHGSS"},
+    "menu.map": {"phase": "F7/F8", "result": "navigation/query, no warp unless explicit Fly destination confirmed", "entrypoints": "CB2_InitPokeNav FieldInitRegionMap OpenPokenavRegionMap CB2_OpenFlyMap ShowRegionMapForPokedexAreaScreen SetFlyDestination"},
+    "menu.profile": {"phase": "F7/F10.1", "result": "profile/Frontier Pass read and original return", "entrypoints": "ShowPlayerTrainerCard ShowTrainerCardInLink ShowFrontierPass"},
+    "menu.save": {"phase": "F10.3", "result": "SAVE_IN_PROGRESS/SAVE_CANCELED/SAVE_SUCCESS/SAVE_ERROR; persistence confirms success", "entrypoints": "SaveDoSaveCallback SaveSuccessCallback SaveErrorCallback"},
+    "menu.options": {"phase": "F10.2", "result": "canonical options + saved callback", "entrypoints": "CB2_InitOptionMenu"},
+    "menu.navigation": {"phase": "F7/F10.4", "result": "exit/retire/confirmation releases field locks and clock ownership", "entrypoints": "HideStartMenu"},
+    "menu.debug": {"phase": "F11", "result": "QA boundary; not the playable HGSS interface", "entrypoints": "Debug_ShowMainMenu"},
+    "menu.disabled": {"phase": "F0/F11", "result": "DexNav disabled by configuration; reclassify if enabled", "entrypoints": "StartMenuDexNavCallback"},
+    "naming": {"phase": "F10.4", "result": "encoded name in supplied destination buffer; return callback/limits", "entrypoints": "DoNamingScreen"},
+    "battle.core": {"phase": "F3/F6", "result": "action/move/target/gimmick result -> engine; complete controller command once", "entrypoints": "HandleInputChooseAction HandleInputChooseMove WaitForMonSelection CompleteWhenChoseItem PlayerBufferExecCompleted"},
+    "battle.special": {"phase": "F6.2", "result": "tutorial/Safari/Frontier/recorded autonomous controllers; not live move input", "entrypoints": "StartWallyTutorialBattle StartOldManTutorialBattle PlayRecordedBattle"},
+    "sentinel": {"phase": "F1", "result": "count/keep/last is metadata, never a selectable option", "entrypoints": ""},
+    "unused": {"phase": "F0/F11", "result": "explicit unused legacy constant; no new feature authorized", "entrypoints": ""}
+  },
+  "catalogs": [
+    {"file": "include/item_menu.h", "prefix": "ITEMMENULOCATION_", "kind": "enum", "groups": {
+      "bag.field": "FIELD", "bag.battle": "BATTLE", "bag.target": "PARTY PCBOX", "bag.shop": "SHOP ITEMPC",
+      "bag.script": "BERRY_TREE BERRY_BLENDER_CRUSH FAVOR_LADY QUIZ_LADY APPRENTICE BERRY_TREE_MULCH", "bag.tutorial": "WALLY", "sentinel": "LAST"
+    }},
+    {"file": "include/party_menu.h", "prefix": "PARTY_MENU_TYPE_", "kind": "enum", "groups": {
+      "party.field": "FIELD", "party.battle": "IN_BATTLE", "party.script": "CONTEST CHOOSE_MON CHOOSE_HALF DAYCARE MOVE_RELEARNER STORE_PYRAMID_HELD_ITEMS",
+      "party.multi": "MULTI_SHOWCASE MULTI_FULL_SHOWCASE", "party.link": "UNION_ROOM_REGISTER UNION_ROOM_TRADE MINIGAME", "unused": "SPIN_TRADE"
+    }},
+    {"file": "include/party_menu.h", "prefix": "PARTY_LAYOUT_", "kind": "enum", "groups": {
+      "party.field": "SINGLE", "party.battle": "DOUBLE", "party.multi": "MULTI MULTI_SHOWCASE MULTI_FULL MULTI_FULL_PARTNER MULTI_FULL_SHOWCASE MULTI_FULL_SHOWCASE_PARTNER", "sentinel": "COUNT"
+    }},
+    {"file": "include/party_menu.h", "prefix": "KEEP_PARTY_", "kind": "enum", "groups": {"sentinel": "LAYOUT"}},
+    {"file": "include/constants/party_menu.h", "prefix": "PARTY_ACTION_", "kind": "define", "groups": {
+      "party.field": "CHOOSE_MON SWITCH SWITCHING SOFTBOILED", "party.battle": "SEND_OUT CANT_SWITCH ABILITY_PREVENTS SEND_MON_TO_BOX CHOOSE_FAINTED_MON",
+      "party.item": "USE_ITEM GIVE_ITEM GIVE_MAILBOX_MAIL", "party.script": "CHOOSE_AND_CLOSE MOVE_TUTOR", "party.link": "MINIGAME", "unused": "GIVE_PC_ITEM"
+    }},
+    {"file": "include/pokemon_summary_screen.h", "prefix": "SUMMARY_MODE_", "kind": "enum", "groups": {
+      "summary.read": "NORMAL LOCK_MOVES BOX BOX_CURSOR", "summary.move": "SELECT_MOVE RELEARNER_BATTLE RELEARNER_CONTEST"
+    }},
+    {"file": "src/start_menu.c", "prefix": "MENU_ACTION_", "kind": "enum", "groups": {
+      "menu.dex": "POKEDEX", "party.field": "POKEMON", "bag.field": "BAG", "menu.map": "POKENAV", "menu.profile": "PLAYER PLAYER_LINK",
+      "menu.save": "SAVE REST_FRONTIER", "menu.options": "OPTION", "menu.navigation": "EXIT RETIRE_SAFARI RETIRE_FRONTIER", "bag.pyramid": "PYRAMID_BAG", "menu.debug": "DEBUG", "menu.disabled": "DEXNAV"
+    }}
+  ],
+  "state_sources": {
+    "src/battle_controller_player.c": "battle.core",
+    "src/item_menu.c": "bag.field",
+    "src/party_menu.c": "party.field",
+    "src/pokemon_summary_screen.c": "summary.read",
+    "src/start_menu.c": "menu.navigation",
+    "src/region_map.c": "menu.map",
+    "src/field_region_map.c": "menu.map",
+    "src/pokenav_region_map.c": "menu.map",
+    "src/pokedex_plus_hgss.c": "menu.dex",
+    "src/trainer_card.c": "menu.profile",
+    "src/option_menu.c": "menu.options",
+    "src/naming_screen.c": "naming",
+    "src/battle_pyramid_bag.c": "bag.pyramid"
+  }
+}

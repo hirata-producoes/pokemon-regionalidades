@@ -1,0 +1,5785 @@
+{
+  "schema": 1,
+  "method": "lexical source inventory; includes inactive branches; not a runtime graph",
+  "scope_sha256": "e351ad244953c06cbf397cf6a9d4c58aaf9013a39e783296484c65d31fa86166",
+  "source_sha256": {
+    "src/apprentice.c": "4ebe18c46629c05f7731228b7d206925b6f39e7ed61d2e7142697168c086d11d",
+    "src/battle_controller_oak_old_man.c": "bbf9cc7798fbb31d40cf8fa77cff968eab5de9be05bc9d2d2216f6bfe14df127",
+    "src/battle_controller_player.c": "03a44b4a76720f594bc00c66dad193de93c59f03c1e8f8853d8210cd3bda681f",
+    "src/battle_controller_safari.c": "3fa6865cefa558da7bff9f126f6a698d985fb097bcfbf5f8b49035da434a1055",
+    "src/battle_controller_wally.c": "39caed0615456f5b66b16ee87c91dd595650eeb89d92d4fd2da2d02c491e5ab9",
+    "src/battle_controllers.c": "32d25add60713dc4aa304c77c58904117a808a90783fd253f9facf3ab59d4f75",
+    "src/battle_factory_screen.c": "ef0ddec52ec877a751d92913ffecded17c0426ef357c67e43585d083340b8145",
+    "src/battle_gfx_sfx_util.c": "4487afdee196906a248cf4ac275be1970148308e0d1e4db7e4dec7f92d679d8d",
+    "src/battle_main.c": "9b08c8416b1fa59b303c1418c311230e183879671cd053f88160b468bddf7769",
+    "src/battle_pyramid_bag.c": "64f823f2a57a6deeec6d753610a1434f64e0af11e4763a15e455046cb20ac9ba",
+    "src/battle_script_commands.c": "f0ef570af9d9b902593f96911b6ca1a5604b6cbb5e5819fcbbbe4f3462b25540",
+    "src/battle_setup.c": "177bf4c260d7bfbac6b102c3978b2863e60c9503ce13a894366e630419205307",
+    "src/berry.c": "4e7dd40749ca37d07b10f902ef482c2c663ca5e323f24023d3a401135a2e52fb",
+    "src/berry_blender.c": "fce3641d3796cb5c158778997c50e988ceb8b0f336138d2941ee87b1d61ef48e",
+    "src/berry_crush.c": "0936eaab3a6acdbcaf309964b11feac81012fb8d6b3f19ddcc5a028c0e97c09b",
+    "src/berry_tag_screen.c": "f88050fd07b1340b2b3d68ee0e7801fe466bff73c1e4e3bb73a7e92bd4270573",
+    "src/cable_club.c": "a16470ea850fa7a6245d2b1d8ba586dd0630cd302d9ba808937105c116edbeb2",
+    "src/chooseboxmon.c": "f4e69364c27ca9ec763eba612d2e42443f0055f236a30ea287a5b98c2be651ae",
+    "src/daycare.c": "352b8d5cde9ad4e95c75e4a86fa99f38dc2b18284874ed82b50ed081ebe08f73",
+    "src/debug.c": "6952ae0c135b13178156cf7fdc72000735a2d310e5eccb489274b78432b0091e",
+    "src/egg_hatch.c": "938613713e1e2547e8a8d84f5b848ccb52b2b85fac48a2a956f8059f8bfbffe6",
+    "src/evolution_scene.c": "a3e06b638814cacba3965c7ab242e50e90c486d5c4ab9c212c8a3bcd9f6d57c0",
+    "src/field_control_avatar.c": "27004cd0f7310d9e1ba2edd58ee296ddf3f4dcbeff8dd9b30b584f766de5eb5e",
+    "src/field_region_map.c": "1e9b5c98387e753bbc50c6245f8f4192f7c66da755e83f0619eea8656d05a082",
+    "src/field_specials.c": "ac985226fc7e457d05f1538db9f5e45b74e58654c5a306e1a651db363fc68ba6",
+    "src/frontier_pass.c": "800ac7461046e7deb66c5b9f5ae142524dba2cb5a164bdcc2af52e8a6e27a6ab",
+    "src/item_menu.c": "29764112e6aeafb30240baeea2e8fdb6d48733c1da2400ee7fb29afaf3a1c5be",
+    "src/item_use.c": "0d092332cbeb13c74fb50a440c8313970678c358cabf51597e762a491799bf82",
+    "src/lilycove_lady.c": "7ac54fbd221ed58fa135c7140d25fac2f7d6d339cc832ae36e806ee0c8925c92",
+    "src/main_menu.c": "0c43855c97733f383afe3f37ffb8ff59b909d77ba43a3715056ee56024c37a9e",
+    "src/map_name_popup.c": "b596c5ae5c6ff6554616d95619e3e5f36d1c8074dc7db44fd49b56119eb6056a",
+    "src/move_relearner.c": "943b72d3e023286cc9b533136a50867806773421f4c4f7be3a0bcc379ae9eb47",
+    "src/naming_screen.c": "fa0a032544ec2f6e847ed282ceb7df9fb329161dce8a8d19ac0c377269113fc1",
+    "src/oak_speech.c": "c3f249aa781979c0615fa7cf5683b6f8850f2f0df48a3a62cc5b7014bb9ac117",
+    "src/option_menu.c": "40b7804362ced25d1f70be34682d5c5622ccc0a3e887ff8594bcf353070b2c61",
+    "src/overworld.c": "f0b21f34bf5e7477dc8abc156a9ed1840054e1fa173105b940931247d5d1f953",
+    "src/party_menu.c": "fd929f92927d47917d8541a043006e932d0124bf614d95582a26f8bd7b0518ce",
+    "src/player_pc.c": "e717891e2fa9e5c5683cd306735863d3a19731f719b5586d8b571fd182a6a1b0",
+    "src/pokedex.c": "2cb3be976698e963d47567b62b0191fa4f94bdb04ef6c781b0f0172b1c36291f",
+    "src/pokedex_area_screen.c": "25b47dd24750fe4822b04376704df58748f439c42879c2e9091c1a5e37526bda",
+    "src/pokedex_plus_hgss.c": "7b40629dc530ccfd973834cd07b5b5dde101301a1f823ee8dd4adba99c91e263",
+    "src/pokemon.c": "e7fc0b83c2395424359e6efb184449fcb1e547607a168e03f7b41acdd6426889",
+    "src/pokemon_storage_system.c": "6fe103337a31676429974cfbff19bfe68f8818816021260dec5779e2c9a65340",
+    "src/pokemon_summary_screen.c": "11d9ce2b2bec1341ca2f41a46d0ec4e13117e7da618ddbf612d8a54f9552d284",
+    "src/pokenav.c": "e1f3794abe4b965e95cb1300b3b47e1d9d652a024bfe86414082b0c7ab19252d",
+    "src/pokenav_region_map.c": "2c0ad75b512bccebba8f1b78b3a786387797e83c46e3a2f345303b9ea5c512ec",
+    "src/recorded_battle.c": "d356d222934b86b8035cd228ff534e5f44fa8e74ea92e27974892ed6b3a30062",
+    "src/region_map.c": "b4fbb968ac50ea3046c2cd985713a5b4a5f1d59a9d70e720ab73210022af0b9d",
+    "src/scrcmd.c": "d677687ec70f1f062276a3f2ed7c5331b5672514bfdeaf91ce14968a94ddd330",
+    "src/script_pokemon_util.c": "f0ee08765f5aef93406a668ec59f9db4f94c70eeef1e1fbe0384f22e347fbd3f",
+    "src/shop.c": "adb3833be09ed80832021abf8a172dc60411c525d9efc6411490f1f89e640bd3",
+    "src/start_menu.c": "f1a8fabbf86d308a00cf9d29d2a8a50042b70f3d1ecc864ae858928a3e59e099",
+    "src/trade.c": "b72ec963bcaa2823b4b21575ac663f06cb74316bbced3e4717233dc19ea708a6",
+    "src/trainer_card.c": "1c614b338350379b4c0d9072c467280d42e8cab4a25b2f62a7ecba091c0f8a1e",
+    "src/type_icons.c": "448832cdcbd1720a0dc6cd7e3e05e2c764d8c416c242125599acf1a4b9ccc167",
+    "src/union_room.c": "c85adaa4e41211c9076ed75f1194b98db219d4d906280fbf80adbd9354c1ae55",
+    "src/walda_phrase.c": "01ea5dbc9ff3bfc351e0cf0bf957ea1fb09e39bd3bda3bbdf96c01120e6465c2",
+    "data/maps/BattleFrontier_Lounge7/scripts.inc": "ef12771cb5d3303332ab1720034b4902ba54db643225c0ce65258d326730ce64",
+    "data/maps/CinnabarIsland_PokemonLab_Lounge_Frlg/scripts.inc": "bea3e7c4fb0177afc72dd6331dbb7099a915e20eed279dc6cefd2fdd9a3c8d5d",
+    "data/maps/FuchsiaCity_House3_Frlg/scripts.inc": "49e86c44bf2eedb9d2d49b6074e9f4f9637870a5e5a814e61ea77a1b9939f475",
+    "data/maps/LavenderTown_House2_Frlg/scripts.inc": "daa20279597d977988d9b8672689e9b7d1dd9f25c048d74ae53c88e1d1ca734d",
+    "data/maps/LilycoveCity_MoveDeletersHouse/scripts.inc": "816b83c785bfd45f558da1c599f5acb726b172dd7e65eb9a85dd3521deca2c46",
+    "data/maps/PalletTown_RivalsHouse_Frlg/scripts.inc": "2df1f7135d6b688ac540b7b1a5e3a84169ee917e7d38e9f2e980632014d25651",
+    "data/maps/PetalburgCity/scripts.inc": "e0bf47b0549d9159ba38fa178fb9f4774f4c4571205581f9111b3eb4783a7189",
+    "data/maps/Route12_FishingHouse_Frlg/scripts.inc": "fe71b61ed9971c1ddf1ad3a5e3711a38a15f3fdc9ba2c005798b37b413311e5e",
+    "data/maps/SixIsland_WaterPath_House1_Frlg/scripts.inc": "9e65f24a8b1f21a447647553322c6a54f4b5504084dd2e107b561d58c657c98b",
+    "data/maps/TwoIsland_House_Frlg/scripts.inc": "849f236c27fc253f6336a78f29fb4e0a1b31bc38a4523b2ff958b07a1a3916f2",
+    "data/maps/ViridianCity_Frlg/scripts.inc": "a254f5eb840b7e3ad77cff6e44be7238191b04e90753e771a25ce168f04a5ee5",
+    "data/scripts/cable_club.inc": "5e35c1ee7e783614c93db80596f0565de2a147b65aedbc78543c202a79ba3fc0",
+    "data/scripts/cable_club_frlg.inc": "41c3705918ab151b71c54a5257eb2576c770baae4bb6f22826e44452701dbd53",
+    "data/scripts/debug.inc": "648ee930417508ec5c3193b10fed35e3b3377fb3f936bc2023560d92d8d08e76",
+    "data/scripts/move_tutors.inc": "51603d2dc63d7919c40b0d4782ca8cbacbcbc39948a90b1186cc4f0c38910088",
+    "data/scripts/move_tutors_frlg.inc": "b06ebcaaa5d1312931a0b0c6769ee33af1e46333ccf82f9d46f3185dfb9d0305",
+    "data/specials.inc": "117753ba2ef0c16ef9d43f2eb14539296afcbfcbeae1a8290a2ce928db608189",
+    "include/item_menu.h": "498ed6931b3fb7bb3a25028b956d8b253e06f7e24f70fca1b4ac22b07c32e243",
+    "include/party_menu.h": "d4c7d83a386226db0d0f01b565a529b74e7aa65823d9393001a2251ee0903f92",
+    "include/constants/party_menu.h": "bce65a4c85bf10e74247c11daa8e6cc49990714fd2ef9dd47010e8ba99071576",
+    "include/pokemon_summary_screen.h": "e34bc5c34a4fbef54121cd2b864cabc5cd20ad6c740d3d72d0d09277ab50b769"
+  },
+  "catalogs": [
+    {
+      "file": "include/item_menu.h",
+      "symbols": {
+        "ITEMMENULOCATION_FIELD": "bag.field",
+        "ITEMMENULOCATION_BATTLE": "bag.battle",
+        "ITEMMENULOCATION_PARTY": "bag.target",
+        "ITEMMENULOCATION_PCBOX": "bag.target",
+        "ITEMMENULOCATION_SHOP": "bag.shop",
+        "ITEMMENULOCATION_ITEMPC": "bag.shop",
+        "ITEMMENULOCATION_BERRY_TREE": "bag.script",
+        "ITEMMENULOCATION_BERRY_BLENDER_CRUSH": "bag.script",
+        "ITEMMENULOCATION_FAVOR_LADY": "bag.script",
+        "ITEMMENULOCATION_QUIZ_LADY": "bag.script",
+        "ITEMMENULOCATION_APPRENTICE": "bag.script",
+        "ITEMMENULOCATION_BERRY_TREE_MULCH": "bag.script",
+        "ITEMMENULOCATION_WALLY": "bag.tutorial",
+        "ITEMMENULOCATION_LAST": "sentinel"
+      }
+    },
+    {
+      "file": "include/party_menu.h",
+      "symbols": {
+        "PARTY_MENU_TYPE_FIELD": "party.field",
+        "PARTY_MENU_TYPE_IN_BATTLE": "party.battle",
+        "PARTY_MENU_TYPE_CONTEST": "party.script",
+        "PARTY_MENU_TYPE_CHOOSE_MON": "party.script",
+        "PARTY_MENU_TYPE_CHOOSE_HALF": "party.script",
+        "PARTY_MENU_TYPE_DAYCARE": "party.script",
+        "PARTY_MENU_TYPE_MOVE_RELEARNER": "party.script",
+        "PARTY_MENU_TYPE_STORE_PYRAMID_HELD_ITEMS": "party.script",
+        "PARTY_MENU_TYPE_MULTI_SHOWCASE": "party.multi",
+        "PARTY_MENU_TYPE_MULTI_FULL_SHOWCASE": "party.multi",
+        "PARTY_MENU_TYPE_UNION_ROOM_REGISTER": "party.link",
+        "PARTY_MENU_TYPE_UNION_ROOM_TRADE": "party.link",
+        "PARTY_MENU_TYPE_MINIGAME": "party.link",
+        "PARTY_MENU_TYPE_SPIN_TRADE": "unused"
+      }
+    },
+    {
+      "file": "include/party_menu.h",
+      "symbols": {
+        "PARTY_LAYOUT_SINGLE": "party.field",
+        "PARTY_LAYOUT_DOUBLE": "party.battle",
+        "PARTY_LAYOUT_MULTI": "party.multi",
+        "PARTY_LAYOUT_MULTI_SHOWCASE": "party.multi",
+        "PARTY_LAYOUT_MULTI_FULL": "party.multi",
+        "PARTY_LAYOUT_MULTI_FULL_PARTNER": "party.multi",
+        "PARTY_LAYOUT_MULTI_FULL_SHOWCASE": "party.multi",
+        "PARTY_LAYOUT_MULTI_FULL_SHOWCASE_PARTNER": "party.multi",
+        "PARTY_LAYOUT_COUNT": "sentinel"
+      }
+    },
+    {
+      "file": "include/party_menu.h",
+      "symbols": {
+        "KEEP_PARTY_LAYOUT": "sentinel"
+      }
+    },
+    {
+      "file": "include/constants/party_menu.h",
+      "symbols": {
+        "PARTY_ACTION_CHOOSE_MON": "party.field",
+        "PARTY_ACTION_SWITCH": "party.field",
+        "PARTY_ACTION_SWITCHING": "party.field",
+        "PARTY_ACTION_SOFTBOILED": "party.field",
+        "PARTY_ACTION_SEND_OUT": "party.battle",
+        "PARTY_ACTION_CANT_SWITCH": "party.battle",
+        "PARTY_ACTION_ABILITY_PREVENTS": "party.battle",
+        "PARTY_ACTION_SEND_MON_TO_BOX": "party.battle",
+        "PARTY_ACTION_CHOOSE_FAINTED_MON": "party.battle",
+        "PARTY_ACTION_USE_ITEM": "party.item",
+        "PARTY_ACTION_GIVE_ITEM": "party.item",
+        "PARTY_ACTION_GIVE_MAILBOX_MAIL": "party.item",
+        "PARTY_ACTION_CHOOSE_AND_CLOSE": "party.script",
+        "PARTY_ACTION_MOVE_TUTOR": "party.script",
+        "PARTY_ACTION_MINIGAME": "party.link",
+        "PARTY_ACTION_GIVE_PC_ITEM": "unused"
+      }
+    },
+    {
+      "file": "include/pokemon_summary_screen.h",
+      "symbols": {
+        "SUMMARY_MODE_NORMAL": "summary.read",
+        "SUMMARY_MODE_LOCK_MOVES": "summary.read",
+        "SUMMARY_MODE_BOX": "summary.read",
+        "SUMMARY_MODE_BOX_CURSOR": "summary.read",
+        "SUMMARY_MODE_SELECT_MOVE": "summary.move",
+        "SUMMARY_MODE_RELEARNER_BATTLE": "summary.move",
+        "SUMMARY_MODE_RELEARNER_CONTEST": "summary.move"
+      }
+    },
+    {
+      "file": "src/start_menu.c",
+      "symbols": {
+        "MENU_ACTION_POKEDEX": "menu.dex",
+        "MENU_ACTION_POKEMON": "party.field",
+        "MENU_ACTION_BAG": "bag.field",
+        "MENU_ACTION_POKENAV": "menu.map",
+        "MENU_ACTION_PLAYER": "menu.profile",
+        "MENU_ACTION_PLAYER_LINK": "menu.profile",
+        "MENU_ACTION_SAVE": "menu.save",
+        "MENU_ACTION_REST_FRONTIER": "menu.save",
+        "MENU_ACTION_OPTION": "menu.options",
+        "MENU_ACTION_EXIT": "menu.navigation",
+        "MENU_ACTION_RETIRE_SAFARI": "menu.navigation",
+        "MENU_ACTION_RETIRE_FRONTIER": "menu.navigation",
+        "MENU_ACTION_PYRAMID_BAG": "bag.pyramid",
+        "MENU_ACTION_DEBUG": "menu.debug",
+        "MENU_ACTION_DEXNAV": "menu.disabled"
+      }
+    }
+  ],
+  "entry_flows": {
+    "GoToBagMenu": [
+      "bag.field"
+    ],
+    "CB2_BagMenuFromStartMenu": [
+      "bag.field"
+    ],
+    "CB2_ReturnToBagMenuPocket": [
+      "bag.field"
+    ],
+    "UseRegisteredKeyItemOnField": [
+      "bag.field"
+    ],
+    "CB2_BagMenuFromBattle": [
+      "bag.battle"
+    ],
+    "ChooseMonForInBattleItem": [
+      "bag.battle"
+    ],
+    "CB2_ChooseMonToGiveItem": [
+      "bag.target"
+    ],
+    "CB2_GoToSellMenu": [
+      "bag.shop"
+    ],
+    "CB2_GoToItemDepositMenu": [
+      "bag.shop"
+    ],
+    "CB2_ChooseBerry": [
+      "bag.script"
+    ],
+    "CB2_ChooseMulch": [
+      "bag.script"
+    ],
+    "ChooseBerryForMachine": [
+      "bag.script"
+    ],
+    "FavorLadyOpenBagMenu": [
+      "bag.script"
+    ],
+    "QuizLadyOpenBagMenu": [
+      "bag.script"
+    ],
+    "ApprenticeOpenBagMenu": [
+      "bag.script"
+    ],
+    "DoWallyTutorialBagMenu": [
+      "bag.tutorial"
+    ],
+    "InitOldManBag": [
+      "bag.tutorial"
+    ],
+    "GoToBattlePyramidBagMenu": [
+      "bag.pyramid"
+    ],
+    "InitPartyMenu": [
+      "party.field"
+    ],
+    "CB2_PartyMenuFromStartMenu": [
+      "party.field"
+    ],
+    "OpenPartyMenuInBattle": [
+      "party.battle"
+    ],
+    "BufferBattlePartyCurrentOrder": [
+      "party.battle"
+    ],
+    "CB2_ShowPartyMenuForItemUse": [
+      "party.item"
+    ],
+    "ChooseMonToGiveMailFromMailbox": [
+      "party.item"
+    ],
+    "ChoosePartyMon": [
+      "party.script"
+    ],
+    "ChooseMonForDaycare": [
+      "party.script"
+    ],
+    "ChooseContestMon": [
+      "party.script"
+    ],
+    "ChooseMonForMoveTutor": [
+      "party.script"
+    ],
+    "ChooseMonForMoveRelearner": [
+      "party.script"
+    ],
+    "InitChooseHalfPartyForBattle": [
+      "party.script"
+    ],
+    "BattlePyramidChooseMonHeldItems": [
+      "party.script"
+    ],
+    "ShowPartyMenuToShowcaseMultiBattleParty": [
+      "party.multi"
+    ],
+    "ChooseMonForTradingBoard": [
+      "party.link"
+    ],
+    "ChooseMonForWirelessMinigame": [
+      "party.link"
+    ],
+    "ShowPokemonSummaryScreen": [
+      "summary.read"
+    ],
+    "CB2_ReturnToPartyMenuFromSummaryScreen": [
+      "summary.read"
+    ],
+    "ShowSelectMovePokemonSummaryScreen": [
+      "summary.move"
+    ],
+    "GetMoveSlotToReplace": [
+      "summary.move"
+    ],
+    "MoveDeleterChooseMoveToForget": [
+      "summary.move"
+    ],
+    "CB2_OpenPokedex": [
+      "menu.dex"
+    ],
+    "CB2_OpenPokedexPlusHGSS": [
+      "menu.dex"
+    ],
+    "CB2_InitPokeNav": [
+      "menu.map"
+    ],
+    "FieldInitRegionMap": [
+      "menu.map"
+    ],
+    "OpenPokenavRegionMap": [
+      "menu.map"
+    ],
+    "CB2_OpenFlyMap": [
+      "menu.map"
+    ],
+    "ShowRegionMapForPokedexAreaScreen": [
+      "menu.map"
+    ],
+    "SetFlyDestination": [
+      "menu.map"
+    ],
+    "ShowPlayerTrainerCard": [
+      "menu.profile"
+    ],
+    "ShowTrainerCardInLink": [
+      "menu.profile"
+    ],
+    "ShowFrontierPass": [
+      "menu.profile"
+    ],
+    "SaveDoSaveCallback": [
+      "menu.save"
+    ],
+    "SaveSuccessCallback": [
+      "menu.save"
+    ],
+    "SaveErrorCallback": [
+      "menu.save"
+    ],
+    "CB2_InitOptionMenu": [
+      "menu.options"
+    ],
+    "HideStartMenu": [
+      "menu.navigation"
+    ],
+    "Debug_ShowMainMenu": [
+      "menu.debug"
+    ],
+    "StartMenuDexNavCallback": [
+      "menu.disabled"
+    ],
+    "DoNamingScreen": [
+      "naming"
+    ],
+    "HandleInputChooseAction": [
+      "battle.core"
+    ],
+    "HandleInputChooseMove": [
+      "battle.core"
+    ],
+    "WaitForMonSelection": [
+      "battle.core"
+    ],
+    "CompleteWhenChoseItem": [
+      "battle.core"
+    ],
+    "PlayerBufferExecCompleted": [
+      "battle.core"
+    ],
+    "StartWallyTutorialBattle": [
+      "battle.special"
+    ],
+    "StartOldManTutorialBattle": [
+      "battle.special"
+    ],
+    "PlayRecordedBattle": [
+      "battle.special"
+    ]
+  },
+  "references": {
+    "GoToBagMenu": [
+      {
+        "file": "src/item_menu.c",
+        "line": 597
+      },
+      {
+        "file": "src/item_menu.c",
+        "line": 603
+      },
+      {
+        "file": "src/item_menu.c",
+        "line": 611
+      },
+      {
+        "file": "src/item_menu.c",
+        "line": 617
+      },
+      {
+        "file": "src/item_menu.c",
+        "line": 623
+      },
+      {
+        "file": "src/item_menu.c",
+        "line": 628
+      },
+      {
+        "file": "src/item_menu.c",
+        "line": 633
+      },
+      {
+        "file": "src/item_menu.c",
+        "line": 638
+      },
+      {
+        "file": "src/item_menu.c",
+        "line": 645
+      },
+      {
+        "file": "src/item_menu.c",
+        "line": 651
+      },
+      {
+        "file": "src/item_menu.c",
+        "line": 655
+      },
+      {
+        "file": "src/item_menu.c",
+        "line": 2104
+      },
+      {
+        "file": "src/item_menu.c",
+        "line": 2428
+      },
+      {
+        "file": "src/item_menu.c",
+        "line": 2436
+      },
+      {
+        "file": "src/party_menu.c",
+        "line": 3473
+      },
+      {
+        "file": "src/party_menu.c",
+        "line": 4733
+      },
+      {
+        "file": "src/pokemon_storage_system.c",
+        "line": 3793
+      }
+    ],
+    "CB2_BagMenuFromStartMenu": [
+      {
+        "file": "src/item_menu.c",
+        "line": 595
+      },
+      {
+        "file": "src/start_menu.c",
+        "line": 811
+      }
+    ],
+    "CB2_ReturnToBagMenuPocket": [
+      {
+        "file": "src/berry_tag_screen.c",
+        "line": 541
+      },
+      {
+        "file": "src/item_menu.c",
+        "line": 2102
+      },
+      {
+        "file": "src/item_use.c",
+        "line": 242
+      },
+      {
+        "file": "src/item_use.c",
+        "line": 727
+      }
+    ],
+    "UseRegisteredKeyItemOnField": [
+      {
+        "file": "src/field_control_avatar.c",
+        "line": 237
+      },
+      {
+        "file": "src/item_menu.c",
+        "line": 2142
+      }
+    ],
+    "CB2_BagMenuFromBattle": [
+      {
+        "file": "src/battle_controller_oak_old_man.c",
+        "line": 330
+      },
+      {
+        "file": "src/battle_controller_player.c",
+        "line": 1618
+      },
+      {
+        "file": "src/item_menu.c",
+        "line": 600
+      }
+    ],
+    "ChooseMonForInBattleItem": [
+      {
+        "file": "src/item_use.c",
+        "line": 1204
+      },
+      {
+        "file": "src/item_use.c",
+        "line": 1209
+      },
+      {
+        "file": "src/party_menu.c",
+        "line": 7499
+      }
+    ],
+    "CB2_ChooseMonToGiveItem": [
+      {
+        "file": "src/battle_pyramid_bag.c",
+        "line": 1264
+      },
+      {
+        "file": "src/item_menu.c",
+        "line": 2037
+      },
+      {
+        "file": "src/party_menu.c",
+        "line": 7076
+      }
+    ],
+    "CB2_GoToSellMenu": [
+      {
+        "file": "src/item_menu.c",
+        "line": 626
+      },
+      {
+        "file": "src/shop.c",
+        "line": 442
+      },
+      {
+        "file": "src/shop.c",
+        "line": 443
+      }
+    ],
+    "CB2_GoToItemDepositMenu": [
+      {
+        "file": "src/item_menu.c",
+        "line": 631
+      },
+      {
+        "file": "src/player_pc.c",
+        "line": 569
+      }
+    ],
+    "CB2_ChooseBerry": [
+      {
+        "file": "src/berry.c",
+        "line": 2812
+      },
+      {
+        "file": "src/item_menu.c",
+        "line": 609
+      }
+    ],
+    "CB2_ChooseMulch": [
+      {
+        "file": "src/berry.c",
+        "line": 2817
+      },
+      {
+        "file": "src/item_menu.c",
+        "line": 615
+      }
+    ],
+    "ChooseBerryForMachine": [
+      {
+        "file": "src/berry_blender.c",
+        "line": 1106
+      },
+      {
+        "file": "src/berry_crush.c",
+        "line": 1050
+      },
+      {
+        "file": "src/item_menu.c",
+        "line": 621
+      }
+    ],
+    "FavorLadyOpenBagMenu": [
+      {
+        "file": "src/item_menu.c",
+        "line": 643
+      },
+      {
+        "file": "src/lilycove_lady.c",
+        "line": 221
+      }
+    ],
+    "QuizLadyOpenBagMenu": [
+      {
+        "file": "src/item_menu.c",
+        "line": 649
+      },
+      {
+        "file": "src/lilycove_lady.c",
+        "line": 507
+      }
+    ],
+    "ApprenticeOpenBagMenu": [
+      {
+        "file": "src/apprentice.c",
+        "line": 1079
+      },
+      {
+        "file": "src/item_menu.c",
+        "line": 636
+      }
+    ],
+    "DoWallyTutorialBagMenu": [
+      {
+        "file": "src/battle_controller_wally.c",
+        "line": 195
+      },
+      {
+        "file": "src/item_menu.c",
+        "line": 2423
+      }
+    ],
+    "InitOldManBag": [
+      {
+        "file": "src/battle_controller_oak_old_man.c",
+        "line": 332
+      },
+      {
+        "file": "src/item_menu.c",
+        "line": 2431
+      }
+    ],
+    "GoToBattlePyramidBagMenu": [
+      {
+        "file": "src/battle_pyramid_bag.c",
+        "line": 379
+      },
+      {
+        "file": "src/battle_pyramid_bag.c",
+        "line": 385
+      },
+      {
+        "file": "src/battle_pyramid_bag.c",
+        "line": 404
+      },
+      {
+        "file": "src/battle_pyramid_bag.c",
+        "line": 411
+      },
+      {
+        "file": "src/battle_pyramid_bag.c",
+        "line": 414
+      },
+      {
+        "file": "src/item_menu.c",
+        "line": 605
+      },
+      {
+        "file": "src/party_menu.c",
+        "line": 3475
+      },
+      {
+        "file": "src/party_menu.c",
+        "line": 4735
+      }
+    ],
+    "InitPartyMenu": [
+      {
+        "file": "src/party_menu.c",
+        "line": 518
+      },
+      {
+        "file": "src/party_menu.c",
+        "line": 3168
+      },
+      {
+        "file": "src/party_menu.c",
+        "line": 3482
+      },
+      {
+        "file": "src/party_menu.c",
+        "line": 3491
+      },
+      {
+        "file": "src/party_menu.c",
+        "line": 3503
+      },
+      {
+        "file": "src/party_menu.c",
+        "line": 3610
+      },
+      {
+        "file": "src/party_menu.c",
+        "line": 3615
+      },
+      {
+        "file": "src/party_menu.c",
+        "line": 3773
+      },
+      {
+        "file": "src/party_menu.c",
+        "line": 4320
+      },
+      {
+        "file": "src/party_menu.c",
+        "line": 4727
+      },
+      {
+        "file": "src/party_menu.c",
+        "line": 5688
+      },
+      {
+        "file": "src/party_menu.c",
+        "line": 5690
+      },
+      {
+        "file": "src/party_menu.c",
+        "line": 7071
+      },
+      {
+        "file": "src/party_menu.c",
+        "line": 7079
+      },
+      {
+        "file": "src/party_menu.c",
+        "line": 7170
+      },
+      {
+        "file": "src/party_menu.c",
+        "line": 7251
+      },
+      {
+        "file": "src/party_menu.c",
+        "line": 7278
+      },
+      {
+        "file": "src/party_menu.c",
+        "line": 7457
+      },
+      {
+        "file": "src/party_menu.c",
+        "line": 7462
+      },
+      {
+        "file": "src/party_menu.c",
+        "line": 7467
+      },
+      {
+        "file": "src/party_menu.c",
+        "line": 7485
+      },
+      {
+        "file": "src/party_menu.c",
+        "line": 7491
+      },
+      {
+        "file": "src/party_menu.c",
+        "line": 7493
+      },
+      {
+        "file": "src/party_menu.c",
+        "line": 7501
+      },
+      {
+        "file": "src/party_menu.c",
+        "line": 7952
+      },
+      {
+        "file": "src/party_menu.c",
+        "line": 7954
+      },
+      {
+        "file": "src/party_menu.c",
+        "line": 8061
+      },
+      {
+        "file": "src/party_menu.c",
+        "line": 8067
+      },
+      {
+        "file": "src/party_menu.c",
+        "line": 8108
+      },
+      {
+        "file": "src/party_menu.c",
+        "line": 8136
+      },
+      {
+        "file": "src/party_menu.c",
+        "line": 8154
+      },
+      {
+        "file": "src/party_menu.c",
+        "line": 8199
+      }
+    ],
+    "CB2_PartyMenuFromStartMenu": [
+      {
+        "file": "src/overworld.c",
+        "line": 1958
+      },
+      {
+        "file": "src/party_menu.c",
+        "line": 7069
+      },
+      {
+        "file": "src/start_menu.c",
+        "line": 796
+      }
+    ],
+    "OpenPartyMenuInBattle": [
+      {
+        "file": "src/battle_controller_oak_old_man.c",
+        "line": 306
+      },
+      {
+        "file": "src/battle_controller_player.c",
+        "line": 1591
+      },
+      {
+        "file": "src/battle_controller_safari.c",
+        "line": 234
+      },
+      {
+        "file": "src/party_menu.c",
+        "line": 7481
+      }
+    ],
+    "BufferBattlePartyCurrentOrder": [
+      {
+        "file": "src/battle_gfx_sfx_util.c",
+        "line": 874
+      },
+      {
+        "file": "src/party_menu.c",
+        "line": 7589
+      }
+    ],
+    "CB2_ShowPartyMenuForItemUse": [
+      {
+        "file": "src/item_use.c",
+        "line": 111
+      },
+      {
+        "file": "src/item_use.c",
+        "line": 114
+      },
+      {
+        "file": "src/item_use.c",
+        "line": 185
+      },
+      {
+        "file": "src/party_menu.c",
+        "line": 4677
+      },
+      {
+        "file": "src/party_menu.c",
+        "line": 6024
+      }
+    ],
+    "ChooseMonToGiveMailFromMailbox": [
+      {
+        "file": "src/party_menu.c",
+        "line": 7249
+      },
+      {
+        "file": "src/player_pc.c",
+        "line": 902
+      }
+    ],
+    "ChoosePartyMon": [
+      {
+        "file": "src/chooseboxmon.c",
+        "line": 48
+      },
+      {
+        "file": "src/chooseboxmon.c",
+        "line": 49
+      },
+      {
+        "file": "src/chooseboxmon.c",
+        "line": 52
+      },
+      {
+        "file": "src/chooseboxmon.c",
+        "line": 54
+      },
+      {
+        "file": "src/party_menu.c",
+        "line": 8124
+      },
+      {
+        "file": "data/maps/CinnabarIsland_PokemonLab_Lounge_Frlg/scripts.inc",
+        "line": 52
+      },
+      {
+        "file": "data/maps/FuchsiaCity_House3_Frlg/scripts.inc",
+        "line": 14
+      },
+      {
+        "file": "data/maps/LavenderTown_House2_Frlg/scripts.inc",
+        "line": 14
+      },
+      {
+        "file": "data/maps/PalletTown_RivalsHouse_Frlg/scripts.inc",
+        "line": 48
+      },
+      {
+        "file": "data/maps/Route12_FishingHouse_Frlg/scripts.inc",
+        "line": 36
+      },
+      {
+        "file": "data/maps/SixIsland_WaterPath_House1_Frlg/scripts.inc",
+        "line": 12
+      },
+      {
+        "file": "data/scripts/debug.inc",
+        "line": 167
+      },
+      {
+        "file": "data/scripts/debug.inc",
+        "line": 187
+      },
+      {
+        "file": "data/scripts/debug.inc",
+        "line": 277
+      },
+      {
+        "file": "data/scripts/debug.inc",
+        "line": 401
+      },
+      {
+        "file": "data/scripts/debug.inc",
+        "line": 426
+      },
+      {
+        "file": "data/scripts/debug.inc",
+        "line": 435
+      },
+      {
+        "file": "data/scripts/debug.inc",
+        "line": 472
+      },
+      {
+        "file": "data/scripts/debug.inc",
+        "line": 486
+      },
+      {
+        "file": "data/scripts/debug.inc",
+        "line": 492
+      },
+      {
+        "file": "data/specials.inc",
+        "line": 186
+      }
+    ],
+    "ChooseMonForDaycare": [
+      {
+        "file": "src/daycare.c",
+        "line": 1589
+      },
+      {
+        "file": "src/party_menu.c",
+        "line": 8059
+      }
+    ],
+    "ChooseContestMon": [
+      {
+        "file": "src/party_menu.c",
+        "line": 8096
+      },
+      {
+        "file": "src/scrcmd.c",
+        "line": 2634
+      }
+    ],
+    "ChooseMonForMoveTutor": [
+      {
+        "file": "src/chooseboxmon.c",
+        "line": 51
+      },
+      {
+        "file": "src/party_menu.c",
+        "line": 7460
+      },
+      {
+        "file": "data/maps/BattleFrontier_Lounge7/scripts.inc",
+        "line": 4
+      },
+      {
+        "file": "data/scripts/move_tutors.inc",
+        "line": 164
+      },
+      {
+        "file": "data/scripts/move_tutors_frlg.inc",
+        "line": 547
+      },
+      {
+        "file": "data/specials.inc",
+        "line": 502
+      }
+    ],
+    "ChooseMonForMoveRelearner": [
+      {
+        "file": "src/chooseboxmon.c",
+        "line": 53
+      },
+      {
+        "file": "src/party_menu.c",
+        "line": 8141
+      },
+      {
+        "file": "data/maps/TwoIsland_House_Frlg/scripts.inc",
+        "line": 49
+      },
+      {
+        "file": "data/specials.inc",
+        "line": 246
+      }
+    ],
+    "InitChooseHalfPartyForBattle": [
+      {
+        "file": "src/party_menu.c",
+        "line": 7275
+      },
+      {
+        "file": "src/script_pokemon_util.c",
+        "line": 187
+      },
+      {
+        "file": "src/script_pokemon_util.c",
+        "line": 208
+      },
+      {
+        "file": "src/union_room.c",
+        "line": 1666
+      }
+    ],
+    "BattlePyramidChooseMonHeldItems": [
+      {
+        "file": "src/party_menu.c",
+        "line": 8187
+      },
+      {
+        "file": "data/specials.inc",
+        "line": 477
+      }
+    ],
+    "ShowPartyMenuToShowcaseMultiBattleParty": [
+      {
+        "file": "src/battle_main.c",
+        "line": 1445
+      },
+      {
+        "file": "src/battle_main.c",
+        "line": 1503
+      },
+      {
+        "file": "src/party_menu.c",
+        "line": 7949
+      }
+    ],
+    "ChooseMonForTradingBoard": [
+      {
+        "file": "src/party_menu.c",
+        "line": 7455
+      },
+      {
+        "file": "src/union_room.c",
+        "line": 3100
+      },
+      {
+        "file": "src/union_room.c",
+        "line": 3222
+      }
+    ],
+    "ChooseMonForWirelessMinigame": [
+      {
+        "file": "src/party_menu.c",
+        "line": 7465
+      },
+      {
+        "file": "data/scripts/cable_club.inc",
+        "line": 1287
+      },
+      {
+        "file": "data/scripts/cable_club.inc",
+        "line": 1302
+      },
+      {
+        "file": "data/scripts/cable_club_frlg.inc",
+        "line": 1117
+      },
+      {
+        "file": "data/scripts/cable_club_frlg.inc",
+        "line": 1131
+      },
+      {
+        "file": "data/specials.inc",
+        "line": 448
+      }
+    ],
+    "ShowPokemonSummaryScreen": [
+      {
+        "file": "src/battle_factory_screen.c",
+        "line": 1464
+      },
+      {
+        "file": "src/battle_factory_screen.c",
+        "line": 2358
+      },
+      {
+        "file": "src/move_relearner.c",
+        "line": 559
+      },
+      {
+        "file": "src/move_relearner.c",
+        "line": 561
+      },
+      {
+        "file": "src/party_menu.c",
+        "line": 3146
+      },
+      {
+        "file": "src/party_menu.c",
+        "line": 3148
+      },
+      {
+        "file": "src/party_menu.c",
+        "line": 3150
+      },
+      {
+        "file": "src/party_menu.c",
+        "line": 3154
+      },
+      {
+        "file": "src/party_menu.c",
+        "line": 3158
+      },
+      {
+        "file": "src/party_menu.c",
+        "line": 8206
+      },
+      {
+        "file": "src/pokemon_storage_system.c",
+        "line": 3785
+      },
+      {
+        "file": "src/pokemon_summary_screen.c",
+        "line": 1199
+      },
+      {
+        "file": "src/pokemon_summary_screen.c",
+        "line": 1267
+      },
+      {
+        "file": "src/pokemon_summary_screen.c",
+        "line": 4889
+      },
+      {
+        "file": "src/trade.c",
+        "line": 1553
+      },
+      {
+        "file": "src/trade.c",
+        "line": 1555
+      }
+    ],
+    "CB2_ReturnToPartyMenuFromSummaryScreen": [
+      {
+        "file": "src/party_menu.c",
+        "line": 3146
+      },
+      {
+        "file": "src/party_menu.c",
+        "line": 3148
+      },
+      {
+        "file": "src/party_menu.c",
+        "line": 3150
+      },
+      {
+        "file": "src/party_menu.c",
+        "line": 3154
+      },
+      {
+        "file": "src/party_menu.c",
+        "line": 3158
+      },
+      {
+        "file": "src/party_menu.c",
+        "line": 3162
+      }
+    ],
+    "ShowSelectMovePokemonSummaryScreen": [
+      {
+        "file": "src/battle_script_commands.c",
+        "line": 5674
+      },
+      {
+        "file": "src/evolution_scene.c",
+        "line": 984
+      },
+      {
+        "file": "src/evolution_scene.c",
+        "line": 1374
+      },
+      {
+        "file": "src/evolution_scene.c",
+        "line": 1383
+      },
+      {
+        "file": "src/field_specials.c",
+        "line": 4512
+      },
+      {
+        "file": "src/move_relearner.c",
+        "line": 506
+      },
+      {
+        "file": "src/party_menu.c",
+        "line": 5680
+      },
+      {
+        "file": "src/pokemon_summary_screen.c",
+        "line": 1265
+      }
+    ],
+    "GetMoveSlotToReplace": [
+      {
+        "file": "src/battle_script_commands.c",
+        "line": 5687
+      },
+      {
+        "file": "src/chooseboxmon.c",
+        "line": 320
+      },
+      {
+        "file": "src/chooseboxmon.c",
+        "line": 335
+      },
+      {
+        "file": "src/chooseboxmon.c",
+        "line": 340
+      },
+      {
+        "file": "src/evolution_scene.c",
+        "line": 993
+      },
+      {
+        "file": "src/evolution_scene.c",
+        "line": 1396
+      },
+      {
+        "file": "src/party_menu.c",
+        "line": 5697
+      },
+      {
+        "file": "src/party_menu.c",
+        "line": 5707
+      },
+      {
+        "file": "src/party_menu.c",
+        "line": 5723
+      },
+      {
+        "file": "src/party_menu.c",
+        "line": 5725
+      },
+      {
+        "file": "src/pokemon_summary_screen.c",
+        "line": 2772
+      }
+    ],
+    "MoveDeleterChooseMoveToForget": [
+      {
+        "file": "src/party_menu.c",
+        "line": 8204
+      },
+      {
+        "file": "data/maps/FuchsiaCity_House3_Frlg/scripts.inc",
+        "line": 22
+      },
+      {
+        "file": "data/maps/LilycoveCity_MoveDeletersHouse/scripts.inc",
+        "line": 26
+      },
+      {
+        "file": "data/specials.inc",
+        "line": 247
+      }
+    ],
+    "CB2_OpenPokedex": [
+      {
+        "file": "src/pokedex.c",
+        "line": 1591
+      },
+      {
+        "file": "src/start_menu.c",
+        "line": 781
+      }
+    ],
+    "CB2_OpenPokedexPlusHGSS": [
+      {
+        "file": "src/pokedex.c",
+        "line": 1595
+      },
+      {
+        "file": "src/pokedex_plus_hgss.c",
+        "line": 1992
+      }
+    ],
+    "CB2_InitPokeNav": [
+      {
+        "file": "src/pokenav.c",
+        "line": 315
+      },
+      {
+        "file": "src/start_menu.c",
+        "line": 826
+      }
+    ],
+    "FieldInitRegionMap": [
+      {
+        "file": "src/field_region_map.c",
+        "line": 99
+      },
+      {
+        "file": "src/field_specials.c",
+        "line": 1011
+      }
+    ],
+    "OpenPokenavRegionMap": [
+      {
+        "file": "src/pokenav.c",
+        "line": 118
+      },
+      {
+        "file": "src/pokenav_region_map.c",
+        "line": 253
+      }
+    ],
+    "CB2_OpenFlyMap": [
+      {
+        "file": "src/debug.c",
+        "line": 1413
+      },
+      {
+        "file": "src/party_menu.c",
+        "line": 4133
+      },
+      {
+        "file": "src/region_map.c",
+        "line": 1945
+      }
+    ],
+    "ShowRegionMapForPokedexAreaScreen": [
+      {
+        "file": "src/pokedex_area_screen.c",
+        "line": 759
+      },
+      {
+        "file": "src/pokedex_area_screen.c",
+        "line": 831
+      },
+      {
+        "file": "src/region_map.c",
+        "line": 730
+      }
+    ],
+    "SetFlyDestination": [
+      {
+        "file": "src/field_region_map.c",
+        "line": 195
+      },
+      {
+        "file": "src/pokenav_region_map.c",
+        "line": 502
+      },
+      {
+        "file": "src/region_map.c",
+        "line": 2492
+      },
+      {
+        "file": "src/region_map.c",
+        "line": 2526
+      }
+    ],
+    "ShowPlayerTrainerCard": [
+      {
+        "file": "src/frontier_pass.c",
+        "line": 945
+      },
+      {
+        "file": "src/start_menu.c",
+        "line": 843
+      },
+      {
+        "file": "src/start_menu.c",
+        "line": 847
+      },
+      {
+        "file": "src/trainer_card.c",
+        "line": 1823
+      }
+    ],
+    "ShowTrainerCardInLink": [
+      {
+        "file": "src/cable_club.c",
+        "line": 1198
+      },
+      {
+        "file": "src/start_menu.c",
+        "line": 927
+      },
+      {
+        "file": "src/trainer_card.c",
+        "line": 1842
+      },
+      {
+        "file": "src/union_room.c",
+        "line": 1568
+      }
+    ],
+    "ShowFrontierPass": [
+      {
+        "file": "src/frontier_pass.c",
+        "line": 584
+      },
+      {
+        "file": "src/start_menu.c",
+        "line": 845
+      }
+    ],
+    "SaveDoSaveCallback": [
+      {
+        "file": "src/start_menu.c",
+        "line": 170
+      },
+      {
+        "file": "src/start_menu.c",
+        "line": 1242
+      },
+      {
+        "file": "src/start_menu.c",
+        "line": 1246
+      }
+    ],
+    "SaveSuccessCallback": [
+      {
+        "file": "src/start_menu.c",
+        "line": 171
+      },
+      {
+        "file": "src/start_menu.c",
+        "line": 1264
+      },
+      {
+        "file": "src/start_menu.c",
+        "line": 1272
+      }
+    ],
+    "SaveErrorCallback": [
+      {
+        "file": "src/start_menu.c",
+        "line": 173
+      },
+      {
+        "file": "src/start_menu.c",
+        "line": 1266
+      },
+      {
+        "file": "src/start_menu.c",
+        "line": 1296
+      }
+    ],
+    "CB2_InitOptionMenu": [
+      {
+        "file": "src/main_menu.c",
+        "line": 1155
+      },
+      {
+        "file": "src/option_menu.c",
+        "line": 168
+      },
+      {
+        "file": "src/start_menu.c",
+        "line": 872
+      }
+    ],
+    "HideStartMenu": [
+      {
+        "file": "src/map_name_popup.c",
+        "line": 342
+      },
+      {
+        "file": "src/start_menu.c",
+        "line": 766
+      },
+      {
+        "file": "src/start_menu.c",
+        "line": 884
+      },
+      {
+        "file": "src/start_menu.c",
+        "line": 906
+      },
+      {
+        "file": "src/start_menu.c",
+        "line": 1587
+      }
+    ],
+    "Debug_ShowMainMenu": [
+      {
+        "file": "src/debug.c",
+        "line": 806
+      },
+      {
+        "file": "src/field_control_avatar.c",
+        "line": 247
+      },
+      {
+        "file": "src/start_menu.c",
+        "line": 897
+      }
+    ],
+    "StartMenuDexNavCallback": [
+      {
+        "file": "src/start_menu.c",
+        "line": 115
+      },
+      {
+        "file": "src/start_menu.c",
+        "line": 246
+      },
+      {
+        "file": "src/start_menu.c",
+        "line": 1601
+      }
+    ],
+    "DoNamingScreen": [
+      {
+        "file": "src/battle_script_commands.c",
+        "line": 10490
+      },
+      {
+        "file": "src/debug.c",
+        "line": 1729
+      },
+      {
+        "file": "src/egg_hatch.c",
+        "line": 745
+      },
+      {
+        "file": "src/field_specials.c",
+        "line": 4578
+      },
+      {
+        "file": "src/main_menu.c",
+        "line": 1781
+      },
+      {
+        "file": "src/naming_screen.c",
+        "line": 404
+      },
+      {
+        "file": "src/naming_screen.c",
+        "line": 2148
+      },
+      {
+        "file": "src/naming_screen.c",
+        "line": 2153
+      },
+      {
+        "file": "src/naming_screen.c",
+        "line": 2158
+      },
+      {
+        "file": "src/naming_screen.c",
+        "line": 2163
+      },
+      {
+        "file": "src/oak_speech.c",
+        "line": 1453
+      },
+      {
+        "file": "src/oak_speech.c",
+        "line": 1459
+      },
+      {
+        "file": "src/pokemon.c",
+        "line": 6831
+      },
+      {
+        "file": "src/pokemon_storage_system.c",
+        "line": 3789
+      },
+      {
+        "file": "src/walda_phrase.c",
+        "line": 53
+      }
+    ],
+    "HandleInputChooseAction": [
+      {
+        "file": "src/battle_controller_oak_old_man.c",
+        "line": 50
+      },
+      {
+        "file": "src/battle_controller_oak_old_man.c",
+        "line": 147
+      },
+      {
+        "file": "src/battle_controller_oak_old_man.c",
+        "line": 766
+      },
+      {
+        "file": "src/battle_controller_player.c",
+        "line": 234
+      },
+      {
+        "file": "src/battle_controller_player.c",
+        "line": 2012
+      },
+      {
+        "file": "src/battle_controller_safari.c",
+        "line": 119
+      },
+      {
+        "file": "src/battle_controller_safari.c",
+        "line": 292
+      }
+    ],
+    "HandleInputChooseMove": [
+      {
+        "file": "src/battle_controller_oak_old_man.c",
+        "line": 291
+      },
+      {
+        "file": "src/battle_controller_player.c",
+        "line": 455
+      },
+      {
+        "file": "src/battle_controller_player.c",
+        "line": 625
+      },
+      {
+        "file": "src/battle_controller_player.c",
+        "line": 654
+      },
+      {
+        "file": "src/battle_controller_player.c",
+        "line": 690
+      },
+      {
+        "file": "src/battle_controller_player.c",
+        "line": 1106
+      },
+      {
+        "file": "src/battle_controller_player.c",
+        "line": 1126
+      },
+      {
+        "file": "src/battle_controller_player.c",
+        "line": 2096
+      },
+      {
+        "file": "src/type_icons.c",
+        "line": 495
+      }
+    ],
+    "WaitForMonSelection": [
+      {
+        "file": "src/battle_controller_oak_old_man.c",
+        "line": 44
+      },
+      {
+        "file": "src/battle_controller_oak_old_man.c",
+        "line": 302
+      },
+      {
+        "file": "src/battle_controller_oak_old_man.c",
+        "line": 310
+      },
+      {
+        "file": "src/battle_controller_player.c",
+        "line": 85
+      },
+      {
+        "file": "src/battle_controller_player.c",
+        "line": 1587
+      },
+      {
+        "file": "src/battle_controller_player.c",
+        "line": 1595
+      },
+      {
+        "file": "src/battle_controller_safari.c",
+        "line": 42
+      },
+      {
+        "file": "src/battle_controller_safari.c",
+        "line": 230
+      },
+      {
+        "file": "src/battle_controller_safari.c",
+        "line": 238
+      }
+    ],
+    "CompleteWhenChoseItem": [
+      {
+        "file": "src/battle_controller_oak_old_man.c",
+        "line": 45
+      },
+      {
+        "file": "src/battle_controller_oak_old_man.c",
+        "line": 326
+      },
+      {
+        "file": "src/battle_controller_oak_old_man.c",
+        "line": 336
+      },
+      {
+        "file": "src/battle_controller_player.c",
+        "line": 86
+      },
+      {
+        "file": "src/battle_controller_player.c",
+        "line": 1615
+      },
+      {
+        "file": "src/battle_controller_player.c",
+        "line": 1622
+      }
+    ],
+    "PlayerBufferExecCompleted": [
+      {
+        "file": "src/battle_controller_player.c",
+        "line": 159
+      },
+      {
+        "file": "src/battle_controller_player.c",
+        "line": 165
+      },
+      {
+        "file": "src/battle_controllers.c",
+        "line": 416
+      }
+    ],
+    "StartWallyTutorialBattle": [
+      {
+        "file": "src/battle_setup.c",
+        "line": 470
+      },
+      {
+        "file": "data/maps/PetalburgCity/scripts.inc",
+        "line": 40
+      },
+      {
+        "file": "data/scripts/debug.inc",
+        "line": 361
+      },
+      {
+        "file": "data/specials.inc",
+        "line": 184
+      }
+    ],
+    "StartOldManTutorialBattle": [
+      {
+        "file": "src/battle_setup.c",
+        "line": 479
+      },
+      {
+        "file": "data/maps/ViridianCity_Frlg/scripts.inc",
+        "line": 147
+      },
+      {
+        "file": "data/maps/ViridianCity_Frlg/scripts.inc",
+        "line": 282
+      },
+      {
+        "file": "data/specials.inc",
+        "line": 583
+      }
+    ],
+    "PlayRecordedBattle": [
+      {
+        "file": "src/frontier_pass.c",
+        "line": 942
+      },
+      {
+        "file": "src/recorded_battle.c",
+        "line": 555
+      }
+    ]
+  },
+  "state_sites": {
+    "src/battle_controller_player.c": [
+      {
+        "function": "SetControllerToPlayer",
+        "line": 156,
+        "callback_calls": [],
+        "callback_assignments": [
+          "PlayerBufferRunCommand"
+        ]
+      },
+      {
+        "function": "PlayerBufferExecCompleted",
+        "line": 165,
+        "callback_calls": [],
+        "callback_assignments": [
+          "PlayerBufferRunCommand"
+        ]
+      },
+      {
+        "function": "HandleInputChooseTarget",
+        "line": 413,
+        "callback_calls": [],
+        "callback_assignments": [
+          "HandleInputChooseMove"
+        ]
+      },
+      {
+        "function": "HandleInputShowEntireFieldTargets",
+        "line": 603,
+        "callback_calls": [],
+        "callback_assignments": [
+          "HandleInputChooseMove"
+        ]
+      },
+      {
+        "function": "HandleInputShowTargets",
+        "line": 631,
+        "callback_calls": [],
+        "callback_assignments": [
+          "HandleInputChooseMove"
+        ]
+      },
+      {
+        "function": "HandleInputChooseMove",
+        "line": 690,
+        "callback_calls": [],
+        "callback_assignments": [
+          "HandleInputChooseTarget",
+          "HandleInputShowTargets",
+          "HandleInputShowEntireFieldTargets",
+          "HandleMoveSwitching"
+        ]
+      },
+      {
+        "function": "HandleMoveSwitching",
+        "line": 1009,
+        "callback_calls": [],
+        "callback_assignments": [
+          "OakOldManHandleInputChooseMove",
+          "HandleInputChooseMove",
+          "OakOldManHandleInputChooseMove",
+          "HandleInputChooseMove"
+        ]
+      },
+      {
+        "function": "SetLinkBattleEndCallbacks",
+        "line": 1209,
+        "callback_calls": [
+          "CB2_InitEndLinkBattle",
+          "CB2_InitEndLinkBattle"
+        ],
+        "callback_assignments": []
+      },
+      {
+        "function": "SetBattleEndCallbacks",
+        "line": 1240,
+        "callback_calls": [
+          "gMain.savedCallback"
+        ],
+        "callback_assignments": [
+          "SetLinkBattleEndCallbacks"
+        ]
+      },
+      {
+        "function": "Intro_WaitForShinyAnimAndHealthbox",
+        "line": 1266,
+        "callback_calls": [],
+        "callback_assignments": [
+          "BtlController_Intro_DelayAndEnd"
+        ]
+      },
+      {
+        "function": "Intro_TryShinyAnimShowHealthbox",
+        "line": 1304,
+        "callback_calls": [],
+        "callback_assignments": [
+          "Intro_WaitForShinyAnimAndHealthbox"
+        ]
+      },
+      {
+        "function": "Task_PlayerController_RestoreBgmAfterCry",
+        "line": 1390,
+        "callback_calls": [],
+        "callback_assignments": []
+      },
+      {
+        "function": "Task_GiveExpToMon",
+        "line": 1418,
+        "callback_calls": [],
+        "callback_assignments": [
+          "Task_LaunchLvlUpAnim",
+          "Task_SetControllerToWaitForString",
+          "Controller_WaitForString",
+          "Task_PrepareToGiveExpWithExpBar"
+        ]
+      },
+      {
+        "function": "Task_PrepareToGiveExpWithExpBar",
+        "line": 1467,
+        "callback_calls": [],
+        "callback_assignments": [
+          "Task_GiveExpWithExpBar"
+        ]
+      },
+      {
+        "function": "Task_GiveExpWithExpBar",
+        "line": 1487,
+        "callback_calls": [],
+        "callback_assignments": [
+          "Task_LaunchLvlUpAnim",
+          "Controller_WaitForString"
+        ]
+      },
+      {
+        "function": "Task_LaunchLvlUpAnim",
+        "line": 1545,
+        "callback_calls": [],
+        "callback_assignments": [
+          "Task_UpdateLvlInHealthbox"
+        ]
+      },
+      {
+        "function": "Task_UpdateLvlInHealthbox",
+        "line": 1557,
+        "callback_calls": [],
+        "callback_assignments": [
+          "Task_SetControllerToWaitForString"
+        ]
+      },
+      {
+        "function": "Task_SetControllerToWaitForString",
+        "line": 1574,
+        "callback_calls": [],
+        "callback_assignments": [
+          "Controller_WaitForString"
+        ]
+      },
+      {
+        "function": "OpenPartyMenuToChooseMon",
+        "line": 1581,
+        "callback_calls": [],
+        "callback_assignments": [
+          "WaitForMonSelection"
+        ]
+      },
+      {
+        "function": "WaitForMonSelection",
+        "line": 1595,
+        "callback_calls": [],
+        "callback_assignments": [
+          "= TRUE)"
+        ]
+      },
+      {
+        "function": "OpenBagAndChooseItem",
+        "line": 1611,
+        "callback_calls": [],
+        "callback_assignments": [
+          "CompleteWhenChoseItem"
+        ]
+      },
+      {
+        "function": "CB2_SetUpReshowBattleScreenAfterMenu",
+        "line": 1855,
+        "callback_calls": [
+          "ReshowBattleScreenAfterMenu"
+        ],
+        "callback_assignments": []
+      },
+      {
+        "function": "CB2_SetUpReshowBattleScreenAfterMenu2",
+        "line": 1860,
+        "callback_calls": [
+          "ReshowBattleScreenAfterMenu"
+        ],
+        "callback_assignments": []
+      },
+      {
+        "function": "PlayerHandleLoadMonSprite",
+        "line": 1875,
+        "callback_calls": [],
+        "callback_assignments": [
+          "CompleteOnBattlerSpritePosX_0"
+        ]
+      },
+      {
+        "function": "HandleChooseActionAfterDma3",
+        "line": 1989,
+        "callback_calls": [],
+        "callback_assignments": [
+          "HandleInputChooseAction"
+        ]
+      },
+      {
+        "function": "PlayerHandleChooseAction",
+        "line": 2016,
+        "callback_calls": [],
+        "callback_assignments": [
+          "HandleChooseActionAfterDma3"
+        ]
+      },
+      {
+        "function": "PlayerHandleYesNoBox",
+        "line": 2074,
+        "callback_calls": [],
+        "callback_assignments": [
+          "PlayerHandleYesNoInput"
+        ]
+      },
+      {
+        "function": "HandleChooseMoveAfterDma3",
+        "line": 2090,
+        "callback_calls": [],
+        "callback_assignments": [
+          "HandleInputChooseMove"
+        ]
+      },
+      {
+        "function": "PlayerHandleChooseMove",
+        "line": 2112,
+        "callback_calls": [],
+        "callback_assignments": [
+          "PlayerChooseMoveInBattlePalace",
+          "HandleChooseMoveAfterDma3"
+        ]
+      },
+      {
+        "function": "PlayerHandleChooseItem",
+        "line": 2155,
+        "callback_calls": [],
+        "callback_assignments": [
+          "OpenBagAndChooseItem"
+        ]
+      },
+      {
+        "function": "PlayerHandleChoosePokemon",
+        "line": 2167,
+        "callback_calls": [
+          "TaskDummy, 0xFF"
+        ],
+        "callback_assignments": [
+          "OpenPartyMenuToChooseMon"
+        ]
+      },
+      {
+        "function": "PlayerHandleExpUpdate",
+        "line": 2203,
+        "callback_calls": [
+          "Task_GiveExpToMon, 10"
+        ],
+        "callback_assignments": [
+          "BattleControllerDummy"
+        ]
+      },
+      {
+        "function": "PlayerHandleEndLinkBattle",
+        "line": 2337,
+        "callback_calls": [],
+        "callback_assignments": [
+          "SetBattleEndCallbacks"
+        ]
+      },
+      {
+        "function": "PlayerHandleBattleDebug",
+        "line": 2356,
+        "callback_calls": [
+          "CB2_BattleDebugMenu"
+        ],
+        "callback_assignments": [
+          "Controller_WaitForDebug"
+        ]
+      }
+    ],
+    "src/battle_pyramid_bag.c": [
+      {
+        "function": "CB2_PyramidBagMenuFromStartMenu",
+        "line": 377,
+        "callback_calls": [],
+        "callback_assignments": []
+      },
+      {
+        "function": "ChooseItemsToTossFromPyramidBag",
+        "line": 391,
+        "callback_calls": [
+          "Task_ChooseItemsToTossFromPyramidBag, 10"
+        ],
+        "callback_assignments": []
+      },
+      {
+        "function": "Task_ChooseItemsToTossFromPyramidBag",
+        "line": 398,
+        "callback_calls": [],
+        "callback_assignments": []
+      },
+      {
+        "function": "CB2_ReturnToPyramidBagMenu",
+        "line": 409,
+        "callback_calls": [],
+        "callback_assignments": []
+      },
+      {
+        "function": "GoToBattlePyramidBagMenu",
+        "line": 414,
+        "callback_calls": [
+          "CB2_LoadPyramidBagMenu"
+        ],
+        "callback_assignments": [
+          "exitCallback",
+          "NULL"
+        ]
+      },
+      {
+        "function": "CB2_PyramidBag",
+        "line": 434,
+        "callback_calls": [],
+        "callback_assignments": []
+      },
+      {
+        "function": "CB2_LoadPyramidBagMenu",
+        "line": 450,
+        "callback_calls": [],
+        "callback_assignments": []
+      },
+      {
+        "function": "LoadPyramidBagMenu",
+        "line": 457,
+        "callback_calls": [
+          "CB2_PyramidBag"
+        ],
+        "callback_assignments": []
+      },
+      {
+        "function": "CreatePyramidBagInputTask",
+        "line": 716,
+        "callback_calls": [
+          "Task_HandlePyramidBagInput, 0"
+        ],
+        "callback_assignments": []
+      },
+      {
+        "function": "CloseBattlePyramidBag",
+        "line": 866,
+        "callback_calls": [],
+        "callback_assignments": [
+          "Task_ClosePyramidBag"
+        ]
+      },
+      {
+        "function": "Task_ClosePyramidBag",
+        "line": 872,
+        "callback_calls": [
+          "gPyramidBagMenu->newScreenCallback",
+          "gPyramidBagMenuState.exitCallback"
+        ],
+        "callback_assignments": []
+      },
+      {
+        "function": "Task_HandlePyramidBagInput",
+        "line": 894,
+        "callback_calls": [],
+        "callback_assignments": []
+      },
+      {
+        "function": "OpenContextMenu",
+        "line": 939,
+        "callback_calls": [],
+        "callback_assignments": [
+          "HandleMenuActionInput_2x2",
+          "HandleMenuActionInput_SingleRow"
+        ]
+      },
+      {
+        "function": "SetTaskToMainPyramidBagInputHandler",
+        "line": 1128,
+        "callback_calls": [],
+        "callback_assignments": [
+          "Task_HandlePyramidBagInput"
+        ]
+      },
+      {
+        "function": "BagAction_Toss",
+        "line": 1134,
+        "callback_calls": [],
+        "callback_assignments": [
+          "Task_ChooseHowManyToToss"
+        ]
+      },
+      {
+        "function": "Task_ChooseHowManyToToss",
+        "line": 1195,
+        "callback_calls": [],
+        "callback_assignments": []
+      },
+      {
+        "function": "TossItem",
+        "line": 1223,
+        "callback_calls": [],
+        "callback_assignments": [
+          "Task_TossItem"
+        ]
+      },
+      {
+        "function": "Task_TossItem",
+        "line": 1235,
+        "callback_calls": [],
+        "callback_assignments": []
+      },
+      {
+        "function": "BagAction_Give",
+        "line": 1255,
+        "callback_calls": [],
+        "callback_assignments": [
+          "CB2_ChooseMonToGiveItem"
+        ]
+      },
+      {
+        "function": "Task_WaitCloseErrorMessage",
+        "line": 1280,
+        "callback_calls": [],
+        "callback_assignments": []
+      },
+      {
+        "function": "Task_CloseBattlePyramidBagMessage",
+        "line": 1289,
+        "callback_calls": [],
+        "callback_assignments": []
+      },
+      {
+        "function": "Task_BeginItemSwap",
+        "line": 1325,
+        "callback_calls": [],
+        "callback_assignments": [
+          "Task_ItemSwapHandleInput"
+        ]
+      },
+      {
+        "function": "Task_ItemSwapHandleInput",
+        "line": 1341,
+        "callback_calls": [],
+        "callback_assignments": []
+      }
+    ],
+    "src/field_region_map.c": [
+      {
+        "function": "FieldInitRegionMap",
+        "line": 99,
+        "callback_calls": [
+          "MCB2_InitRegionMapRegisters"
+        ],
+        "callback_assignments": []
+      },
+      {
+        "function": "MCB2_InitRegionMapRegisters",
+        "line": 108,
+        "callback_calls": [
+          "MCB2_FieldUpdateRegionMap"
+        ],
+        "callback_assignments": []
+      },
+      {
+        "function": "FieldUpdateRegionMap",
+        "line": 147,
+        "callback_calls": [
+          "sFieldRegionMapHandler->callback"
+        ],
+        "callback_assignments": []
+      }
+    ],
+    "src/item_menu.c": [
+      {
+        "function": "CB2_BagMenuFromStartMenu",
+        "line": 595,
+        "callback_calls": [],
+        "callback_assignments": []
+      },
+      {
+        "function": "CB2_BagMenuFromBattle",
+        "line": 600,
+        "callback_calls": [],
+        "callback_assignments": []
+      },
+      {
+        "function": "CB2_ChooseBerry",
+        "line": 609,
+        "callback_calls": [],
+        "callback_assignments": []
+      },
+      {
+        "function": "CB2_ChooseMulch",
+        "line": 615,
+        "callback_calls": [],
+        "callback_assignments": []
+      },
+      {
+        "function": "CB2_GoToSellMenu",
+        "line": 626,
+        "callback_calls": [],
+        "callback_assignments": []
+      },
+      {
+        "function": "CB2_GoToItemDepositMenu",
+        "line": 631,
+        "callback_calls": [],
+        "callback_assignments": []
+      },
+      {
+        "function": "GoToBagMenu",
+        "line": 655,
+        "callback_calls": [
+          "exitCallback",
+          "CB2_Bag"
+        ],
+        "callback_assignments": [
+          "exitCallback",
+          "NULL"
+        ]
+      },
+      {
+        "function": "CB2_BagMenuRun",
+        "line": 685,
+        "callback_calls": [],
+        "callback_assignments": []
+      },
+      {
+        "function": "CB2_Bag",
+        "line": 711,
+        "callback_calls": [],
+        "callback_assignments": []
+      },
+      {
+        "function": "SetupBagMenu",
+        "line": 717,
+        "callback_calls": [
+          "CB2_BagMenuRun"
+        ],
+        "callback_assignments": []
+      },
+      {
+        "function": "CreateBagInputHandlerTask",
+        "line": 886,
+        "callback_calls": [
+          "Task_WallyTutorialBagMenu, 0",
+          "Task_BagMenu_HandleInput, 0"
+        ],
+        "callback_assignments": []
+      },
+      {
+        "function": "Task_FadeAndCloseBagMenu",
+        "line": 1108,
+        "callback_calls": [],
+        "callback_assignments": [
+          "Task_CloseBagMenu"
+        ]
+      },
+      {
+        "function": "Task_FadeAndCloseBagMenuIfMulch",
+        "line": 1114,
+        "callback_calls": [],
+        "callback_assignments": []
+      },
+      {
+        "function": "Task_CloseBagMenu",
+        "line": 1131,
+        "callback_calls": [
+          "gBagMenu->newScreenCallback",
+          "gBagPosition.exitCallback"
+        ],
+        "callback_assignments": []
+      },
+      {
+        "function": "Task_BagMenu_HandleInput",
+        "line": 1261,
+        "callback_calls": [],
+        "callback_assignments": [
+          "Task_LoadBagSortOptions",
+          "Task_FadeAndCloseBagMenu"
+        ]
+      },
+      {
+        "function": "ReturnToItemList",
+        "line": 1354,
+        "callback_calls": [],
+        "callback_assignments": [
+          "Task_BagMenu_HandleInput"
+        ]
+      },
+      {
+        "function": "SwitchBagPocket",
+        "line": 1394,
+        "callback_calls": [
+          "taskId, Task_SwitchBagPocket, gTasks[taskId].func"
+        ],
+        "callback_assignments": []
+      },
+      {
+        "function": "Task_SwitchBagPocket",
+        "line": 1433,
+        "callback_calls": [],
+        "callback_assignments": []
+      },
+      {
+        "function": "StartItemSwap",
+        "line": 1511,
+        "callback_calls": [],
+        "callback_assignments": [
+          "Task_HandleSwappingItemsInput"
+        ]
+      },
+      {
+        "function": "Task_HandleSwappingItemsInput",
+        "line": 1528,
+        "callback_calls": [],
+        "callback_assignments": []
+      },
+      {
+        "function": "DoItemSwap",
+        "line": 1566,
+        "callback_calls": [],
+        "callback_assignments": [
+          "Task_BagMenu_HandleInput"
+        ]
+      },
+      {
+        "function": "CancelItemSwap",
+        "line": 1593,
+        "callback_calls": [],
+        "callback_assignments": [
+          "Task_BagMenu_HandleInput"
+        ]
+      },
+      {
+        "function": "Task_ItemContext_Normal",
+        "line": 1762,
+        "callback_calls": [],
+        "callback_assignments": [
+          "Task_ItemContext_SingleRow",
+          "Task_ItemContext_MultipleRows"
+        ]
+      },
+      {
+        "function": "Task_ItemContext_SingleRow",
+        "line": 1774,
+        "callback_calls": [],
+        "callback_assignments": []
+      },
+      {
+        "function": "Task_ItemContext_MultipleRows",
+        "line": 1795,
+        "callback_calls": [],
+        "callback_assignments": []
+      },
+      {
+        "function": "ItemMenu_Toss",
+        "line": 1889,
+        "callback_calls": [],
+        "callback_assignments": [
+          "Task_ChooseHowManyToToss"
+        ]
+      },
+      {
+        "function": "Task_ChooseHowManyToToss",
+        "line": 1929,
+        "callback_calls": [],
+        "callback_assignments": []
+      },
+      {
+        "function": "ConfirmToss",
+        "line": 1949,
+        "callback_calls": [],
+        "callback_assignments": [
+          "Task_RemoveItemFromBag",
+          "Task_TossItemFromBag"
+        ]
+      },
+      {
+        "function": "Task_TossItemFromBag",
+        "line": 1963,
+        "callback_calls": [],
+        "callback_assignments": []
+      },
+      {
+        "function": "Task_RemoveItemFromBag",
+        "line": 1985,
+        "callback_calls": [],
+        "callback_assignments": []
+      },
+      {
+        "function": "ItemMenu_Give",
+        "line": 2022,
+        "callback_calls": [],
+        "callback_assignments": [
+          "CB2_ChooseMonToGiveItem"
+        ]
+      },
+      {
+        "function": "ItemMenu_CheckTag",
+        "line": 2068,
+        "callback_calls": [],
+        "callback_assignments": [
+          "DoBerryTagScreen"
+        ]
+      },
+      {
+        "function": "CB2_ReturnToBagMenuPocket",
+        "line": 2102,
+        "callback_calls": [],
+        "callback_assignments": []
+      },
+      {
+        "function": "Task_ItemContext_GiveToParty",
+        "line": 2107,
+        "callback_calls": [],
+        "callback_assignments": []
+      },
+      {
+        "function": "Task_ItemContext_GiveToPC",
+        "line": 2130,
+        "callback_calls": [],
+        "callback_assignments": [
+          "Task_FadeAndCloseBagMenu"
+        ]
+      },
+      {
+        "function": "UseRegisteredKeyItemOnField",
+        "line": 2142,
+        "callback_calls": [
+          "GetItemFieldFunc(gSaveBlock1Ptr->registeredItem), 8"
+        ],
+        "callback_assignments": []
+      },
+      {
+        "function": "Task_ItemContext_Sell",
+        "line": 2174,
+        "callback_calls": [],
+        "callback_assignments": []
+      },
+      {
+        "function": "InitSellHowManyInput",
+        "line": 2226,
+        "callback_calls": [],
+        "callback_assignments": [
+          "Task_ChooseHowManyToSell"
+        ]
+      },
+      {
+        "function": "Task_ChooseHowManyToSell",
+        "line": 2235,
+        "callback_calls": [],
+        "callback_assignments": []
+      },
+      {
+        "function": "SellItem",
+        "line": 2268,
+        "callback_calls": [],
+        "callback_assignments": [
+          "WaitAfterItemSell"
+        ]
+      },
+      {
+        "function": "Task_ItemContext_Deposit",
+        "line": 2297,
+        "callback_calls": [],
+        "callback_assignments": [
+          "Task_ChooseHowManyToDeposit"
+        ]
+      },
+      {
+        "function": "Task_ChooseHowManyToDeposit",
+        "line": 2316,
+        "callback_calls": [],
+        "callback_assignments": []
+      },
+      {
+        "function": "TryDepositItem",
+        "line": 2340,
+        "callback_calls": [],
+        "callback_assignments": [
+          "WaitDepositErrorMessage",
+          "Task_RemoveItemFromBag",
+          "WaitDepositErrorMessage"
+        ]
+      },
+      {
+        "function": "Task_WallyTutorialBagMenu",
+        "line": 2442,
+        "callback_calls": [],
+        "callback_assignments": []
+      },
+      {
+        "function": "CB2_ApprenticeExitBagMenu",
+        "line": 2488,
+        "callback_calls": [
+          "CB2_ReturnToField"
+        ],
+        "callback_assignments": [
+          "Apprentice_ScriptContext_Enable"
+        ]
+      },
+      {
+        "function": "CB2_FavorLadyExitBagMenu",
+        "line": 2502,
+        "callback_calls": [
+          "CB2_ReturnToField"
+        ],
+        "callback_assignments": [
+          "FieldCallback_FavorLadyEnableScriptContexts"
+        ]
+      },
+      {
+        "function": "CB2_QuizLadyExitBagMenu",
+        "line": 2517,
+        "callback_calls": [
+          "CB2_ReturnToField"
+        ],
+        "callback_assignments": [
+          "FieldCallback_QuizLadyEnableScriptContexts"
+        ]
+      },
+      {
+        "function": "Task_LoadBagSortOptions",
+        "line": 2794,
+        "callback_calls": [],
+        "callback_assignments": [
+          "Task_ItemContext_SingleRow",
+          "Task_ItemContext_MultipleRows"
+        ]
+      },
+      {
+        "function": "ItemMenu_SortByName",
+        "line": 2804,
+        "callback_calls": [],
+        "callback_assignments": [
+          "SortBagItems"
+        ]
+      },
+      {
+        "function": "ItemMenu_SortByType",
+        "line": 2811,
+        "callback_calls": [],
+        "callback_assignments": [
+          "SortBagItems"
+        ]
+      },
+      {
+        "function": "ItemMenu_SortByAmount",
+        "line": 2818,
+        "callback_calls": [],
+        "callback_assignments": [
+          "SortBagItems"
+        ]
+      },
+      {
+        "function": "ItemMenu_SortByIndex",
+        "line": 2825,
+        "callback_calls": [],
+        "callback_assignments": [
+          "SortBagItems"
+        ]
+      },
+      {
+        "function": "Task_SortFinish",
+        "line": 2854,
+        "callback_calls": [],
+        "callback_assignments": []
+      }
+    ],
+    "src/naming_screen.c": [
+      {
+        "function": "DoNamingScreen",
+        "line": 404,
+        "callback_calls": [
+          "returnCallback",
+          "CB2_LoadNamingScreen"
+        ],
+        "callback_assignments": [
+          "returnCallback"
+        ]
+      },
+      {
+        "function": "CB2_LoadNamingScreen",
+        "line": 427,
+        "callback_calls": [],
+        "callback_assignments": []
+      },
+      {
+        "function": "CreateNamingScreenTask",
+        "line": 546,
+        "callback_calls": [
+          "Task_NamingScreen, 2",
+          "CB2_NamingScreen"
+        ],
+        "callback_assignments": []
+      },
+      {
+        "function": "Task_NamingScreen",
+        "line": 552,
+        "callback_calls": [],
+        "callback_assignments": []
+      },
+      {
+        "function": "MainState_Exit",
+        "line": 695,
+        "callback_calls": [
+          "BattleMainCB2",
+          "sNamingScreen->returnCallback"
+        ],
+        "callback_assignments": []
+      },
+      {
+        "function": "StartPageSwapAnim",
+        "line": 822,
+        "callback_calls": [
+          "Task_HandlePageSwapAnim, 0"
+        ],
+        "callback_assignments": []
+      },
+      {
+        "function": "Task_HandlePageSwapAnim",
+        "line": 830,
+        "callback_calls": [],
+        "callback_assignments": []
+      },
+      {
+        "function": "CreateButtonFlashTask",
+        "line": 916,
+        "callback_calls": [
+          "Task_UpdateButtonFlash, 3"
+        ],
+        "callback_assignments": []
+      },
+      {
+        "function": "Task_UpdateButtonFlash",
+        "line": 943,
+        "callback_calls": [],
+        "callback_assignments": []
+      },
+      {
+        "function": "CreateInputHandlerTask",
+        "line": 1632,
+        "callback_calls": [
+          "Task_HandleInput, 1"
+        ],
+        "callback_assignments": []
+      },
+      {
+        "function": "Task_HandleInput",
+        "line": 1651,
+        "callback_calls": [],
+        "callback_assignments": []
+      },
+      {
+        "function": "CB2_NamingScreen",
+        "line": 2084,
+        "callback_calls": [],
+        "callback_assignments": []
+      }
+    ],
+    "src/option_menu.c": [
+      {
+        "function": "CB2_InitOptionMenu",
+        "line": 168,
+        "callback_calls": [
+          "Task_OptionMenuFadeIn, 0",
+          "MainCB2"
+        ],
+        "callback_assignments": []
+      },
+      {
+        "function": "Task_OptionMenuFadeIn",
+        "line": 274,
+        "callback_calls": [],
+        "callback_assignments": [
+          "Task_OptionMenuProcessInput"
+        ]
+      },
+      {
+        "function": "Task_OptionMenuProcessInput",
+        "line": 280,
+        "callback_calls": [],
+        "callback_assignments": [
+          "Task_OptionMenuSave",
+          "Task_OptionMenuSave"
+        ]
+      },
+      {
+        "function": "Task_OptionMenuSave",
+        "line": 367,
+        "callback_calls": [],
+        "callback_assignments": [
+          "Task_OptionMenuFadeOut"
+        ]
+      },
+      {
+        "function": "Task_OptionMenuFadeOut",
+        "line": 380,
+        "callback_calls": [
+          "gMain.savedCallback"
+        ],
+        "callback_assignments": []
+      }
+    ],
+    "src/party_menu.c": [
+      {
+        "function": "InitPartyMenu",
+        "line": 518,
+        "callback_calls": [
+          "callback",
+          "CB2_InitPartyMenu"
+        ],
+        "callback_assignments": [
+          "callback",
+          "NULL"
+        ]
+      },
+      {
+        "function": "RefreshPartyMenu",
+        "line": 586,
+        "callback_calls": [
+          "CB2_ReloadPartyMenu"
+        ],
+        "callback_assignments": []
+      },
+      {
+        "function": "CB2_UpdatePartyMenu",
+        "line": 599,
+        "callback_calls": [],
+        "callback_assignments": []
+      },
+      {
+        "function": "CB2_InitPartyMenu",
+        "line": 615,
+        "callback_calls": [],
+        "callback_assignments": []
+      },
+      {
+        "function": "CB2_ReloadPartyMenu",
+        "line": 624,
+        "callback_calls": [],
+        "callback_assignments": []
+      },
+      {
+        "function": "ShowPartyMenu",
+        "line": 633,
+        "callback_calls": [
+          "sPartyMenuInternal->task, 0",
+          "CB2_UpdatePartyMenu"
+        ],
+        "callback_assignments": []
+      },
+      {
+        "function": "ReloadPartyMenu",
+        "line": 757,
+        "callback_calls": [
+          "CB2_UpdatePartyMenu"
+        ],
+        "callback_assignments": []
+      },
+      {
+        "function": "ExitPartyMenu",
+        "line": 855,
+        "callback_calls": [
+          "Task_ExitPartyMenu, 0",
+          "CB2_UpdatePartyMenu"
+        ],
+        "callback_assignments": []
+      },
+      {
+        "function": "Task_ExitPartyMenu",
+        "line": 863,
+        "callback_calls": [
+          "gPartyMenu.exitCallback"
+        ],
+        "callback_assignments": []
+      },
+      {
+        "function": "Task_ClosePartyMenu",
+        "line": 1439,
+        "callback_calls": [],
+        "callback_assignments": [
+          "Task_ClosePartyMenuAndSetCB2"
+        ]
+      },
+      {
+        "function": "Task_ClosePartyMenuAndSetCB2",
+        "line": 1445,
+        "callback_calls": [
+          "sPartyMenuInternal->exitCallback",
+          "gPartyMenu.exitCallback"
+        ],
+        "callback_assignments": []
+      },
+      {
+        "function": "Task_HandleChooseMonInput",
+        "line": 1473,
+        "callback_calls": [],
+        "callback_assignments": []
+      },
+      {
+        "function": "HandleChooseMonSelection",
+        "line": 1522,
+        "callback_calls": [],
+        "callback_assignments": [
+          "CB2_SetUpExitToBattleScreen",
+          "Task_ReturnToChooseMonAfterText",
+          "Task_ReturnToChooseMonAfterText"
+        ]
+      },
+      {
+        "function": "HandleChooseMonCancel",
+        "line": 1669,
+        "callback_calls": [],
+        "callback_assignments": [
+          "FALSE"
+        ]
+      },
+      {
+        "function": "DisplayCancelChooseMonYesNo",
+        "line": 1705,
+        "callback_calls": [],
+        "callback_assignments": [
+          "Task_CancelChooseMonYesNo"
+        ]
+      },
+      {
+        "function": "Task_CancelChooseMonYesNo",
+        "line": 1724,
+        "callback_calls": [],
+        "callback_assignments": [
+          "Task_HandleCancelChooseMonYesNoInput"
+        ]
+      },
+      {
+        "function": "Task_HandleCancelChooseMonYesNoInput",
+        "line": 1733,
+        "callback_calls": [],
+        "callback_assignments": [
+          "FALSE"
+        ]
+      },
+      {
+        "function": "DisplayPartyMenuMessage",
+        "line": 2011,
+        "callback_calls": [
+          "Task_PrintAndWaitForText, 1"
+        ],
+        "callback_assignments": []
+      },
+      {
+        "function": "Task_PrintAndWaitForText",
+        "line": 2021,
+        "callback_calls": [],
+        "callback_assignments": []
+      },
+      {
+        "function": "Task_WaitForLinkAndReturnToChooseMon",
+        "line": 2041,
+        "callback_calls": [],
+        "callback_assignments": [
+          "Task_HandleChooseMonInput"
+        ]
+      },
+      {
+        "function": "Task_ReturnToChooseMonAfterText",
+        "line": 2050,
+        "callback_calls": [],
+        "callback_assignments": [
+          "Task_WaitForLinkAndReturnToChooseMon",
+          "Task_HandleChooseMonInput"
+        ]
+      },
+      {
+        "function": "Task_PartyMenuModifyHP",
+        "line": 2157,
+        "callback_calls": [],
+        "callback_assignments": []
+      },
+      {
+        "function": "PartyMenuModifyHP",
+        "line": 2180,
+        "callback_calls": [
+          "taskId, Task_PartyMenuModifyHP, task"
+        ],
+        "callback_assignments": []
+      },
+      {
+        "function": "ResetHPTaskData",
+        "line": 2196,
+        "callback_calls": [
+          "taskId, Task_PartyMenuModifyHP, (TaskFunc)hp"
+        ],
+        "callback_assignments": []
+      },
+      {
+        "function": "TryEnterMonForMinigame",
+        "line": 2304,
+        "callback_calls": [],
+        "callback_assignments": [
+          "Task_ReturnToChooseMonAfterText"
+        ]
+      },
+      {
+        "function": "CancelParticipationPrompt",
+        "line": 2321,
+        "callback_calls": [],
+        "callback_assignments": [
+          "Task_CancelParticipationYesNo"
+        ]
+      },
+      {
+        "function": "Task_CancelParticipationYesNo",
+        "line": 2328,
+        "callback_calls": [],
+        "callback_assignments": [
+          "Task_HandleCancelParticipationYesNoInput"
+        ]
+      },
+      {
+        "function": "Task_HandleCancelParticipationYesNoInput",
+        "line": 2337,
+        "callback_calls": [],
+        "callback_assignments": [
+          "Task_ReturnToChooseMonAfterText"
+        ]
+      },
+      {
+        "function": "CreateSelectionWindow",
+        "line": 3040,
+        "callback_calls": [],
+        "callback_assignments": [
+          "Task_UpdateHeldItemSprite"
+        ]
+      },
+      {
+        "function": "Task_TryCreateSelectionWindow",
+        "line": 3078,
+        "callback_calls": [],
+        "callback_assignments": [
+          "Task_HandleSelectionMenuInput"
+        ]
+      },
+      {
+        "function": "Task_HandleSelectionMenuInput",
+        "line": 3087,
+        "callback_calls": [],
+        "callback_assignments": []
+      },
+      {
+        "function": "CursorCb_Summary",
+        "line": 3123,
+        "callback_calls": [],
+        "callback_assignments": [
+          "CB2_ShowPokemonSummaryScreen"
+        ]
+      },
+      {
+        "function": "CB2_ShowPokemonSummaryScreen",
+        "line": 3130,
+        "callback_calls": [],
+        "callback_assignments": []
+      },
+      {
+        "function": "CB2_ReturnToPartyMenuFromSummaryScreen",
+        "line": 3162,
+        "callback_calls": [],
+        "callback_assignments": []
+      },
+      {
+        "function": "CursorCb_Switch",
+        "line": 3171,
+        "callback_calls": [],
+        "callback_assignments": [
+          "Task_HandleChooseMonInput"
+        ]
+      },
+      {
+        "function": "SwitchSelectedMons",
+        "line": 3199,
+        "callback_calls": [],
+        "callback_assignments": [
+          "Task_SlideSelectedSlotsOffscreen"
+        ]
+      },
+      {
+        "function": "Task_SlideSelectedSlotsOffscreen",
+        "line": 3313,
+        "callback_calls": [],
+        "callback_assignments": [
+          "Task_SlideSelectedSlotsOnscreen"
+        ]
+      },
+      {
+        "function": "Task_SlideSelectedSlotsOnscreen",
+        "line": 3343,
+        "callback_calls": [],
+        "callback_assignments": []
+      },
+      {
+        "function": "FinishTwoMonAction",
+        "line": 3415,
+        "callback_calls": [],
+        "callback_assignments": [
+          "Task_HandleChooseMonInput"
+        ]
+      },
+      {
+        "function": "CursorCb_Cancel1",
+        "line": 3439,
+        "callback_calls": [],
+        "callback_assignments": [
+          "Task_HandleChooseMonInput"
+        ]
+      },
+      {
+        "function": "CursorCb_Item",
+        "line": 3451,
+        "callback_calls": [],
+        "callback_assignments": [
+          "Task_HandleSelectionMenuInput"
+        ]
+      },
+      {
+        "function": "CursorCb_Give",
+        "line": 3463,
+        "callback_calls": [],
+        "callback_assignments": [
+          "CB2_SelectBagItemToGive"
+        ]
+      },
+      {
+        "function": "CB2_SelectBagItemToGive",
+        "line": 3470,
+        "callback_calls": [],
+        "callback_assignments": []
+      },
+      {
+        "function": "CB2_GiveHoldItem",
+        "line": 3478,
+        "callback_calls": [],
+        "callback_assignments": []
+      },
+      {
+        "function": "Task_GiveHoldItem",
+        "line": 3508,
+        "callback_calls": [],
+        "callback_assignments": [
+          "Task_UpdateHeldItemSprite"
+        ]
+      },
+      {
+        "function": "Task_SwitchHoldItemsPrompt",
+        "line": 3522,
+        "callback_calls": [],
+        "callback_assignments": [
+          "Task_SwitchItemsYesNo"
+        ]
+      },
+      {
+        "function": "Task_SwitchItemsYesNo",
+        "line": 3531,
+        "callback_calls": [],
+        "callback_assignments": [
+          "Task_HandleSwitchItemsYesNoInput"
+        ]
+      },
+      {
+        "function": "Task_HandleSwitchItemsYesNoInput",
+        "line": 3540,
+        "callback_calls": [],
+        "callback_assignments": [
+          "Task_ReturnToChooseMonAfterText",
+          "Task_WriteMailToGiveMonAfterText",
+          "Task_UpdateHeldItemSprite",
+          "Task_ReturnToChooseMonAfterText"
+        ]
+      },
+      {
+        "function": "Task_WriteMailToGiveMonAfterText",
+        "line": 3578,
+        "callback_calls": [],
+        "callback_assignments": [
+          "CB2_WriteMailToGiveMon"
+        ]
+      },
+      {
+        "function": "CB2_WriteMailToGiveMon",
+        "line": 3587,
+        "callback_calls": [],
+        "callback_assignments": []
+      },
+      {
+        "function": "CB2_ReturnToPartyMenuFromWritingMail",
+        "line": 3598,
+        "callback_calls": [],
+        "callback_assignments": []
+      },
+      {
+        "function": "Task_DisplayGaveMailFromPartyMessage",
+        "line": 3620,
+        "callback_calls": [],
+        "callback_assignments": [
+          "Task_UpdateHeldItemSprite"
+        ]
+      },
+      {
+        "function": "Task_UpdateHeldItemSprite",
+        "line": 3632,
+        "callback_calls": [],
+        "callback_assignments": []
+      },
+      {
+        "function": "CursorCb_TakeItem",
+        "line": 3650,
+        "callback_calls": [],
+        "callback_assignments": [
+          "Task_UpdateHeldItemSprite"
+        ]
+      },
+      {
+        "function": "CursorCb_Toss",
+        "line": 3677,
+        "callback_calls": [],
+        "callback_assignments": [
+          "Task_UpdateHeldItemSprite",
+          "Task_TossHeldItemYesNo"
+        ]
+      },
+      {
+        "function": "Task_TossHeldItemYesNo",
+        "line": 3701,
+        "callback_calls": [],
+        "callback_assignments": [
+          "Task_HandleTossHeldItemYesNoInput"
+        ]
+      },
+      {
+        "function": "Task_HandleTossHeldItemYesNoInput",
+        "line": 3710,
+        "callback_calls": [],
+        "callback_assignments": [
+          "Task_TossHeldItem",
+          "Task_ReturnToChooseMonAfterText"
+        ]
+      },
+      {
+        "function": "Task_TossHeldItem",
+        "line": 3731,
+        "callback_calls": [],
+        "callback_assignments": [
+          "Task_ReturnToChooseMonAfterText"
+        ]
+      },
+      {
+        "function": "CursorCb_Mail",
+        "line": 3746,
+        "callback_calls": [],
+        "callback_assignments": [
+          "Task_HandleSelectionMenuInput"
+        ]
+      },
+      {
+        "function": "CursorCb_Read",
+        "line": 3758,
+        "callback_calls": [],
+        "callback_assignments": [
+          "CB2_ReadHeldMail"
+        ]
+      },
+      {
+        "function": "CB2_ReadHeldMail",
+        "line": 3765,
+        "callback_calls": [],
+        "callback_assignments": []
+      },
+      {
+        "function": "CB2_ReturnToPartyMenuFromReadingMail",
+        "line": 3770,
+        "callback_calls": [],
+        "callback_assignments": []
+      },
+      {
+        "function": "CursorCb_TakeMail",
+        "line": 3776,
+        "callback_calls": [],
+        "callback_assignments": [
+          "Task_SendMailToPCYesNo"
+        ]
+      },
+      {
+        "function": "Task_SendMailToPCYesNo",
+        "line": 3785,
+        "callback_calls": [],
+        "callback_assignments": [
+          "Task_HandleSendMailToPCYesNoInput"
+        ]
+      },
+      {
+        "function": "Task_HandleSendMailToPCYesNoInput",
+        "line": 3794,
+        "callback_calls": [],
+        "callback_assignments": [
+          "Task_UpdateHeldItemSprite",
+          "Task_ReturnToChooseMonAfterText",
+          "Task_LoseMailMessageYesNo"
+        ]
+      },
+      {
+        "function": "Task_LoseMailMessageYesNo",
+        "line": 3820,
+        "callback_calls": [],
+        "callback_assignments": [
+          "Task_HandleLoseMailMessageYesNoInput"
+        ]
+      },
+      {
+        "function": "Task_HandleLoseMailMessageYesNoInput",
+        "line": 3829,
+        "callback_calls": [],
+        "callback_assignments": [
+          "Task_UpdateHeldItemSprite",
+          "Task_ReturnToChooseMonAfterText",
+          "Task_ReturnToChooseMonAfterText"
+        ]
+      },
+      {
+        "function": "CursorCb_Cancel2",
+        "line": 3859,
+        "callback_calls": [],
+        "callback_assignments": [
+          "Task_HandleSelectionMenuInput"
+        ]
+      },
+      {
+        "function": "CursorCb_SendMon",
+        "line": 3882,
+        "callback_calls": [],
+        "callback_assignments": [
+          "Task_ReturnToChooseMonAfterText"
+        ]
+      },
+      {
+        "function": "CursorCb_Enter",
+        "line": 3899,
+        "callback_calls": [],
+        "callback_assignments": [
+          "Task_HandleChooseMonInput",
+          "Task_ReturnToChooseMonAfterText"
+        ]
+      },
+      {
+        "function": "CursorCb_NoEntry",
+        "line": 3935,
+        "callback_calls": [],
+        "callback_assignments": [
+          "Task_HandleChooseMonInput"
+        ]
+      },
+      {
+        "function": "CursorCb_Register",
+        "line": 3971,
+        "callback_calls": [],
+        "callback_assignments": [
+          "Task_ReturnToChooseMonAfterText"
+        ]
+      },
+      {
+        "function": "CursorCb_Trade1",
+        "line": 4001,
+        "callback_calls": [],
+        "callback_assignments": [
+          "Task_ReturnToChooseMonAfterText"
+        ]
+      },
+      {
+        "function": "CursorCb_Trade2",
+        "line": 4027,
+        "callback_calls": [],
+        "callback_assignments": [
+          "Task_SpinTradeYesNo",
+          "Task_ReturnToChooseMonAfterText"
+        ]
+      },
+      {
+        "function": "Task_SpinTradeYesNo",
+        "line": 4056,
+        "callback_calls": [],
+        "callback_assignments": [
+          "Task_HandleSpinTradeYesNoInput"
+        ]
+      },
+      {
+        "function": "Task_HandleSpinTradeYesNoInput",
+        "line": 4066,
+        "callback_calls": [],
+        "callback_assignments": []
+      },
+      {
+        "function": "CursorCb_FieldMove",
+        "line": 4082,
+        "callback_calls": [],
+        "callback_assignments": [
+          "Task_CancelAfterAorBPress",
+          "Task_ReturnToChooseMonAfterText",
+          "CB2_OpenFlyMap",
+          "CB2_ReturnToField",
+          "Task_CancelAfterAorBPress"
+        ]
+      },
+      {
+        "function": "DisplayFieldMoveExitAreaMessage",
+        "line": 4162,
+        "callback_calls": [],
+        "callback_assignments": [
+          "Task_FieldMoveExitAreaYesNo"
+        ]
+      },
+      {
+        "function": "Task_FieldMoveExitAreaYesNo",
+        "line": 4168,
+        "callback_calls": [],
+        "callback_assignments": [
+          "Task_HandleFieldMoveExitAreaYesNoInput"
+        ]
+      },
+      {
+        "function": "Task_HandleFieldMoveExitAreaYesNoInput",
+        "line": 4177,
+        "callback_calls": [],
+        "callback_assignments": [
+          "CB2_ReturnToField",
+          "NULL"
+        ]
+      },
+      {
+        "function": "FieldCallback_PrepareFadeInFromMenu",
+        "line": 4196,
+        "callback_calls": [
+          "Task_FieldMoveWaitForFade, 8",
+          "Task_HideFollowerNPCForTeleport, 0"
+        ],
+        "callback_assignments": []
+      },
+      {
+        "function": "Task_HideFollowerNPCForTeleport",
+        "line": 4221,
+        "callback_calls": [],
+        "callback_assignments": []
+      },
+      {
+        "function": "Task_FieldMoveWaitForFade",
+        "line": 4250,
+        "callback_calls": [],
+        "callback_assignments": []
+      },
+      {
+        "function": "Task_CancelAfterAorBPress",
+        "line": 4265,
+        "callback_calls": [],
+        "callback_assignments": []
+      },
+      {
+        "function": "SetUpFieldMove_Surf",
+        "line": 4285,
+        "callback_calls": [],
+        "callback_assignments": [
+          "FieldCallback_Surf"
+        ]
+      },
+      {
+        "function": "CB2_ReturnToPartyMenuFromFlyMap",
+        "line": 4318,
+        "callback_calls": [],
+        "callback_assignments": []
+      },
+      {
+        "function": "SetUpFieldMove_Waterfall",
+        "line": 4329,
+        "callback_calls": [],
+        "callback_assignments": [
+          "FieldCallback_Waterfall"
+        ]
+      },
+      {
+        "function": "SetUpFieldMove_RockClimb",
+        "line": 4346,
+        "callback_calls": [],
+        "callback_assignments": [
+          "FieldCallback_RockClimb"
+        ]
+      },
+      {
+        "function": "SetUpFieldMove_Dive",
+        "line": 4367,
+        "callback_calls": [],
+        "callback_assignments": [
+          "FieldCallback_Dive"
+        ]
+      },
+      {
+        "function": "CB2_ShowPartyMenuForItemUse",
+        "line": 4677,
+        "callback_calls": [],
+        "callback_assignments": []
+      },
+      {
+        "function": "CB2_ReturnToBagMenu",
+        "line": 4730,
+        "callback_calls": [],
+        "callback_assignments": []
+      },
+      {
+        "function": "Task_SetSacredAshCB",
+        "line": 4738,
+        "callback_calls": [],
+        "callback_assignments": [
+          "CB2_SetUpExitToBattleScreen"
+        ]
+      },
+      {
+        "function": "ItemUseCB_BattleScript",
+        "line": 4844,
+        "callback_calls": [],
+        "callback_assignments": [
+          "FALSE",
+          "task",
+          "TRUE",
+          "task"
+        ]
+      },
+      {
+        "function": "ItemUseCB_BattleChooseMove",
+        "line": 4867,
+        "callback_calls": [],
+        "callback_assignments": [
+          "Task_HandleWhichMoveInput"
+        ]
+      },
+      {
+        "function": "ItemUseCB_Medicine",
+        "line": 4875,
+        "callback_calls": [],
+        "callback_assignments": [
+          "FALSE",
+          "Task_ReturnToChooseMonAfterText",
+          "task",
+          "TRUE",
+          "Task_ReturnToChooseMonAfterText",
+          "task"
+        ]
+      },
+      {
+        "function": "Task_AbilityCapsule",
+        "line": 4957,
+        "callback_calls": [],
+        "callback_assignments": [
+          "FALSE",
+          "Task_ClosePartyMenuAfterText",
+          "TRUE",
+          "FALSE",
+          "(void *)GetWordTaskArg(taskId, tOldFunc)",
+          "Task_ClosePartyMenu"
+        ]
+      },
+      {
+        "function": "ItemUseCB_AbilityCapsule",
+        "line": 5031,
+        "callback_calls": [],
+        "callback_assignments": [
+          "Task_AbilityCapsule"
+        ]
+      },
+      {
+        "function": "Task_AbilityPatch",
+        "line": 5043,
+        "callback_calls": [],
+        "callback_assignments": [
+          "FALSE",
+          "Task_ClosePartyMenuAfterText",
+          "TRUE",
+          "FALSE",
+          "(void *)GetWordTaskArg(taskId, tOldFunc)",
+          "Task_ClosePartyMenu"
+        ]
+      },
+      {
+        "function": "ItemUseCB_AbilityPatch",
+        "line": 5116,
+        "callback_calls": [],
+        "callback_assignments": [
+          "Task_AbilityPatch"
+        ]
+      },
+      {
+        "function": "Task_Mint",
+        "line": 5143,
+        "callback_calls": [],
+        "callback_assignments": [
+          "FALSE",
+          "Task_ClosePartyMenuAfterText",
+          "TRUE",
+          "FALSE",
+          "(void *)GetWordTaskArg(taskId, tOldFunc)",
+          "Task_ClosePartyMenu"
+        ]
+      },
+      {
+        "function": "ItemUseCB_Mint",
+        "line": 5217,
+        "callback_calls": [],
+        "callback_assignments": [
+          "Task_Mint"
+        ]
+      },
+      {
+        "function": "Task_DisplayHPRestoredMessage",
+        "line": 5235,
+        "callback_calls": [],
+        "callback_assignments": [
+          "Task_ReturnToChooseMonAfterText",
+          "Task_ClosePartyMenuAfterText"
+        ]
+      },
+      {
+        "function": "Task_ClosePartyMenuAfterText",
+        "line": 5252,
+        "callback_calls": [],
+        "callback_assignments": [
+          "= FALSE)",
+          "NULL"
+        ]
+      },
+      {
+        "function": "ItemUseCB_ResetEVs",
+        "line": 5262,
+        "callback_calls": [],
+        "callback_assignments": [
+          "FALSE",
+          "task",
+          "TRUE",
+          "task"
+        ]
+      },
+      {
+        "function": "ItemUseCB_ReduceEV",
+        "line": 5289,
+        "callback_calls": [],
+        "callback_assignments": [
+          "FALSE",
+          "task",
+          "TRUE",
+          "task"
+        ]
+      },
+      {
+        "function": "Task_HandleWhichMoveInput",
+        "line": 5398,
+        "callback_calls": [],
+        "callback_assignments": []
+      },
+      {
+        "function": "ItemUseCB_PPRecovery",
+        "line": 5417,
+        "callback_calls": [],
+        "callback_assignments": [
+          "Task_HandleWhichMoveInput"
+        ]
+      },
+      {
+        "function": "ReturnToUseOnWhichMon",
+        "line": 5442,
+        "callback_calls": [],
+        "callback_assignments": [
+          "Task_HandleChooseMonInput",
+          "NULL"
+        ]
+      },
+      {
+        "function": "TryUseItemOnMove",
+        "line": 5450,
+        "callback_calls": [],
+        "callback_assignments": [
+          "FALSE",
+          "Task_ClosePartyMenuAfterText",
+          "TRUE",
+          "Task_ClosePartyMenuAfterText",
+          "FALSE",
+          "Task_ClosePartyMenuAfterText",
+          "TRUE",
+          "Task_ClosePartyMenuAfterText"
+        ]
+      },
+      {
+        "function": "ItemUseCB_PPUp",
+        "line": 5508,
+        "callback_calls": [],
+        "callback_assignments": [
+          "Task_HandleWhichMoveInput"
+        ]
+      },
+      {
+        "function": "DisplayLearnMoveMessageAndClose",
+        "line": 5552,
+        "callback_calls": [],
+        "callback_assignments": [
+          "Task_ClosePartyMenuAfterText"
+        ]
+      },
+      {
+        "function": "ItemUseCB_TMHM",
+        "line": 5560,
+        "callback_calls": [],
+        "callback_assignments": [
+          "Task_LearnedMove",
+          "Task_ReplaceMoveYesNo"
+        ]
+      },
+      {
+        "function": "Task_LearnedMove",
+        "line": 5598,
+        "callback_calls": [],
+        "callback_assignments": [
+          "Task_DoLearnedMoveFanfareAfterText"
+        ]
+      },
+      {
+        "function": "Task_DoLearnedMoveFanfareAfterText",
+        "line": 5617,
+        "callback_calls": [],
+        "callback_assignments": [
+          "Task_LearnNextMoveOrClosePartyMenu"
+        ]
+      },
+      {
+        "function": "Task_LearnNextMoveOrClosePartyMenu",
+        "line": 5626,
+        "callback_calls": [],
+        "callback_assignments": []
+      },
+      {
+        "function": "Task_ReplaceMoveYesNo",
+        "line": 5643,
+        "callback_calls": [],
+        "callback_assignments": [
+          "Task_HandleReplaceMoveYesNoInput"
+        ]
+      },
+      {
+        "function": "Task_HandleReplaceMoveYesNoInput",
+        "line": 5652,
+        "callback_calls": [],
+        "callback_assignments": [
+          "Task_ShowSummaryScreenToForgetMove"
+        ]
+      },
+      {
+        "function": "Task_ShowSummaryScreenToForgetMove",
+        "line": 5669,
+        "callback_calls": [],
+        "callback_assignments": [
+          "CB2_ShowSummaryScreenToForgetMove"
+        ]
+      },
+      {
+        "function": "CB2_ShowSummaryScreenToForgetMove",
+        "line": 5678,
+        "callback_calls": [],
+        "callback_assignments": []
+      },
+      {
+        "function": "CB2_ReturnToPartyMenuWhileLearningMove",
+        "line": 5683,
+        "callback_calls": [],
+        "callback_assignments": []
+      },
+      {
+        "function": "Task_ReturnToPartyMenuWhileLearningMove",
+        "line": 5693,
+        "callback_calls": [],
+        "callback_assignments": []
+      },
+      {
+        "function": "DisplayPartyMenuForgotMoveMessage",
+        "line": 5704,
+        "callback_calls": [],
+        "callback_assignments": [
+          "Task_PartyMenuReplaceMove"
+        ]
+      },
+      {
+        "function": "Task_PartyMenuReplaceMove",
+        "line": 5715,
+        "callback_calls": [],
+        "callback_assignments": []
+      },
+      {
+        "function": "StopLearningMovePrompt",
+        "line": 5730,
+        "callback_calls": [],
+        "callback_assignments": [
+          "(P_ASK_MOVE_CONFIRMATION) ? Task_StopLearningMoveYesNo : Task_HandleStopLearningMove"
+        ]
+      },
+      {
+        "function": "Task_HandleStopLearningMove",
+        "line": 5745,
+        "callback_calls": [],
+        "callback_assignments": [
+          "Task_TryLearningNextMoveAfterText",
+          "Task_ClosePartyMenuAfterText"
+        ]
+      },
+      {
+        "function": "Task_StopLearningMoveYesNo",
+        "line": 5756,
+        "callback_calls": [],
+        "callback_assignments": [
+          "Task_HandleStopLearningMoveYesNoInput"
+        ]
+      },
+      {
+        "function": "Task_HandleStopLearningMoveYesNoInput",
+        "line": 5765,
+        "callback_calls": [],
+        "callback_assignments": [
+          "Task_TryLearningNextMoveAfterText",
+          "Task_ClosePartyMenuAfterText",
+          "Task_ReplaceMoveYesNo"
+        ]
+      },
+      {
+        "function": "Task_TryLearningNextMoveAfterText",
+        "line": 5799,
+        "callback_calls": [],
+        "callback_assignments": []
+      },
+      {
+        "function": "ItemUseCB_RareCandy",
+        "line": 5815,
+        "callback_calls": [],
+        "callback_assignments": [
+          "FALSE",
+          "task",
+          "TRUE",
+          "Task_DisplayLevelUpStatsPg1",
+          "FALSE",
+          "task"
+        ]
+      },
+      {
+        "function": "Task_DisplayLevelUpStatsPg1",
+        "line": 5919,
+        "callback_calls": [],
+        "callback_assignments": [
+          "Task_DisplayLevelUpStatsPg2"
+        ]
+      },
+      {
+        "function": "Task_DisplayLevelUpStatsPg2",
+        "line": 5929,
+        "callback_calls": [],
+        "callback_assignments": [
+          "Task_TryLearnNewMoves"
+        ]
+      },
+      {
+        "function": "Task_TryLearnNewMoves",
+        "line": 5959,
+        "callback_calls": [],
+        "callback_assignments": [
+          "Task_TryLearningNextMove"
+        ]
+      },
+      {
+        "function": "Task_TryLearningNextMove",
+        "line": 5993,
+        "callback_calls": [],
+        "callback_assignments": [
+          "Task_TryLearningNextMove"
+        ]
+      },
+      {
+        "function": "CB2_ReturnToPartyMenuUsingRareCandy",
+        "line": 6021,
+        "callback_calls": [
+          "CB2_ShowPartyMenuForItemUse"
+        ],
+        "callback_assignments": []
+      },
+      {
+        "function": "PartyMenuTryEvolution",
+        "line": 6027,
+        "callback_calls": [],
+        "callback_assignments": [
+          "Task_ReturnToChooseMonAfterText",
+          "Task_ClosePartyMenuAfterText"
+        ]
+      },
+      {
+        "function": "DisplayMonNeedsToReplaceMove",
+        "line": 6059,
+        "callback_calls": [],
+        "callback_assignments": [
+          "Task_ReplaceMoveYesNo"
+        ]
+      },
+      {
+        "function": "DisplayMonLearnedMove",
+        "line": 6070,
+        "callback_calls": [],
+        "callback_assignments": [
+          "Task_DoLearnedMoveFanfareAfterText"
+        ]
+      },
+      {
+        "function": "Task_DynamaxCandy",
+        "line": 6096,
+        "callback_calls": [],
+        "callback_assignments": [
+          "FALSE",
+          "Task_ClosePartyMenuAfterText",
+          "TRUE",
+          "Task_ClosePartyMenu"
+        ]
+      },
+      {
+        "function": "ItemUseCB_DynamaxCandy",
+        "line": 6139,
+        "callback_calls": [],
+        "callback_assignments": [
+          "Task_DynamaxCandy"
+        ]
+      },
+      {
+        "function": "UseSacredAsh",
+        "line": 6167,
+        "callback_calls": [],
+        "callback_assignments": [
+          "Task_SacredAshLoop",
+          "Task_SacredAshLoop"
+        ]
+      },
+      {
+        "function": "Task_SacredAshLoop",
+        "line": 6197,
+        "callback_calls": [],
+        "callback_assignments": [
+          "FALSE",
+          "TRUE",
+          "Task_ClosePartyMenuAfterText"
+        ]
+      },
+      {
+        "function": "Task_SacredAshDisplayHPRestored",
+        "line": 6229,
+        "callback_calls": [],
+        "callback_assignments": [
+          "Task_SacredAshLoop"
+        ]
+      },
+      {
+        "function": "ItemUseCB_EvolutionStone",
+        "line": 6242,
+        "callback_calls": [],
+        "callback_assignments": [
+          "FALSE",
+          "task"
+        ]
+      },
+      {
+        "function": "FormChangeTeachMove",
+        "line": 6302,
+        "callback_calls": [],
+        "callback_assignments": [
+          "Task_LearnedMove",
+          "Task_ReplaceMoveYesNo"
+        ]
+      },
+      {
+        "function": "TryItemUseFusionChange",
+        "line": 6361,
+        "callback_calls": [],
+        "callback_assignments": [
+          "TRUE",
+          "Task_TryItemUseFusionChange",
+          "FALSE",
+          "task"
+        ]
+      },
+      {
+        "function": "Task_TryItemUseFusionChange",
+        "line": 6485,
+        "callback_calls": [],
+        "callback_assignments": [
+          "(void *)GetWordTaskArg(taskId, tNextFunc)"
+        ]
+      },
+      {
+        "function": "ItemUseCB_Fusion",
+        "line": 6623,
+        "callback_calls": [],
+        "callback_assignments": [
+          "FALSE",
+          "FALSE",
+          "NULL",
+          "FALSE"
+        ]
+      },
+      {
+        "function": "Task_TryItemUseFormChange",
+        "line": 6751,
+        "callback_calls": [],
+        "callback_assignments": [
+          "(void *)GetWordTaskArg(taskId, tNextFunc)"
+        ]
+      },
+      {
+        "function": "TryItemUseFormChange",
+        "line": 6819,
+        "callback_calls": [],
+        "callback_assignments": [
+          "TRUE",
+          "Task_TryItemUseFormChange",
+          "FALSE",
+          "task"
+        ]
+      },
+      {
+        "function": "ItemUseCB_RotomCatalog",
+        "line": 6855,
+        "callback_calls": [],
+        "callback_assignments": [
+          "Task_HandleSelectionMenuInput"
+        ]
+      },
+      {
+        "function": "TryMultichoiceFormChange",
+        "line": 6866,
+        "callback_calls": [],
+        "callback_assignments": [
+          "TRUE",
+          "Task_TryItemUseFormChange",
+          "FALSE",
+          "Task_ClosePartyMenuAfterText"
+        ]
+      },
+      {
+        "function": "ItemUseCB_ZygardeCube",
+        "line": 6936,
+        "callback_calls": [],
+        "callback_assignments": [
+          "Task_HandleSelectionMenuInput"
+        ]
+      },
+      {
+        "function": "TryTutorSelectedMon",
+        "line": 7037,
+        "callback_calls": [],
+        "callback_assignments": [
+          "Task_ReplaceMoveYesNo"
+        ]
+      },
+      {
+        "function": "CB2_PartyMenuFromStartMenu",
+        "line": 7069,
+        "callback_calls": [],
+        "callback_assignments": []
+      },
+      {
+        "function": "CB2_ChooseMonToGiveItem",
+        "line": 7076,
+        "callback_calls": [],
+        "callback_assignments": []
+      },
+      {
+        "function": "TryGiveItemOrMailToSelectedMon",
+        "line": 7083,
+        "callback_calls": [],
+        "callback_assignments": [
+          "Task_SwitchItemsFromBagYesNo"
+        ]
+      },
+      {
+        "function": "GiveItemOrMailToSelectedMon",
+        "line": 7101,
+        "callback_calls": [],
+        "callback_assignments": [
+          "CB2_WriteMailToGiveMonFromBag"
+        ]
+      },
+      {
+        "function": "GiveItemToSelectedMon",
+        "line": 7115,
+        "callback_calls": [],
+        "callback_assignments": [
+          "Task_UpdateHeldItemSpriteAndClosePartyMenu"
+        ]
+      },
+      {
+        "function": "Task_UpdateHeldItemSpriteAndClosePartyMenu",
+        "line": 7129,
+        "callback_calls": [],
+        "callback_assignments": []
+      },
+      {
+        "function": "CB2_WriteMailToGiveMonFromBag",
+        "line": 7140,
+        "callback_calls": [],
+        "callback_assignments": []
+      },
+      {
+        "function": "CB2_ReturnToPartyOrBagMenuFromWritingMail",
+        "line": 7153,
+        "callback_calls": [
+          "gPartyMenu.exitCallback"
+        ],
+        "callback_assignments": []
+      },
+      {
+        "function": "Task_DisplayGaveMailFromBagMessage",
+        "line": 7174,
+        "callback_calls": [],
+        "callback_assignments": [
+          "Task_UpdateHeldItemSpriteAndClosePartyMenu"
+        ]
+      },
+      {
+        "function": "Task_SwitchItemsFromBagYesNo",
+        "line": 7186,
+        "callback_calls": [],
+        "callback_assignments": [
+          "Task_HandleSwitchItemsFromBagYesNoInput"
+        ]
+      },
+      {
+        "function": "Task_HandleSwitchItemsFromBagYesNoInput",
+        "line": 7195,
+        "callback_calls": [],
+        "callback_assignments": [
+          "Task_UpdateHeldItemSpriteAndClosePartyMenu",
+          "CB2_WriteMailToGiveMonFromBag",
+          "Task_UpdateHeldItemSpriteAndClosePartyMenu",
+          "Task_UpdateHeldItemSpriteAndClosePartyMenu"
+        ]
+      },
+      {
+        "function": "DisplayItemMustBeRemovedFirstMessage",
+        "line": 7232,
+        "callback_calls": [],
+        "callback_assignments": [
+          "Task_UpdateHeldItemSpriteAndClosePartyMenu"
+        ]
+      },
+      {
+        "function": "TryGiveMailToSelectedMon",
+        "line": 7254,
+        "callback_calls": [],
+        "callback_assignments": [
+          "FALSE",
+          "Task_UpdateHeldItemSpriteAndClosePartyMenu"
+        ]
+      },
+      {
+        "function": "Task_ValidateChosenHalfParty",
+        "line": 7375,
+        "callback_calls": [],
+        "callback_assignments": [
+          "Task_ContinueChoosingHalfParty"
+        ]
+      },
+      {
+        "function": "Task_ContinueChoosingHalfParty",
+        "line": 7392,
+        "callback_calls": [],
+        "callback_assignments": [
+          "Task_HandleChooseMonInput"
+        ]
+      },
+      {
+        "function": "TrySwitchInPokemon",
+        "line": 7520,
+        "callback_calls": [],
+        "callback_assignments": [
+          "TRUE"
+        ]
+      },
+      {
+        "function": "CB2_SetUpExitToBattleScreen",
+        "line": 7944,
+        "callback_calls": [
+          "CB2_SetUpReshowBattleScreenAfterMenu"
+        ],
+        "callback_assignments": []
+      },
+      {
+        "function": "Task_InitMultiPartnerPartySlideIn",
+        "line": 7959,
+        "callback_calls": [],
+        "callback_assignments": [
+          "Task_MultiPartnerPartySlideIn"
+        ]
+      },
+      {
+        "function": "Task_MultiPartnerPartySlideIn",
+        "line": 7968,
+        "callback_calls": [],
+        "callback_assignments": [
+          "Task_WaitAfterMultiPartnerPartySlideIn"
+        ]
+      },
+      {
+        "function": "Task_WaitAfterMultiPartnerFullParty",
+        "line": 7990,
+        "callback_calls": [],
+        "callback_assignments": []
+      },
+      {
+        "function": "Task_WaitBeforeMultiPartnerFullParty",
+        "line": 8006,
+        "callback_calls": [],
+        "callback_assignments": [
+          "Task_WaitAfterMultiPartnerFullParty"
+        ]
+      },
+      {
+        "function": "Task_WaitAfterMultiPartnerPartySlideIn",
+        "line": 8019,
+        "callback_calls": [],
+        "callback_assignments": []
+      },
+      {
+        "function": "BufferMonSelection",
+        "line": 8070,
+        "callback_calls": [
+          "CB2_ReturnToField"
+        ],
+        "callback_assignments": []
+      },
+      {
+        "function": "CB2_FadeFromPartyMenu",
+        "line": 8079,
+        "callback_calls": [
+          "Task_PartyMenuWaitForFade, 10"
+        ],
+        "callback_assignments": []
+      },
+      {
+        "function": "Task_PartyMenuWaitForFade",
+        "line": 8086,
+        "callback_calls": [],
+        "callback_assignments": []
+      },
+      {
+        "function": "ChooseContestMon",
+        "line": 8096,
+        "callback_calls": [
+          "Task_ChooseContestMon, 10"
+        ],
+        "callback_assignments": []
+      },
+      {
+        "function": "Task_ChooseContestMon",
+        "line": 8103,
+        "callback_calls": [],
+        "callback_assignments": []
+      },
+      {
+        "function": "CB2_ChooseContestMon",
+        "line": 8113,
+        "callback_calls": [
+          "CB2_ReturnToField"
+        ],
+        "callback_assignments": []
+      },
+      {
+        "function": "ChoosePartyMon",
+        "line": 8124,
+        "callback_calls": [
+          "Task_ChoosePartyMon, 10"
+        ],
+        "callback_assignments": []
+      },
+      {
+        "function": "Task_ChoosePartyMon",
+        "line": 8131,
+        "callback_calls": [],
+        "callback_assignments": []
+      },
+      {
+        "function": "ChooseMonForMoveRelearner",
+        "line": 8141,
+        "callback_calls": [
+          "Task_ChooseMonForMoveRelearner, 10"
+        ],
+        "callback_assignments": []
+      },
+      {
+        "function": "Task_ChooseMonForMoveRelearner",
+        "line": 8149,
+        "callback_calls": [],
+        "callback_assignments": []
+      },
+      {
+        "function": "CB2_ChooseMonForMoveRelearner",
+        "line": 8159,
+        "callback_calls": [
+          "CB2_ReturnToField"
+        ],
+        "callback_assignments": []
+      },
+      {
+        "function": "BattlePyramidChooseMonHeldItems",
+        "line": 8187,
+        "callback_calls": [
+          "Task_BattlePyramidChooseMonHeldItems, 10"
+        ],
+        "callback_assignments": []
+      },
+      {
+        "function": "Task_BattlePyramidChooseMonHeldItems",
+        "line": 8194,
+        "callback_calls": [],
+        "callback_assignments": []
+      },
+      {
+        "function": "MoveDeleterChooseMoveToForget",
+        "line": 8204,
+        "callback_calls": [],
+        "callback_assignments": [
+          "FieldCB_ContinueScriptHandleMusic"
+        ]
+      },
+      {
+        "function": "CursorCb_MoveItemCallback",
+        "line": 8303,
+        "callback_calls": [],
+        "callback_assignments": [
+          "Task_UpdateHeldItemSprite"
+        ]
+      },
+      {
+        "function": "CursorCb_MoveItem",
+        "line": 8376,
+        "callback_calls": [],
+        "callback_assignments": [
+          "CursorCb_MoveItemCallback",
+          "Task_UpdateHeldItemSprite"
+        ]
+      },
+      {
+        "function": "Task_FirstBattleEnterParty_WaitFadeIn",
+        "line": 8531,
+        "callback_calls": [],
+        "callback_assignments": [
+          "Task_FirstBattleEnterParty_DarkenScreen"
+        ]
+      },
+      {
+        "function": "Task_FirstBattleEnterParty_DarkenScreen",
+        "line": 8537,
+        "callback_calls": [],
+        "callback_assignments": [
+          "Task_FirstBattleEnterParty_WaitDarken"
+        ]
+      },
+      {
+        "function": "Task_FirstBattleEnterParty_WaitDarken",
+        "line": 8543,
+        "callback_calls": [],
+        "callback_assignments": [
+          "Task_FirstBattleEnterParty_CreatePrinter"
+        ]
+      },
+      {
+        "function": "Task_FirstBattleEnterParty_CreatePrinter",
+        "line": 8549,
+        "callback_calls": [],
+        "callback_assignments": [
+          "Task_FirstBattleEnterParty_RunPrinterMsg1"
+        ]
+      },
+      {
+        "function": "Task_FirstBattleEnterParty_RunPrinterMsg1",
+        "line": 8555,
+        "callback_calls": [],
+        "callback_assignments": [
+          "Task_FirstBattleEnterParty_LightenFirstMonIcon"
+        ]
+      },
+      {
+        "function": "Task_FirstBattleEnterParty_LightenFirstMonIcon",
+        "line": 8563,
+        "callback_calls": [],
+        "callback_assignments": [
+          "Task_FirstBattleEnterParty_WaitLightenFirstMonIcon"
+        ]
+      },
+      {
+        "function": "Task_FirstBattleEnterParty_WaitLightenFirstMonIcon",
+        "line": 8569,
+        "callback_calls": [],
+        "callback_assignments": [
+          "Task_FirstBattleEnterParty_StartPrintMsg2"
+        ]
+      },
+      {
+        "function": "Task_FirstBattleEnterParty_StartPrintMsg2",
+        "line": 8575,
+        "callback_calls": [],
+        "callback_assignments": [
+          "Task_FirstBattleEnterParty_RunPrinterMsg2"
+        ]
+      },
+      {
+        "function": "Task_FirstBattleEnterParty_RunPrinterMsg2",
+        "line": 8583,
+        "callback_calls": [],
+        "callback_assignments": [
+          "Task_FirstBattleEnterParty_FadeNormal"
+        ]
+      },
+      {
+        "function": "Task_FirstBattleEnterParty_FadeNormal",
+        "line": 8594,
+        "callback_calls": [],
+        "callback_assignments": [
+          "Task_FirstBattleEnterParty_WaitFadeNormal"
+        ]
+      },
+      {
+        "function": "Task_FirstBattleEnterParty_WaitFadeNormal",
+        "line": 8600,
+        "callback_calls": [],
+        "callback_assignments": [
+          "Task_HandleChooseMonInput"
+        ]
+      }
+    ],
+    "src/pokedex_plus_hgss.c": [
+      {
+        "function": "CB2_OpenPokedexPlusHGSS",
+        "line": 1992,
+        "callback_calls": [
+          "Task_OpenPokedexMainPage, 0",
+          "CB2_Pokedex"
+        ],
+        "callback_assignments": []
+      },
+      {
+        "function": "CB2_Pokedex",
+        "line": 2110,
+        "callback_calls": [],
+        "callback_assignments": []
+      },
+      {
+        "function": "Task_OpenPokedexMainPage",
+        "line": 2118,
+        "callback_calls": [],
+        "callback_assignments": [
+          "Task_HandlePokedexInput"
+        ]
+      },
+      {
+        "function": "Task_HandlePokedexInput",
+        "line": 2129,
+        "callback_calls": [],
+        "callback_assignments": [
+          "Task_OpenInfoScreenAfterMonMovement",
+          "Task_HandlePokedexStartMenuInput",
+          "Task_WaitForExitSearch",
+          "Task_ClosePokedex",
+          "Task_WaitForScroll"
+        ]
+      },
+      {
+        "function": "Task_WaitForScroll",
+        "line": 2197,
+        "callback_calls": [],
+        "callback_assignments": [
+          "Task_HandlePokedexInput"
+        ]
+      },
+      {
+        "function": "Task_HandlePokedexStartMenuInput",
+        "line": 2204,
+        "callback_calls": [],
+        "callback_assignments": [
+          "Task_ClosePokedex",
+          "Task_HandlePokedexInput"
+        ]
+      },
+      {
+        "function": "Task_OpenInfoScreenAfterMonMovement",
+        "line": 2266,
+        "callback_calls": [],
+        "callback_assignments": [
+          "Task_WaitForExitInfoScreen"
+        ]
+      },
+      {
+        "function": "Task_WaitForExitInfoScreen",
+        "line": 2276,
+        "callback_calls": [],
+        "callback_assignments": [
+          "Task_OpenPokedexMainPage"
+        ]
+      },
+      {
+        "function": "Task_ClosePokedex",
+        "line": 2294,
+        "callback_calls": [
+          "CB2_ReturnToFieldWithOpenMenu"
+        ],
+        "callback_assignments": []
+      },
+      {
+        "function": "LoadInfoScreen",
+        "line": 3692,
+        "callback_calls": [
+          "Task_LoadInfoScreen, 0"
+        ],
+        "callback_assignments": []
+      },
+      {
+        "function": "IsInfoScreenScrolling",
+        "line": 3717,
+        "callback_calls": [],
+        "callback_assignments": [
+          "= Task_HandleInfoScreenInput)"
+        ]
+      },
+      {
+        "function": "Task_LoadInfoScreen",
+        "line": 3735,
+        "callback_calls": [],
+        "callback_assignments": [
+          "Task_HandleInfoScreenInput"
+        ]
+      },
+      {
+        "function": "Task_HandleInfoScreenInput",
+        "line": 3858,
+        "callback_calls": [],
+        "callback_assignments": [
+          "Task_LoadInfoScreenWaitForFade",
+          "Task_ExitInfoScreen",
+          "Task_SwitchScreensFromInfoScreen"
+        ]
+      },
+      {
+        "function": "Task_SwitchScreensFromInfoScreen",
+        "line": 3887,
+        "callback_calls": [],
+        "callback_assignments": [
+          "Task_LoadAreaScreen",
+          "Task_LoadCryScreen",
+          "Task_LoadSizeScreen"
+        ]
+      },
+      {
+        "function": "Task_LoadInfoScreenWaitForFade",
+        "line": 3908,
+        "callback_calls": [],
+        "callback_assignments": [
+          "Task_LoadInfoScreen"
+        ]
+      },
+      {
+        "function": "Task_ExitInfoScreen",
+        "line": 3917,
+        "callback_calls": [],
+        "callback_assignments": []
+      },
+      {
+        "function": "Task_LoadAreaScreen",
+        "line": 3934,
+        "callback_calls": [],
+        "callback_assignments": [
+          "Task_WaitForAreaScreenInput"
+        ]
+      },
+      {
+        "function": "Task_ReloadAreaScreen",
+        "line": 3965,
+        "callback_calls": [],
+        "callback_assignments": [
+          "Task_WaitForAreaScreenInput"
+        ]
+      },
+      {
+        "function": "Task_WaitForAreaScreenInput",
+        "line": 3987,
+        "callback_calls": [],
+        "callback_assignments": [
+          "Task_SwitchScreensFromAreaScreen"
+        ]
+      },
+      {
+        "function": "Task_SwitchScreensFromAreaScreen",
+        "line": 3994,
+        "callback_calls": [],
+        "callback_assignments": [
+          "Task_LoadInfoScreen",
+          "Task_LoadStatsScreen",
+          "Task_ReloadAreaScreen"
+        ]
+      },
+      {
+        "function": "Task_DisplayCaughtMonDexPageHGSS",
+        "line": 4077,
+        "callback_calls": [],
+        "callback_assignments": [
+          "Task_HandleCaughtMonPageInput"
+        ]
+      },
+      {
+        "function": "Task_HandleCaughtMonPageInput",
+        "line": 4171,
+        "callback_calls": [],
+        "callback_assignments": [
+          "Task_ExitCaughtMonPage"
+        ]
+      },
+      {
+        "function": "Task_ExitCaughtMonPage",
+        "line": 4198,
+        "callback_calls": [],
+        "callback_assignments": []
+      },
+      {
+        "function": "Task_LoadStatsScreen",
+        "line": 4811,
+        "callback_calls": [],
+        "callback_assignments": [
+          "Task_HandleStatsScreenInput"
+        ]
+      },
+      {
+        "function": "Task_HandleStatsScreenInput",
+        "line": 4954,
+        "callback_calls": [],
+        "callback_assignments": [
+          "Task_ExitStatsScreen",
+          "Task_SwitchScreensFromStatsScreen",
+          "Task_SwitchScreensFromStatsScreen"
+        ]
+      },
+      {
+        "function": "Task_SwitchScreensFromStatsScreen",
+        "line": 5832,
+        "callback_calls": [],
+        "callback_assignments": [
+          "Task_LoadAreaScreen",
+          "Task_LoadCryScreen",
+          "Task_LoadEvolutionScreen",
+          "Task_LoadInfoScreen"
+        ]
+      },
+      {
+        "function": "Task_ExitStatsScreen",
+        "line": 5866,
+        "callback_calls": [],
+        "callback_assignments": []
+      },
+      {
+        "function": "Task_LoadEvolutionScreen",
+        "line": 5957,
+        "callback_calls": [],
+        "callback_assignments": [
+          "Task_HandleEvolutionScreenInput"
+        ]
+      },
+      {
+        "function": "Task_HandleEvolutionScreenInput",
+        "line": 6079,
+        "callback_calls": [],
+        "callback_assignments": [
+          "Task_SwitchScreensFromEvolutionScreen",
+          "Task_LoadInfoScreenWaitForFade",
+          "Task_ExitEvolutionScreen",
+          "Task_SwitchScreensFromEvolutionScreen",
+          "Task_SwitchScreensFromEvolutionScreen"
+        ]
+      },
+      {
+        "function": "Task_SwitchScreensFromEvolutionScreen",
+        "line": 6824,
+        "callback_calls": [],
+        "callback_assignments": [
+          "Task_LoadStatsScreen",
+          "Task_LoadCryScreen",
+          "Task_LoadFormsScreen",
+          "Task_LoadInfoScreen"
+        ]
+      },
+      {
+        "function": "Task_ExitEvolutionScreen",
+        "line": 6855,
+        "callback_calls": [],
+        "callback_assignments": []
+      },
+      {
+        "function": "Task_LoadFormsScreen",
+        "line": 6880,
+        "callback_calls": [],
+        "callback_assignments": [
+          "Task_HandleFormsScreenInput"
+        ]
+      },
+      {
+        "function": "Task_HandleFormsScreenInput",
+        "line": 6985,
+        "callback_calls": [],
+        "callback_assignments": [
+          "Task_SwitchScreensFromFormsScreen",
+          "Task_ExitFormsScreen",
+          "Task_LoadInfoScreenWaitForFade"
+        ]
+      },
+      {
+        "function": "Task_SwitchScreensFromFormsScreen",
+        "line": 7133,
+        "callback_calls": [],
+        "callback_assignments": [
+          "Task_LoadEvolutionScreen",
+          "Task_LoadInfoScreen"
+        ]
+      },
+      {
+        "function": "Task_ExitFormsScreen",
+        "line": 7158,
+        "callback_calls": [],
+        "callback_assignments": []
+      },
+      {
+        "function": "Task_LoadCryScreen",
+        "line": 7191,
+        "callback_calls": [],
+        "callback_assignments": [
+          "Task_HandleCryScreenInput"
+        ]
+      },
+      {
+        "function": "Task_HandleCryScreenInput",
+        "line": 7294,
+        "callback_calls": [],
+        "callback_assignments": [
+          "Task_SwitchScreensFromCryScreen",
+          "Task_SwitchScreensFromCryScreen",
+          "Task_SwitchScreensFromCryScreen"
+        ]
+      },
+      {
+        "function": "Task_SwitchScreensFromCryScreen",
+        "line": 7350,
+        "callback_calls": [],
+        "callback_assignments": [
+          "Task_LoadInfoScreen",
+          "Task_LoadEvolutionScreen",
+          "Task_LoadSizeScreen"
+        ]
+      },
+      {
+        "function": "Task_LoadSizeScreen",
+        "line": 7378,
+        "callback_calls": [],
+        "callback_assignments": [
+          "Task_HandleSizeScreenInput"
+        ]
+      },
+      {
+        "function": "Task_HandleSizeScreenInput",
+        "line": 7495,
+        "callback_calls": [],
+        "callback_assignments": [
+          "Task_SwitchScreensFromSizeScreen",
+          "Task_SwitchScreensFromSizeScreen"
+        ]
+      },
+      {
+        "function": "Task_SwitchScreensFromSizeScreen",
+        "line": 7514,
+        "callback_calls": [],
+        "callback_assignments": [
+          "Task_LoadInfoScreen",
+          "Task_LoadCryScreen"
+        ]
+      },
+      {
+        "function": "Task_WaitForExitSearch",
+        "line": 7547,
+        "callback_calls": [],
+        "callback_assignments": [
+          "Task_OpenSearchResults",
+          "Task_OpenPokedexMainPage"
+        ]
+      },
+      {
+        "function": "Task_OpenSearchResults",
+        "line": 7576,
+        "callback_calls": [],
+        "callback_assignments": [
+          "Task_HandleSearchResultsInput"
+        ]
+      },
+      {
+        "function": "Task_HandleSearchResultsInput",
+        "line": 7585,
+        "callback_calls": [],
+        "callback_assignments": [
+          "Task_OpenSearchResultsInfoScreenAfterMonMovement",
+          "Task_HandleSearchResultsStartMenuInput",
+          "Task_WaitForExitSearch",
+          "Task_ReturnToPokedexFromSearchResults",
+          "Task_WaitForSearchResultsScroll"
+        ]
+      },
+      {
+        "function": "Task_WaitForSearchResultsScroll",
+        "line": 7651,
+        "callback_calls": [],
+        "callback_assignments": [
+          "Task_HandleSearchResultsInput"
+        ]
+      },
+      {
+        "function": "Task_HandleSearchResultsStartMenuInput",
+        "line": 7658,
+        "callback_calls": [],
+        "callback_assignments": [
+          "Task_ReturnToPokedexFromSearchResults",
+          "Task_ClosePokedexFromSearchResultsStartMenu",
+          "Task_HandleSearchResultsInput"
+        ]
+      },
+      {
+        "function": "Task_OpenSearchResultsInfoScreenAfterMonMovement",
+        "line": 7723,
+        "callback_calls": [],
+        "callback_assignments": [
+          "Task_WaitForExitSearchResultsInfoScreen"
+        ]
+      },
+      {
+        "function": "Task_WaitForExitSearchResultsInfoScreen",
+        "line": 7734,
+        "callback_calls": [],
+        "callback_assignments": [
+          "Task_OpenSearchResults"
+        ]
+      },
+      {
+        "function": "Task_ReturnToPokedexFromSearchResults",
+        "line": 7749,
+        "callback_calls": [],
+        "callback_assignments": [
+          "Task_OpenPokedexMainPage"
+        ]
+      },
+      {
+        "function": "Task_ClosePokedexFromSearchResultsStartMenu",
+        "line": 7765,
+        "callback_calls": [],
+        "callback_assignments": [
+          "Task_ClosePokedex"
+        ]
+      },
+      {
+        "function": "LoadSearchMenu",
+        "line": 7901,
+        "callback_calls": [
+          "Task_LoadSearchMenu, 0"
+        ],
+        "callback_assignments": []
+      },
+      {
+        "function": "Task_LoadSearchMenu",
+        "line": 7946,
+        "callback_calls": [],
+        "callback_assignments": [
+          "Task_SwitchToSearchMenuTopBar"
+        ]
+      },
+      {
+        "function": "Task_SwitchToSearchMenuTopBar",
+        "line": 8044,
+        "callback_calls": [],
+        "callback_assignments": [
+          "Task_HandleSearchTopBarInput"
+        ]
+      },
+      {
+        "function": "Task_HandleSearchTopBarInput",
+        "line": 8053,
+        "callback_calls": [],
+        "callback_assignments": [
+          "Task_ExitSearch",
+          "Task_SwitchToSearchMenu",
+          "Task_SwitchToSearchMenu",
+          "Task_ExitSearch"
+        ]
+      },
+      {
+        "function": "Task_SwitchToSearchMenu",
+        "line": 8100,
+        "callback_calls": [],
+        "callback_assignments": [
+          "Task_HandleSearchMenuInput"
+        ]
+      },
+      {
+        "function": "Task_HandleSearchMenuInput",
+        "line": 8110,
+        "callback_calls": [],
+        "callback_assignments": [
+          "Task_SwitchToSearchMenuTopBar",
+          "Task_ExitSearch",
+          "Task_StartPokedexSearch",
+          "Task_SelectSearchMenuItem"
+        ]
+      },
+      {
+        "function": "Task_StartPokedexSearch",
+        "line": 8205,
+        "callback_calls": [],
+        "callback_assignments": [
+          "Task_WaitAndCompleteSearch"
+        ]
+      },
+      {
+        "function": "Task_WaitAndCompleteSearch",
+        "line": 8218,
+        "callback_calls": [],
+        "callback_assignments": [
+          "Task_SearchCompleteWaitForInput"
+        ]
+      },
+      {
+        "function": "Task_SearchCompleteWaitForInput",
+        "line": 8237,
+        "callback_calls": [],
+        "callback_assignments": [
+          "Task_ExitSearch",
+          "Task_SwitchToSearchMenu"
+        ]
+      },
+      {
+        "function": "Task_SelectSearchMenuItem",
+        "line": 8258,
+        "callback_calls": [],
+        "callback_assignments": [
+          "Task_HandleSearchParameterInput"
+        ]
+      },
+      {
+        "function": "Task_HandleSearchParameterInput",
+        "line": 8278,
+        "callback_calls": [],
+        "callback_assignments": [
+          "Task_SwitchToSearchMenu",
+          "Task_SwitchToSearchMenu"
+        ]
+      },
+      {
+        "function": "Task_ExitSearch",
+        "line": 8369,
+        "callback_calls": [],
+        "callback_assignments": [
+          "Task_ExitSearchWaitForFade"
+        ]
+      },
+      {
+        "function": "Task_ExitSearchWaitForFade",
+        "line": 8375,
+        "callback_calls": [],
+        "callback_assignments": []
+      },
+      {
+        "function": "SpriteCB_SearchParameterScrollArrow",
+        "line": 8711,
+        "callback_calls": [],
+        "callback_assignments": [
+          "= Task_HandleSearchParameterInput)"
+        ]
+      }
+    ],
+    "src/pokemon_summary_screen.c": [
+      {
+        "function": "ShowPokemonSummaryScreen",
+        "line": 1199,
+        "callback_calls": [
+          "CB2_InitSummaryScreen"
+        ],
+        "callback_assignments": [
+          "= NULL)",
+          "callback"
+        ]
+      },
+      {
+        "function": "CB2_InitSummaryScreen",
+        "line": 1287,
+        "callback_calls": [],
+        "callback_assignments": []
+      },
+      {
+        "function": "LoadGraphics",
+        "line": 1292,
+        "callback_calls": [
+          "Task_HandleInput, 0",
+          "Task_SetHandleReplaceMoveInput, 0",
+          "MainCB2"
+        ],
+        "callback_assignments": []
+      },
+      {
+        "function": "BeginCloseSummaryScreen",
+        "line": 1645,
+        "callback_calls": [],
+        "callback_assignments": [
+          "CloseSummaryScreen"
+        ]
+      },
+      {
+        "function": "CloseSummaryScreen",
+        "line": 1651,
+        "callback_calls": [
+          "sMonSummaryScreen->callback"
+        ],
+        "callback_assignments": [
+          "NULL"
+        ]
+      },
+      {
+        "function": "Task_HandleInput",
+        "line": 1757,
+        "callback_calls": [],
+        "callback_assignments": []
+      },
+      {
+        "function": "ShowMonSkillsInfo",
+        "line": 1872,
+        "callback_calls": [],
+        "callback_assignments": [
+          "Task_HandleInput"
+        ]
+      },
+      {
+        "function": "ChangeSummaryPokemon",
+        "line": 1964,
+        "callback_calls": [],
+        "callback_assignments": [
+          "Task_ChangeSummaryMon"
+        ]
+      },
+      {
+        "function": "Task_ChangeSummaryMon",
+        "line": 2014,
+        "callback_calls": [],
+        "callback_assignments": [
+          "Task_HandleInput"
+        ]
+      },
+      {
+        "function": "ChangePage",
+        "line": 2162,
+        "callback_calls": [
+          "taskId, PssScrollRight, gTasks[taskId].func",
+          "taskId, PssScrollLeft, gTasks[taskId].func"
+        ],
+        "callback_assignments": []
+      },
+      {
+        "function": "PssScrollRight",
+        "line": 2205,
+        "callback_calls": [],
+        "callback_assignments": [
+          "PssScrollRightEnd"
+        ]
+      },
+      {
+        "function": "PssScrollLeft",
+        "line": 2248,
+        "callback_calls": [],
+        "callback_assignments": [
+          "PssScrollLeftEnd"
+        ]
+      },
+      {
+        "function": "SwitchToMoveSelection",
+        "line": 2306,
+        "callback_calls": [],
+        "callback_assignments": [
+          "Task_HandleInput_MoveSelect"
+        ]
+      },
+      {
+        "function": "Task_HandleInput_MoveSelect",
+        "line": 2341,
+        "callback_calls": [],
+        "callback_assignments": []
+      },
+      {
+        "function": "CloseMoveSelectMode",
+        "line": 2454,
+        "callback_calls": [],
+        "callback_assignments": [
+          "Task_HandleInput"
+        ]
+      },
+      {
+        "function": "SwitchToMovePositionSwitchMode",
+        "line": 2479,
+        "callback_calls": [],
+        "callback_assignments": [
+          "Task_HandleInput_MovePositionSwitch"
+        ]
+      },
+      {
+        "function": "Task_HandleInput_MovePositionSwitch",
+        "line": 2487,
+        "callback_calls": [],
+        "callback_assignments": []
+      },
+      {
+        "function": "ExitMovePositionSwitchMode",
+        "line": 2517,
+        "callback_calls": [],
+        "callback_assignments": [
+          "Task_HandleInput_MoveSelect"
+        ]
+      },
+      {
+        "function": "Task_SetHandleReplaceMoveInput",
+        "line": 2621,
+        "callback_calls": [],
+        "callback_assignments": [
+          "Task_HandleReplaceMoveInput"
+        ]
+      },
+      {
+        "function": "Task_HandleReplaceMoveInput",
+        "line": 2628,
+        "callback_calls": [],
+        "callback_assignments": []
+      },
+      {
+        "function": "ShowCantForgetHMsWindow",
+        "line": 2694,
+        "callback_calls": [],
+        "callback_assignments": [
+          "Task_HandleInputCantForgetHMsMoves"
+        ]
+      },
+      {
+        "function": "Task_HandleInputCantForgetHMsMoves",
+        "line": 2707,
+        "callback_calls": [],
+        "callback_assignments": [
+          "Task_HandleReplaceMoveInput",
+          "Task_HandleReplaceMoveInput",
+          "Task_HandleReplaceMoveInput",
+          "Task_HandleReplaceMoveInput",
+          "Task_HandleReplaceMoveInput"
+        ]
+      },
+      {
+        "function": "PositionPowerAccSlidingWindow",
+        "line": 2873,
+        "callback_calls": [
+          "Task_SlidePowerAccWindow, 8"
+        ],
+        "callback_assignments": []
+      },
+      {
+        "function": "Task_SlidePowerAccWindow",
+        "line": 2891,
+        "callback_calls": [],
+        "callback_assignments": []
+      },
+      {
+        "function": "PositionAppealJamSlidingWindow",
+        "line": 2924,
+        "callback_calls": [
+          "Task_SlideAppealJamWindow, 8"
+        ],
+        "callback_assignments": []
+      },
+      {
+        "function": "Task_SlideAppealJamWindow",
+        "line": 2944,
+        "callback_calls": [],
+        "callback_assignments": []
+      },
+      {
+        "function": "PositionStatusSlidingWindow",
+        "line": 2980,
+        "callback_calls": [
+          "Task_SlideStatusWindow, 8"
+        ],
+        "callback_assignments": []
+      },
+      {
+        "function": "Task_SlideStatusWindow",
+        "line": 2997,
+        "callback_calls": [],
+        "callback_assignments": []
+      },
+      {
+        "function": "CreateTextPrinterTask",
+        "line": 3465,
+        "callback_calls": [
+          "sTextPrinterTasks[pageIndex], 16"
+        ],
+        "callback_assignments": []
+      },
+      {
+        "function": "Task_PrintInfoPage",
+        "line": 3490,
+        "callback_calls": [],
+        "callback_assignments": []
+      },
+      {
+        "function": "Task_PrintSkillsPage",
+        "line": 3769,
+        "callback_calls": [],
+        "callback_assignments": []
+      },
+      {
+        "function": "Task_PrintBattleMoves",
+        "line": 4019,
+        "callback_calls": [],
+        "callback_assignments": []
+      },
+      {
+        "function": "Task_PrintContestMoves",
+        "line": 4148,
+        "callback_calls": [],
+        "callback_assignments": []
+      },
+      {
+        "function": "CB2_ReturnToSummaryScreenFromNamingScreen",
+        "line": 4886,
+        "callback_calls": [],
+        "callback_assignments": []
+      },
+      {
+        "function": "CB2_PssChangePokemonNickname",
+        "line": 4892,
+        "callback_calls": [],
+        "callback_assignments": []
+      }
+    ],
+    "src/pokenav_region_map.c": [
+      {
+        "function": "ChangeBgYForZoom",
+        "line": 605,
+        "callback_calls": [
+          "Task_ChangeBgYForZoom, 3"
+        ],
+        "callback_assignments": []
+      },
+      {
+        "function": "Task_ChangeBgYForZoom",
+        "line": 616,
+        "callback_calls": [],
+        "callback_assignments": []
+      }
+    ],
+    "src/region_map.c": [
+      {
+        "function": "InitRegionMapData",
+        "line": 708,
+        "callback_calls": [],
+        "callback_assignments": [
+          "zoomed == TRUE ? ProcessRegionMapInput_Zoomed : ProcessRegionMapInput_Full"
+        ]
+      },
+      {
+        "function": "ProcessRegionMapInput_Full",
+        "line": 846,
+        "callback_calls": [],
+        "callback_assignments": [
+          "MoveRegionMapCursor_Full"
+        ]
+      },
+      {
+        "function": "MoveRegionMapCursor_Full",
+        "line": 893,
+        "callback_calls": [],
+        "callback_assignments": [
+          "ProcessRegionMapInput_Full"
+        ]
+      },
+      {
+        "function": "ProcessRegionMapInput_Zoomed",
+        "line": 929,
+        "callback_calls": [],
+        "callback_assignments": [
+          "MoveRegionMapCursor_Zoomed"
+        ]
+      },
+      {
+        "function": "MoveRegionMapCursor_Zoomed",
+        "line": 976,
+        "callback_calls": [],
+        "callback_assignments": [
+          "ProcessRegionMapInput_Zoomed"
+        ]
+      },
+      {
+        "function": "UpdateRegionMapZoom",
+        "line": 1045,
+        "callback_calls": [],
+        "callback_assignments": [
+          "(sRegionMap->zoomed == FALSE) ? ProcessRegionMapInput_Full : ProcessRegionMapInput_Zoomed"
+        ]
+      },
+      {
+        "function": "CB2_OpenFlyMap",
+        "line": 1945,
+        "callback_calls": [
+          "CB2_ReturnToFieldWithOpenMenu",
+          "CB2_FlyMap"
+        ],
+        "callback_assignments": []
+      },
+      {
+        "function": "CB2_FlyMap",
+        "line": 2044,
+        "callback_calls": [],
+        "callback_assignments": []
+      },
+      {
+        "function": "CB_ExitFlyMap",
+        "line": 2476,
+        "callback_calls": [
+          "CB2_ReturnToPartyMenuFromFlyMap"
+        ],
+        "callback_assignments": []
+      }
+    ],
+    "src/start_menu.c": [
+      {
+        "function": "Pgr_IsPanelMenuActive",
+        "line": 128,
+        "callback_calls": [],
+        "callback_assignments": [
+          "= HandleStartMenuInput"
+        ]
+      },
+      {
+        "function": "CreateStartMenuTask",
+        "line": 637,
+        "callback_calls": [
+          "StartMenuTask, 0x50",
+          "taskId, StartMenuTask, followupFunc"
+        ],
+        "callback_assignments": []
+      },
+      {
+        "function": "Task_ShowStartMenu",
+        "line": 666,
+        "callback_calls": [],
+        "callback_assignments": [
+          "HandleStartMenuInput"
+        ]
+      },
+      {
+        "function": "HandleStartMenuInput",
+        "line": 699,
+        "callback_calls": [],
+        "callback_assignments": [
+          "sStartMenuItems[sCurrentStartMenuActions[sStartMenuCursorPos]].func.u8_void"
+        ]
+      },
+      {
+        "function": "StartMenuPokedexCallback",
+        "line": 773,
+        "callback_calls": [
+          "CB2_OpenPokedex"
+        ],
+        "callback_assignments": []
+      },
+      {
+        "function": "StartMenuPokemonCallback",
+        "line": 789,
+        "callback_calls": [
+          "CB2_PartyMenuFromStartMenu"
+        ],
+        "callback_assignments": []
+      },
+      {
+        "function": "StartMenuBagCallback",
+        "line": 804,
+        "callback_calls": [
+          "CB2_BagMenuFromStartMenu"
+        ],
+        "callback_assignments": []
+      },
+      {
+        "function": "StartMenuPokeNavCallback",
+        "line": 819,
+        "callback_calls": [
+          "CB2_InitPokeNav"
+        ],
+        "callback_assignments": []
+      },
+      {
+        "function": "StartMenuSaveCallback",
+        "line": 855,
+        "callback_calls": [],
+        "callback_assignments": [
+          "SaveStartCallback"
+        ]
+      },
+      {
+        "function": "StartMenuOptionCallback",
+        "line": 865,
+        "callback_calls": [
+          "CB2_InitOptionMenu"
+        ],
+        "callback_assignments": [
+          "CB2_ReturnToFieldWithOpenMenu"
+        ]
+      },
+      {
+        "function": "StartMenuBattlePyramidRetireCallback",
+        "line": 935,
+        "callback_calls": [],
+        "callback_assignments": [
+          "BattlePyramidRetireStartCallback"
+        ]
+      },
+      {
+        "function": "StartMenuBattlePyramidBagCallback",
+        "line": 951,
+        "callback_calls": [
+          "CB2_PyramidBagMenuFromStartMenu"
+        ],
+        "callback_assignments": []
+      },
+      {
+        "function": "SaveStartCallback",
+        "line": 966,
+        "callback_calls": [],
+        "callback_assignments": [
+          "SaveCallback"
+        ]
+      },
+      {
+        "function": "SaveCallback",
+        "line": 974,
+        "callback_calls": [],
+        "callback_assignments": [
+          "HandleStartMenuInput"
+        ]
+      },
+      {
+        "function": "BattlePyramidRetireStartCallback",
+        "line": 997,
+        "callback_calls": [],
+        "callback_assignments": [
+          "BattlePyramidRetireCallback"
+        ]
+      },
+      {
+        "function": "BattlePyramidRetireReturnCallback",
+        "line": 1005,
+        "callback_calls": [],
+        "callback_assignments": [
+          "HandleStartMenuInput"
+        ]
+      },
+      {
+        "function": "BattlePyramidRetireCallback",
+        "line": 1013,
+        "callback_calls": [],
+        "callback_assignments": [
+          "BattlePyramidRetireReturnCallback"
+        ]
+      },
+      {
+        "function": "InitSave",
+        "line": 1034,
+        "callback_calls": [],
+        "callback_assignments": [
+          "SaveConfirmSaveCallback"
+        ]
+      },
+      {
+        "function": "SaveGame",
+        "line": 1053,
+        "callback_calls": [
+          "SaveGameTask, 0x50"
+        ],
+        "callback_assignments": []
+      },
+      {
+        "function": "ShowSaveMessage",
+        "line": 1059,
+        "callback_calls": [],
+        "callback_assignments": [
+          "saveCallback"
+        ]
+      },
+      {
+        "function": "SaveYesNoCallback",
+        "line": 1153,
+        "callback_calls": [],
+        "callback_assignments": [
+          "SaveConfirmInputCallback"
+        ]
+      },
+      {
+        "function": "SaveConfirmInputCallback",
+        "line": 1160,
+        "callback_calls": [],
+        "callback_assignments": [
+          "SaveFileExistsCallback",
+          "SaveSavingMessageCallback",
+          "SaveSavingMessageCallback",
+          "SaveFileExistsCallback"
+        ]
+      },
+      {
+        "function": "SaveConfirmOverwriteDefaultNoCallback",
+        "line": 1209,
+        "callback_calls": [],
+        "callback_assignments": [
+          "SaveOverwriteInputCallback"
+        ]
+      },
+      {
+        "function": "SaveConfirmOverwriteCallback",
+        "line": 1216,
+        "callback_calls": [],
+        "callback_assignments": [
+          "SaveOverwriteInputCallback"
+        ]
+      },
+      {
+        "function": "SaveOverwriteInputCallback",
+        "line": 1223,
+        "callback_calls": [],
+        "callback_assignments": [
+          "SaveSavingMessageCallback"
+        ]
+      },
+      {
+        "function": "SaveSuccessCallback",
+        "line": 1272,
+        "callback_calls": [],
+        "callback_assignments": [
+          "SaveReturnSuccessCallback"
+        ]
+      },
+      {
+        "function": "SaveErrorCallback",
+        "line": 1296,
+        "callback_calls": [],
+        "callback_assignments": [
+          "SaveReturnErrorCallback"
+        ]
+      },
+      {
+        "function": "InitBattlePyramidRetire",
+        "line": 1320,
+        "callback_calls": [],
+        "callback_assignments": [
+          "BattlePyramidConfirmRetireCallback"
+        ]
+      },
+      {
+        "function": "BattlePyramidRetireYesNoCallback",
+        "line": 1335,
+        "callback_calls": [],
+        "callback_assignments": [
+          "BattlePyramidRetireInputCallback"
+        ]
+      },
+      {
+        "function": "CB2_SetUpSaveAfterLinkBattle",
+        "line": 1401,
+        "callback_calls": [
+          "Task_SaveAfterLinkBattle, 0x50",
+          "CB2_SaveAfterLinkBattle"
+        ],
+        "callback_assignments": []
+      },
+      {
+        "function": "CB2_SaveAfterLinkBattle",
+        "line": 1410,
+        "callback_calls": [],
+        "callback_assignments": []
+      },
+      {
+        "function": "Task_SaveAfterLinkBattle",
+        "line": 1416,
+        "callback_calls": [
+          "gMain.savedCallback",
+          "Task_LinkFullSave, 5"
+        ],
+        "callback_assignments": []
+      },
+      {
+        "function": "Task_WaitForBattleTowerLinkSave",
+        "line": 1559,
+        "callback_calls": [],
+        "callback_assignments": []
+      },
+      {
+        "function": "SaveForBattleTowerLink",
+        "line": 1570,
+        "callback_calls": [
+          "Task_LinkFullSave, 5"
+        ],
+        "callback_assignments": []
+      },
+      {
+        "function": "StartMenuDexNavCallback",
+        "line": 1601,
+        "callback_calls": [
+          "Task_OpenDexNavFromStartMenu, 0"
+        ],
+        "callback_assignments": []
+      },
+      {
+        "function": "Script_ForceSaveGame",
+        "line": 1607,
+        "callback_calls": [],
+        "callback_assignments": [
+          "SaveCallback",
+          "SaveSavingMessageCallback"
+        ]
+      }
+    ],
+    "src/trainer_card.c": [
+      {
+        "function": "CB2_TrainerCard",
+        "line": 353,
+        "callback_calls": [],
+        "callback_assignments": []
+      },
+      {
+        "function": "CloseTrainerCard",
+        "line": 361,
+        "callback_calls": [
+          "sData->callback2"
+        ],
+        "callback_assignments": []
+      },
+      {
+        "function": "Task_TrainerCard",
+        "line": 381,
+        "callback_calls": [],
+        "callback_assignments": []
+      },
+      {
+        "function": "CB2_InitTrainerCard",
+        "line": 592,
+        "callback_calls": [],
+        "callback_assignments": []
+      },
+      {
+        "function": "SetTrainerCardCb2",
+        "line": 931,
+        "callback_calls": [
+          "CB2_TrainerCard"
+        ],
+        "callback_assignments": []
+      },
+      {
+        "function": "SetUpTrainerCardTask",
+        "line": 936,
+        "callback_calls": [
+          "Task_TrainerCard, 0"
+        ],
+        "callback_assignments": []
+      },
+      {
+        "function": "FlipTrainerCard",
+        "line": 1612,
+        "callback_calls": [
+          "Task_DoCardFlipTask, 0"
+        ],
+        "callback_assignments": []
+      },
+      {
+        "function": "Task_DoCardFlipTask",
+        "line": 1627,
+        "callback_calls": [],
+        "callback_assignments": []
+      },
+      {
+        "function": "Task_BeginCardFlip",
+        "line": 1633,
+        "callback_calls": [],
+        "callback_assignments": []
+      },
+      {
+        "function": "Task_AnimateCardFlipDown",
+        "line": 1650,
+        "callback_calls": [],
+        "callback_assignments": []
+      },
+      {
+        "function": "Task_DrawFlippedCardSide",
+        "line": 1695,
+        "callback_calls": [],
+        "callback_assignments": []
+      },
+      {
+        "function": "Task_SetCardFlipped",
+        "line": 1749,
+        "callback_calls": [],
+        "callback_assignments": []
+      },
+      {
+        "function": "Task_AnimateCardFlipUp",
+        "line": 1769,
+        "callback_calls": [],
+        "callback_assignments": []
+      },
+      {
+        "function": "Task_EndCardFlip",
+        "line": 1814,
+        "callback_calls": [],
+        "callback_assignments": []
+      },
+      {
+        "function": "ShowPlayerTrainerCard",
+        "line": 1823,
+        "callback_calls": [
+          "CB2_InitTrainerCard"
+        ],
+        "callback_assignments": []
+      },
+      {
+        "function": "ShowTrainerCardInLink",
+        "line": 1842,
+        "callback_calls": [
+          "CB2_InitTrainerCard"
+        ],
+        "callback_assignments": []
+      }
+    ]
+  }
+}
