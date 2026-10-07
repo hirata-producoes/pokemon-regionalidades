@@ -1,0 +1,138 @@
+{
+  "schema": 1,
+  "revision": "9d8b7591f09b65804da2fb2dfd56f320633e0d36",
+  "source_sha256": {
+    "src/battle/battle_cursor.c": "ea0746fed4f29c5a07210ab527953ad918946a6d962790037c16ab011ed9839b",
+    "src/battle/battle_input.c": "085280b149a7ff4caeb2f08c52b1e184ab99130a412a2b93bb323578a1d33be6",
+    "src/battle/overlay_12_0226BEC4.c": "1b1ce0212d2a255700aee1d89d7f5f8a879f7b79c4b49ad7bd766b75dcd358a8",
+    "asm/unk_02077678.s": "8416cc9c7120e762925285de6e2f12f181e743df3138f72a20ed232a1840be31",
+    "include/battle/battle_cursor.h": "b7aab1f7a27962584b7f423b058525631acb581298129b4f79a6469185c56337",
+    "include/battle/battle_input.h": "7580d78231ccfc7e3dc49d627827b3eb00e9cdf2d655fe3c9a6a222bbd631995",
+    "lib/include/nnsys/g2d/fmt/g2d_Anim_data.h": "7d19a3ed5254197ab250575ac3d46071211863dfc30f7a55964b97cc90b9f0c6",
+    "lib/asm/nnsys.s": "6ee4c095cf3c47483540883d66701126bc06f8ff8cd52047e646802af0ed4314",
+    "files/a/0/0/8": "d8ebf4d2963737ed3c8bd69823eb791429216785fad627a7d23dac624d640fdb"
+  },
+  "archive": "files/a/0/0/8",
+  "cursor_resources": [
+    {
+      "member": 80,
+      "role": "palette",
+      "stored_sha256": "88d75f1fc4a2ad816ce1c99f35c754652f032f41a17112744abd9d8d6e5ca947",
+      "stored_size": 90,
+      "decoded_size": 90,
+      "decoded_magic": "RLCN",
+      "decoded_sha256": "88d75f1fc4a2ad816ce1c99f35c754652f032f41a17112744abd9d8d6e5ca947"
+    },
+    {
+      "member": 250,
+      "role": "characters",
+      "stored_sha256": "9e7c51376ac016b3b01b73c014f6fa1e5205dd8cfbbe2096d4f5c6949a89470b",
+      "stored_size": 92,
+      "decoded_size": 176,
+      "decoded_magic": "RGCN",
+      "decoded_sha256": "6c8abefebef3a5266cf5422778f8036db2fe72d98c41223cd2cdd519431d6d76"
+    },
+    {
+      "member": 251,
+      "role": "cells",
+      "stored_sha256": "7ffcf6cdf64d9b8d97776325df064a379a4623667ca2352548f86f7cef7fdab8",
+      "stored_size": 140,
+      "decoded_size": 216,
+      "decoded_magic": "RECN",
+      "decoded_sha256": "fbffb2d898d9023dbc4d79bc1cd56049f25b8fcd3f5abca35c526c242263789c"
+    },
+    {
+      "member": 252,
+      "role": "animation",
+      "stored_sha256": "ecdf76d5d1ed6c1d45811bcb4fbd1381e82bb4fea36b600adabca4c458731dd6",
+      "stored_size": 220,
+      "decoded_size": 416,
+      "decoded_magic": "RNAN",
+      "decoded_sha256": "921355637995a8c99f2472839d2ceff2f1fe3c067fe0f1b92f454dfb329b5c5a"
+    }
+  ],
+  "animation": {
+    "sequence_count": 4,
+    "declared_frame_count": 16,
+    "sequences": [
+      {
+        "index": 0,
+        "animation_type": 65538,
+        "play_mode": 2,
+        "loop_start_frame": 0,
+        "durations_ticks": [
+          6,
+          6,
+          6,
+          6
+        ],
+        "forward_duration_ticks": 24,
+        "content_offsets": [
+          0,
+          8,
+          16,
+          8
+        ]
+      },
+      {
+        "index": 1,
+        "animation_type": 65538,
+        "play_mode": 2,
+        "loop_start_frame": 0,
+        "durations_ticks": [
+          6,
+          6,
+          6,
+          6
+        ],
+        "forward_duration_ticks": 24,
+        "content_offsets": [
+          24,
+          32,
+          40,
+          32
+        ]
+      },
+      {
+        "index": 2,
+        "animation_type": 65538,
+        "play_mode": 2,
+        "loop_start_frame": 0,
+        "durations_ticks": [
+          6,
+          6,
+          6,
+          6
+        ],
+        "forward_duration_ticks": 24,
+        "content_offsets": [
+          48,
+          56,
+          64,
+          56
+        ]
+      },
+      {
+        "index": 3,
+        "animation_type": 65538,
+        "play_mode": 2,
+        "loop_start_frame": 0,
+        "durations_ticks": [
+          6,
+          6,
+          6,
+          6
+        ],
+        "forward_duration_ticks": 24,
+        "content_offsets": [
+          72,
+          80,
+          88,
+          80
+        ]
+      }
+    ],
+    "scope": "timing/offset metadata only; cell transforms not decoded"
+  },
+  "status": "reference only; not ported; not visually validated"
+}
