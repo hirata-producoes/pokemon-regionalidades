@@ -1,6 +1,13 @@
 # Documentação de Pokémon Regionalidades
 
-Esta área reúne a documentação atual do projeto. Os textos foram organizados para servir tanto como referência técnica quanto como material de estudo.
+Esta área reúne documentação e registros históricos publicados. Para o contexto
+vigente conferido em 11/10/2026, comece pelo [README principal](../../README.md):
+ele distingue desenvolvimento local e conteúdo efetivamente publicado.
+Documentos datados abaixo não substituem o plano local vigente nem comprovam
+conclusão das fases posteriores.
+
+A [avaliação de MCPs e ferramentas](MCP_AND_WORKFLOW_REVIEW.md) registra
+recomendações e limites de evidência, sem adicionar dependências ao jogo.
 
 ## Caminhos de leitura
 

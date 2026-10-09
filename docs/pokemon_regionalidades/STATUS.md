@@ -1,4 +1,9 @@
-# Estado atual
+# Registro publicado anteriormente
+
+> Atualização de 11/10/2026: o estado vigente do desenvolvimento está na
+> [conferência do README](../../README.md#conferência-de-desenvolvimento--11102026).
+> As seções abaixo são relatos históricos de entregas publicadas. Não são a fila
+> atual nem certificam o runtime local posterior. Esta revisão não publica esse runtime.
 
 ## Câmera livre oculta para inspeção — 22 de setembro de 2026
 

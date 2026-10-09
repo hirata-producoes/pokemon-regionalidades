@@ -22,19 +22,32 @@ O porte para Windows já compila o jogo nativamente, renderiza por SDL2, aceita 
 
 O World Clock 3×, as estações de 30 dias, as fases de transição e a reconciliação do tempo transcorrido com o jogo fechado já estão na base de gameplay. O PC também possui um contêiner de save extensível: progresso mundial, módulos do RotomDex e inventário ficam em blocos versionados, enquanto a imagem Emerald permanece como camada de compatibilidade.
 
-Layouts de mapas já foram preparados para o pacote externo. Depois da correção da procura por esse pacote, o caminhão, Littleroot, a casa inicial e suas transições foram validados manualmente no PC. A fundação multirregional já registra Kanto, Johto, Hoenn e Sinnoh e apresenta a escolha inicial, mas somente Hoenn está liberada como campanha. A campanha original continua em validação progressiva antes de ser considerada uma baseline completa. Um save separado de exploração reduz repetições sem falsificar cenas narrativas. Consulte [Estado do projeto](docs/pokemon_regionalidades/STATUS.md) para diferenciar protótipo, implementação e planejamento.
+### Conferência de desenvolvimento — 11/10/2026
+
+O desenvolvimento local e o código publicado são estados diferentes. Esta atualização é documental: não publica o runtime pendente nem certifica uma release. A última base publicada antes dela é `8a0be68b551fa4da0681ee0b7e3b048405e92127`, de 08/10/2026.
+
+No registro regional do código local, Hoenn e Kanto estão disponíveis para testes no PC, Johto possui abertura selecionável na casa do jogador em New Bark e Sinnoh permanece planejada. Isso não significa campanhas completas ou validação integral. Relatos anteriores descrevem somente as versões testadas.
+
+A meta atual é reconstruir a interface de duas telas no port PC, usando HGSS/Platinum como referência de recursos e comportamento, não transplantar o jogo inteiro. A base lógica é 4:3 por tela, sem impor ao PC os limites físicos do console. F0/F1 encerraram investigação/especificação; F2 está parcialmente implementada. Nenhum marco integrado M1–M4 foi declarado concluído.
+
+Seleção inferior, fonte HGSS0 e HUD estão parcialmente ligados ao controlador local. A arena ainda usa a composição nativa: recursos HGSS de cenário/bases foram preparados, mas a composição com Pokémon, efeitos e mensagens permanece pendente. Equipe, resumo e bolsa 3D novos ainda não estão integrados ao recorte de batalha. A próxima entrega é essa composição superior da primeira batalha simples, passo 5 do plano local vigente.
+
+As mensagens de turno permanecem na tela superior. Aplicativos podem ocupar ambas as telas e devem restaurar arena/HUD ao voltar. A interface antiga deve ser substituída quando o equivalente novo estiver completo, sem manter dois controladores concorrentes. Testes jogados naturais, registros internos direcionados e validações pequenas orientam a integração; documentação não justifica abrir automaticamente o jogo.
+
+A revisão consolidou os documentos locais de retomada, sem descartar evidências ou atribuir ao GitHub mudanças ainda reservadas. Consulte a [avaliação de MCPs e ferramentas](docs/pokemon_regionalidades/MCP_AND_WORKFLOW_REVIEW.md). O [estado publicado anteriormente](docs/pokemon_regionalidades/STATUS.md) foi mantido como histórico, não como fila atual.
 
 ## Regiões
 
-Hoenn é a base jogável atual. Kanto possui dados de FireRed/LeafGreen e uma primeira integração própria em Pallet Town. Johto, Sinnoh, Hisui, Unova, Kalos, Alola, Galar, Paldea e Ilhas Laranja fazem parte do planejamento, com definições de região e iniciais já preparadas, mas ainda não são campanhas completas.
+Hoenn é a campanha-base. A tabela descreve o desenvolvimento local conferido acima, não promete que todo esse conteúdo esteja neste commit. O objetivo inicial reúne Kanto, Johto, Hoenn e Sinnoh; mapas regionais precedem uma futura composição conjunta.
 
 Veja [Regiões e jogos de referência](docs/pokemon_regionalidades/REGIONS.md).
 
 | Parte | Situação atual |
 |---|---|
 | Hoenn | campanha-base jogável, em validação progressiva |
-| Kanto | dados de mapas presentes; campanha bloqueada |
-| Johto e Sinnoh | fundação registrada; campanhas planejadas |
+| Kanto | disponível para testes no PC local; campanha não certificada |
+| Johto | abertura selecionável em teste local; campanha incompleta |
+| Sinnoh | planejada; sem abertura jogável |
 | Porte Windows | executável nativo funcional, ainda em desenvolvimento |
 | Alvo GBA | preservado como referência de regressão |
 | Mundo contínuo e mapas ampliados | arquitetura e geografia em planejamento |
