@@ -1,0 +1,1262 @@
+{
+  "schema": 1,
+  "revision": "9d8b7591f09b65804da2fb2dfd56f320633e0d36",
+  "source_sha256": {
+    "src/font.c": "43c7616ceba37f7bf86364c75c7236d9dee28781429465b4fc301f14f34e79ff",
+    "src/font_data.c": "308e5083177eb936e1eb342ea191e3accdcc46fcc58fbb0bdeb86eaa84773ce5",
+    "include/font_data.h": "5ba4cae8e045f9245559819451f02c2d44a10f2022badba1d56e59019d0d7aa5",
+    "charmap.txt": "58861d34f40623fd2a9b29c10a79ee2ec872182285a288381759a3b251412ded",
+    "files/graphic/font/font_00000000.bin": "9a17de3036f4aac8540163e560a60d83b7facde78d0ec41e688374fdbf669e73",
+    "files/graphic/font/font_00000001.bin": "9a17de3036f4aac8540163e560a60d83b7facde78d0ec41e688374fdbf669e73",
+    "files/graphic/font/font_00000002.bin": "510929943be91a358d604db84aef9bf234a35f9f21d0928dabc8adaf992966c9",
+    "files/graphic/font/font_00000003.bin": "b97404763e16ecdb0f26a538dacb6d3d2d4dee606ff717f3302b611a21c6d7d9",
+    "files/graphic/font/font_00000004.bin": "7bdadd0f2ed2507b34f002ad17117a532423ab474c46d499388eb551e785296a",
+    "files/graphic/font/font_00000010.bin": "b15556c1ec2d86840592a228669a5635eca704bee67416b4608dd3863797f02f"
+  },
+  "fonts": [
+    {
+      "logical_font": 0,
+      "member": 0,
+      "path": "files/graphic/font/font_00000000.bin",
+      "header_size": 16,
+      "width_data_start": 32592,
+      "glyph_count": 509,
+      "fixed_width": 16,
+      "fixed_height": 16,
+      "tiles_width": 2,
+      "tiles_height": 2,
+      "packed_glyph_size": 64,
+      "characters": {
+        "E": {
+          "character_id_hex": "012F",
+          "zero_based_glyph": 302,
+          "advance": 6,
+          "packed_sha256": "6c4c09e31f258c6bd4a558ad16f7b1213a037678cb33a78a47187ca8b19008bf"
+        },
+        "S": {
+          "character_id_hex": "013D",
+          "zero_based_glyph": 316,
+          "advance": 6,
+          "packed_sha256": "e6a6249a880b6a144e44fa1f5c3ab40ec46473fbb9455022f3ec056b4265a8b7"
+        },
+        "T": {
+          "character_id_hex": "013E",
+          "zero_based_glyph": 317,
+          "advance": 6,
+          "packed_sha256": "88b5a5bed22f49309743864b10abe77f13734bac2481b0f73c09fa42a343969d"
+        },
+        "A": {
+          "character_id_hex": "012B",
+          "zero_based_glyph": 298,
+          "advance": 6,
+          "packed_sha256": "771b0beab4b01ff6fddad740e6d73b1b7462f344207b2a31fc70924a7cd3b2e5"
+        },
+        "Ç": {
+          "character_id_hex": "0166",
+          "zero_based_glyph": 357,
+          "advance": 6,
+          "packed_sha256": "aefa616f76754c5c3b579d4e47b072bc318218686effef071fab18f47984f1fa"
+        },
+        "Ã": {
+          "character_id_hex": "0162",
+          "zero_based_glyph": 353,
+          "advance": 6,
+          "packed_sha256": "ced37e6a327f1ede6b815864cc6dcf76a53c1c2c8743692829d80611f5725070"
+        },
+        "O": {
+          "character_id_hex": "0139",
+          "zero_based_glyph": 312,
+          "advance": 6,
+          "packed_sha256": "1d54bbf9da9c2ff775e695976a19d649d722f4ebe10af9bc04cec340709b64bc"
+        },
+        "M": {
+          "character_id_hex": "0137",
+          "zero_based_glyph": 310,
+          "advance": 6,
+          "packed_sha256": "6af9ffc261af42bd7a4a642215ab2b2d4800f011f89a5d172dfcb1d375dffeb9"
+        },
+        "N": {
+          "character_id_hex": "0138",
+          "zero_based_glyph": 311,
+          "advance": 6,
+          "packed_sha256": "80c19c8f6c0e1bd9ed4f24342849305e4eb0ec6e6fef5f00e2d03e8a2a882149"
+        },
+        "H": {
+          "character_id_hex": "0132",
+          "zero_based_glyph": 305,
+          "advance": 6,
+          "packed_sha256": "a46ab21b9f5f960099e9ee8b1e3481ad3ecba9e4e7bd5f7ec82dcf9c77931811"
+        },
+        "P": {
+          "character_id_hex": "013A",
+          "zero_based_glyph": 313,
+          "advance": 6,
+          "packed_sha256": "1a2a90319dadc5f66647f2f6c806c1abf3405e1e6bd08d8b881dee4dcd3d8d4f"
+        },
+        "Õ": {
+          "character_id_hex": "0174",
+          "zero_based_glyph": 371,
+          "advance": 6,
+          "packed_sha256": "42e983f8c9ad62fbb30cc786bc6abffe8f794731be4a6b8abcd1fd438d028467"
+        },
+        "K": {
+          "character_id_hex": "0135",
+          "zero_based_glyph": 308,
+          "advance": 6,
+          "packed_sha256": "e36f878e5f3e1cf26b2c2693c521f12efb44ade86f6617547ce723cab0bf2bec"
+        },
+        "É": {
+          "character_id_hex": "0168",
+          "zero_based_glyph": 359,
+          "advance": 6,
+          "packed_sha256": "85836772793469619826556ad8ec53ad8f53038e3943fd5f3fabaf4e862bb012"
+        },
+        "r": {
+          "character_id_hex": "0156",
+          "zero_based_glyph": 341,
+          "advance": 6,
+          "packed_sha256": "a5784cff8ec96b9f8043cb99aa3a3783aca0f959183c6e19ce557c289d0dc21b"
+        },
+        "e": {
+          "character_id_hex": "0149",
+          "zero_based_glyph": 328,
+          "advance": 6,
+          "packed_sha256": "f350a47e3f0347578b4ee5ff930d4ee9e0f9415534d76895ca80ae07cc36d1a7"
+        },
+        "g": {
+          "character_id_hex": "014B",
+          "zero_based_glyph": 330,
+          "advance": 6,
+          "packed_sha256": "207b08a7646c74f0fd96fb3ead586636332323af18061791b6ce26d9d49d5a61"
+        },
+        "i": {
+          "character_id_hex": "014D",
+          "zero_based_glyph": 332,
+          "advance": 3,
+          "packed_sha256": "dae73647a6fef0efd235e5a80672543247bfddd6a15e3090d5b5d3b0430ebb1d"
+        },
+        "ã": {
+          "character_id_hex": "0182",
+          "zero_based_glyph": 385,
+          "advance": 6,
+          "packed_sha256": "eac0ec9aaf5a25d6f42eabcbf5d63e9dc3af9c762fa915eded01cd3120849c27"
+        },
+        "o": {
+          "character_id_hex": "0153",
+          "zero_based_glyph": 338,
+          "advance": 6,
+          "packed_sha256": "cf97dec3713fb9e6728c0fa12065d8d177dba80072d7b75e2b9bf51030132a73"
+        },
+        "n": {
+          "character_id_hex": "0152",
+          "zero_based_glyph": 337,
+          "advance": 6,
+          "packed_sha256": "39dae96af20b3cb20cacda8ab155b7b8d1acc80395074481006b6af2634c21ad"
+        },
+        "í": {
+          "character_id_hex": "018C",
+          "zero_based_glyph": 395,
+          "advance": 4,
+          "packed_sha256": "c902057ee3980a908e5470c22425d158b881bff1905a45b7aed717d750a8d37f"
+        },
+        "c": {
+          "character_id_hex": "0147",
+          "zero_based_glyph": 326,
+          "advance": 6,
+          "packed_sha256": "160914e25ea9fa1a7b5f6a4d19e833cfff4ed6a2c387dffd4db8fafa9ead2ed6"
+        },
+        "I": {
+          "character_id_hex": "0133",
+          "zero_based_glyph": 306,
+          "advance": 6,
+          "packed_sha256": "209e6a6c7c86078705977c0ff6ca930feb45b8abfcb7ebb96e820507a53fae9d"
+        },
+        "l": {
+          "character_id_hex": "0150",
+          "zero_based_glyph": 335,
+          "advance": 4,
+          "packed_sha256": "1c6343a6c6d4052ddc91059e6c8cedee4fdc874980dd21b716c72a9d795a94d8"
+        },
+        "À": {
+          "character_id_hex": "015F",
+          "zero_based_glyph": 350,
+          "advance": 6,
+          "packed_sha256": "6cdaa21353e1e73bc16ead0c0c786fc514bab1663b47666f5bcec6eb71614445"
+        },
+        "Á": {
+          "character_id_hex": "0160",
+          "zero_based_glyph": 351,
+          "advance": 6,
+          "packed_sha256": "0e5cb23e71e2bffcf44b0acb753585fc253d0592ebe8438bf3fcdf23ce9d0b74"
+        },
+        "Â": {
+          "character_id_hex": "0161",
+          "zero_based_glyph": 352,
+          "advance": 6,
+          "packed_sha256": "0a74b77271050d5a5855776096393872236db6577e7453c4f6d939e6e55ba758"
+        },
+        "Ä": {
+          "character_id_hex": "0163",
+          "zero_based_glyph": 354,
+          "advance": 6,
+          "packed_sha256": "c678d04d4884e1b9fb8702d3ef8208f792e583eadba12a5b07db59b2a3f23ae3"
+        },
+        "C": {
+          "character_id_hex": "012D",
+          "zero_based_glyph": 300,
+          "advance": 6,
+          "packed_sha256": "00ed562e873b3bc207ac862e16e8ffccfed2199a7d055c3fa6aab7ccea1f485e"
+        },
+        "È": {
+          "character_id_hex": "0167",
+          "zero_based_glyph": 358,
+          "advance": 6,
+          "packed_sha256": "9845e55f7487a804f1005d1ce6c2ab9949f4ffeda8235414f0ee6130e502afb2"
+        },
+        "õ": {
+          "character_id_hex": "0194",
+          "zero_based_glyph": 403,
+          "advance": 6,
+          "packed_sha256": "642270a72bf0ca3c8480bfe33352958974362e13bcb038ad49f71f1fcc08951d"
+        }
+      }
+    },
+    {
+      "logical_font": 1,
+      "member": 1,
+      "path": "files/graphic/font/font_00000001.bin",
+      "header_size": 16,
+      "width_data_start": 32592,
+      "glyph_count": 509,
+      "fixed_width": 16,
+      "fixed_height": 16,
+      "tiles_width": 2,
+      "tiles_height": 2,
+      "packed_glyph_size": 64,
+      "characters": {
+        "E": {
+          "character_id_hex": "012F",
+          "zero_based_glyph": 302,
+          "advance": 6,
+          "packed_sha256": "6c4c09e31f258c6bd4a558ad16f7b1213a037678cb33a78a47187ca8b19008bf"
+        },
+        "S": {
+          "character_id_hex": "013D",
+          "zero_based_glyph": 316,
+          "advance": 6,
+          "packed_sha256": "e6a6249a880b6a144e44fa1f5c3ab40ec46473fbb9455022f3ec056b4265a8b7"
+        },
+        "T": {
+          "character_id_hex": "013E",
+          "zero_based_glyph": 317,
+          "advance": 6,
+          "packed_sha256": "88b5a5bed22f49309743864b10abe77f13734bac2481b0f73c09fa42a343969d"
+        },
+        "A": {
+          "character_id_hex": "012B",
+          "zero_based_glyph": 298,
+          "advance": 6,
+          "packed_sha256": "771b0beab4b01ff6fddad740e6d73b1b7462f344207b2a31fc70924a7cd3b2e5"
+        },
+        "Ç": {
+          "character_id_hex": "0166",
+          "zero_based_glyph": 357,
+          "advance": 6,
+          "packed_sha256": "aefa616f76754c5c3b579d4e47b072bc318218686effef071fab18f47984f1fa"
+        },
+        "Ã": {
+          "character_id_hex": "0162",
+          "zero_based_glyph": 353,
+          "advance": 6,
+          "packed_sha256": "ced37e6a327f1ede6b815864cc6dcf76a53c1c2c8743692829d80611f5725070"
+        },
+        "O": {
+          "character_id_hex": "0139",
+          "zero_based_glyph": 312,
+          "advance": 6,
+          "packed_sha256": "1d54bbf9da9c2ff775e695976a19d649d722f4ebe10af9bc04cec340709b64bc"
+        },
+        "M": {
+          "character_id_hex": "0137",
+          "zero_based_glyph": 310,
+          "advance": 6,
+          "packed_sha256": "6af9ffc261af42bd7a4a642215ab2b2d4800f011f89a5d172dfcb1d375dffeb9"
+        },
+        "N": {
+          "character_id_hex": "0138",
+          "zero_based_glyph": 311,
+          "advance": 6,
+          "packed_sha256": "80c19c8f6c0e1bd9ed4f24342849305e4eb0ec6e6fef5f00e2d03e8a2a882149"
+        },
+        "H": {
+          "character_id_hex": "0132",
+          "zero_based_glyph": 305,
+          "advance": 6,
+          "packed_sha256": "a46ab21b9f5f960099e9ee8b1e3481ad3ecba9e4e7bd5f7ec82dcf9c77931811"
+        },
+        "P": {
+          "character_id_hex": "013A",
+          "zero_based_glyph": 313,
+          "advance": 6,
+          "packed_sha256": "1a2a90319dadc5f66647f2f6c806c1abf3405e1e6bd08d8b881dee4dcd3d8d4f"
+        },
+        "Õ": {
+          "character_id_hex": "0174",
+          "zero_based_glyph": 371,
+          "advance": 6,
+          "packed_sha256": "42e983f8c9ad62fbb30cc786bc6abffe8f794731be4a6b8abcd1fd438d028467"
+        },
+        "K": {
+          "character_id_hex": "0135",
+          "zero_based_glyph": 308,
+          "advance": 6,
+          "packed_sha256": "e36f878e5f3e1cf26b2c2693c521f12efb44ade86f6617547ce723cab0bf2bec"
+        },
+        "É": {
+          "character_id_hex": "0168",
+          "zero_based_glyph": 359,
+          "advance": 6,
+          "packed_sha256": "85836772793469619826556ad8ec53ad8f53038e3943fd5f3fabaf4e862bb012"
+        },
+        "r": {
+          "character_id_hex": "0156",
+          "zero_based_glyph": 341,
+          "advance": 6,
+          "packed_sha256": "a5784cff8ec96b9f8043cb99aa3a3783aca0f959183c6e19ce557c289d0dc21b"
+        },
+        "e": {
+          "character_id_hex": "0149",
+          "zero_based_glyph": 328,
+          "advance": 6,
+          "packed_sha256": "f350a47e3f0347578b4ee5ff930d4ee9e0f9415534d76895ca80ae07cc36d1a7"
+        },
+        "g": {
+          "character_id_hex": "014B",
+          "zero_based_glyph": 330,
+          "advance": 6,
+          "packed_sha256": "207b08a7646c74f0fd96fb3ead586636332323af18061791b6ce26d9d49d5a61"
+        },
+        "i": {
+          "character_id_hex": "014D",
+          "zero_based_glyph": 332,
+          "advance": 3,
+          "packed_sha256": "dae73647a6fef0efd235e5a80672543247bfddd6a15e3090d5b5d3b0430ebb1d"
+        },
+        "ã": {
+          "character_id_hex": "0182",
+          "zero_based_glyph": 385,
+          "advance": 6,
+          "packed_sha256": "eac0ec9aaf5a25d6f42eabcbf5d63e9dc3af9c762fa915eded01cd3120849c27"
+        },
+        "o": {
+          "character_id_hex": "0153",
+          "zero_based_glyph": 338,
+          "advance": 6,
+          "packed_sha256": "cf97dec3713fb9e6728c0fa12065d8d177dba80072d7b75e2b9bf51030132a73"
+        },
+        "n": {
+          "character_id_hex": "0152",
+          "zero_based_glyph": 337,
+          "advance": 6,
+          "packed_sha256": "39dae96af20b3cb20cacda8ab155b7b8d1acc80395074481006b6af2634c21ad"
+        },
+        "í": {
+          "character_id_hex": "018C",
+          "zero_based_glyph": 395,
+          "advance": 4,
+          "packed_sha256": "c902057ee3980a908e5470c22425d158b881bff1905a45b7aed717d750a8d37f"
+        },
+        "c": {
+          "character_id_hex": "0147",
+          "zero_based_glyph": 326,
+          "advance": 6,
+          "packed_sha256": "160914e25ea9fa1a7b5f6a4d19e833cfff4ed6a2c387dffd4db8fafa9ead2ed6"
+        },
+        "I": {
+          "character_id_hex": "0133",
+          "zero_based_glyph": 306,
+          "advance": 6,
+          "packed_sha256": "209e6a6c7c86078705977c0ff6ca930feb45b8abfcb7ebb96e820507a53fae9d"
+        },
+        "l": {
+          "character_id_hex": "0150",
+          "zero_based_glyph": 335,
+          "advance": 4,
+          "packed_sha256": "1c6343a6c6d4052ddc91059e6c8cedee4fdc874980dd21b716c72a9d795a94d8"
+        },
+        "À": {
+          "character_id_hex": "015F",
+          "zero_based_glyph": 350,
+          "advance": 6,
+          "packed_sha256": "6cdaa21353e1e73bc16ead0c0c786fc514bab1663b47666f5bcec6eb71614445"
+        },
+        "Á": {
+          "character_id_hex": "0160",
+          "zero_based_glyph": 351,
+          "advance": 6,
+          "packed_sha256": "0e5cb23e71e2bffcf44b0acb753585fc253d0592ebe8438bf3fcdf23ce9d0b74"
+        },
+        "Â": {
+          "character_id_hex": "0161",
+          "zero_based_glyph": 352,
+          "advance": 6,
+          "packed_sha256": "0a74b77271050d5a5855776096393872236db6577e7453c4f6d939e6e55ba758"
+        },
+        "Ä": {
+          "character_id_hex": "0163",
+          "zero_based_glyph": 354,
+          "advance": 6,
+          "packed_sha256": "c678d04d4884e1b9fb8702d3ef8208f792e583eadba12a5b07db59b2a3f23ae3"
+        },
+        "C": {
+          "character_id_hex": "012D",
+          "zero_based_glyph": 300,
+          "advance": 6,
+          "packed_sha256": "00ed562e873b3bc207ac862e16e8ffccfed2199a7d055c3fa6aab7ccea1f485e"
+        },
+        "È": {
+          "character_id_hex": "0167",
+          "zero_based_glyph": 358,
+          "advance": 6,
+          "packed_sha256": "9845e55f7487a804f1005d1ce6c2ab9949f4ffeda8235414f0ee6130e502afb2"
+        },
+        "õ": {
+          "character_id_hex": "0194",
+          "zero_based_glyph": 403,
+          "advance": 6,
+          "packed_sha256": "642270a72bf0ca3c8480bfe33352958974362e13bcb038ad49f71f1fcc08951d"
+        }
+      }
+    },
+    {
+      "logical_font": 2,
+      "member": 2,
+      "path": "files/graphic/font/font_00000002.bin",
+      "header_size": 16,
+      "width_data_start": 32592,
+      "glyph_count": 509,
+      "fixed_width": 16,
+      "fixed_height": 16,
+      "tiles_width": 2,
+      "tiles_height": 2,
+      "packed_glyph_size": 64,
+      "characters": {
+        "E": {
+          "character_id_hex": "012F",
+          "zero_based_glyph": 302,
+          "advance": 7,
+          "packed_sha256": "2a911fac30077ca7577aa8bb5a1e513a832777f166dbf1ba02641d85534a17ca"
+        },
+        "S": {
+          "character_id_hex": "013D",
+          "zero_based_glyph": 316,
+          "advance": 7,
+          "packed_sha256": "c21f3672366f03189434e70eb6de2c9e1cc8f57b72d1a8015ae7b25e5957ca65"
+        },
+        "T": {
+          "character_id_hex": "013E",
+          "zero_based_glyph": 317,
+          "advance": 7,
+          "packed_sha256": "fc24ae63ccdfdebd0c911e5255034fef9b97b4e44f8cfbf7a513d01f63beef2e"
+        },
+        "A": {
+          "character_id_hex": "012B",
+          "zero_based_glyph": 298,
+          "advance": 7,
+          "packed_sha256": "75f1ee170c7d4cb3f5c9cda56bbf0ff536db40d3c6b0fb4a2ddbfb5aa3cec314"
+        },
+        "Ç": {
+          "character_id_hex": "0166",
+          "zero_based_glyph": 357,
+          "advance": 7,
+          "packed_sha256": "66a5edfabaf2bd3cf99c80284335733caccd2facb07721fe0a0458d01751abf0"
+        },
+        "Ã": {
+          "character_id_hex": "0162",
+          "zero_based_glyph": 353,
+          "advance": 7,
+          "packed_sha256": "60ff7d4901da1cdfe54ee4ef6d857c2748c0861f0a1f15c5118c36b710160b75"
+        },
+        "O": {
+          "character_id_hex": "0139",
+          "zero_based_glyph": 312,
+          "advance": 7,
+          "packed_sha256": "85f53b063bd508211f5b6c0fcd91767b7b045c9dc031625faaedf39edf27b72d"
+        },
+        "M": {
+          "character_id_hex": "0137",
+          "zero_based_glyph": 310,
+          "advance": 7,
+          "packed_sha256": "6d5bdffcdfcb6bbeb5babf4ccb874624fcad3e28dae14c6f7aa2b1a6b78ec6f0"
+        },
+        "N": {
+          "character_id_hex": "0138",
+          "zero_based_glyph": 311,
+          "advance": 7,
+          "packed_sha256": "94cf3ffc1a7fe23d35c1c430d9a616126b63fcc3b9e83708c959465f02680a81"
+        },
+        "H": {
+          "character_id_hex": "0132",
+          "zero_based_glyph": 305,
+          "advance": 7,
+          "packed_sha256": "8dbd6cdac76fc3016a7d6c16a4441e7797ce350b23759d7e940d49054c66f9e1"
+        },
+        "P": {
+          "character_id_hex": "013A",
+          "zero_based_glyph": 313,
+          "advance": 7,
+          "packed_sha256": "7154faece47b493fe41316e5af71408dd4bb80b24493cecb745be56177244164"
+        },
+        "Õ": {
+          "character_id_hex": "0174",
+          "zero_based_glyph": 371,
+          "advance": 7,
+          "packed_sha256": "03a7932150df5d5d692ba9901849288fb6932b22f76a65a308453ea82c86fc98"
+        },
+        "K": {
+          "character_id_hex": "0135",
+          "zero_based_glyph": 308,
+          "advance": 7,
+          "packed_sha256": "202b72d291cad0e9463ae227b0ca93a96846f4973347b60b685959c5b51f414e"
+        },
+        "É": {
+          "character_id_hex": "0168",
+          "zero_based_glyph": 359,
+          "advance": 7,
+          "packed_sha256": "73154524b44e9778d1e7d9ba9f45193a2c5043e8f669269ca820010eba92125b"
+        },
+        "r": {
+          "character_id_hex": "0156",
+          "zero_based_glyph": 341,
+          "advance": 7,
+          "packed_sha256": "489b346ae01f6e33c6b47dc00cf0524076961042670a9a6aaae1c789f60a5f82"
+        },
+        "e": {
+          "character_id_hex": "0149",
+          "zero_based_glyph": 328,
+          "advance": 7,
+          "packed_sha256": "1739a59d474ffaf11a1b00ac61f23f533c5e6e5e63f3fb2fe8bc17a4764bd5df"
+        },
+        "g": {
+          "character_id_hex": "014B",
+          "zero_based_glyph": 330,
+          "advance": 7,
+          "packed_sha256": "adde3f41b2da347b125d779446047c24dff28d2f22ef750d116372425b4661f9"
+        },
+        "i": {
+          "character_id_hex": "014D",
+          "zero_based_glyph": 332,
+          "advance": 4,
+          "packed_sha256": "9970e3a853f4010f5d996a69e905be442b79148613a167c90344172bde613c80"
+        },
+        "ã": {
+          "character_id_hex": "0182",
+          "zero_based_glyph": 385,
+          "advance": 7,
+          "packed_sha256": "4a9ddcb5aff6a3abd7bcd561fa91887bdc9ce46b983cf1414e045d31a7d4184b"
+        },
+        "o": {
+          "character_id_hex": "0153",
+          "zero_based_glyph": 338,
+          "advance": 7,
+          "packed_sha256": "d390a94374e8f9c2ca1efa2241dc73c1dc018143fb834265b2c37b8d8bb1d61e"
+        },
+        "n": {
+          "character_id_hex": "0152",
+          "zero_based_glyph": 337,
+          "advance": 7,
+          "packed_sha256": "05c24998a5a8bbcbcad3400695ac83779cbb15c5af26143b045e95adb5890cff"
+        },
+        "í": {
+          "character_id_hex": "018C",
+          "zero_based_glyph": 395,
+          "advance": 5,
+          "packed_sha256": "62554e6a12b2709ddd892e840e67ba1033bf0b37e2ba857910047a9b8625dc4c"
+        },
+        "c": {
+          "character_id_hex": "0147",
+          "zero_based_glyph": 326,
+          "advance": 7,
+          "packed_sha256": "321d75b78b6e66c6761ac8f142bdb0cb2ee10aacacdb898053bad41fcea08fd7"
+        },
+        "I": {
+          "character_id_hex": "0133",
+          "zero_based_glyph": 306,
+          "advance": 7,
+          "packed_sha256": "ef7fe522f85d74611932d663c43623f44fc87f6ff3df0559642f5c5d4d003f55"
+        },
+        "l": {
+          "character_id_hex": "0150",
+          "zero_based_glyph": 335,
+          "advance": 5,
+          "packed_sha256": "3b6845c1b39d926bf0f1ebf1b6964ea6e88bd1d316836142a9c53e9a4bdd1ddb"
+        },
+        "À": {
+          "character_id_hex": "015F",
+          "zero_based_glyph": 350,
+          "advance": 7,
+          "packed_sha256": "ffe250bc7dd9382a73995ac86e0fb8abb3b1a146fd0fa517a1aa3e60b74870a8"
+        },
+        "Á": {
+          "character_id_hex": "0160",
+          "zero_based_glyph": 351,
+          "advance": 7,
+          "packed_sha256": "ca21719ba33a1be1c6b40ddc936a13a572158aace029ff7292d00f424af0839d"
+        },
+        "Â": {
+          "character_id_hex": "0161",
+          "zero_based_glyph": 352,
+          "advance": 7,
+          "packed_sha256": "cbf8bf7faaeabb8c9dc0aa9f446bfba7f7184d99dbda3bdfe5a670fec7db22e1"
+        },
+        "Ä": {
+          "character_id_hex": "0163",
+          "zero_based_glyph": 354,
+          "advance": 7,
+          "packed_sha256": "94480d47ce68dc08380e3470c871331cac90cb06101690bdc534454e3139bec2"
+        },
+        "C": {
+          "character_id_hex": "012D",
+          "zero_based_glyph": 300,
+          "advance": 7,
+          "packed_sha256": "1be356a629d8a7e28676bdc30358cdd653e9fcc4fa2390ecab5c3814db52fc35"
+        },
+        "È": {
+          "character_id_hex": "0167",
+          "zero_based_glyph": 358,
+          "advance": 7,
+          "packed_sha256": "008a204562e1d79bc2837c7f456a3ff5f981857543232adc86279208cbc51e0c"
+        },
+        "õ": {
+          "character_id_hex": "0194",
+          "zero_based_glyph": 403,
+          "advance": 7,
+          "packed_sha256": "b0d0da4bb65904e94622c05533a24f0b9c30eb29b38412eb6529e6962b448452"
+        }
+      }
+    },
+    {
+      "logical_font": 3,
+      "member": 3,
+      "path": "files/graphic/font/font_00000003.bin",
+      "header_size": 16,
+      "width_data_start": 32592,
+      "glyph_count": 509,
+      "fixed_width": 12,
+      "fixed_height": 16,
+      "tiles_width": 2,
+      "tiles_height": 2,
+      "packed_glyph_size": 64,
+      "characters": {
+        "E": {
+          "character_id_hex": "012F",
+          "zero_based_glyph": 302,
+          "advance": 11,
+          "packed_sha256": "bb4514a8be8af52f1929dd957915fa15ead15f495cd647fdbe21a2475895757d"
+        },
+        "S": {
+          "character_id_hex": "013D",
+          "zero_based_glyph": 316,
+          "advance": 12,
+          "packed_sha256": "49bee13d65828051ebf1aba61c55d53ce145b55739f49a8b43a9a06743a5a375"
+        },
+        "T": {
+          "character_id_hex": "013E",
+          "zero_based_glyph": 317,
+          "advance": 10,
+          "packed_sha256": "86971e1c031ae89a3fff933ea7656e658b8a850a1d1eb6a8aa12c02bd5ce431e"
+        },
+        "A": {
+          "character_id_hex": "012B",
+          "zero_based_glyph": 298,
+          "advance": 8,
+          "packed_sha256": "0e12738a94246cc29582fa8665e13242072168ab8a8c83d029e8f61a357d75b1"
+        },
+        "Ç": {
+          "character_id_hex": "0166",
+          "zero_based_glyph": 357,
+          "advance": 0,
+          "packed_sha256": "f5a5fd42d16a20302798ef6ed309979b43003d2320d9f0e8ea9831a92759fb4b"
+        },
+        "Ã": {
+          "character_id_hex": "0162",
+          "zero_based_glyph": 353,
+          "advance": 0,
+          "packed_sha256": "f5a5fd42d16a20302798ef6ed309979b43003d2320d9f0e8ea9831a92759fb4b"
+        },
+        "O": {
+          "character_id_hex": "0139",
+          "zero_based_glyph": 312,
+          "advance": 12,
+          "packed_sha256": "2587d7349713898b4aa5478b9ec33ed2877e2fdbef8e5cbf9652f9ee45b4a982"
+        },
+        "M": {
+          "character_id_hex": "0137",
+          "zero_based_glyph": 310,
+          "advance": 12,
+          "packed_sha256": "29dc98c7e6fc218f7310e0b2c534b4e642d34ed703a54b09d35891684e5c86b2"
+        },
+        "N": {
+          "character_id_hex": "0138",
+          "zero_based_glyph": 311,
+          "advance": 12,
+          "packed_sha256": "d9c6388ba441a02bf318527c0485c0ef06198611a36423e5acce65019dda5332"
+        },
+        "H": {
+          "character_id_hex": "0132",
+          "zero_based_glyph": 305,
+          "advance": 12,
+          "packed_sha256": "68d65cf54fae5966a83b5313cb3b9280302faad8983193b1b3a10e5d7b8e31ef"
+        },
+        "P": {
+          "character_id_hex": "013A",
+          "zero_based_glyph": 313,
+          "advance": 9,
+          "packed_sha256": "23cfec0b58a1b9af7a707fed8a59481b722258457890738511df28501232bd81"
+        },
+        "Õ": {
+          "character_id_hex": "0174",
+          "zero_based_glyph": 371,
+          "advance": 0,
+          "packed_sha256": "f5a5fd42d16a20302798ef6ed309979b43003d2320d9f0e8ea9831a92759fb4b"
+        },
+        "K": {
+          "character_id_hex": "0135",
+          "zero_based_glyph": 308,
+          "advance": 12,
+          "packed_sha256": "4f5408a429c0af7cb17c29fc20e28643f570f0dd90ca208ef2303aa83d04d5e7"
+        },
+        "É": {
+          "character_id_hex": "0168",
+          "zero_based_glyph": 359,
+          "advance": 0,
+          "packed_sha256": "f5a5fd42d16a20302798ef6ed309979b43003d2320d9f0e8ea9831a92759fb4b"
+        },
+        "r": {
+          "character_id_hex": "0156",
+          "zero_based_glyph": 341,
+          "advance": 9,
+          "packed_sha256": "f67faf914ea76f2cb4caa2017781f92606ff22530b17e86bcd0f38563aea630c"
+        },
+        "e": {
+          "character_id_hex": "0149",
+          "zero_based_glyph": 328,
+          "advance": 11,
+          "packed_sha256": "bb4514a8be8af52f1929dd957915fa15ead15f495cd647fdbe21a2475895757d"
+        },
+        "g": {
+          "character_id_hex": "014B",
+          "zero_based_glyph": 330,
+          "advance": 11,
+          "packed_sha256": "0501b292709feda41e63c2a54ff2dd750931173a7913ec8acbb34c08c8ab91e2"
+        },
+        "i": {
+          "character_id_hex": "014D",
+          "zero_based_glyph": 332,
+          "advance": 10,
+          "packed_sha256": "5fad64ffb02d04f5bf6c11b057c5fae3ff217913dd9d9aa508e9fbc7c4c63696"
+        },
+        "ã": {
+          "character_id_hex": "0182",
+          "zero_based_glyph": 385,
+          "advance": 0,
+          "packed_sha256": "f5a5fd42d16a20302798ef6ed309979b43003d2320d9f0e8ea9831a92759fb4b"
+        },
+        "o": {
+          "character_id_hex": "0153",
+          "zero_based_glyph": 338,
+          "advance": 12,
+          "packed_sha256": "2587d7349713898b4aa5478b9ec33ed2877e2fdbef8e5cbf9652f9ee45b4a982"
+        },
+        "n": {
+          "character_id_hex": "0152",
+          "zero_based_glyph": 337,
+          "advance": 12,
+          "packed_sha256": "d9c6388ba441a02bf318527c0485c0ef06198611a36423e5acce65019dda5332"
+        },
+        "í": {
+          "character_id_hex": "018C",
+          "zero_based_glyph": 395,
+          "advance": 0,
+          "packed_sha256": "f5a5fd42d16a20302798ef6ed309979b43003d2320d9f0e8ea9831a92759fb4b"
+        },
+        "c": {
+          "character_id_hex": "0147",
+          "zero_based_glyph": 326,
+          "advance": 12,
+          "packed_sha256": "7020722f40186863e236fffa0da4985043dc5c6f8608a4a43dd6e2e26ba92cf9"
+        },
+        "I": {
+          "character_id_hex": "0133",
+          "zero_based_glyph": 306,
+          "advance": 10,
+          "packed_sha256": "5fad64ffb02d04f5bf6c11b057c5fae3ff217913dd9d9aa508e9fbc7c4c63696"
+        },
+        "l": {
+          "character_id_hex": "0150",
+          "zero_based_glyph": 335,
+          "advance": 11,
+          "packed_sha256": "9abba9a185cb4652a4fcbacc03dfc1292684340487feafc5b152079b2fa6e467"
+        },
+        "À": {
+          "character_id_hex": "015F",
+          "zero_based_glyph": 350,
+          "advance": 0,
+          "packed_sha256": "f5a5fd42d16a20302798ef6ed309979b43003d2320d9f0e8ea9831a92759fb4b"
+        },
+        "Á": {
+          "character_id_hex": "0160",
+          "zero_based_glyph": 351,
+          "advance": 0,
+          "packed_sha256": "f5a5fd42d16a20302798ef6ed309979b43003d2320d9f0e8ea9831a92759fb4b"
+        },
+        "Â": {
+          "character_id_hex": "0161",
+          "zero_based_glyph": 352,
+          "advance": 0,
+          "packed_sha256": "f5a5fd42d16a20302798ef6ed309979b43003d2320d9f0e8ea9831a92759fb4b"
+        },
+        "Ä": {
+          "character_id_hex": "0163",
+          "zero_based_glyph": 354,
+          "advance": 0,
+          "packed_sha256": "f5a5fd42d16a20302798ef6ed309979b43003d2320d9f0e8ea9831a92759fb4b"
+        },
+        "C": {
+          "character_id_hex": "012D",
+          "zero_based_glyph": 300,
+          "advance": 12,
+          "packed_sha256": "7020722f40186863e236fffa0da4985043dc5c6f8608a4a43dd6e2e26ba92cf9"
+        },
+        "È": {
+          "character_id_hex": "0167",
+          "zero_based_glyph": 358,
+          "advance": 0,
+          "packed_sha256": "f5a5fd42d16a20302798ef6ed309979b43003d2320d9f0e8ea9831a92759fb4b"
+        },
+        "õ": {
+          "character_id_hex": "0194",
+          "zero_based_glyph": 403,
+          "advance": 0,
+          "packed_sha256": "f5a5fd42d16a20302798ef6ed309979b43003d2320d9f0e8ea9831a92759fb4b"
+        }
+      }
+    },
+    {
+      "logical_font": 4,
+      "member": 4,
+      "path": "files/graphic/font/font_00000004.bin",
+      "header_size": 16,
+      "width_data_start": 32592,
+      "glyph_count": 509,
+      "fixed_width": 16,
+      "fixed_height": 16,
+      "tiles_width": 2,
+      "tiles_height": 2,
+      "packed_glyph_size": 64,
+      "characters": {
+        "E": {
+          "character_id_hex": "012F",
+          "zero_based_glyph": 302,
+          "advance": 7,
+          "packed_sha256": "30d0f56b831c17ddade57a41e5f1c10e225771ef7c241694f09f79524c085d75"
+        },
+        "S": {
+          "character_id_hex": "013D",
+          "zero_based_glyph": 316,
+          "advance": 7,
+          "packed_sha256": "002353125d9edd9ba362560c86b9cb15addc875255bb5650ff16ea1284922358"
+        },
+        "T": {
+          "character_id_hex": "013E",
+          "zero_based_glyph": 317,
+          "advance": 7,
+          "packed_sha256": "f35dc38f877f69995054dc7256e2cb052cd5d30526cfa622c25dc495806b7c63"
+        },
+        "A": {
+          "character_id_hex": "012B",
+          "zero_based_glyph": 298,
+          "advance": 7,
+          "packed_sha256": "82af0a279794d49430f9277b0ee1fe769bece847216e8c5bbb4fa6481eb80c5e"
+        },
+        "Ç": {
+          "character_id_hex": "0166",
+          "zero_based_glyph": 357,
+          "advance": 7,
+          "packed_sha256": "30f0109a7053d0aee7c505b25df00825300af488fe72f9a92ba646764e5115ec"
+        },
+        "Ã": {
+          "character_id_hex": "0162",
+          "zero_based_glyph": 353,
+          "advance": 7,
+          "packed_sha256": "54c19f93963127a66fd4b1647a01f916561e54ab2d26430908ce9be3d5f64068"
+        },
+        "O": {
+          "character_id_hex": "0139",
+          "zero_based_glyph": 312,
+          "advance": 7,
+          "packed_sha256": "897ca11fb268712536c8527b2e44d01bf6e8b7b46a4acc3da7402942d963775c"
+        },
+        "M": {
+          "character_id_hex": "0137",
+          "zero_based_glyph": 310,
+          "advance": 7,
+          "packed_sha256": "a03e6454ab11e2c62111e8ecbd119351a67a15a84e46688e296b0a00348dc77a"
+        },
+        "N": {
+          "character_id_hex": "0138",
+          "zero_based_glyph": 311,
+          "advance": 7,
+          "packed_sha256": "208edd4d3aef57284068bd9a9ce7593220731be0d12468a1b3a3177fd72b2a2b"
+        },
+        "H": {
+          "character_id_hex": "0132",
+          "zero_based_glyph": 305,
+          "advance": 7,
+          "packed_sha256": "4c80d23d7775ff9c141fd24b49fca9312a80d955ddcd6f16ef89c052f4771249"
+        },
+        "P": {
+          "character_id_hex": "013A",
+          "zero_based_glyph": 313,
+          "advance": 7,
+          "packed_sha256": "180d98471eed4395bb1244dbbff29d9cd22dce3384f54b6b8b3e89b64cca1f05"
+        },
+        "Õ": {
+          "character_id_hex": "0174",
+          "zero_based_glyph": 371,
+          "advance": 7,
+          "packed_sha256": "ca50826ed3a34b19dd9fd5a4659f2c756712858b04c067207fae4cfc44429bbc"
+        },
+        "K": {
+          "character_id_hex": "0135",
+          "zero_based_glyph": 308,
+          "advance": 7,
+          "packed_sha256": "9b9cb915020fbbf5da457738177af0b25d34bd15cd69f1fac3ef7e65c2de0765"
+        },
+        "É": {
+          "character_id_hex": "0168",
+          "zero_based_glyph": 359,
+          "advance": 7,
+          "packed_sha256": "6dd077f355d32256a3975d2b3d71622283d285779a77b72264ecbb9990ed40d2"
+        },
+        "r": {
+          "character_id_hex": "0156",
+          "zero_based_glyph": 341,
+          "advance": 7,
+          "packed_sha256": "a4045e462d53a99552becd30a177091f9ccf8a5237aec182f39e5290ad9a762b"
+        },
+        "e": {
+          "character_id_hex": "0149",
+          "zero_based_glyph": 328,
+          "advance": 7,
+          "packed_sha256": "64de631ac382a3c44138ce54f66f649a0414041e15e632476fcca505fbc5ec81"
+        },
+        "g": {
+          "character_id_hex": "014B",
+          "zero_based_glyph": 330,
+          "advance": 7,
+          "packed_sha256": "52deec2e0c7c47390a66e11b56fb3d62ab0d6ac4b2a392ecf14f749e42acbbd1"
+        },
+        "i": {
+          "character_id_hex": "014D",
+          "zero_based_glyph": 332,
+          "advance": 4,
+          "packed_sha256": "eed3e5204b727c96dd68dab349b487a27178863f299320efa5de18711e136f37"
+        },
+        "ã": {
+          "character_id_hex": "0182",
+          "zero_based_glyph": 385,
+          "advance": 7,
+          "packed_sha256": "00c4f6c90c8c3637f73af98c82b227935503290da68527a6d809abab02344028"
+        },
+        "o": {
+          "character_id_hex": "0153",
+          "zero_based_glyph": 338,
+          "advance": 7,
+          "packed_sha256": "83004506124683bb4424d9df3ec0f524affcf77c44da2790a4cd8f0e3b7a8cc5"
+        },
+        "n": {
+          "character_id_hex": "0152",
+          "zero_based_glyph": 337,
+          "advance": 7,
+          "packed_sha256": "e4ecee75321679ee762a3e5ccb042f986606e7762de61752cb735638d4f6fed5"
+        },
+        "í": {
+          "character_id_hex": "018C",
+          "zero_based_glyph": 395,
+          "advance": 5,
+          "packed_sha256": "e591e54e194f93fe447a5767c43ed5712f53b594dcef8cf7edc3ddac0b654752"
+        },
+        "c": {
+          "character_id_hex": "0147",
+          "zero_based_glyph": 326,
+          "advance": 7,
+          "packed_sha256": "b931b4c9cbac4b657c98e45c68c2e071e608a61d8cbee70c6ddd1d1aaef85a40"
+        },
+        "I": {
+          "character_id_hex": "0133",
+          "zero_based_glyph": 306,
+          "advance": 7,
+          "packed_sha256": "71228b8e36fc51058519dd176bddc28bd882672e9bc176b0929850030fa86585"
+        },
+        "l": {
+          "character_id_hex": "0150",
+          "zero_based_glyph": 335,
+          "advance": 5,
+          "packed_sha256": "54e2a28fcfcddc641fa70e1f2084ad0e154af8915eb3270883b52c724439f5c0"
+        },
+        "À": {
+          "character_id_hex": "015F",
+          "zero_based_glyph": 350,
+          "advance": 7,
+          "packed_sha256": "eabc62b57d720312c4407a1c186c528588574c104b38cf1c36af8982c92b58c3"
+        },
+        "Á": {
+          "character_id_hex": "0160",
+          "zero_based_glyph": 351,
+          "advance": 7,
+          "packed_sha256": "95a91d1f7f73aa33559aa17e2160f2f7e482d543dc4f61e7f1d0cb13036fe31c"
+        },
+        "Â": {
+          "character_id_hex": "0161",
+          "zero_based_glyph": 352,
+          "advance": 7,
+          "packed_sha256": "6308785d92c831bed1eafc0e976eec956248cab71e3d9cb8d150e0c3a3b5925f"
+        },
+        "Ä": {
+          "character_id_hex": "0163",
+          "zero_based_glyph": 354,
+          "advance": 7,
+          "packed_sha256": "7f9080222b927cef73f929d06bf72e1d3104da67e04e4a4de6b32b69a96618f8"
+        },
+        "C": {
+          "character_id_hex": "012D",
+          "zero_based_glyph": 300,
+          "advance": 7,
+          "packed_sha256": "bbf93743529f8f16d825c58a6342088cca87ff9a4d3d542adfac6e649d2d9737"
+        },
+        "È": {
+          "character_id_hex": "0167",
+          "zero_based_glyph": 358,
+          "advance": 7,
+          "packed_sha256": "03916801fc29bfb293482f227a7a5acaa37fc5d1fddcf35764f2043b156e5dfb"
+        },
+        "õ": {
+          "character_id_hex": "0194",
+          "zero_based_glyph": 403,
+          "advance": 7,
+          "packed_sha256": "f71be5418166007f439eec479b79d154c9b7ff1322821204f07ea4414ddd06c9"
+        }
+      }
+    },
+    {
+      "logical_font": 5,
+      "member": 10,
+      "path": "files/graphic/font/font_00000010.bin",
+      "header_size": 16,
+      "width_data_start": 32592,
+      "glyph_count": 509,
+      "fixed_width": 16,
+      "fixed_height": 16,
+      "tiles_width": 2,
+      "tiles_height": 2,
+      "packed_glyph_size": 64,
+      "characters": {
+        "E": {
+          "character_id_hex": "012F",
+          "zero_based_glyph": 302,
+          "advance": 5,
+          "packed_sha256": "8fb47938f5f37061738439014bc4ee5865a4b142e27c7fa4713f7c9fe0555b8c"
+        },
+        "S": {
+          "character_id_hex": "013D",
+          "zero_based_glyph": 316,
+          "advance": 5,
+          "packed_sha256": "7de96f3ea72ce38316a8ecc7b5e710f7942f93f9c96785dc85dea5708a6e3436"
+        },
+        "T": {
+          "character_id_hex": "013E",
+          "zero_based_glyph": 317,
+          "advance": 4,
+          "packed_sha256": "777fa9f64c5d571facbacf77550b27b2b5df09c52ab3f07841deecdb1eecd394"
+        },
+        "A": {
+          "character_id_hex": "012B",
+          "zero_based_glyph": 298,
+          "advance": 5,
+          "packed_sha256": "478e128786c5868aca9f8634b0dd4421276651d3ab494a17bc74f4782e6e382e"
+        },
+        "Ç": {
+          "character_id_hex": "0166",
+          "zero_based_glyph": 357,
+          "advance": 5,
+          "packed_sha256": "c2d7aa579dda5033e39311a0f6a2b9e55ee6b6cc8ce49d9765e4602376b6e78e"
+        },
+        "Ã": {
+          "character_id_hex": "0162",
+          "zero_based_glyph": 353,
+          "advance": 5,
+          "packed_sha256": "827b68fb874d9e5c838d564af79aeb6d20769bb2fef43e2dbe0a8cab213052e7"
+        },
+        "O": {
+          "character_id_hex": "0139",
+          "zero_based_glyph": 312,
+          "advance": 5,
+          "packed_sha256": "e6e2e93ed2b9dfc7caec669b5c06e99890b7bdfedb0c51d1f582d442eb4986d5"
+        },
+        "M": {
+          "character_id_hex": "0137",
+          "zero_based_glyph": 310,
+          "advance": 6,
+          "packed_sha256": "c959d44e3f8300261f5ab0750bfc36bf9186ce34444a7a2d5258ce0bfde26dad"
+        },
+        "N": {
+          "character_id_hex": "0138",
+          "zero_based_glyph": 311,
+          "advance": 5,
+          "packed_sha256": "5dd28e20f67ddece3a1a746fa9be39f2d0144041405aefec970169761678a11a"
+        },
+        "H": {
+          "character_id_hex": "0132",
+          "zero_based_glyph": 305,
+          "advance": 5,
+          "packed_sha256": "673016b317108d370a5d9b21461d47e6143427d1bcf88cce1c9170c08551cdbb"
+        },
+        "P": {
+          "character_id_hex": "013A",
+          "zero_based_glyph": 313,
+          "advance": 5,
+          "packed_sha256": "e9ed6afb12990ff2668e1d211d3ae810d0e6315f689057b6ced1382c680c19d7"
+        },
+        "Õ": {
+          "character_id_hex": "0174",
+          "zero_based_glyph": 371,
+          "advance": 5,
+          "packed_sha256": "620f11715fe6d8891b4449fd21ff1a2b21b8ece1c49bc7cdca2506d7e7b0d9e7"
+        },
+        "K": {
+          "character_id_hex": "0135",
+          "zero_based_glyph": 308,
+          "advance": 5,
+          "packed_sha256": "4f3101c858a6bf4fe47d126c94575787bd068bac1fe42316d1a6ca7482fa7dc5"
+        },
+        "É": {
+          "character_id_hex": "0168",
+          "zero_based_glyph": 359,
+          "advance": 5,
+          "packed_sha256": "46cce7058cc85a444abf9ecb5d2cd0d62d435c41c5ef83e073f03cd0eeda8e2b"
+        },
+        "r": {
+          "character_id_hex": "0156",
+          "zero_based_glyph": 341,
+          "advance": 5,
+          "packed_sha256": "057f04bd9aee3fac2d5ae9439823e76341cada6a6d3466076f64599dbb9bde0b"
+        },
+        "e": {
+          "character_id_hex": "0149",
+          "zero_based_glyph": 328,
+          "advance": 5,
+          "packed_sha256": "bf62f582ab0e011116a9677960a845d4e83cdac6664d5bbab4f0aa7f513eb050"
+        },
+        "g": {
+          "character_id_hex": "014B",
+          "zero_based_glyph": 330,
+          "advance": 5,
+          "packed_sha256": "2f21f9ff5d2aab45580b534ab55386fcb17434a038b928a6ab93e995969d102f"
+        },
+        "i": {
+          "character_id_hex": "014D",
+          "zero_based_glyph": 332,
+          "advance": 2,
+          "packed_sha256": "1be0a22e2d8a3f0fcb30b6caf1d9fb75bd9d52462c1b858816e0954e29650679"
+        },
+        "ã": {
+          "character_id_hex": "0182",
+          "zero_based_glyph": 385,
+          "advance": 5,
+          "packed_sha256": "6cf2ffa92c334e2012e307fc175ccc3b3d88245daf35e6acce27630ee0377c89"
+        },
+        "o": {
+          "character_id_hex": "0153",
+          "zero_based_glyph": 338,
+          "advance": 5,
+          "packed_sha256": "d99a338ab99059b58cfccb0c2bede5c17e3772aa299ff75c80bd3784bea30725"
+        },
+        "n": {
+          "character_id_hex": "0152",
+          "zero_based_glyph": 337,
+          "advance": 5,
+          "packed_sha256": "a338f8dfdfde22cf0f182d4099f0ce71cc093827068ce2c482960e74c197e828"
+        },
+        "í": {
+          "character_id_hex": "018C",
+          "zero_based_glyph": 395,
+          "advance": 3,
+          "packed_sha256": "a3615a4301bd506cbd1e5d1f8162a0da5f898e6ac6c798d616a61e3facf49234"
+        },
+        "c": {
+          "character_id_hex": "0147",
+          "zero_based_glyph": 326,
+          "advance": 5,
+          "packed_sha256": "ff6e60e330dba529e00855abf73fc51f4cd0b65dad71a913845aea272db639cb"
+        },
+        "I": {
+          "character_id_hex": "0133",
+          "zero_based_glyph": 306,
+          "advance": 4,
+          "packed_sha256": "9b535dbaf5d5dc7aa558020e229fedd48ef2891e4aefa44223f23fb5007df6aa"
+        },
+        "l": {
+          "character_id_hex": "0150",
+          "zero_based_glyph": 335,
+          "advance": 3,
+          "packed_sha256": "77738bdd6ff09597ca18662fe76f0fede0f643db96a2ad4d737652d81487cf58"
+        },
+        "À": {
+          "character_id_hex": "015F",
+          "zero_based_glyph": 350,
+          "advance": 5,
+          "packed_sha256": "a9e479dc9d046a1467e208871d05d7b43415d892a49c280e669ea68b6b31878e"
+        },
+        "Á": {
+          "character_id_hex": "0160",
+          "zero_based_glyph": 351,
+          "advance": 5,
+          "packed_sha256": "6570295efa4600483c9474085904fef85fc019feedfca87c38b799b392bc73ed"
+        },
+        "Â": {
+          "character_id_hex": "0161",
+          "zero_based_glyph": 352,
+          "advance": 5,
+          "packed_sha256": "9baf9bd23bcb8af4a1c8927698d4e6d8525b6e19a749d3ed15cc7e126c947986"
+        },
+        "Ä": {
+          "character_id_hex": "0163",
+          "zero_based_glyph": 354,
+          "advance": 5,
+          "packed_sha256": "a3b2b88932f6164ffafdb0b93858afedc6ff11d4d0dbf96ee77fce75d5cda026"
+        },
+        "C": {
+          "character_id_hex": "012D",
+          "zero_based_glyph": 300,
+          "advance": 5,
+          "packed_sha256": "00303219bdd0a35fe049869c2e4c1b1b1356b18eb2b40d6edf901a981e8bbe0e"
+        },
+        "È": {
+          "character_id_hex": "0167",
+          "zero_based_glyph": 358,
+          "advance": 5,
+          "packed_sha256": "4e751d4b8868e8aaf7ad2c83583c60b7d65868f4d7da3892856c96610d0d2a90"
+        },
+        "õ": {
+          "character_id_hex": "0194",
+          "zero_based_glyph": 403,
+          "advance": 5,
+          "packed_sha256": "eb4bc48a598740a32ab27a41caa4a4e31977c1664618be24ae95132802dcb1ce"
+        }
+      }
+    }
+  ],
+  "status": "original packed font metrics; not converted or visually validated",
+  "mapping": "IDs from charmap, glyph index = ID - 1; variable advances per font"
+}
